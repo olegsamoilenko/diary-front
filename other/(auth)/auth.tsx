@@ -95,7 +95,7 @@ const getStyles = (colors: ColorTheme) =>
       alignItems: "center",
       backgroundColor: "#f2f3f7",
     },
-    tabActive: { backgroundColor: colors.main },
+    tabActive: { backgroundColor: colors.primary },
     tabText: { fontSize: 16, color: "#666" },
     tabTextActive: { color: "#fff", fontWeight: "600" },
   });

@@ -1,36 +1,33 @@
 import {
   StyleSheet,
   View,
-  Text,
-  Pressable,
   ActivityIndicator,
+  Platform,
+  StatusBar,
 } from "react-native";
 
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Colors } from "@/constants/Colors";
-import { Theme } from "@/constants/Theme";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useEffect, useRef, useState } from "react";
 import AddButton from "@/components/ui/AddButton";
 import { SideSheetRef } from "@/components/SideSheet";
-import AddNewEntry from "@/components/diary/AddNewEntry";
+import AddNewEntry from "@/components/diary/add-new-entry/AddNewEntry";
 import { apiRequest } from "@/utils";
-import { Entry } from "@/types";
-import { MoodEmoji } from "@/constants/Mood";
+import { Entry, MoodByDate } from "@/types";
 import WeekView from "@/components/diary/calendar/WeekView";
 import MonthView from "@/components/diary/calendar/MonthView";
 import Animated from "react-native-reanimated";
-import { useAppSelector } from "@/store/hooks";
-import { AILoader } from "@/components/ui/AILoader";
-import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "@/utils/store/secureStore";
 import { useTranslation } from "react-i18next";
+import EntryCard from "@/components/diary/EntryCard";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { Portal } from "@gorhom/portal";
+import ViewReachEditor from "@/components/diary/ViewReachEditor";
 
 export default function Diary() {
   const { t } = useTranslation();
-  const aiModel = useAppSelector((state) => state.settings.aiModel);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const addNewEntryRef = useRef<SideSheetRef>(null);
@@ -43,51 +40,34 @@ export default function Diary() {
   const [diaryEntries, setDiaryEntries] = useState<Record<string, Entry[]>>({});
   const [month, setMonth] = useState<number | null>(new Date().getMonth() + 1);
   const [year, setYear] = useState<number | null>(new Date().getFullYear());
-  const [moodByDate, setMoodByDate] = useState<Record<string, string>>({});
-  const [moodByDateBeforeConvert, setMoodByDateBeforeConvert] = useState<
-    { date: string; mood: number; length: number }[]
-  >([]);
+  const [moodsByDate, setMoodsByDate] = useState<Record<string, MoodByDate[]>>(
+    {},
+  );
   const [showWeek, setShowWeek] = useState(false);
   const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
 
   const offsetMinutes = new Date().getTimezoneOffset() * -1;
-
-  const emojiByValue: Record<number, string> = Object.fromEntries(
-    MoodEmoji.map(({ value, label }) => [value, label]),
-  );
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const scrollRef = useRef<Animated.ScrollView>(null);
   const [loading, setLoading] = useState(true);
   const [justAddedTodayEntry, setJustAddedTodayEntry] = useState(false);
-  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isAddNewEntryOpen, setIsAddNewEntryOpen] = useState(false);
 
-  function moodsArrayToDict(
-    moods: { date: string; mood: number; length: number }[],
-  ): Record<string, string> {
-    return moods.reduce(
-      (acc, { date, mood, length }) => {
-        acc[date] = emojiByValue[Math.round(mood / length)] ?? "🙂";
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-  }
-
-  const toggleExpand = (id: number) => {
-    setExpanded((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+  const handleNewEntryOpen = () => {
+    setIsAddNewEntryOpen(true);
+    addNewEntryRef.current?.open();
   };
 
-  const fetchDiaryEntries = async () => {
+  const fetchDiaryEntries = async (back = false) => {
     if (justAddedTodayEntry) return;
 
     const user = await SecureStore.getItemAsync("user");
 
     if (!user) return;
 
-    setLoading(true);
+    if (!back) {
+      setLoading(true);
+    }
 
     try {
       const response = await apiRequest({
@@ -113,88 +93,15 @@ export default function Diary() {
     }
   };
 
-  const generateAiContent = async (
-    entryId: number,
-    content: string,
-    embedding: number[],
-    aiModel: string,
-    mood: number,
-  ) => {
-    setExpanded({});
-    setIsAiLoading(true);
-    setExpanded((prev) => ({
-      ...prev,
-      [entryId]: true,
-    }));
-    try {
-      const response = await apiRequest({
-        url: "/ai/generate-comment",
-        method: "POST",
-        data: {
-          entryId,
-          data: {
-            content,
-            embedding,
-            aiModel,
-            mood,
-          },
-        },
-      });
+  const handleBack = async (back: boolean) => {
+    if (back) {
+      await fetchDiaryEntries(back);
+      await fetchMoodsByDate();
 
-      setDiaryEntries((prev) => ({
-        ...prev,
-        [new Date().toISOString().split("T")[0] as string]:
-          prev[new Date().toISOString().split("T")[0] as string]?.map(
-            (entry) => {
-              if (Number(entry.id) === entryId) {
-                return { ...entry, aiComment: response.data };
-              }
-              return entry;
-            },
-          ) || [],
-      }));
-
-      setIsAiLoading(false);
-    } catch (error) {
-      console.error("Error generating AI content:", error);
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }, 0);
     }
-  };
-
-  const handleAfterAddEntry = async (newEntry: Entry) => {
-    const todayStr = new Date().toISOString().split("T")[0];
-    setSelectedDay(todayStr);
-    setDiaryEntries((prev) => ({
-      ...prev,
-      [todayStr]: [...(prev[todayStr] ?? []), newEntry],
-    }));
-    setMoodByDateBeforeConvert((prev) => {
-      const idx = prev.findIndex((p) => p.date === todayStr);
-
-      if (idx !== -1) {
-        const obj = prev[idx];
-        const newLength = (obj.length ?? 1) + 1;
-        const newMood = obj.mood + newEntry.mood;
-
-        return [
-          ...prev.slice(0, idx),
-          { ...obj, mood: Math.round(newMood), length: newLength },
-          ...prev.slice(idx + 1),
-        ];
-      } else {
-        return [...prev, { date: todayStr, mood: newEntry.mood, length: 1 }];
-      }
-    });
-
-    setWeekAnchorDay(todayStr);
-    setJustAddedTodayEntry(true);
-    setShowWeek(true);
-    await generateAiContent(
-      Number(newEntry.id),
-      newEntry.content,
-      newEntry.embedding,
-      aiModel,
-      newEntry.mood,
-    );
   };
 
   useEffect(() => {
@@ -212,48 +119,50 @@ export default function Diary() {
     }
   }, [justAddedTodayEntry]);
 
+  const fetchMoodsByDate = async () => {
+    const user = await SecureStore.getItemAsync("user");
+
+    if (!user) return;
+    try {
+      const response = await apiRequest({
+        url: "/diary-entries/get-moods-by-date",
+        method: "POST",
+        data: {
+          month,
+          year,
+          offsetMinutes,
+        },
+      });
+
+      setMoodsByDate(response.data);
+    } catch (error) {
+      console.error("Error fetching moods by date:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchMoodsByDate = async () => {
-      const user = await SecureStore.getItemAsync("user");
-
-      if (!user) return;
-      try {
-        const response = await apiRequest({
-          url: "/diary-entries/get-moods-by-date",
-          method: "POST",
-          data: {
-            month,
-            year,
-            offsetMinutes,
-          },
-        });
-
-        setMoodByDateBeforeConvert(response.data);
-      } catch (error) {
-        console.error("Error fetching moods by date:", error);
-      }
-    };
-
     fetchMoodsByDate();
   }, [month, year, offsetMinutes]);
 
-  useEffect(() => {
-    setMoodByDate(moodsArrayToDict(moodByDateBeforeConvert));
-  }, [moodByDateBeforeConvert]);
+  const tabBarHeight = useBottomTabBarHeight();
+
+  // useEffect(() => {
+  //   setMoodsByDate(moodsArrayToDict(moodsByDateBeforeConvert));
+  // }, [moodsByDateBeforeConvert]);
 
   return (
-    <SafeAreaView
+    <View
       style={{
         flex: 1,
-        backgroundColor: colors.statusBarBg,
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+        backgroundColor: colors.background,
       }}
-      edges={["top"]}
     >
       {loading ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
-          <ActivityIndicator size="large" color={colors.main} />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
         <>
@@ -265,7 +174,7 @@ export default function Diary() {
                 setWeekAnchorDay(dayStr);
                 setShowWeek(true);
               }}
-              moodByDate={moodByDate}
+              moodsByDate={moodsByDate}
               setMonth={setMonth}
               setYear={setYear}
               setShowWeek={setShowWeek}
@@ -276,149 +185,33 @@ export default function Diary() {
               setWeekAnchorDay={setWeekAnchorDay}
               selectedDay={selectedDay}
               setSelectedDay={setSelectedDay}
-              moodByDate={moodByDate}
+              moodsByDate={moodsByDate}
               setMonth={setMonth}
               setYear={setYear}
               onBackToMonth={() => setShowWeek(false)}
             />
           )}
           <ParallaxScrollView scrollRef={scrollRef}>
-            <ThemedView style={{ flex: 1 }}>
+            <View style={{ flex: 1 }}>
               {(diaryEntries[selectedDay as string] &&
                 diaryEntries[selectedDay as string].length > 0 &&
                 diaryEntries[selectedDay as string].map((entry: Entry) => (
-                  <ThemedView
-                    key={entry.id}
-                    style={{
-                      backgroundColor: colors.entryBackground,
-                      padding: 8,
-                      borderRadius: 8,
-                      marginBottom: 8,
-                    }}
-                  >
-                    <ThemedView
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "flex-start",
-                        justifyContent: "space-between",
-                        backgroundColor: colors.entryBackground,
-                      }}
-                    >
-                      <ThemedView
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "flex-start",
-                          flex: 1,
-                          backgroundColor: colors.entryBackground,
-                          marginBottom: 8,
-                        }}
-                      >
-                        {MoodEmoji.find(
-                          (mood) => mood.value === entry.mood,
-                        ) && (
-                          <ThemedView
-                            style={{
-                              justifyContent: "flex-start",
-                              flexDirection: "row",
-                              alignItems: "flex-start",
-                            }}
-                          >
-                            <ThemedText
-                              style={{
-                                fontSize: 22,
-                                marginRight: 8,
-                              }}
-                            >
-                              {MoodEmoji.find(
-                                (mood) => mood.value === entry.mood,
-                              )?.label ?? ""}
-                            </ThemedText>
-                          </ThemedView>
-                        )}
-
-                        <ThemedText type="subtitle">{entry.title}</ThemedText>
-                      </ThemedView>
-
-                      <ThemedView
-                        style={{
-                          justifyContent: "flex-start",
-                          flexDirection: "row",
-                          alignItems: "flex-start",
-                        }}
-                      >
-                        <ThemedText
-                          type="default"
-                          style={{
-                            marginLeft: 8,
-                            fontSize: Theme.fontSizes.small,
-                            color: colors.text,
-                          }}
-                        >
-                          {new Date(entry.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </ThemedText>
-                      </ThemedView>
-                    </ThemedView>
-
-                    <Pressable
-                      key={entry.id}
-                      onPress={() => toggleExpand(Number(entry.id))}
-                    >
-                      <ThemedView
-                        style={{
-                          backgroundColor: colors.diaryNotesBackground,
-                          borderRadius: 4,
-                          padding: 8,
-                          marginBottom: 8,
-                          elevation: 6,
-                        }}
-                      >
-                        <ThemedText
-                          numberOfLines={
-                            expanded[Number(entry.id)] ? undefined : 3
-                          }
-                        >
-                          {entry.content}
-                        </ThemedText>
-                      </ThemedView>
-                      {expanded[Number(entry.id)] && entry.aiComment && (
-                        <ThemedView
-                          style={{
-                            backgroundColor: colors.aiCommentBackground,
-                            borderRadius: 18,
-                            paddingLeft: 4,
-                            width: "80%",
-                            elevation: 6,
-                          }}
-                        >
-                          {isAiLoading ? (
-                            <AILoader />
-                          ) : (
-                            <ThemedText style={{ marginTop: 6 }}>
-                              {entry.aiComment?.content}
-                            </ThemedText>
-                          )}
-                        </ThemedView>
-                      )}
-                    </Pressable>
-                  </ThemedView>
+                  <EntryCard entry={entry} key={entry.id} />
                 ))) || <ThemedText>{t("diary.noRecords")}</ThemedText>}
-            </ThemedView>
+            </View>
           </ParallaxScrollView>
-          <AddButton
-            onPress={() => {
-              addNewEntryRef.current?.open();
-            }}
-          />
-          <AddNewEntry
-            ref={addNewEntryRef}
-            onSuccess={(entry) => handleAfterAddEntry(entry)}
-          />
+          <AddButton onPress={handleNewEntryOpen} />
+          <Portal>
+            <AddNewEntry
+              ref={addNewEntryRef}
+              isOpen={isAddNewEntryOpen}
+              handleBack={(back) => handleBack(back)}
+              tabBarHeight={tabBarHeight}
+            />
+          </Portal>
         </>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 

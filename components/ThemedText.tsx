@@ -1,60 +1,117 @@
 import { StyleSheet, Text, type TextProps } from "react-native";
-
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { ColorTheme } from "@/types";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { getFont } from "@/utils";
 
 export type ThemedTextProps = TextProps & {
-  lightColor?: string;
-  darkColor?: string;
-  type?: "default" | "title" | "defaultSemiBold" | "subtitle" | "link";
+  type?:
+    | "titleXL"
+    | "titleLG"
+    | "subtitleXL"
+    | "subtitleLG"
+    | "extraSmall"
+    | "small"
+    | "default"
+    | "extraSmallLink"
+    | "smallLink"
+    | "link";
+  onLinesCount?: (number: number) => void;
 };
 
 export function ThemedText({
   style,
-  lightColor,
-  darkColor,
   type = "default",
+  onLinesCount,
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  const font = useSelector((state: RootState) => state.font.font);
+  const styles = getStyles(colors, font);
 
   return (
     <Text
       style={[
-        { color },
+        type === "titleXL" ? styles.titleXL : undefined,
+        type === "titleLG" ? styles.titleLG : undefined,
+        type === "subtitleXL" ? styles.subtitleXL : undefined,
+        type === "subtitleLG" ? styles.subtitleLG : undefined,
+        type === "extraSmall" ? styles.extraSmall : undefined,
+        type === "small" ? styles.small : undefined,
         type === "default" ? styles.default : undefined,
-        type === "title" ? styles.title : undefined,
-        type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
-        type === "subtitle" ? styles.subtitle : undefined,
+        type === "extraSmallLink" ? styles.extraSmallLink : undefined,
+        type === "smallLink" ? styles.smallLink : undefined,
         type === "link" ? styles.link : undefined,
+        { color: colors.text },
         style,
       ]}
       {...rest}
+      onTextLayout={(e) => {
+        const lines = e.nativeEvent.lines.length;
+        if (onLinesCount) onLinesCount(lines);
+      }}
     />
   );
 }
 
-const styles = StyleSheet.create({
-  default: {
-    fontSize: 16,
-    lineHeight: 24,
-  },
-  defaultSemiBold: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: "600",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    lineHeight: 32,
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  link: {
-    lineHeight: 30,
-    fontSize: 16,
-    color: "#0a7ea4",
-  },
-});
+const getStyles = (
+  colors: ColorTheme,
+  font: { title: string; name: string },
+) => {
+  return StyleSheet.create({
+    titleXL: {
+      fontSize: 24,
+      fontFamily: getFont(font.name, "bold"),
+      lineHeight: 32,
+    },
+    titleLG: {
+      fontSize: 22,
+      fontFamily: getFont(font.name, "bold"),
+      lineHeight: 28,
+    },
+    subtitleXL: {
+      fontSize: 20,
+      fontFamily: getFont(font.name, "bold"),
+      lineHeight: 26,
+    },
+    subtitleLG: {
+      fontSize: 18,
+      fontFamily: getFont(font.name, "bold"),
+      lineHeight: 24,
+    },
+    extraSmall: {
+      fontSize: 12,
+      fontFamily: getFont(font.name, "regular"),
+      lineHeight: 16,
+    },
+    small: {
+      fontSize: 14,
+      fontFamily: getFont(font.name, "regular"),
+      lineHeight: 18,
+    },
+    default: {
+      fontSize: 16,
+      fontFamily: getFont(font.name, "regular"),
+      lineHeight: 24,
+    },
+    extraSmallLink: {
+      fontFamily: getFont(font.name, "regular"),
+      lineHeight: 16,
+
+      fontSize: 12,
+    },
+    smallLink: {
+      fontFamily: getFont(font.name, "regular"),
+      lineHeight: 18,
+      fontSize: 14,
+    },
+    link: {
+      fontFamily: getFont(font.name, "regular"),
+      lineHeight: 30,
+      fontSize: 16,
+    },
+  });
+};

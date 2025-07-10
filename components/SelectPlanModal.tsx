@@ -65,7 +65,7 @@ const getStyles = (colors: ColorTheme) =>
     },
     container: {
       width: "90%",
-      backgroundColor: colors.secondBackground,
+      backgroundColor: colors.secondaryBackground,
       borderRadius: 18,
       padding: 20,
       elevation: 10,
@@ -91,7 +91,7 @@ const getStyles = (colors: ColorTheme) =>
       marginBottom: 4,
       color: colors.text,
     },
-    desc: { fontSize: 14, color: colors.secondText, marginBottom: 4 },
+    desc: { fontSize: 14, color: colors.secondaryText, marginBottom: 4 },
     price: {
       fontSize: 16,
       fontWeight: "500",

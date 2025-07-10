@@ -1,7 +1,0 @@
-import { apiRequest } from "./api/apiRequest";
-import { addDays } from "./diary/addDays";
-import { getMonthYearStr } from "./diary/getMonthYearStr";
-import { getWeekdayLabels } from "./diary/getWeekdayLabels";
-import { getNumbersMonthAndYear } from "./diary/getNumbersMonthAndYear";
-
-export { apiRequest, getWeekdayLabels, addDays, getMonthYearStr, getNumbersMonthAndYear };

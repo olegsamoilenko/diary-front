@@ -1,12 +1,24 @@
 import { AiComment } from "./ai";
+import { ImageSourcePropType } from "react-native";
+import { Dialog } from "@/types/dialog";
 
 export type Entry = {
   id: string;
   title: string;
-  content: "file" | "directory";
+  content: string;
+  previewContent?: string;
   aiComment: AiComment;
-  mood: number;
+  mood: string;
   embedding: number[];
+  dialogs?: Dialog[];
+  settings?: {
+    background: {
+      id: number;
+      type: "color" | "image";
+      value?: string;
+      url?: ImageSourcePropType | undefined;
+    };
+  };
   createdAt: Date;
   updatedAt: Date;
 };

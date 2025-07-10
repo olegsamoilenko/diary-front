@@ -1,27 +1,46 @@
 export type ColorTheme = {
-  main: string;
-  text: string;
-  secondText: string;
+  // General
   background: string;
-  secondBackground: string;
+  backgroundAdditional: string;
+  card: string;
+  secondaryBackground: string;
+  additionalBackground: string;
+  primary: string;
+  secondary: string;
+  additional: string;
+  text: string;
+  textAdditional: string;
+  textInPrimary: string;
+  secondaryText: string;
+  additionalText: string;
+  link: string;
   border: string;
+  calendarEnableDayBorder: string;
+  calendarDisableDayBorder: string;
   error: string;
-  tint: string;
+  // icon
   icon: string;
+  tabIcon: string;
   tabIconDefault: string;
   tabIconSelected: string;
-  statusBarBg: string;
+  // input
+  inputBackground: string;
+  inputBorder: string;
+  // radio
   radioBackground: string;
   radioBorder: string;
   radioSelectedBorder: string;
   radioSelectedBackground: string;
   radioSelectedDot: string;
-  inputBackground: string;
-  inputBorder: string;
+  // plans Modal
+  tariff: string;
+  tokens: string;
+  // settings
+  settingsBlockBackground: string;
+  // diary
   diaryNotesBackground: string;
   aiCommentBackground: string;
   entryBackground: string;
+  // calendar
   calendarBackground: string;
-  tariff: string;
-  tokens: string;
 };

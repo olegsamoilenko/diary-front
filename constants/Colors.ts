@@ -1,77 +1,173 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+import type { ColorTheme } from "@/types";
+const Base = {
+  light: {
+    background: "#",
+    backgroundAdditional: "#",
+    card: "#",
+    primary: "#",
+    secondary: "#",
+    text: "#",
+    textAdditional: "#",
+    textInPrimary: "",
+    link: "#0000ff",
+    border: "#",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#",
+    calendarDisableDayBorder: "#",
+    error: "#B9130F",
+    tabIcon: "#",
+    tabIconSelected: "#",
+    inputBackground: "#",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#",
+  },
+};
 
 const tintColorLight = "#344360";
 const tintColorDark = "#fff";
+const primaryColorDark = "#344360";
 
-export const Colors = {
+export const Colors: Record<string, ColorTheme> = {
   light: {
-    main: "#344360",
+    // General
+    background: "#FFFFFF",
+    backgroundAdditional: "#babfc8",
+    card: "#FFFFFF",
+    primary: "#344360",
+    secondary: "",
     text: "#2E3A59",
-    secondText: "#687076",
-    background: "#F7F8FA",
-    secondBackground: "#F7F8FA",
+    textAdditional: "#687076",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
     border: "#E0E0E0",
+    calendarEnableDayBorder: "#bfbdbd",
+    calendarDisableDayBorder: "#f4f4f4",
     error: "#B9130F",
-    tint: tintColorLight,
-    icon: "#687076",
-    tabIconDefault: "#687076",
+    // icon
+    tabIcon: "#687076",
     tabIconSelected: tintColorLight,
-    statusBarBg: "#F7F8FA",
-    // radio
-    radioBackground: "#fff",
-    radioBorder: "#aaa",
-    radioSelectedBorder: "#0284c7",
-    radioSelectedBackground: "#eee",
-    radioSelectedDot: "#0284c7",
     // input
     inputBackground: "#ffffff",
-    inputBorder: "#e6e4e4",
     // diary
     diaryNotesBackground: "#EFE7DA",
     aiCommentBackground: "#ECECEC",
-    entryBackground: "#F7F8FA",
-    // calendar
-    calendarBackground: "#F7F8FA",
+  },
 
-    // plans Modal
-    tariff: "#536c9c",
-    tokens: "#F7F8FA",
+  lightModern: {
+    background: "#F9F6F2",
+    backgroundAdditional: "#EFE7E3",
+    card: "#FFFFFF",
+    primary: "#FFAB91",
+    secondary: "#F5E3E0",
+    text: "#303336",
+    textAdditional: "#AD9B8E",
+    textInPrimary: "#FFFFFF",
+    link: "#FF5722",
+    border: "#E1D3CA",
+    calendarEnableDayBorder: "#FFAB91",
+    calendarDisableDayBorder: "#F3DDD8",
+    error: "#F07167",
+    tabIcon: "#E7BFA9",
+    tabIconSelected: "#FFAB91",
+    inputBackground: "#F5EDEB",
+    diaryNotesBackground: "#FFF7F0",
+    aiCommentBackground: "#F9E1DA",
+  },
+
+  chocolateBrownie: {
+    background: "#d8cbb8",
+    backgroundAdditional: "#b19f84",
+    card: "#fff",
+    primary: "#523634",
+    secondary: "#523634",
+    text: "#242833",
+    textAdditional: "#687076",
+    textInPrimary: "#FFFFFF",
+    link: "#2D7FF9",
+    border: "#E5EAF0",
+    calendarEnableDayBorder: "#8e6f6d",
+    calendarDisableDayBorder: "#a39494",
+    error: "#FF5151",
+    tabIcon: "#717375",
+    tabIconSelected: "#2D7FF9",
+    inputBackground: "#F1F4F8",
+    diaryNotesBackground: "#ede6dc",
+    aiCommentBackground: "#F7F9FB",
   },
 
   dark: {
-    main: "#344360",
-    text: "#ECEDEE",
-    secondText: "#9BA1A6",
+    // General
     background: "#151718",
-    secondBackground: "#222627",
+    backgroundAdditional: "#282c2e",
+    card: "#151718",
+    primary: "#344360",
+    secondary: "",
+    text: "#ECEDEE",
+    textAdditional: "#a5a5a6",
+    textInPrimary: "#FFFFFF",
+    link: "#",
     border: "#2A2D2F",
+    calendarEnableDayBorder: "#5b6165",
+    calendarDisableDayBorder: "#1e2022",
     error: "#B9130F",
-    tint: tintColorDark,
-    icon: "#9BA1A6",
-    tabIconDefault: "#9BA1A6",
+    // icon
+    tabIcon: "#9BA1A6",
     tabIconSelected: tintColorDark,
-    statusBarBg: "#121212",
-    // radio
-    radioBackground: "#151718",
-    radioBorder: "#9BA1A6",
-    radioSelectedBorder: "#fff",
-    radioSelectedBackground: "#151718",
-    radioSelectedDot: "#fff",
     // input
     inputBackground: "#000000",
-    inputBorder: "#64676a",
     // diary
     diaryNotesBackground: "#4b5255",
     aiCommentBackground: "",
-    entryBackground: "#353a3c",
-    // calendar
-    calendarBackground: "#151718",
+  },
 
-    // plans Modal
-    tariff: "#536c9c",
-    tokens: "#F7F8FA",
+  dark2: {
+    // General
+    background: "#151718",
+    backgroundAdditional: "#282c2e",
+    card: "#151718",
+    primary: "#344360",
+    secondary: "",
+    text: "#ECEDEE",
+    textAdditional: "#a5a5a6",
+    textInPrimary: "#FFFFFF",
+    link: "#",
+    border: "#2A2D2F",
+    calendarEnableDayBorder: "#5b6165",
+    calendarDisableDayBorder: "#1e2022",
+    error: "#B9130F",
+    // icon
+    tabIcon: "#9BA1A6",
+    tabIconSelected: tintColorDark,
+    // input
+    inputBackground: "#000000",
+    // diary
+    diaryNotesBackground: "#4b5255",
+    aiCommentBackground: "",
+  },
+
+  dark3: {
+    // General
+    background: "#151718",
+    backgroundAdditional: "#282c2e",
+    card: "#151718",
+    primary: "#344360",
+    secondary: "",
+    text: "#ECEDEE",
+    textAdditional: "#a5a5a6",
+    textInPrimary: "#FFFFFF",
+    link: "#",
+    border: "#2A2D2F",
+    calendarEnableDayBorder: "#5b6165",
+    calendarDisableDayBorder: "#1e2022",
+    error: "#B9130F",
+    // icon
+    tabIcon: "#9BA1A6",
+    tabIconSelected: tintColorDark,
+    // input
+    inputBackground: "#000000",
+    // diary
+    diaryNotesBackground: "#4b5255",
+    aiCommentBackground: "",
   },
 };

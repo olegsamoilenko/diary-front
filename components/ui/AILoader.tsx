@@ -31,7 +31,7 @@ export const AILoader = () => {
       <MaterialCommunityIcons
         name="robot"
         size={22}
-        color={Colors[colorScheme].main}
+        color={Colors[colorScheme].primary}
         style={{ marginRight: 8 }}
       />
       <Text style={[styles.text, { color: Colors[colorScheme].text }]}>

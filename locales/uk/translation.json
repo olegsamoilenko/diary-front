@@ -4,18 +4,47 @@
     "addEntryTitle": "Заголовок",
     "addEntryContent": "Текст...",
     "addEntryButton": "Зберегти",
-    "noRecords": "Немає записів за цей день"
+    "noRecords": "Немає записів за цей день",
+    "entry": {
+      "settings": {
+        "background": "Фон",
+        "color": "Кольори",
+        "size": "Розмір",
+        "font": "Шрифт",
+        "emoji": "Емодзі",
+        "List": "Список",
+        "Image": "Зображення",
+        "photo": "Фото",
+        "tag": "Тег"
+      }
+    }
   },
   "chat": {
     "title": "Чат"
   },
   "settings": {
     "title": "Налаштування",
+    "common": {
+      "timeFormat": "Формат часу",
+      "activeHours": "Час активності"
+    },
+    "personal": "Особисті налаштування",
     "theme": {
-      "system": "Системна",
-      "light": "Світла",
-      "dark": "Темна",
-      "title": "Тема"
+      "title": "Теми",
+      "themes": {
+        "light": "Світла",
+        "chocolateBrownie": "Шоколадний брауні",
+        "dark": "Темна"
+      }
+    },
+    "font": {
+      "title": "Шрифти"
+    },
+    "timeFormat": {
+      "title": "Формат часу",
+      "12": "12-годинний формат",
+      "24": "24-годинний формат",
+      "h": "- годин"
     },
     "languages": {
       "title": "Мова",
@@ -45,5 +74,9 @@
     "pro": {
       "description": "Максимальний тариф"
     }
+  },
+  "toolTips": {
+    "title": "Tips",
+    "howAreYouFeeling": "Як ти себе почуваєш?"
   }
 }

@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactElement } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { useAnimatedRef } from "react-native-reanimated";
 
 import { ThemedView } from "@/components/ThemedView";
@@ -7,30 +7,36 @@ import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
 
 const HEADER_HEIGHT = 250;
 
-type Props = PropsWithChildren<{ isPadding?: boolean; scrollRef?: any }>;
+type Props = PropsWithChildren<{
+  isPadding?: boolean;
+  scrollRef?: any;
+  style?: any;
+}>;
 
 export default function ParallaxScrollView({
   children,
   isPadding = true,
   scrollRef,
-}: Props) {
+  style = {},
+}: Props): ReactElement {
   const localScrollRef = useAnimatedRef<Animated.ScrollView>();
   const refToUse = scrollRef || localScrollRef;
   const bottom = useBottomTabOverflow();
 
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
       <Animated.ScrollView
         ref={refToUse}
         scrollEventThrottle={16}
         scrollIndicatorInsets={{ bottom }}
         contentContainerStyle={[{ paddingBottom: bottom, flexGrow: 1 }]}
+        keyboardShouldPersistTaps="always"
       >
-        <ThemedView style={[styles.content, { padding: isPadding ? 20 : 0 }]}>
+        <View style={[styles.content, { padding: isPadding ? 20 : 0 }, style]}>
           {children}
-        </ThemedView>
+        </View>
       </Animated.ScrollView>
-    </ThemedView>
+    </View>
   );
 }
 
@@ -44,7 +50,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
     gap: 16,
     overflow: "hidden",
   },

@@ -4,18 +4,46 @@
     "addEntryTitle": "Title",
     "addEntryContent": "Content...",
     "addEntryButton": "Save",
-    "noRecords": "There are no records for this day"
+    "noRecords": "There are no records for this day",
+    "entry": {
+      "settings": {
+        "background": "Background",
+        "color": "Colors",
+        "size": "Text size",
+        "font": "Text font",
+        "emoji": "Emoji",
+        "List": "List",
+        "Image": "Image",
+        "photo": "Photo",
+        "tag": "Tag"
+      }
+    }
   },
   "chat": {
     "title": "Chat"
   },
   "settings": {
     "title": "Settings",
+    "common": {
+      "activeHours": "Active Hours"
+    },
+    "personal": "Personal settings",
     "theme": {
-      "system": "System",
-      "light": "Light",
-      "dark": "Dark",
-      "title": "Theme"
+      "title": "Themes",
+      "themes": {
+        "light": "Light",
+        "chocolateBrownie": "Chocolate Brownie",
+        "dark": "Dark"
+      }
+    },
+    "font": {
+      "title": "Fonts"
+    },
+    "timeFormat": {
+      "title": "Time Format",
+      "12": "12-hour format",
+      "24": "24-hour format",
+      "h": "- hours"
     },
     "languages": {
       "title": "Language",
@@ -45,5 +73,9 @@
     "pro": {
         "description": "Maximum tariff"
     }
+  },
+  "toolTips": {
+    "title": "Tips",
+    "howAreYouFeeling": "How are you feeling?"
   }
 }

@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, Text } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
@@ -9,30 +9,48 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useTranslation } from "react-i18next";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { getFont } from "@/utils/common/getFont";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { t } = useTranslation();
+  const font = useSelector((state: RootState) => state.font.font);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].primary,
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIcon,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            position: "absolute",
-          },
-          default: {},
-        }),
+        tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? "light"].background,
+          ...Platform.select({
+            ios: { position: "absolute" },
+            default: {},
+          }),
+        },
       }}
     >
       <Tabs.Screen
         name="diary"
         options={{
-          title: t("diary.title"),
+          tabBarLabel: ({ color }) => {
+            return (
+              <Text
+                style={{
+                  fontFamily: getFont(font.name, "regular"),
+                  color,
+                  fontSize: 13,
+                }}
+              >
+                {t("diary.title")}
+              </Text>
+            );
+          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="notebook-outline"
@@ -45,7 +63,19 @@ export default function TabLayout() {
       <Tabs.Screen
         name="chat"
         options={{
-          title: t("chat.title"),
+          tabBarLabel: ({ color }) => {
+            return (
+              <Text
+                style={{
+                  fontFamily: getFont(font.name, "regular"),
+                  color,
+                  fontSize: 13,
+                }}
+              >
+                {t("chat.title")}
+              </Text>
+            );
+          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="robot-outline"
@@ -58,7 +88,19 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: t("settings.title"),
+          tabBarLabel: ({ color }) => {
+            return (
+              <Text
+                style={{
+                  fontFamily: getFont(font.name, "regular"),
+                  color,
+                  fontSize: 13,
+                }}
+              >
+                {t("settings.title")}
+              </Text>
+            );
+          },
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="cog-outline"

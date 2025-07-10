@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
-import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "@/utils/store/secureStore";
 import Constants from "expo-constants";
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;

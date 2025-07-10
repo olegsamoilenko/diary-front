@@ -24,7 +24,7 @@ const getStyles = (colors: ColorTheme) =>
       width: 56,
       height: 56,
       borderRadius: 28,
-      backgroundColor: colors.main,
+      backgroundColor: colors.primary,
       alignItems: "center",
       justifyContent: "center",
       elevation: 4,
