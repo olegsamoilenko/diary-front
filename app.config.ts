@@ -13,6 +13,9 @@ export default {
     },
     extra: {
       API_URL: process.env.API_URL,
+      eas: {
+        projectId: "be6994c0-5be5-4005-b6e4-1385174eecc3",
+      },
     },
   },
 };
