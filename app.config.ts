@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-export default {
+export default () => ({
   expo: {
     name: "Nemory",
     slug: "nemory",
@@ -11,6 +11,9 @@ export default {
     ios: {
       jsEngine: "jsc",
     },
+    android: {
+      package: "com.soniac12.nemory",
+    },
     extra: {
       API_URL: process.env.API_URL,
       eas: {
@@ -18,4 +21,4 @@ export default {
       },
     },
   },
-};
+});
