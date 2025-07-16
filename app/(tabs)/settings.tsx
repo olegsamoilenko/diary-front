@@ -1,12 +1,10 @@
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { useTranslation } from "react-i18next";
 import { useThemeCustom } from "@/context/ThemeContext";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import i18n from "i18next";
 import { useRef } from "react";
 import {
   TouchableOpacity,
@@ -26,6 +24,8 @@ import ActivitySwitcher from "@/components/settings/personal/ActivitySwitcher";
 import TimeFormatSwitcher from "@/components/settings/personal/TimeFormatSwitcher";
 import FontSwitcher from "@/components/settings/personal/FontSwitcher";
 import { Portal } from "@gorhom/portal";
+import NemoryLogo from "@/components/ui/logo/NemoryLogo";
+import Background from "@/components/Background";
 
 export default function Settings() {
   const themeSwitcherRef = useRef<SideSheetRef>(null);
@@ -35,21 +35,23 @@ export default function Settings() {
   const fontSwitcherRef = useRef<SideSheetRef>(null);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const { theme } = useThemeCustom();
   const colors = Colors[colorScheme];
 
   const modelSwitcherRef = useRef<SideSheetRef>(null);
   const aiModel = useAppSelector((state) => state.settings.aiModel);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-        backgroundColor: colors.background,
-      }}
-    >
+    <Background background={colors.background} paddingTop={40}>
       <ParallaxScrollView>
+        <View
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <NemoryLogo />
+        </View>
         <ThemedText type="titleXL">{t("settings.title")}</ThemedText>
         <ThemedText type="subtitleXL">{t("settings.personal")}</ThemedText>
         <PersonalSettingsBlock
@@ -99,7 +101,7 @@ export default function Settings() {
         <LanguageSwitcher ref={languageSwitcherRef} />
         <ModelSwitcher ref={modelSwitcherRef} />
       </Portal>
-    </View>
+    </Background>
   );
 }
 

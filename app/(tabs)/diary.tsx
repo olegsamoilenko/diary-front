@@ -24,7 +24,7 @@ import { useTranslation } from "react-i18next";
 import EntryCard from "@/components/diary/EntryCard";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Portal } from "@gorhom/portal";
-import ViewReachEditor from "@/components/diary/ViewReachEditor";
+import Background from "@/components/Background";
 
 export default function Diary() {
   const { t } = useTranslation();
@@ -44,14 +44,13 @@ export default function Diary() {
     {},
   );
   const [showWeek, setShowWeek] = useState(false);
-  const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
 
   const offsetMinutes = new Date().getTimezoneOffset() * -1;
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const scrollRef = useRef<Animated.ScrollView>(null);
   const [loading, setLoading] = useState(true);
-  const [justAddedTodayEntry, setJustAddedTodayEntry] = useState(false);
   const [isAddNewEntryOpen, setIsAddNewEntryOpen] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(false);
 
   const handleNewEntryOpen = () => {
     setIsAddNewEntryOpen(true);
@@ -59,8 +58,6 @@ export default function Diary() {
   };
 
   const fetchDiaryEntries = async (back = false) => {
-    if (justAddedTodayEntry) return;
-
     const user = await SecureStore.getItemAsync("user");
 
     if (!user) return;
@@ -94,8 +91,9 @@ export default function Diary() {
   };
 
   const handleBack = async (back: boolean) => {
+    setForceUpdate(new Date().toISOString().split("T")[0] === selectedDay);
     if (back) {
-      await fetchDiaryEntries(back);
+      setSelectedDay(new Date().toISOString().split("T")[0]);
       await fetchMoodsByDate();
 
       setTimeout(() => {
@@ -105,19 +103,13 @@ export default function Diary() {
   };
 
   useEffect(() => {
-    if (selectedDay && timeZone) {
+    if (selectedDay && timeZone && forceUpdate) {
+      fetchDiaryEntries(true);
+    }
+    if (selectedDay && timeZone && !forceUpdate) {
       fetchDiaryEntries();
     }
-  }, [selectedDay, timeZone]);
-
-  useEffect(() => {
-    if (justAddedTodayEntry) {
-      setTimeout(() => {
-        scrollRef.current?.scrollToEnd({ animated: true });
-        setJustAddedTodayEntry(false);
-      }, 100);
-    }
-  }, [justAddedTodayEntry]);
+  }, [selectedDay, timeZone, forceUpdate]);
 
   const fetchMoodsByDate = async () => {
     const user = await SecureStore.getItemAsync("user");
@@ -146,18 +138,33 @@ export default function Diary() {
 
   const tabBarHeight = useBottomTabBarHeight();
 
-  // useEffect(() => {
-  //   setMoodsByDate(moodsArrayToDict(moodsByDateBeforeConvert));
-  // }, [moodsByDateBeforeConvert]);
+  const deleteEntry = async (id: number) => {
+    try {
+      const response = await apiRequest({
+        url: `/diary-entries/${id}`,
+        method: "DELETE",
+      });
+
+      if (!response || response.status !== 20) {
+        console.log("No data returned from server");
+        return;
+      }
+
+      setDiaryEntries((prev) => {
+        return {
+          ...prev,
+          [selectedDay]: prev[selectedDay]
+            ? prev[selectedDay].filter((entry: Entry) => entry.id !== id)
+            : [],
+        };
+      });
+    } catch (error) {
+      console.error("Error deleting entry:", error);
+    }
+  };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-        backgroundColor: colors.background,
-      }}
-    >
+    <Background background={colors.background} paddingTop={40}>
       {loading ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -196,7 +203,11 @@ export default function Diary() {
               {(diaryEntries[selectedDay as string] &&
                 diaryEntries[selectedDay as string].length > 0 &&
                 diaryEntries[selectedDay as string].map((entry: Entry) => (
-                  <EntryCard entry={entry} key={entry.id} />
+                  <EntryCard
+                    entry={entry}
+                    key={entry.id}
+                    deleteEntry={deleteEntry}
+                  />
                 ))) || <ThemedText>{t("diary.noRecords")}</ThemedText>}
             </View>
           </ParallaxScrollView>
@@ -211,7 +222,7 @@ export default function Diary() {
           </Portal>
         </>
       )}
-    </View>
+    </Background>
   );
 }
 

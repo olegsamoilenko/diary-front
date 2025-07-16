@@ -1,28 +1,36 @@
-import { Button, Pressable, Text, View } from "react-native";
-import { getEmojiByMood, MoodEmoji } from "@/constants/Mood";
+import {
+  Animated,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { getEmojiByMood } from "@/constants/Mood";
 import { ThemedText } from "@/components/ThemedText";
-import { AILoader } from "@/components/ui/AILoader";
 import type { Entry } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import React, { useEffect, useState } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import i18n from "i18next";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import ViewReachEditor from "@/components/diary/ViewReachEditor";
-import { RichEditor } from "react-native-pell-rich-editor";
-import Background from "@/components/diary/add-new-entry/Background";
 import EntryCardBackground from "@/components/diary/EntryCardBackground";
+import NemoryIcon from "@/components/ui/logo/NemoryIcon";
+import ModalPortal from "@/components/ui/Modal";
+import { useTranslation } from "react-i18next";
+import { ExpandableSection } from "@/components/ExpandableSection";
 
-type EntryCardProps = { entry: Entry };
-export default function EntryCard({ entry }: EntryCardProps) {
+type EntryCardProps = { entry: Entry; deleteEntry: (id: number) => void };
+export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
-  const lang = useState<string | null>(i18n.language)[0];
   const format = useSelector((state: RootState) => state.timeFormat.value);
   const [key, setKey] = useState<number>(0);
+  const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
+  const { t } = useTranslation();
 
   const toggleExpand = (id: number) => {
     setExpanded((prev) => ({
@@ -31,6 +39,18 @@ export default function EntryCard({ entry }: EntryCardProps) {
     }));
     setKey((prevKey) => prevKey + 1);
   };
+
+  const handleDeleteEntry = async (id: number) => {
+    setVisibleDeleteModal(false);
+    deleteEntry(id);
+  };
+
+  const [contentHeight, setContentHeight] = useState<number>(30);
+  const onLayout = (e) => {
+    const height = e.nativeEvent.layout.height;
+    if (height > 0) setContentHeight(height);
+  };
+
   return (
     <EntryCardBackground
       background={
@@ -102,28 +122,113 @@ export default function EntryCard({ entry }: EntryCardProps) {
                 .toLocaleTimeString(i18n.language!, {
                   hour: "2-digit",
                   minute: "2-digit",
-                  hour12: format === 12,
+                  hour12: Number(format) === 12,
                 })
                 .toUpperCase()}
             </ThemedText>
           </View>
-        </View>
-
-        <Pressable key={entry.id}>
-          <View
+          <TouchableOpacity
             style={{
-              backgroundColor: "rgba(0, 0, 0, 0.05)",
-              // backgroundColor: "rgba(255, 255, 255, 0.3)",
-              borderRadius: 8,
-              marginBottom: 12,
+              justifyContent: "flex-start",
+              flexDirection: "row",
+              alignItems: "flex-start",
+              marginTop: 5,
+              marginLeft: 7,
+            }}
+            onPress={() => {
+              setVisibleDeleteModal(true);
             }}
           >
-            {expanded[Number(entry.id)] ? (
-              <ViewReachEditor key={key} content={entry.content} />
-            ) : (
-              <ViewReachEditor key={key} content={entry.previewContent} />
-            )}
-          </View>
+            <MaterialIcons
+              name="delete-outline"
+              size={24}
+              color={colors.error}
+            />
+          </TouchableOpacity>
+          <ModalPortal
+            visible={visibleDeleteModal}
+            onClose={() => setVisibleDeleteModal(false)}
+          >
+            <View>
+              <ThemedText>
+                {t("diary.entry.deleteEntryConfirmation")}
+              </ThemedText>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  gap: 10,
+                  marginTop: 10,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    borderRadius: 50,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    backgroundColor: "transparent",
+                  }}
+                  onPress={() => setVisibleDeleteModal(false)}
+                >
+                  <ThemedText
+                    style={{
+                      color: colors.text,
+                    }}
+                  >
+                    {t("common.cancel")}
+                  </ThemedText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    borderRadius: 50,
+                    backgroundColor: colors.primary,
+                  }}
+                  onPress={() => handleDeleteEntry(Number(entry.id))}
+                >
+                  <ThemedText
+                    style={{
+                      color: colors.textInPrimary,
+                    }}
+                  >
+                    {t("common.delete")}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ModalPortal>
+        </View>
+
+        <ExpandableSection
+          expanded={expanded[Number(entry.id)]}
+          collapsedHeight={115}
+          expandedHeight={180}
+          style={{
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            borderRadius: 8,
+            marginBottom: 12,
+            padding: 6,
+          }}
+        >
+          <Pressable
+            key={entry.id}
+            onPress={() => toggleExpand(Number(entry.id))}
+          >
+            <View onLayout={onLayout}>
+              <ViewReachEditor
+                key={key}
+                content={
+                  expanded[Number(entry.id)]
+                    ? entry.content
+                    : entry.previewContent
+                }
+              />
+            </View>
+          </Pressable>
 
           {expanded[Number(entry.id)] && entry.aiComment && (
             <View
@@ -136,15 +241,25 @@ export default function EntryCard({ entry }: EntryCardProps) {
                 marginBottom: 18,
               }}
             >
+              <ThemedText
+                style={{
+                  fontWeight: "bold",
+                  color: colors.primary,
+                  marginRight: 5,
+                  position: "absolute",
+                  top: 10,
+                  left: 0,
+                }}
+              >
+                <NemoryIcon /> <ThemedText> </ThemedText>
+              </ThemedText>
               <ThemedText style={{ marginTop: 6, padding: 5 }}>
                 <ThemedText
                   style={{
-                    fontWeight: "bold",
-                    color: colors.primary,
-                    marginRight: 5,
+                    paddingLeft: 300,
                   }}
                 >
-                  NEMORY: <ThemedText> </ThemedText>
+                  {"        "}
                 </ThemedText>
                 {entry.aiComment?.content}
               </ThemedText>
@@ -196,28 +311,28 @@ export default function EntryCard({ entry }: EntryCardProps) {
                 </View>
               </View>
             ))}
-        </Pressable>
-        <Pressable onPress={() => toggleExpand(Number(entry.id))}>
-          <Text
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              textAlign: "center",
-              marginTop: 5,
-              color: "#888",
-            }}
-          >
-            <MaterialCommunityIcons
-              name="chevron-down"
-              size={24}
-              color="#000"
-              style={{
-                transform: [{ scaleX: 5.6 }, { scaleY: 6.9 }],
-                color: colors.icon,
-              }}
-            />
-          </Text>
-        </Pressable>
+        </ExpandableSection>
+
+        {/*<Pressable onPress={() => toggleExpand(Number(entry.id))}>*/}
+        {/*  <View*/}
+        {/*    style={{*/}
+        {/*      justifyContent: "center",*/}
+        {/*      alignItems: "center",*/}
+        {/*      marginTop: 5,*/}
+        {/*    }}*/}
+        {/*  >*/}
+        {/*    <MaterialCommunityIcons*/}
+        {/*      name="chevron-down"*/}
+        {/*      size={5}*/}
+        {/*      style={{*/}
+        {/*        transform: expanded[Number(entry.id)]*/}
+        {/*          ? [{ rotate: "180deg" }, { scaleX: 5.6 }, { scaleY: 6.9 }]*/}
+        {/*          : [{ scaleX: 5.6 }, { scaleY: 6.9 }],*/}
+        {/*        color: colors.tabIcon,*/}
+        {/*      }}*/}
+        {/*    />*/}
+        {/*  </View>*/}
+        {/*</Pressable>*/}
       </View>
     </EntryCardBackground>
   );

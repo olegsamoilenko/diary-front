@@ -6,6 +6,7 @@
     "addEntryButton": "Зберегти",
     "noRecords": "Немає записів за цей день",
     "entry": {
+      "deleteEntryConfirmation": "Ви впевнені, що хочете видалити цей запис?",
       "settings": {
         "background": "Фон",
         "color": "Кольори",
@@ -33,8 +34,11 @@
       "title": "Теми",
       "themes": {
         "light": "Світла",
-        "chocolateBrownie": "Шоколадний брауні",
-        "dark": "Темна"
+        "calmMind": "Спокійний розум",
+        "orange": "Помаранчева",
+        "dark": "Темна",
+        "sandDune": "Піщана дюна",
+        "yellowBokeh": "Жовтий боке"
       }
     },
     "font": {
@@ -78,5 +82,15 @@
   "toolTips": {
     "title": "Tips",
     "howAreYouFeeling": "Як ти себе почуваєш?"
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "delete": "Видалити",
+    "edit": "Редагувати",
+    "close": "Закрити",
+    "yes": "Так",
+    "no": "Ні"
   }
 }

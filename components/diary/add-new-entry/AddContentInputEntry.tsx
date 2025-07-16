@@ -20,6 +20,17 @@ type InputEntryProps = {
   onHandleSave: () => void;
   tooltipVisible: boolean;
   entrySettings: EntrySettings;
+  textReachEditorKey: number;
+  showBackgroundSetting: boolean;
+  setShowBackgroundSetting: (show: boolean) => void;
+  showSizeSetting: boolean;
+  setShowSizeSetting: (show: boolean) => void;
+  showFontSetting: boolean;
+  setShowFontSetting: (show: boolean) => void;
+  showColorSetting: boolean;
+  setShowColorSetting: (show: boolean) => void;
+  isFocusTextRichEditor: boolean;
+  setIsFocusTextRichEditor: (focus: boolean) => void;
 };
 
 export default function AddContentInputEntry({
@@ -30,13 +41,20 @@ export default function AddContentInputEntry({
   onChangeEntrySettings,
   tooltipVisible,
   entrySettings,
+  textReachEditorKey,
+  showBackgroundSetting,
+  setShowBackgroundSetting,
+  showSizeSetting,
+  setShowSizeSetting,
+  showFontSetting,
+  setShowFontSetting,
+  showColorSetting,
+  setShowColorSetting,
+  isFocusTextRichEditor,
+  setIsFocusTextRichEditor,
 }: InputEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const [showBackgroundSetting, setShowBackgroundSetting] = useState(false);
-  const [showSizeSetting, setShowSizeSetting] = useState(false);
-  const [showFontSetting, setShowFontSetting] = useState(false);
-  const [showColorSetting, setShowColorSetting] = useState(false);
   const [showEmojiSetting, setShowEmojiSetting] = useState(false);
   const [showImageSetting, setShowImageSetting] = useState(false);
   const [showPhotoSetting, setShowPhotoSetting] = useState(false);
@@ -50,7 +68,7 @@ export default function AddContentInputEntry({
   const [isBulletedListAction, setIsBulletedListAction] = useState(false);
   const [isOrderedListAction, setIsOrderedListAction] = useState(false);
   const [sizeAction, setSizeAction] = useState(16);
-  const [colorAction, setColorAction] = useState("");
+  const [colorAction, setColorAction] = useState(colors.text);
   const [activeActions, setActiveActions] = useState<Record<string, boolean>>(
     {},
   );
@@ -62,7 +80,7 @@ export default function AddContentInputEntry({
   const debouncedSave = useCallback(
     debounce((content: string) => {
       setEntryContent(content);
-    }, 800),
+    }, 300),
     [],
   );
 
@@ -124,13 +142,12 @@ export default function AddContentInputEntry({
     setSelectedFont(font);
   };
 
-  const [isFocusRichEditor, setIsFocusRichEditor] = useState(false);
   const handleFocus = () => {
-    setIsFocusRichEditor(true);
+    setIsFocusTextRichEditor(true);
   };
 
   const handleBlur = () => {
-    setIsFocusRichEditor(false);
+    setIsFocusTextRichEditor(false);
   };
 
   const handleImageAction = () => {
@@ -156,6 +173,7 @@ export default function AddContentInputEntry({
       }}
     >
       <TextReachEditor
+        textReachEditorKey={textReachEditorKey}
         content={content}
         setContent={setContent}
         isKeyboardOpen={isKeyboardOpen}
@@ -176,7 +194,7 @@ export default function AddContentInputEntry({
         setShowPhotoSetting={setShowPhotoSetting}
       />
 
-      {isKeyboardOpen && isFocusRichEditor && (
+      {isKeyboardOpen && isFocusTextRichEditor && (
         <RichToolbar
           actions={{
             background: true,

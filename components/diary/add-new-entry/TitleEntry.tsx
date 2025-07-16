@@ -38,6 +38,7 @@ type TitleEntryProps = {
     isInsertOrderedList?: boolean;
   } | null;
   disabledTitleReachEditor?: boolean;
+  titleReachEditorKey: number;
 };
 export default function TitleEntry({
   onChangeEntry,
@@ -54,6 +55,7 @@ export default function TitleEntry({
   handleBlur,
   setActiveActions,
   disabledTitleReachEditor,
+  titleReachEditorKey,
 }: TitleEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -148,6 +150,7 @@ export default function TitleEntry({
         </Portal>
       </View>
       <TitleRichEditor
+        titleReachEditorKey={titleReachEditorKey}
         disabledTitleReachEditor={disabledTitleReachEditor}
         title={entry.title}
         setTitle={setTitle}

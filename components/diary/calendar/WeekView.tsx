@@ -118,7 +118,7 @@ export default function WeekView({
         >
           <MaterialCommunityIcons
             name="triangle"
-            size={8}
+            size={12}
             color={colors.primary}
             style={{
               transform: [
@@ -144,7 +144,7 @@ export default function WeekView({
         >
           <MaterialCommunityIcons
             name="triangle"
-            size={8}
+            size={12}
             color={colors.primary}
             style={{
               transform: [
@@ -171,7 +171,7 @@ export default function WeekView({
             style={{
               width: 40,
               textAlign: "center",
-              color: "#888",
+              color: colors.calendarDayLabels,
               fontSize: 14,
             }}
           >
@@ -201,9 +201,11 @@ export default function WeekView({
                 justifyContent: "center",
                 backgroundColor: isSelected ? colors.primary : "transparent",
                 borderColor:
-                  itemMonth === month
+                  itemMonth === month && !isSelected
                     ? colors.calendarEnableDayBorder
-                    : colors.calendarDisableDayBorder,
+                    : itemMonth !== month && !isSelected
+                      ? colors.calendarDisableDayBorder
+                      : colors.primary,
                 borderWidth: 1,
                 width: CLOCK_RADIUS * 2,
                 height: CLOCK_RADIUS * 2,

@@ -12,6 +12,7 @@ import AmaticSCFontStylesheet from "@/assets/fonts/entry/AmaticSCFontStylesheet"
 type TitleReachEditorProps = {
   disabledTitleReachEditor?: boolean;
   title: string;
+  titleReachEditorKey: number;
   setTitle: (title: string) => void;
   isKeyboardOpen: boolean;
   isBoldAction: boolean;
@@ -49,6 +50,7 @@ export default function TitleReachEditor({
   handleBlur,
   selectedFont,
   setActiveActions,
+  titleReachEditorKey,
 }: TitleReachEditorProps) {
   const richTitle = useRef(null);
   const [editorHeight, setEditorHeight] = useState(40);
@@ -98,6 +100,7 @@ export default function TitleReachEditor({
   }, [isItalicAction]);
 
   useEffect(() => {
+    console.log("Color action changed fot title:", colorAction);
     // @ts-ignore
     richTitle.current?.setForeColor(colorAction);
   }, [colorAction]);
@@ -124,14 +127,38 @@ export default function TitleReachEditor({
   }, [selectedFont]);
 
   const onFocus = () => {
+    console.log("Editor title focused", colorAction);
     handleFocus();
     // @ts-ignore
-    richText.current?.commandDOM(`
+    richTitle.current?.commandDOM(`
         document.execCommand("fontName", false, "${selectedFont.name}");
       `);
+
+    setTimeout(() => {
+      if (richTitle.current) {
+        console.log("Setting focus on richTitle editor", colorAction);
+        // @ts-ignore
+        richTitle.current.commandDOM(
+          `document.execCommand('foreColor', false, '${colorAction}')`,
+        );
+        // @ts-ignore
+        richTitle.current?.commandDOM(
+          `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
+      var fontElements = document.getElementsByTagName("font");
+      for (var i = 0; i < fontElements.length; ++i) {
+        if (fontElements[i].size == "7") {
+          fontElements[i].removeAttribute("size");
+          fontElements[i].style.fontSize = "${sizeAction}px";
+        }
+      }`,
+        );
+      }
+    }, 100);
   };
+
   return (
     <RichEditor
+      key={titleReachEditorKey}
       disabled={disabledTitleReachEditor}
       ref={richTitle}
       initialContentHTML={title}
@@ -151,7 +178,7 @@ export default function TitleReachEditor({
       placeholder={t("diary.addEntryTitle")}
       editorStyle={{
         backgroundColor: "transparent",
-        color: colors.text,
+        color: "#6c6b6b",
         initialCSSText: `
             ${MarckScriptFontStylesheet}
             ${NeuchaFontStylesheet}

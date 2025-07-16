@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, View, Text, StyleSheet } from "react-native";
+import { Animated, View, Text, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 
 const dots = ["", ".", "..", "..."];
 
@@ -22,20 +23,10 @@ export const AILoader = () => {
   }, []);
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: Colors[colorScheme].aiCommentBackground },
-      ]}
-    >
-      <MaterialCommunityIcons
-        name="robot"
-        size={22}
-        color={Colors[colorScheme].primary}
-        style={{ marginRight: 8 }}
-      />
-      <Text style={[styles.text, { color: Colors[colorScheme].text }]}>
-        AI думає{dots[step]}
+    <View style={[styles.container, { backgroundColor: "transparent" }]}>
+      <NemoryIcon width={25} height={30} />
+      <Text style={[styles.text, { color: Colors[colorScheme].primary }]}>
+        {dots[step]}
       </Text>
     </View>
   );
@@ -44,15 +35,11 @@ export const AILoader = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     borderRadius: 18,
-    paddingLeft: 8,
+    paddingLeft: 30,
     paddingVertical: 6,
     marginTop: 8,
-    marginBottom: 8,
-    elevation: 3,
-    minHeight: 40,
-    minWidth: 120,
   },
   text: {
     fontSize: 16,

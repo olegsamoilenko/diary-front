@@ -79,7 +79,7 @@ const getStyles = (
       top: top,
       right: right,
       bottom: bottom,
-      backgroundColor: colors.background,
+      backgroundColor: colors.backgroundColor,
       borderRadius: 8,
       padding: 10,
       zIndex: 99,
@@ -95,7 +95,7 @@ const getStyles = (
       position: "absolute",
       width: 12,
       height: 12,
-      backgroundColor: colors.background,
+      backgroundColor: colors.backgroundColor,
       top:
         arrowPosition === "start" &&
         (position === "left" || position === "right")

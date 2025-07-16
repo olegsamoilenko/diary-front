@@ -35,6 +35,7 @@ export default function MonthView({
 }: MonthViewProps) {
   const lang = i18n.language || "uk";
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const localeArr = Localization.getLocales();
   const locale =
     localeArr!.find((loc) => loc.languageCode === lang)?.languageTag ?? "en-US";
@@ -67,7 +68,7 @@ export default function MonthView({
             style={{
               flex: 1,
               textAlign: "center",
-              color: "#888",
+              color: colors.calendarDayLabels,
               fontSize: 14,
             }}
           >
@@ -80,9 +81,9 @@ export default function MonthView({
         firstDay={firstDayOfWeek}
         hideDayNames={true}
         theme={{
-          calendarBackground: Colors[colorScheme].background,
-          arrowColor: Colors[colorScheme].primary,
-          monthTextColor: Colors[colorScheme].text,
+          calendarBackground: colors.background,
+          arrowColor: colors.primary,
+          monthTextColor: colors.text,
           textDayHeaderFontFamily: getFont(font.name, "regular"),
         }}
         onMonthChange={(obj) => {
@@ -91,10 +92,17 @@ export default function MonthView({
         }}
         renderArrow={(direction) => (
           <MaterialCommunityIcons
-            name={direction === "left" ? "chevron-left" : "chevron-right"}
-            size={24}
-            color={Colors[colorScheme].text}
-            style={{ marginHorizontal: 10, marginBottom: 20 }}
+            name="triangle"
+            size={12}
+            color={colors.primary}
+            style={{
+              marginHorizontal: 10,
+              marginBottom: 40,
+              transform:
+                direction === "left"
+                  ? [{ rotate: "270deg" }, { scaleX: 1.4 }, { scaleY: 0.8 }]
+                  : [{ rotate: "90deg" }, { scaleX: 1.4 }, { scaleY: 0.8 }],
+            }}
           />
         )}
         renderHeader={(date) => {
@@ -110,7 +118,7 @@ export default function MonthView({
                 style={{
                   fontSize: 18,
                   textAlign: "center",
-                  marginBottom: 20,
+                  marginBottom: 40,
                 }}
               >
                 {monthYearStr.slice(0, 1).toUpperCase() + monthYearStr.slice(1)}
@@ -129,7 +137,7 @@ export default function MonthView({
                 justifyContent: "center",
                 backgroundColor:
                   selectedDay === date.dateString
-                    ? Colors[colorScheme].primary
+                    ? colors.primary
                     : "transparent",
                 borderRadius: 100,
                 position: "relative",
@@ -138,10 +146,10 @@ export default function MonthView({
                 borderWidth: 1,
                 borderColor:
                   state === "disabled"
-                    ? Colors[colorScheme].calendarDisableDayBorder
+                    ? colors.calendarDisableDayBorder
                     : selectedDay === date.dateString
-                      ? Colors[colorScheme].primary
-                      : Colors[colorScheme].calendarEnableDayBorder,
+                      ? colors.primary
+                      : colors.calendarEnableDayBorder,
               }}
             >
               <ThemedText
@@ -151,7 +159,7 @@ export default function MonthView({
                       ? "gray"
                       : selectedDay === date.dateString
                         ? "#ffffff"
-                        : Colors[colorScheme].text,
+                        : colors.text,
                   position: "absolute",
                   zIndex: 100,
                 }}

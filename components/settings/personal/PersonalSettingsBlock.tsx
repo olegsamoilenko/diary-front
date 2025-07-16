@@ -42,7 +42,7 @@ export default function PersonalSettingsBlock({
 
         // Android
         borderRadius: 10,
-        backgroundColor: colors.background,
+        backgroundColor: colors.blockBackground,
         padding: 20,
         display: "flex",
         flexDirection: "column",

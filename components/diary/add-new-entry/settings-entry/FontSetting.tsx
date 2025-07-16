@@ -22,12 +22,12 @@ export default function SizeSetting({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: colors.background,
+        backgroundColor: colors.backgroundColor,
       }}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{ maxHeight: 350, width: "100%" }} // Або просто flex: 1
+        style={{ maxHeight: 350, width: "100%" }}
         contentContainerStyle={{
           flexDirection: "row",
           flexWrap: "wrap",
@@ -46,7 +46,7 @@ export default function SizeSetting({
               justifyContent: "center",
               alignItems: "center",
               elevation: 5,
-              backgroundColor: colors.backgroundAdditional,
+              backgroundColor: colors.backgroundColor,
               borderRadius: 2,
             }}
           >

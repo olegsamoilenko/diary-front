@@ -2,10 +2,10 @@ import React, { forwardRef, useEffect, useState } from "react";
 import {
   View,
   TouchableOpacity,
-  Text,
   StyleSheet,
   Switch,
   Pressable,
+  Image,
 } from "react-native";
 import { useThemeCustom } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -17,10 +17,42 @@ import { lightenColor } from "@/utils";
 import { ThemedText } from "@/components/ThemedText";
 import { Theme } from "@/types";
 import WeekView from "@/components/diary/calendar/WeekView";
-import { MoodEmoji } from "@/constants/Mood";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { getEmojiByMood, MoodEmoji } from "@/constants/Mood";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import i18n from "i18next";
 import BackArrow from "@/components/ui/BackArrow";
+import EntryCard from "@/components/diary/EntryCard";
+import ViewReachEditor from "@/components/diary/ViewReachEditor";
+import ModalPortal from "@/components/ui/Modal";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+
+const themes = [
+  {
+    name: "light",
+    img: require("@/assets/images/theme/light.jpg"),
+  },
+  {
+    name: "calmMind",
+    img: require("@/assets/images/theme/calmMind.jpg"),
+  },
+  {
+    name: "orange",
+    img: require("@/assets/images/theme/orange.jpg"),
+  },
+  {
+    name: "dark",
+    img: require("@/assets/images/theme/dark.jpg"),
+  },
+  {
+    name: "sandDune",
+    img: require("@/assets/images/theme/sandDune.jpg"),
+  },
+  {
+    name: "yellowBokeh",
+    img: require("@/assets/images/theme/yellowBokeh.jpg"),
+  },
+];
 
 const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { theme, setTheme } = useThemeCustom();
@@ -29,6 +61,7 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const lang = useState<string | null>(i18n.language)[0];
+  const format = useSelector((state: RootState) => state.timeFormat.value);
 
   function getMonthName(locale = "uk") {
     const date = new Date();
@@ -58,10 +91,10 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           {t("settings.theme.title")}
         </ThemedText>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
-          {Object.entries(Colors).map(([themeName, colorTheme]) => {
+          {themes.map((theme) => {
             return (
               <View
-                key={themeName}
+                key={theme.name}
                 style={{
                   width: "45%",
                 }}
@@ -71,130 +104,16 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                     marginBottom: 5,
                   }}
                 >
-                  {t(`settings.theme.themes.${themeName}`)}
+                  {t(`settings.theme.themes.${theme.name}`)}
                 </ThemedText>
-                <TouchableOpacity onPress={() => handleTheme(themeName)}>
-                  <View
+                <TouchableOpacity onPress={() => handleTheme(theme.name)}>
+                  <Image
+                    source={theme.img}
                     style={{
-                      backgroundColor: colorTheme.background,
-                      padding: 8,
-                      elevation: 12,
-                      height: 250,
-                      borderRadius: 8,
-                      flexDirection: "column",
-                      justifyContent: "space-between",
+                      width: "100%",
+                      height: 315,
                     }}
-                  >
-                    <View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          width: "100%",
-                        }}
-                      >
-                        <View>
-                          <MaterialCommunityIcons
-                            name="triangle"
-                            size={5}
-                            color={colorTheme.primary}
-                            style={{
-                              transform: [
-                                { rotate: "270deg" },
-                                { scaleX: 1.4 },
-                                { scaleY: 0.8 },
-                              ],
-                            }}
-                          />
-                        </View>
-                        <Text style={{ fontSize: 10, color: colorTheme.text }}>
-                          {getMonthName(lang || undefined) +
-                            " " +
-                            new Date().getFullYear()}
-                        </Text>
-                        <View>
-                          <MaterialCommunityIcons
-                            name="triangle"
-                            size={5}
-                            color={colorTheme.primary}
-                            style={{
-                              transform: [
-                                { rotate: "90deg" },
-                                { scaleX: 1.4 },
-                                { scaleY: 0.8 },
-                              ],
-                            }}
-                          />
-                        </View>
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          marginTop: 2,
-                          marginBottom: 6,
-                        }}
-                      >
-                        {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                          <View
-                            key={day}
-                            style={{
-                              borderRadius: 500,
-                              width: 14,
-                              height: 14,
-                              padding: 2,
-                              position: "relative",
-                              backgroundColor:
-                                day === 3 ? colorTheme.primary : "transparent",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontSize: 8,
-                                fontWeight: day === 3 ? "bold" : "normal",
-                                position: "absolute",
-                                top: -1,
-                                left: 2,
-                                color:
-                                  day === 3
-                                    ? colorTheme.textInPrimary
-                                    : colorTheme.text,
-                              }}
-                            >
-                              {day}
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: 5,
-                                marginLeft: 4,
-                                position: "absolute",
-                                right: 2,
-                                bottom: 1,
-                              }}
-                            >
-                              {"🙂"}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                    <View
-                      style={{
-                        flex: 1,
-                      }}
-                    >
-                      <ThemedText>Content</ThemedText>
-                    </View>
-                    <View
-                      style={{
-                        borderWidth: 1,
-                      }}
-                    >
-                      <ThemedText>Bottom</ThemedText>
-                    </View>
-                  </View>
+                  />
                 </TouchableOpacity>
               </View>
             );

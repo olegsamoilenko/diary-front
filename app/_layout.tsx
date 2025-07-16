@@ -29,6 +29,7 @@ import { setFont } from "@/store/slices/settings/fontSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 import AuthGate from "@/components/auth/AuthGate";
+import { Colors } from "@/constants/Colors";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -168,7 +169,7 @@ export default function RootLayout() {
 function RootLayoutInner() {
   const colorScheme = useColorScheme();
   const navTheme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
-  const barStyle = colorScheme === "dark" ? "light" : "dark";
+  const colors = Colors[colorScheme ?? "light"];
 
   const dispatch = useDispatch();
 
@@ -194,7 +195,7 @@ function RootLayoutInner() {
   return (
     <ThemeProvider value={navTheme}>
       <Stack screenOptions={{ headerShown: false }}></Stack>
-      <StatusBar style={barStyle} translucent />
+      <StatusBar style={colors.barStyle} translucent />
     </ThemeProvider>
   );
 }

@@ -10,11 +10,12 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { AiComment, ColorTheme, Entry } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { apiRequest, getTodayDateStr } from "@/utils";
+import { apiRequest, getFont, getTodayDateStr } from "@/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -29,6 +30,8 @@ import { ThemedText } from "@/components/ThemedText";
 import RichToolbar from "@/components/ui/RichToolbar";
 import SettingsEntry from "@/components/diary/add-new-entry/settings-entry/SettingsEntry";
 import { FONTS } from "@/assets/fonts/entry";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -51,17 +54,25 @@ const AddNewEntry = forwardRef<
   const [isBoldAction, setIsBoldAction] = useState(false);
   const [isItalicAction, setIsItalicAction] = useState(false);
   const [sizeAction, setSizeAction] = useState(16);
-  const [colorAction, setColorAction] = useState("");
+  const [colorAction, setColorAction] = useState(colors.text);
+  const [showBackgroundSetting, setShowBackgroundSetting] = useState(false);
   const [showFontSetting, setShowFontSetting] = useState(false);
   const [showSizeSetting, setShowSizeSetting] = useState(false);
   const [showColorSetting, setShowColorSetting] = useState(false);
+  const [showTitleFontSetting, setShowTitleFontSetting] = useState(false);
+  const [showTitleSizeSetting, setShowTitleSizeSetting] = useState(false);
+  const [showTitleColorSetting, setShowTitleColorSetting] = useState(false);
   const [selectedColor, setSelectedColor] = useState(colors.text);
   const [selectedFont, setSelectedFont] = useState(FONTS[0]);
   const [selectedSize, setSelectedSize] = useState(16);
   const [aiDialogLoading, setAiDialogLoading] = useState(false);
+  const [textReachEditorKey, setTextReachEditorKey] = useState(0);
+  const [titleReachEditorKey, setTitleReachEditorKey] = useState(0);
+  const [isFocusTextRichEditor, setIsFocusTextRichEditor] = useState(false);
+  const font = useSelector((state: RootState) => state.font.font);
 
   const [entry, setEntry] = useState<Entry>({
-    id: "0",
+    id: 0,
     title: "",
     content: "",
     mood: "",
@@ -78,7 +89,7 @@ const AddNewEntry = forwardRef<
     background: {
       id: 0,
       type: "color",
-      value: colors.diaryNotesBackground,
+      value: colors.card,
       url: undefined,
     },
   });
@@ -99,23 +110,37 @@ const AddNewEntry = forwardRef<
   const [dialogQuestion, setDialogQuestion] = useState("");
 
   useEffect(() => {
+    setColorAction(colors.text);
+  }, [colorScheme]);
+
+  useEffect(() => {
     if (!isAddNewEntryOpen) {
       setIsEntrySaved(false);
-      setEntry({
-        id: "0",
-        title: "",
-        content: "",
-        mood: "",
-        aiComment: {
-          content: "",
-          aiModel: aiModel,
-        },
-        embedding: [],
-        dialogs: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
     }
+
+    setEntry({
+      id: 0,
+      title: "",
+      content: "",
+      mood: "",
+      aiComment: {
+        content: "",
+        aiModel: aiModel,
+      },
+      embedding: [],
+      dialogs: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    setEntrySettings({
+      background: {
+        id: 0,
+        type: "color",
+        value: colors.card,
+        url: undefined,
+      },
+    });
   }, [isAddNewEntryOpen]);
 
   useEffect(() => {
@@ -156,26 +181,28 @@ const AddNewEntry = forwardRef<
   };
 
   const handleFontAction = () => {
-    setShowFontSetting(true);
+    setShowTitleFontSetting(true);
   };
 
   const handleColorAction = () => {
     if (isKeyboardOpen) {
-      setShowColorSetting(true);
+      setShowTitleColorSetting(true);
     }
   };
 
   const handleSizeAction = () => {
     if (isKeyboardOpen) {
-      setShowSizeSetting(true);
+      setShowTitleSizeSetting(true);
     }
   };
 
   const handleFocus = () => {
+    console.log(111);
     setIsFocusTitleRichEditor(true);
   };
 
   const handleBlur = () => {
+    console.log(222);
     setIsFocusTitleRichEditor(false);
   };
 
@@ -199,48 +226,55 @@ const AddNewEntry = forwardRef<
   }, []);
 
   const handleSave = async () => {
+    console.log("handleSave called");
     setLoading(true);
+    setIsFocusTitleRichEditor(false);
+    setIsFocusTextRichEditor(false);
+    setTextReachEditorKey((k) => k + 1);
+    setTitleReachEditorKey((k) => k + 1);
+
+    console.log("Saving entry:", entry);
 
     try {
-      const res = await apiRequest({
-        url: `/diary-entries/create`,
-        method: "POST",
-        data: {
-          title: entry.title,
-          content: entry.content,
-          mood: entry.mood,
-          aiModel,
-          settings: entrySettings,
-        },
-      });
-
-      if (!res || res.status !== 201) {
-        console.log("No data returned from server");
-        setLoading(false);
-        return;
-      }
-
-      const newEntry: Entry = res.data;
-
-      setEntry((prev) => ({ ...prev, ...newEntry }));
-
-      setLoading(false);
-
-      setIsEntrySaved(true);
-
-      // if (ref && typeof ref !== "function" && ref?.current) {
-      //   ref.current.close();
+      // const res = await apiRequest({
+      //   url: `/diary-entries/create`,
+      //   method: "POST",
+      //   data: {
+      //     title: entry.title,
+      //     content: entry.content,
+      //     mood: entry.mood,
+      //     aiModel,
+      //     settings: entrySettings,
+      //   },
+      // });
+      //
+      // if (!res || res.status !== 201) {
+      //   console.log("No data returned from server");
+      //   setLoading(false);
+      //   return;
       // }
-
-      // if (props.onSuccess && entry) props.onSuccess(entry);
-
-      await generateAiContent(
-        Number(newEntry!.id),
-        newEntry!.content,
-        newEntry!.embedding,
-        aiModel,
-        newEntry!.mood,
-      );
+      //
+      // const newEntry: Entry = res.data;
+      //
+      // setEntry((prev) => ({ ...prev, ...newEntry }));
+      //
+      setLoading(false);
+      //
+      // setIsEntrySaved(true);
+      //
+      // // if (ref && typeof ref !== "function" && ref?.current) {
+      // //   ref.current.close();
+      // // }
+      //
+      // // if (props.onSuccess && entry) props.onSuccess(entry);
+      //
+      // await generateAiContent(
+      //   Number(newEntry!.id),
+      //   newEntry!.content,
+      //   newEntry!.embedding,
+      //   aiModel,
+      //   newEntry!.mood,
+      // );
     } catch (err) {
       console.log("Error saving entry.ts:", err);
       setLoading(false);
@@ -336,6 +370,15 @@ const AddNewEntry = forwardRef<
     await handleDialog();
   };
 
+  const anySettingOpen =
+    showTitleColorSetting ||
+    showColorSetting ||
+    showTitleSizeSetting ||
+    showSizeSetting ||
+    showTitleFontSetting ||
+    showFontSetting ||
+    showBackgroundSetting;
+
   return (
     <SideSheet ref={ref} onOpenChange={setIsAddNewEntryOpen}>
       <View style={{ flex: 1 }}>
@@ -398,6 +441,7 @@ const AddNewEntry = forwardRef<
               )}
             </View>
             <TitleEntry
+              titleReachEditorKey={titleReachEditorKey}
               disabledTitleReachEditor={isEntrySaved}
               onChangeEntry={setEntry}
               entry={entry}
@@ -425,6 +469,17 @@ const AddNewEntry = forwardRef<
             ) : (
               <>
                 <AddContentInputEntry
+                  isFocusTextRichEditor={isFocusTextRichEditor}
+                  setIsFocusTextRichEditor={setIsFocusTextRichEditor}
+                  showFontSetting={showFontSetting}
+                  setShowFontSetting={setShowFontSetting}
+                  showSizeSetting={showSizeSetting}
+                  setShowSizeSetting={setShowSizeSetting}
+                  showColorSetting={showColorSetting}
+                  setShowColorSetting={setShowColorSetting}
+                  showBackgroundSetting={showBackgroundSetting}
+                  setShowBackgroundSetting={setShowBackgroundSetting}
+                  textReachEditorKey={textReachEditorKey}
                   isKeyboardOpen={isKeyboardOpen}
                   entry={entry}
                   isEntrySaved={isEntrySaved}
@@ -465,14 +520,14 @@ const AddNewEntry = forwardRef<
             <SettingsEntry
               keyboardHeight={keyboardHeight}
               entrySettings={entrySettings}
-              setShowColorSetting={setShowColorSetting}
-              showColorSetting={showColorSetting}
+              setShowColorSetting={setShowTitleColorSetting}
+              showColorSetting={showTitleColorSetting}
               setColor={setColor}
               selectedColor={selectedColor}
-              setShowSizeSetting={setShowSizeSetting}
-              showSizeSetting={showSizeSetting}
-              setShowFontSetting={setShowFontSetting}
-              showFontSetting={showFontSetting}
+              setShowSizeSetting={setShowTitleSizeSetting}
+              showSizeSetting={showTitleSizeSetting}
+              setShowFontSetting={setShowTitleFontSetting}
+              showFontSetting={showTitleFontSetting}
               setSize={setSize}
               setFont={setFont}
               selectedFont={selectedFont}
@@ -483,17 +538,17 @@ const AddNewEntry = forwardRef<
               <View
                 style={{
                   position: "relative",
-                  bottom: isKeyboardOpen ? 0 : -32,
+                  bottom: isKeyboardOpen ? 7 : -25,
                   left: 0,
                   right: 0,
                   elevation: 10,
                   borderWidth: 1,
                   borderColor: colors.border,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderRadius: 20,
                   backgroundColor: colors.diaryNotesBackground,
                   marginTop: isKeyboardOpen ? 0 : -33,
                   padding: 10,
+                  marginHorizontal: 10,
                 }}
               >
                 <TextInput
@@ -503,6 +558,8 @@ const AddNewEntry = forwardRef<
                   scrollEnabled={true}
                   style={{
                     maxHeight: ROW_HEIGHT * 10,
+                    color: colors.text,
+                    fontFamily: getFont(font.name, "regular"),
                   }}
                 />
                 <View
@@ -526,6 +583,28 @@ const AddNewEntry = forwardRef<
             )}
           </KeyboardAvoidingView>
         </View>
+        {anySettingOpen && (
+          <Pressable
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.07)",
+              zIndex: 0,
+            }}
+            onPress={() => {
+              setShowBackgroundSetting(false);
+              setShowColorSetting(false);
+              setShowSizeSetting(false);
+              setShowFontSetting(false);
+              setShowTitleColorSetting(false);
+              setShowTitleSizeSetting(false);
+              setShowTitleFontSetting(false);
+            }}
+          />
+        )}
       </View>
     </SideSheet>
   );

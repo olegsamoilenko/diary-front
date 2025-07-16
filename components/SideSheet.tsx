@@ -17,6 +17,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
+import Background from "@/components/Background";
 
 export interface SideSheetRef {
   open: () => void;
@@ -75,7 +76,7 @@ const SideSheet = forwardRef<SideSheetRef, SideSheetProps>(
         style={[
           styles.sideScreen,
           {
-            transform: [{ translateX }],
+            transform: [{ translateX: translateX }],
             paddingBottom: insets.bottom,
             paddingLeft: insets.left,
             paddingRight: insets.right,
@@ -83,9 +84,11 @@ const SideSheet = forwardRef<SideSheetRef, SideSheetProps>(
           style,
         ]}
       >
-        <ParallaxScrollView isPadding={false} style={{ marginBottom: 0 }}>
-          <View style={styles.content}>{children}</View>
-        </ParallaxScrollView>
+        <Background background={Colors[colorScheme].background}>
+          <ParallaxScrollView isPadding={false} style={{ marginBottom: 0 }}>
+            <View style={styles.content}>{children}</View>
+          </ParallaxScrollView>
+        </Background>
       </Animated.View>
     );
   },

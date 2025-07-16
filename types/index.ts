@@ -5,7 +5,7 @@ import type { Plan } from "./plan";
 import type { User } from "./user";
 import type { Payment } from "./payment";
 import type { TokenUsageHistory, UserTokenUsage } from "./token";
-import type { Theme, ThemeContextType } from "./theme";
+import type { Theme, ThemeContextType, LogoTheme } from "./theme";
 import type { MoodByDate } from "./moodByDate";
 import type { EntrySettings, BackgroundSettings } from "./entrySettings";
 
@@ -23,4 +23,5 @@ export type {
   MoodByDate,
   EntrySettings,
   BackgroundSettings,
+  LogoTheme,
 };

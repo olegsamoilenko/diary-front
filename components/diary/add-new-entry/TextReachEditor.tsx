@@ -12,6 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import { uploadImageToServer } from "@/utils";
 
 type TextReachEditorProps = {
+  textReachEditorKey: number;
   content: string;
   setContent: (content: string) => void;
   isKeyboardOpen: boolean;
@@ -45,6 +46,7 @@ const sizeMap: Record<number, number> = {
 };
 
 export default function TextReachEditor({
+  textReachEditorKey,
   content,
   setContent,
   isKeyboardOpen,
@@ -171,6 +173,7 @@ export default function TextReachEditor({
   }, [isOrderedListAction]);
 
   useEffect(() => {
+    console.log("Color action changed:", colorAction);
     // @ts-ignore
     richText.current?.setForeColor(colorAction);
   }, [colorAction]);
@@ -197,11 +200,32 @@ export default function TextReachEditor({
   }, [selectedFont]);
 
   const onFocus = () => {
+    console.log("Editor focused");
     handleFocus();
     // @ts-ignore
     richText.current?.commandDOM(`
         document.execCommand("fontName", false, "${selectedFont.name}");
       `);
+    setTimeout(() => {
+      if (richText.current) {
+        // @ts-ignore
+        richText.current.commandDOM(
+          `document.execCommand('foreColor', false, '${colorAction}')`,
+        );
+        // @ts-ignore
+        richText.current?.commandDOM(
+          `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
+      var fontElements = document.getElementsByTagName("font");
+      for (var i = 0; i < fontElements.length; ++i) {
+        if (fontElements[i].size == "7") {
+          fontElements[i].removeAttribute("size");
+          fontElements[i].style.fontSize = "${sizeAction}px";
+        }
+      }`,
+        );
+      }
+      console.log("String(colors.text)", String(colors.text));
+    }, 100);
   };
 
   useEffect(() => {
@@ -362,15 +386,17 @@ export default function TextReachEditor({
   return (
     <ScrollView ref={scrollRef} style={{ flex: 1 }}>
       <RichEditor
+        key={textReachEditorKey}
         ref={richText}
         initialContentHTML={content}
         onChange={setContent}
         style={{ flex: 1, height: 300 }}
         onFocus={onFocus}
         onBlur={handleBlur}
+        editorInitializedCallback={() => {}}
         editorStyle={{
           backgroundColor: "transparent",
-          color: colors.text,
+          color: "#6c6b6b",
           initialCSSText: `
             ${MarckScriptFontStylesheet}
             ${NeuchaFontStylesheet}
@@ -382,7 +408,7 @@ export default function TextReachEditor({
             flex-direction: column; 
             min-height: 200px; top: 0; right: 0; bottom: 0; left: 0;`,
         }}
-        useContainer={true}
+        // useContainer={true}
         onCursorPosition={(scrollY) => {
           // @ts-ignore
           scrollRef.current?.scrollTo({ y: scrollY - 30, animated: true });

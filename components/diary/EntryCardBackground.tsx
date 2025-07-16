@@ -65,7 +65,7 @@ export default function EntryCardBackground({ children, background }) {
     <View
       style={{
         // flex: 1,
-        backgroundColor: background.value || "#fff",
+        backgroundColor: String(background.value) || "#fff",
         marginBottom: 20,
         borderRadius: 8,
       }}

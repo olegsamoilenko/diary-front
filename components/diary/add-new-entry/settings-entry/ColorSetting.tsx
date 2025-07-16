@@ -45,7 +45,7 @@ export default function ColorSetting({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: colors.background,
+        backgroundColor: colors.backgroundColor,
         width: "100%",
       }}
     >

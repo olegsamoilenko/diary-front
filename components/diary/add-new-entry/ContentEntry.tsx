@@ -7,6 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { Entry } from "@/types";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import ViewReachEditor from "@/components/diary/ViewReachEditor";
+import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -58,17 +59,33 @@ export default function ContentEntry({
                   backgroundColor: colors.aiCommentBackground,
                   elevation: 1,
                   marginBottom: 20,
+                  position: "relative",
                 }}
               >
-                <ThemedText style={{ color: colors.text, padding: 10 }}>
+                <ThemedText
+                  style={{
+                    fontWeight: "bold",
+                    color: colors.primary,
+                    marginRight: 5,
+                    position: "absolute",
+                    top: 10,
+                    left: 0,
+                  }}
+                >
+                  <NemoryIcon /> <ThemedText> </ThemedText>
+                </ThemedText>
+                <ThemedText
+                  style={{
+                    color: colors.text,
+                    padding: 10,
+                  }}
+                >
                   <ThemedText
                     style={{
-                      fontWeight: "bold",
-                      color: colors.primary,
-                      marginRight: 5,
+                      paddingLeft: 300,
                     }}
                   >
-                    NEMORY: <ThemedText> </ThemedText>
+                    {"        "}
                   </ThemedText>
                   {entry.aiComment.content}
                 </ThemedText>
