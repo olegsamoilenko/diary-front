@@ -80,6 +80,11 @@ export default function RootLayout() {
     // };
     // clearFontFromStore();
 
+    // const clearThemeFromStore = async () => {
+    //   await AsyncStorage.removeItem("APP_THEME");
+    // };
+    // clearThemeFromStore();
+
     const initUser = async () => {
       let storedUser = await SecureStore.getItemAsync("user");
       let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;

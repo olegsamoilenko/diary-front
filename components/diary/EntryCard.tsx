@@ -62,7 +62,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
         style={{
           backgroundColor: "transparent",
           borderRadius: 8,
-          marginBottom: 18,
+          marginBottom: 8,
           padding: 8,
           position: "relative",
         }}
@@ -81,14 +81,16 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               justifyContent: "flex-start",
               // flex: 1,
               backgroundColor: "transparent",
-              marginBottom: 8,
-              marginTop: 8,
+              marginBottom: 0,
+              marginTop: 5,
+              paddingBottom: 0,
             }}
           >
             <ThemedText
               style={{
-                fontSize: 22,
+                fontSize: 24,
                 marginRight: 8,
+                paddingBottom: 5,
               }}
             >
               {getEmojiByMood(entry.mood)}
@@ -208,10 +210,9 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
           collapsedHeight={115}
           expandedHeight={180}
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.05)",
             borderRadius: 8,
             marginBottom: 12,
-            padding: 6,
+            padding: 0,
           }}
         >
           <Pressable
@@ -237,30 +238,37 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                 borderRadius: 10,
                 paddingLeft: 4,
                 width: "80%",
-                elevation: 2,
                 marginBottom: 18,
               }}
             >
-              <ThemedText
+              <View
                 style={{
-                  fontWeight: "bold",
-                  color: colors.primary,
-                  marginRight: 5,
-                  position: "absolute",
-                  top: 10,
-                  left: 0,
+                  paddingLeft: 5,
+                  paddingTop: 10,
                 }}
               >
-                <NemoryIcon /> <ThemedText> </ThemedText>
-              </ThemedText>
-              <ThemedText style={{ marginTop: 6, padding: 5 }}>
-                <ThemedText
-                  style={{
-                    paddingLeft: 300,
-                  }}
-                >
-                  {"        "}
-                </ThemedText>
+                <NemoryIcon />
+              </View>
+              {/*<ThemedText*/}
+              {/*  style={{*/}
+              {/*    fontWeight: "bold",*/}
+              {/*    color: colors.primary,*/}
+              {/*    marginRight: 5,*/}
+              {/*    position: "absolute",*/}
+              {/*    top: 10,*/}
+              {/*    left: 0,*/}
+              {/*  }}*/}
+              {/*>*/}
+              {/*  <NemoryIcon /> <ThemedText> </ThemedText>*/}
+              {/*</ThemedText>*/}
+              <ThemedText style={{ padding: 5 }}>
+                {/*<ThemedText*/}
+                {/*  style={{*/}
+                {/*    paddingLeft: 300,*/}
+                {/*  }}*/}
+                {/*>*/}
+                {/*  {"        "}*/}
+                {/*</ThemedText>*/}
                 {entry.aiComment?.content}
               </ThemedText>
             </View>
@@ -277,13 +285,12 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               >
                 <View
                   style={{
-                    backgroundColor: colors.diaryNotesBackground,
+                    backgroundColor: colors.questionBackground,
                     borderRadius: 10,
                     width: "80%",
                     alignSelf: "flex-end",
                     padding: 8,
                     marginBottom: 18,
-                    elevation: 2,
                   }}
                 >
                   <ThemedText
@@ -298,13 +305,20 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                 </View>
                 <View
                   style={{
-                    backgroundColor: colors.aiCommentBackground,
+                    backgroundColor: colors.answerBackground,
                     borderRadius: 10,
                     paddingLeft: 4,
                     width: "80%",
-                    elevation: 2,
                   }}
                 >
+                  <View
+                    style={{
+                      paddingLeft: 5,
+                      paddingTop: 10,
+                    }}
+                  >
+                    <NemoryIcon />
+                  </View>
                   <ThemedText style={{ marginTop: 6 }}>
                     {dialog.answer}
                   </ThemedText>

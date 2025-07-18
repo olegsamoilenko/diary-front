@@ -1,19 +1,21 @@
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { AILoader } from "@/components/ui/AILoader";
 import { ThemedText } from "@/components/ThemedText";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { Entry } from "@/types";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
 import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
+import { useTypewriter } from "@/hooks/useTypewriter";
+import TypewriterAIResponse from "@/components/diary/add-new-entry/TypewriterAIResponse";
 
 type ContentEntryProps = {
   entry: Entry;
   aiLoading: boolean;
   aiDialogLoading: boolean;
   isKeyboardOpen: boolean;
+  isEntrySaved?: boolean;
 };
 
 export default function ContentEntry({
@@ -21,12 +23,26 @@ export default function ContentEntry({
   aiLoading,
   aiDialogLoading,
   isKeyboardOpen,
+  isEntrySaved,
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const animatedAiComment = useTypewriter(entry.aiComment.content, 30);
+  const scrollViewRef = useRef(null);
+  const [idx, setIdx] = useState<number>(0);
+
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [animatedAiComment, idx, isEntrySaved, aiDialogLoading]);
+
+  useEffect(() => {
+    console.log("ContentEntry mounted", entry.dialogs);
+  }, [entry.dialogs]);
 
   return (
-    <ParallaxScrollView isPadding={false} style={{ marginBottom: 0 }}>
+    <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
       <View
         style={{
           marginBottom: isKeyboardOpen ? 0 : 20,
@@ -46,114 +62,146 @@ export default function ContentEntry({
         </View>
         {entry && entry.aiComment && (
           <>
-            {aiLoading ? (
-              <AILoader />
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  padding: 0,
-                  marginLeft: 15,
-                  marginRight: 50,
-                  borderRadius: 8,
-                  backgroundColor: colors.aiCommentBackground,
-                  elevation: 1,
-                  marginBottom: 20,
-                  position: "relative",
-                }}
-              >
-                <ThemedText
+            <View
+              style={{
+                flex: 1,
+                padding: 0,
+                marginLeft: 15,
+                width: "75%",
+                alignItems: "flex-start",
+                borderRadius: 8,
+                backgroundColor: colors.aiCommentBackground,
+                marginBottom: 20,
+                position: "relative",
+              }}
+            >
+              {aiLoading ? (
+                <View
                   style={{
-                    fontWeight: "bold",
-                    color: colors.primary,
-                    marginRight: 5,
-                    position: "absolute",
-                    top: 10,
-                    left: 0,
-                  }}
-                >
-                  <NemoryIcon /> <ThemedText> </ThemedText>
-                </ThemedText>
-                <ThemedText
-                  style={{
-                    color: colors.text,
+                    width: "75%",
+                    alignItems: "flex-start",
                     padding: 10,
                   }}
                 >
-                  <ThemedText
+                  <AILoader width={50} height={60} dotFontSize={24} />
+                </View>
+              ) : (
+                <View>
+                  <View
                     style={{
-                      paddingLeft: 300,
+                      padding: 10,
                     }}
                   >
-                    {"        "}
+                    <NemoryIcon width={50} height={60} />
+                  </View>
+
+                  {/*<ThemedText*/}
+                  {/*  style={{*/}
+                  {/*    fontWeight: "bold",*/}
+                  {/*    color: colors.primary,*/}
+                  {/*    marginRight: 5,*/}
+                  {/*    position: "absolute",*/}
+                  {/*    top: 10,*/}
+                  {/*    left: 0,*/}
+                  {/*  }}*/}
+                  {/*>*/}
+                  {/*  <NemoryIcon /> <ThemedText> </ThemedText>*/}
+                  {/*</ThemedText>*/}
+                  <ThemedText
+                    style={{
+                      color: colors.text,
+                      padding: 10,
+                    }}
+                  >
+                    {/*<ThemedText*/}
+                    {/*  style={{*/}
+                    {/*    paddingLeft: 300,*/}
+                    {/*  }}*/}
+                    {/*>*/}
+                    {/*  {"        "}*/}
+                    {/*</ThemedText>*/}
+                    {animatedAiComment}
                   </ThemedText>
-                  {entry.aiComment.content}
-                </ThemedText>
-              </View>
-            )}
+                </View>
+              )}
+            </View>
           </>
         )}
         {entry && entry.dialogs && entry.dialogs.length > 0 && (
           <>
-            {entry.dialogs.map((dialog, index) => (
-              <View key={index} style={{ marginBottom: 10 }}>
-                <View
-                  style={{
-                    alignItems: "flex-end",
-                  }}
-                >
+            {entry.dialogs.map((dialog, index) => {
+              return (
+                <View key={index} style={{ marginBottom: 10 }}>
                   <View
                     style={{
-                      width: "80%",
-                      marginBottom: 20,
-                      padding: 10,
+                      alignItems: "flex-end",
                     }}
                   >
-                    <ThemedText
+                    <View
                       style={{
-                        color: colors.text,
-                        marginBottom: 5,
+                        width: "80%",
+                        marginBottom: 20,
+                        padding: 10,
+                        backgroundColor: colors.questionBackground,
                       }}
                     >
-                      {dialog.question}
-                    </ThemedText>
+                      <ThemedText
+                        style={{
+                          color: colors.text,
+                          marginBottom: 5,
+                        }}
+                      >
+                        {dialog.question}
+                      </ThemedText>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      width: "75%",
+                      alignItems: "flex-start",
+                      backgroundColor: colors.aiCommentBackground,
+                      padding: 10,
+                      marginLeft: 10,
+                      borderRadius: 8,
+                    }}
+                  >
+                    {aiDialogLoading ? (
+                      <AILoader width={50} height={60} dotFontSize={24} />
+                    ) : (
+                      <NemoryIcon width={50} height={60} />
+                    )}
+
+                    <TypewriterAIResponse
+                      response={dialog.answer}
+                      style={{ color: colors.text }}
+                      setIdx={setIdx}
+                    />
+                    {/*<ThemedText style={{ color: colors.text }}>*/}
+                    {/*  {dialog.answer}*/}
+                    {/*</ThemedText>*/}
                   </View>
                 </View>
-                <View
-                  style={{
-                    width: "80%",
-                    alignItems: "flex-start",
-                    backgroundColor: colors.aiCommentBackground,
-                    padding: 10,
-                    borderRadius: 8,
-                    elevation: 1,
-                  }}
-                >
-                  <ThemedText style={{ color: colors.text }}>
-                    {dialog.answer}
-                  </ThemedText>
-                </View>
-              </View>
-            ))}
+              );
+            })}
           </>
         )}
-        <View>
-          {aiDialogLoading && (
-            <View
-              style={{
-                flex: 1,
-                padding: 10,
-                marginHorizontal: 15,
-                backgroundColor: "transparent",
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-            >
-              <AILoader />
-            </View>
-          )}
-        </View>
+        {/*<View>*/}
+        {/*  {aiDialogLoading && (*/}
+        {/*    <View*/}
+        {/*      style={{*/}
+        {/*        width: "75%",*/}
+        {/*        alignItems: "flex-start",*/}
+        {/*        backgroundColor: colors.aiCommentBackground,*/}
+        {/*        padding: 10,*/}
+        {/*        marginLeft: 10,*/}
+        {/*        borderRadius: 8,*/}
+        {/*      }}*/}
+        {/*    >*/}
+        {/*      <AILoader width={50} height={60} dotFontSize={24} />*/}
+        {/*    </View>*/}
+        {/*  )}*/}
+        {/*</View>*/}
       </View>
-    </ParallaxScrollView>
+    </ScrollView>
   );
 }

@@ -145,7 +145,7 @@ export default function Diary() {
         method: "DELETE",
       });
 
-      if (!response || response.status !== 20) {
+      if (!response || response.status !== 200) {
         console.log("No data returned from server");
         return;
       }
@@ -158,6 +158,7 @@ export default function Diary() {
             : [],
         };
       });
+      await fetchMoodsByDate();
     } catch (error) {
       console.error("Error deleting entry:", error);
     }

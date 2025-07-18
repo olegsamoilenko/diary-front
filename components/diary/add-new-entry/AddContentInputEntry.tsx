@@ -29,8 +29,12 @@ type InputEntryProps = {
   setShowFontSetting: (show: boolean) => void;
   showColorSetting: boolean;
   setShowColorSetting: (show: boolean) => void;
+  showEmojiSetting: boolean;
+  setShowEmojiSetting: (show: boolean) => void;
   isFocusTextRichEditor: boolean;
   setIsFocusTextRichEditor: (focus: boolean) => void;
+  emoji: string;
+  addEmoji: (emoji: string) => void;
 };
 
 export default function AddContentInputEntry({
@@ -50,12 +54,15 @@ export default function AddContentInputEntry({
   setShowFontSetting,
   showColorSetting,
   setShowColorSetting,
+  showEmojiSetting,
+  setShowEmojiSetting,
   isFocusTextRichEditor,
   setIsFocusTextRichEditor,
+  emoji,
+  addEmoji,
 }: InputEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const [showEmojiSetting, setShowEmojiSetting] = useState(false);
   const [showImageSetting, setShowImageSetting] = useState(false);
   const [showPhotoSetting, setShowPhotoSetting] = useState(false);
   const [selectedColor, setSelectedColor] = useState(colors.text);
@@ -142,6 +149,15 @@ export default function AddContentInputEntry({
     setSelectedFont(font);
   };
 
+  const handleEmojiAction = () => {
+    setShowEmojiSetting(true);
+  };
+
+  const handleEmoji = (emoji: string) => {
+    addEmoji(emoji);
+    setShowEmojiSetting(false);
+  };
+
   const handleFocus = () => {
     setIsFocusTextRichEditor(true);
   };
@@ -192,6 +208,7 @@ export default function AddContentInputEntry({
         setShowImageSetting={setShowImageSetting}
         showPhotoSetting={showPhotoSetting}
         setShowPhotoSetting={setShowPhotoSetting}
+        emoji={emoji}
       />
 
       {isKeyboardOpen && isFocusTextRichEditor && (
@@ -206,6 +223,7 @@ export default function AddContentInputEntry({
             font: true,
             bulletedList: true,
             orderedList: true,
+            emoji: true,
             photo: true,
             image: true,
           }}
@@ -219,6 +237,7 @@ export default function AddContentInputEntry({
           handleFontAction={handleFontAction}
           handleBulletedListAction={handleBulletedListAction}
           handleOrderedListAction={handleOrderedListAction}
+          handleEmojiAction={handleEmojiAction}
           handleImageAction={handleImageAction}
           handlePhotoAction={handlePhotoAction}
         ></RichToolbar>
@@ -241,6 +260,9 @@ export default function AddContentInputEntry({
         setSize={setSize}
         setFont={setFont}
         selectedFont={selectedFont}
+        setShowEmojiSetting={setShowEmojiSetting}
+        showEmojiSetting={showEmojiSetting}
+        addEmoji={handleEmoji}
       />
     </View>
   );

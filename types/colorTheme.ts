@@ -5,7 +5,6 @@ export type ColorTheme = {
   background: BackgroundSettings;
   backgroundColor: string;
   backgroundAdditional: string;
-  card: string;
   primary: string;
   secondary: string;
   text: string;
@@ -26,8 +25,10 @@ export type ColorTheme = {
   // input
   inputBackground: string;
   // diary
+  card: string;
   diaryNotesBackground: string;
   aiCommentBackground: string;
+  questionBackground: string;
   //  settings
   blockBackground: string;
   // barStyle

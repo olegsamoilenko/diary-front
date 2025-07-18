@@ -1,6 +1,12 @@
 import React, { forwardRef, useCallback, useState } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { THEME_OPTIONS } from "@/constants/ThemeOptions";
 import { Colors } from "@/constants/Colors";
 import i18n from "i18next";
@@ -45,39 +51,39 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         <ThemedText type={"titleLG"}>
           {t("settings.languages.title")}
         </ThemedText>
-        {languages.map((option) => (
-          <TouchableOpacity
-            key={option.value}
-            style={styles.row}
-            onPress={() => setValue(option.value as any)}
-          >
-            <View
-              style={[
-                styles.radio,
-                lang === option.value && {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].primary,
-                },
-                {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].background,
-                },
-              ]}
+        <ScrollView style={{ marginBottom: 0 }}>
+          {languages.map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              style={styles.row}
+              onPress={() => setValue(option.value as any)}
             >
-              {lang === option.value && (
-                <View
-                  style={[
-                    styles.radioDot,
-                    { backgroundColor: Colors[colorScheme].primary },
-                  ]}
-                />
-              )}
-            </View>
-            <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-              {t(`settings.languages.${option.key}`)}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <View
+                style={[
+                  styles.radio,
+                  lang === option.value && {
+                    borderColor: Colors[colorScheme].primary,
+                  },
+                  {
+                    borderColor: Colors[colorScheme].primary,
+                  },
+                ]}
+              >
+                {lang === option.value && (
+                  <View
+                    style={[
+                      styles.radioDot,
+                      { backgroundColor: Colors[colorScheme].primary },
+                    ]}
+                  />
+                )}
+              </View>
+              <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+                {t(`settings.languages.${option.key}`)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
     </SideSheet>
   );

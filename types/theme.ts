@@ -8,6 +8,8 @@ export type ThemeContextType = {
 export type LogoTheme = {
   light?: any;
   calmMind: any;
+  orange?: any;
   dark?: any;
+  sandDune?: any;
   yellowBokeh?: any;
 };

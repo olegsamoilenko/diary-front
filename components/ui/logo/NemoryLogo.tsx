@@ -10,7 +10,11 @@ export default function NemoryLogo({
 }) {
   const colorScheme = useColorScheme();
   const logos: LogoTheme = {
+    light: require("@/assets/images/logo/light_full.png"),
     calmMind: require("@/assets/images/logo/calmMind_full.png"),
+    orange: require("@/assets/images/logo/orange_full.png"),
+    dark: require("@/assets/images/logo/dark_full.png"),
+    sandDune: require("@/assets/images/logo/sandDune_full.png"),
     yellowBokeh: require("@/assets/images/logo/yellowBokeh_full.png"),
   };
   return (

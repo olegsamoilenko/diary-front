@@ -1,6 +1,12 @@
 import React, { forwardRef, useEffect, useState } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -25,8 +31,10 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const format = useSelector((state: RootState) => state.timeFormat);
 
   async function handleFormat(format: { key: 12 | 24; value: "12h" | "24h" }) {
+    console.log("Selected time format:", format);
     dispatch(saveTimeFormat(format));
     await SecureStore.setItemAsync("timeFormat", JSON.stringify(format));
+    console.log("Current time format:", format);
   }
 
   return (
@@ -36,39 +44,42 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         <ThemedText type={"titleLG"}>
           {t("settings.timeFormat.title")}
         </ThemedText>
-        {timeFormatOptions.map((f) => (
-          <TouchableOpacity
-            key={f.key}
-            style={styles.row}
-            onPress={() => handleFormat(f as any)}
-          >
-            <View
-              style={[
-                styles.radio,
-                Number(format) === Number(f.key) && {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].primary,
-                },
-                {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].background,
-                },
-              ]}
-            >
-              {Number(format.key) === Number(f.key) && (
+        <ScrollView style={{ marginBottom: 0 }}>
+          {timeFormatOptions.map((f) => {
+            console.log("Rendering format option:", f);
+            console.log("Current format key:", format);
+            return (
+              <TouchableOpacity
+                key={f.key}
+                style={styles.row}
+                onPress={() => handleFormat(f as any)}
+              >
                 <View
                   style={[
-                    styles.radioDot,
-                    { backgroundColor: Colors[colorScheme].primary },
+                    styles.radio,
+                    // Number(format.key) === Number(f.key) && {
+                    //   borderColor: Colors[colorScheme].primary,
+                    // },
                   ]}
-                />
-              )}
-            </View>
-            <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-              {t(`settings.timeFormat.${f.key}`)}
-            </Text>
-          </TouchableOpacity>
-        ))}
+                >
+                  {Number(format.key) === Number(f.key) && (
+                    <View
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: Colors[colorScheme].primary },
+                      ]}
+                    />
+                  )}
+                </View>
+                <Text
+                  style={[styles.label, { color: Colors[colorScheme].text }]}
+                >
+                  {t(`settings.timeFormat.${f.key}`)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
     </SideSheet>
   );

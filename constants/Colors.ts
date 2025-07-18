@@ -32,6 +32,7 @@ const Base = {
     card: "#",
     diaryNotesBackground: "#",
     aiCommentBackground: "#",
+    questionBackground: "#",
     // settings
     blockBackground: "#",
     // barStyle
@@ -42,17 +43,14 @@ const Base = {
   },
 };
 
-const tintColorLight = "#344360";
-const tintColorDark = "#fff";
-const primaryColorDark = "#344360";
-
 export const Colors: Record<string, ColorTheme> = {
   light: {
     // General
     background: {
       id: 201,
       value: "#FFFFFF",
-      type: "color",
+      type: "image",
+      url: require("@/assets/images//background/light.jpg"),
     },
     backgroundColor: "#FFFFFF",
     backgroundAdditional: "#babfc8",
@@ -80,7 +78,8 @@ export const Colors: Record<string, ColorTheme> = {
     // diary
     card: "#FFFFFF",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ECECEC",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "#FFFFFF",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
@@ -94,10 +93,11 @@ export const Colors: Record<string, ColorTheme> = {
     background: {
       id: 202,
       value: "#F6F7F9",
-      type: "color",
+      type: "image",
+      url: require("@/assets/images//background/calmMind.jpg"),
     },
     backgroundColor: "#F6F7F9",
-    backgroundAdditional: "#",
+    backgroundAdditional: "#cdd3df",
     primary: "#5BA9A6",
     secondary: "#FFC97A",
     text: "#23272F",
@@ -121,6 +121,7 @@ export const Colors: Record<string, ColorTheme> = {
     card: "#FFFFFF",
     aiCommentBackground: "#E7FAF8",
     diaryNotesBackground: "#FFFBEA",
+    questionBackground: "#F6F7F9",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
@@ -134,10 +135,11 @@ export const Colors: Record<string, ColorTheme> = {
     background: {
       id: 203,
       value: "#FFF9F4",
-      type: "color",
+      type: "image",
+      url: require("@/assets/images//background/orange.jpg"),
     },
     backgroundColor: "#FFF9F4",
-    backgroundAdditional: "#9e795c",
+    backgroundAdditional: "#dcd0c5",
     primary: "#FF8200",
     secondary: "#FFB354",
     text: "#2E2E2E",
@@ -160,13 +162,15 @@ export const Colors: Record<string, ColorTheme> = {
     // diary
     card: "#FFE4C7",
     diaryNotesBackground: "#FFE9D1",
-    aiCommentBackground: "#FFF1E6",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "transparent",
+    answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
     barStyle: "dark",
     // rich
-    toolbarBackground: "#FFF9F4",
+    toolbarBackground: "#FFE4C7",
     toolbarIcon: "#FF8200",
   },
 
@@ -201,7 +205,9 @@ export const Colors: Record<string, ColorTheme> = {
     // diary
     card: "#151718",
     diaryNotesBackground: "#4b5255",
-    aiCommentBackground: "",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
@@ -220,7 +226,7 @@ export const Colors: Record<string, ColorTheme> = {
       url: require("@/assets/images//background/sandDune.jpg"),
     },
     backgroundColor: "#8e8680",
-    backgroundAdditional: "#babfc8",
+    backgroundAdditional: "#bab0a9",
     primary: "#604d3f",
     secondary: "#4a5365",
     text: "#344360",
@@ -242,9 +248,11 @@ export const Colors: Record<string, ColorTheme> = {
     // input
     inputBackground: "#ffffff",
     // diary
-    card: "#b5aea8",
+    card: "#8e8680",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ECECEC",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
     //  settings
     blockBackground: "#b5aea8",
     // barStyle
@@ -263,7 +271,7 @@ export const Colors: Record<string, ColorTheme> = {
       url: require("@/assets/images/background/yellowBokeh.jpg"),
     },
     backgroundColor: "#222020",
-    backgroundAdditional: "#babfc8",
+    backgroundAdditional: "#534f4f",
     primary: "#a59f37",
     secondary: "#4a5365",
     text: "#b6bcca",
@@ -286,7 +294,9 @@ export const Colors: Record<string, ColorTheme> = {
     // diary
     card: "#222020",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ECECEC",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
     //  settings
     blockBackground: "#222020",
     // barStyle

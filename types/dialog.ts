@@ -1,8 +1,8 @@
 export type Dialog = {
-  id: string;
+  id?: string;
   question: string;
-  answer: string;
-  entryId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  answer?: string;
+  entryId?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

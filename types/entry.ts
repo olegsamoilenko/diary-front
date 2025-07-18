@@ -10,7 +10,7 @@ export type Entry = {
   aiComment: AiComment;
   mood: string;
   embedding: number[];
-  dialogs?: Dialog[];
+  dialogs: Dialog[];
   settings?: {
     background: {
       id: number;

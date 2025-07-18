@@ -59,12 +59,16 @@ const AddNewEntry = forwardRef<
   const [showFontSetting, setShowFontSetting] = useState(false);
   const [showSizeSetting, setShowSizeSetting] = useState(false);
   const [showColorSetting, setShowColorSetting] = useState(false);
+  const [showEmojiSetting, setShowEmojiSetting] = useState(false);
   const [showTitleFontSetting, setShowTitleFontSetting] = useState(false);
   const [showTitleSizeSetting, setShowTitleSizeSetting] = useState(false);
   const [showTitleColorSetting, setShowTitleColorSetting] = useState(false);
+  const [showTitleEmojiSetting, setShowTitleEmojiSetting] = useState(false);
   const [selectedColor, setSelectedColor] = useState(colors.text);
   const [selectedFont, setSelectedFont] = useState(FONTS[0]);
   const [selectedSize, setSelectedSize] = useState(16);
+  const [emoji, setEmoji] = useState<string>("");
+  const [titleEmoji, setTitleEmoji] = useState<string>("");
   const [aiDialogLoading, setAiDialogLoading] = useState(false);
   const [textReachEditorKey, setTextReachEditorKey] = useState(0);
   const [titleReachEditorKey, setTitleReachEditorKey] = useState(0);
@@ -196,6 +200,10 @@ const AddNewEntry = forwardRef<
     }
   };
 
+  const handleEmojiAction = () => {
+    setShowTitleEmojiSetting(true);
+  };
+
   const handleFocus = () => {
     console.log(111);
     setIsFocusTitleRichEditor(true);
@@ -204,6 +212,11 @@ const AddNewEntry = forwardRef<
   const handleBlur = () => {
     console.log(222);
     setIsFocusTitleRichEditor(false);
+  };
+
+  const handleTitleEmoji = (emoji: string) => {
+    setTitleEmoji(emoji);
+    setShowTitleEmojiSetting(false);
   };
 
   useEffect(() => {
@@ -236,45 +249,45 @@ const AddNewEntry = forwardRef<
     console.log("Saving entry:", entry);
 
     try {
-      // const res = await apiRequest({
-      //   url: `/diary-entries/create`,
-      //   method: "POST",
-      //   data: {
-      //     title: entry.title,
-      //     content: entry.content,
-      //     mood: entry.mood,
-      //     aiModel,
-      //     settings: entrySettings,
-      //   },
-      // });
-      //
-      // if (!res || res.status !== 201) {
-      //   console.log("No data returned from server");
-      //   setLoading(false);
-      //   return;
-      // }
-      //
-      // const newEntry: Entry = res.data;
-      //
-      // setEntry((prev) => ({ ...prev, ...newEntry }));
-      //
+      const res = await apiRequest({
+        url: `/diary-entries/create`,
+        method: "POST",
+        data: {
+          title: entry.title,
+          content: entry.content,
+          mood: entry.mood,
+          aiModel,
+          settings: entrySettings,
+        },
+      });
+
+      if (!res || res.status !== 201) {
+        console.log("No data returned from server");
+        setLoading(false);
+        return;
+      }
+
+      const newEntry: Entry = res.data;
+
+      setEntry((prev) => ({ ...prev, ...newEntry }));
+
       setLoading(false);
-      //
-      // setIsEntrySaved(true);
-      //
-      // // if (ref && typeof ref !== "function" && ref?.current) {
-      // //   ref.current.close();
-      // // }
-      //
-      // // if (props.onSuccess && entry) props.onSuccess(entry);
-      //
-      // await generateAiContent(
-      //   Number(newEntry!.id),
-      //   newEntry!.content,
-      //   newEntry!.embedding,
-      //   aiModel,
-      //   newEntry!.mood,
-      // );
+
+      setIsEntrySaved(true);
+
+      // if (ref && typeof ref !== "function" && ref?.current) {
+      //   ref.current.close();
+      // }
+
+      // if (props.onSuccess && entry) props.onSuccess(entry);
+
+      await generateAiContent(
+        Number(newEntry!.id),
+        newEntry!.content,
+        newEntry!.embedding,
+        aiModel,
+        newEntry!.mood,
+      );
     } catch (err) {
       console.log("Error saving entry.ts:", err);
       setLoading(false);
@@ -349,9 +362,16 @@ const AddNewEntry = forwardRef<
 
       setEntry((prev) => ({
         ...prev,
-        dialogs: prev.dialogs?.length
-          ? [...prev.dialogs, response.data]
-          : [response.data],
+        dialogs: prev.dialogs.map((dialog) => {
+          if (dialog.question === dialogQuestion) {
+            const { question, ...restData } = response.data;
+            return {
+              ...dialog,
+              ...restData,
+            };
+          }
+          return dialog;
+        }),
       }));
       setAiDialogLoading(false);
     } catch (error) {
@@ -366,7 +386,15 @@ const AddNewEntry = forwardRef<
   }
 
   const handleSend = async () => {
+    setEntry((prev) => ({
+      ...prev,
+      dialogs:
+        prev.dialogs && prev.dialogs.length
+          ? [...prev.dialogs, { question: dialogQuestion, answer: "" }]
+          : [{ question: dialogQuestion, answer: "" }],
+    }));
     Keyboard.dismiss();
+    setDialogQuestion("");
     await handleDialog();
   };
 
@@ -377,7 +405,9 @@ const AddNewEntry = forwardRef<
     showSizeSetting ||
     showTitleFontSetting ||
     showFontSetting ||
-    showBackgroundSetting;
+    showBackgroundSetting ||
+    showEmojiSetting ||
+    showTitleEmojiSetting;
 
   return (
     <SideSheet ref={ref} onOpenChange={setIsAddNewEntryOpen}>
@@ -457,6 +487,7 @@ const AddNewEntry = forwardRef<
               colorAction={colorAction}
               sizeAction={sizeAction}
               selectedFont={selectedFont}
+              titleEmoji={titleEmoji}
             />
 
             {entry && entry.content && isEntrySaved ? (
@@ -465,6 +496,7 @@ const AddNewEntry = forwardRef<
                 aiLoading={aiLoading}
                 aiDialogLoading={aiDialogLoading}
                 isKeyboardOpen={isKeyboardOpen}
+                isEntrySaved={isEntrySaved}
               />
             ) : (
               <>
@@ -479,6 +511,8 @@ const AddNewEntry = forwardRef<
                   setShowColorSetting={setShowColorSetting}
                   showBackgroundSetting={showBackgroundSetting}
                   setShowBackgroundSetting={setShowBackgroundSetting}
+                  showEmojiSetting={showEmojiSetting}
+                  setShowEmojiSetting={setShowEmojiSetting}
                   textReachEditorKey={textReachEditorKey}
                   isKeyboardOpen={isKeyboardOpen}
                   entry={entry}
@@ -495,6 +529,8 @@ const AddNewEntry = forwardRef<
                   onHandleSave={handleSave}
                   tooltipVisible={tooltipVisible}
                   entrySettings={entrySettings}
+                  addEmoji={setEmoji}
+                  emoji={emoji}
                 />
               </>
             )}
@@ -507,6 +543,7 @@ const AddNewEntry = forwardRef<
                   color: true,
                   size: true,
                   font: true,
+                  emoji: true,
                 }}
                 activeActions={activeActions}
                 handleBoldAction={handleBoldAction}
@@ -514,6 +551,7 @@ const AddNewEntry = forwardRef<
                 handleColorAction={handleColorAction}
                 handleSizeAction={handleSizeAction}
                 handleFontAction={handleFontAction}
+                handleEmojiAction={handleEmojiAction}
               ></RichToolbar>
             )}
 
@@ -528,10 +566,13 @@ const AddNewEntry = forwardRef<
               showSizeSetting={showTitleSizeSetting}
               setShowFontSetting={setShowTitleFontSetting}
               showFontSetting={showTitleFontSetting}
+              showEmojiSetting={showTitleEmojiSetting}
+              setShowEmojiSetting={setShowTitleEmojiSetting}
               setSize={setSize}
               setFont={setFont}
               selectedFont={selectedFont}
               selectedSize={selectedSize}
+              addEmoji={handleTitleEmoji}
             />
 
             {isEntrySaved && (
@@ -542,10 +583,8 @@ const AddNewEntry = forwardRef<
                   left: 0,
                   right: 0,
                   elevation: 10,
-                  borderWidth: 1,
-                  borderColor: colors.border,
                   borderRadius: 20,
-                  backgroundColor: colors.diaryNotesBackground,
+                  backgroundColor: colors.backgroundAdditional,
                   marginTop: isKeyboardOpen ? 0 : -33,
                   padding: 10,
                   marginHorizontal: 10,
@@ -554,8 +593,10 @@ const AddNewEntry = forwardRef<
                 <TextInput
                   multiline
                   onChangeText={setDialogQuestion}
+                  value={dialogQuestion}
                   placeholder="Enter text"
                   scrollEnabled={true}
+                  placeholderTextColor={colors.textAdditional}
                   style={{
                     maxHeight: ROW_HEIGHT * 10,
                     color: colors.text,
@@ -599,9 +640,11 @@ const AddNewEntry = forwardRef<
               setShowColorSetting(false);
               setShowSizeSetting(false);
               setShowFontSetting(false);
+              setShowEmojiSetting(false);
               setShowTitleColorSetting(false);
               setShowTitleSizeSetting(false);
               setShowTitleFontSetting(false);
+              setShowTitleEmojiSetting(false);
             }}
           />
         )}

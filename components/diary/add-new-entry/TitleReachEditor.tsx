@@ -27,6 +27,7 @@ type TitleReachEditorProps = {
     css: string;
   };
   setActiveActions: (actions: (prev: any) => any) => void;
+  titleEmoji: string;
 };
 
 const sizeMap: Record<number, number> = {
@@ -51,6 +52,7 @@ export default function TitleReachEditor({
   selectedFont,
   setActiveActions,
   titleReachEditorKey,
+  titleEmoji,
 }: TitleReachEditorProps) {
   const richTitle = useRef(null);
   const [editorHeight, setEditorHeight] = useState(40);
@@ -118,6 +120,11 @@ export default function TitleReachEditor({
       }`,
     );
   }, [sizeAction]);
+
+  useEffect(() => {
+    // @ts-ignore
+    richTitle.current?.insertText(titleEmoji);
+  }, [titleEmoji]);
 
   useEffect(() => {
     // @ts-ignore

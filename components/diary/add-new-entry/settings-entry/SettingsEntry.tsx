@@ -5,8 +5,6 @@ import { Colors } from "@/constants/Colors";
 import type { ColorTheme, EntrySettings } from "@/types";
 import BackgroundSetting from "@/components/diary/add-new-entry/settings-entry/BackgroundSetting";
 import EmojiSetting from "@/components/diary/add-new-entry/settings-entry/EmojiSetting";
-import ImageSetting from "@/components/diary/add-new-entry/settings-entry/ImageSetting";
-import PhotoSetting from "@/components/diary/add-new-entry/settings-entry/PhotoSetting";
 import TitleSettingEntry from "@/components/diary/add-new-entry/settings-entry/TitleSettingEntry";
 import { useTranslation } from "react-i18next";
 import ColorSetting from "@/components/diary/add-new-entry/settings-entry/ColorSetting";
@@ -33,10 +31,7 @@ type SettingsEntryProps = {
   selectedFont: any;
   setShowEmojiSetting?: (value: boolean) => void;
   showEmojiSetting?: boolean;
-  setShowImageSetting?: (value: boolean) => void;
-  showImageSetting?: boolean;
-  setShowPhotoSetting?: (value: boolean) => void;
-  showPhotoSetting?: boolean;
+  addEmoji: (emoji: string) => void;
 };
 
 export default function SettingsEntry({
@@ -59,10 +54,7 @@ export default function SettingsEntry({
   selectedFont,
   setShowEmojiSetting,
   showEmojiSetting,
-  setShowImageSetting,
-  showImageSetting,
-  setShowPhotoSetting,
-  showPhotoSetting,
+  addEmoji,
 }: SettingsEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -139,27 +131,7 @@ export default function SettingsEntry({
             title={t("diary.entry.settings.emoji")}
             onPress={setShowEmojiSetting}
           />
-          <EmojiSetting></EmojiSetting>
-        </View>
-      )}
-
-      {showImageSetting && setShowImageSetting && (
-        <View style={styles.setting}>
-          <TitleSettingEntry
-            title={t("diary.entry.settings.Image")}
-            onPress={setShowImageSetting}
-          />
-          <ImageSetting></ImageSetting>
-        </View>
-      )}
-
-      {showPhotoSetting && setShowPhotoSetting && (
-        <View style={styles.setting}>
-          <TitleSettingEntry
-            title={t("diary.entry.settings.photo")}
-            onPress={setShowPhotoSetting}
-          />
-          <PhotoSetting></PhotoSetting>
+          <EmojiSetting setEmoji={addEmoji}></EmojiSetting>
         </View>
       )}
     </View>

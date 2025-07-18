@@ -16,6 +16,7 @@ type RichToolbarProps = {
     font?: boolean;
     bulletedList?: boolean;
     orderedList?: boolean;
+    emoji?: boolean;
     image?: boolean;
     photo?: boolean;
   };
@@ -35,6 +36,7 @@ type RichToolbarProps = {
   handleFontAction?: () => void;
   handleBulletedListAction?: () => void;
   handleOrderedListAction?: () => void;
+  handleEmojiAction?: () => void;
   handleImageAction?: () => void;
   handlePhotoAction?: () => void;
 };
@@ -50,6 +52,7 @@ export default function RichToolbar({
   handleFontAction,
   handleBulletedListAction,
   handleOrderedListAction,
+  handleEmojiAction,
   handleImageAction,
   handlePhotoAction,
 }: RichToolbarProps) {
@@ -187,6 +190,16 @@ export default function RichToolbar({
           >
             <MaterialIcons
               name="format-list-numbered"
+              size={24}
+              color={colors.toolbarIcon}
+            />
+          </TouchableOpacity>
+        )}
+
+        {actions?.emoji && (
+          <TouchableOpacity onPress={handleEmojiAction}>
+            <MaterialIcons
+              name="sentiment-satisfied-alt"
               size={24}
               color={colors.toolbarIcon}
             />

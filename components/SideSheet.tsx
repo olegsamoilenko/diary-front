@@ -85,9 +85,7 @@ const SideSheet = forwardRef<SideSheetRef, SideSheetProps>(
         ]}
       >
         <Background background={Colors[colorScheme].background}>
-          <ParallaxScrollView isPadding={false} style={{ marginBottom: 0 }}>
-            <View style={styles.content}>{children}</View>
-          </ParallaxScrollView>
+          <View style={styles.content}>{children}</View>
         </Background>
       </Animated.View>
     );

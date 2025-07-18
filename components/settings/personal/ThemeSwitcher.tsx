@@ -6,6 +6,7 @@ import {
   Switch,
   Pressable,
   Image,
+  ScrollView,
 } from "react-native";
 import { useThemeCustom } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -90,35 +91,37 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         >
           {t("settings.theme.title")}
         </ThemedText>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
-          {themes.map((theme) => {
-            return (
-              <View
-                key={theme.name}
-                style={{
-                  width: "45%",
-                }}
-              >
-                <ThemedText
+        <ScrollView style={{ marginBottom: 0 }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
+            {themes.map((theme) => {
+              return (
+                <View
+                  key={theme.name}
                   style={{
-                    marginBottom: 5,
+                    width: "45%",
                   }}
                 >
-                  {t(`settings.theme.themes.${theme.name}`)}
-                </ThemedText>
-                <TouchableOpacity onPress={() => handleTheme(theme.name)}>
-                  <Image
-                    source={theme.img}
+                  <ThemedText
                     style={{
-                      width: "100%",
-                      height: 315,
+                      marginBottom: 5,
                     }}
-                  />
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </View>
+                  >
+                    {t(`settings.theme.themes.${theme.name}`)}
+                  </ThemedText>
+                  <TouchableOpacity onPress={() => handleTheme(theme.name)}>
+                    <Image
+                      source={theme.img}
+                      style={{
+                        width: "100%",
+                        height: 315,
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
       </View>
     </SideSheet>
   );

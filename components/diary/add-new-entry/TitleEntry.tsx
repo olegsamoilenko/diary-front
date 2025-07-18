@@ -39,6 +39,7 @@ type TitleEntryProps = {
   } | null;
   disabledTitleReachEditor?: boolean;
   titleReachEditorKey: number;
+  titleEmoji: string;
 };
 export default function TitleEntry({
   onChangeEntry,
@@ -56,6 +57,7 @@ export default function TitleEntry({
   setActiveActions,
   disabledTitleReachEditor,
   titleReachEditorKey,
+  titleEmoji,
 }: TitleEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -163,6 +165,7 @@ export default function TitleEntry({
         handleFocus={handleFocus}
         handleBlur={handleBlur}
         setActiveActions={setActiveActions}
+        titleEmoji={titleEmoji}
       />
     </View>
   );

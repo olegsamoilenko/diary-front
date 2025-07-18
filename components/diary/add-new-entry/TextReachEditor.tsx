@@ -35,6 +35,7 @@ type TextReachEditorProps = {
   setShowImageSetting: (show: boolean) => void;
   showPhotoSetting: boolean;
   setShowPhotoSetting: (show: boolean) => void;
+  emoji?: string;
 };
 
 const sizeMap: Record<number, number> = {
@@ -65,6 +66,7 @@ export default function TextReachEditor({
   setShowImageSetting,
   showPhotoSetting,
   setShowPhotoSetting,
+  emoji,
 }: TextReachEditorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -109,6 +111,11 @@ export default function TextReachEditor({
   `);
     }
   }, [isBoldAction]);
+
+  useEffect(() => {
+    // @ts-ignore
+    richText.current?.insertText(emoji);
+  }, [emoji]);
 
   useEffect(() => {
     if (isKeyboardOpen) {

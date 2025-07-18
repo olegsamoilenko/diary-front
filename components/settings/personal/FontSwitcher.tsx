@@ -1,5 +1,11 @@
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
@@ -47,47 +53,49 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         >
           {t("settings.font.title")}
         </ThemedText>
-        <View
-          style={{
-            flexDirection: "row",
-            flexWrap: "wrap",
-            rowGap: 16,
-            columnGap: 6,
-            justifyContent: "space-between",
-          }}
-        >
-          {Fonts.map((f) => {
-            return (
-              <TouchableOpacity key={f.name} onPress={() => handleFont(f)}>
-                <View style={styles.fontContainer}>
-                  <Text
+        <ScrollView style={{ marginBottom: 0 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              rowGap: 16,
+              columnGap: 6,
+              justifyContent: "space-between",
+            }}
+          >
+            {Fonts.map((f) => {
+              return (
+                <TouchableOpacity key={f.name} onPress={() => handleFont(f)}>
+                  <View style={styles.fontContainer}>
+                    <Text
+                      style={{
+                        fontFamily: getFont(f.name, "regular"),
+                        color: colors.text,
+                        textAlign: "center",
+                        fontSize: 16,
+                      }}
+                    >
+                      {f.title}
+                    </Text>
+                  </View>
+                  <View
                     style={{
-                      fontFamily: getFont(f.name, "regular"),
-                      color: colors.text,
-                      textAlign: "center",
-                      fontSize: 16,
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      borderRadius: 10,
+                      borderWidth: 3,
+                      borderColor:
+                        f.name === font.name ? colors.primary : "transparent",
                     }}
-                  >
-                    {f.title}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    borderRadius: 10,
-                    borderWidth: 3,
-                    borderColor:
-                      f.name === font.name ? colors.primary : "transparent",
-                  }}
-                />
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
       </View>
     </SideSheet>
   );
