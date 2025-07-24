@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 import * as SecureStore from "@/utils/store/secureStore";
 import Constants from "expo-constants";
+import Toast from "react-native-toast-message";
 
 const apiUrl = Constants.expoConfig?.extra?.API_URL;
 
@@ -33,9 +34,18 @@ export async function apiRequest<T = any>({
       const user = userRaw ? JSON.parse(userRaw) : {};
       const uuid = user.uuid;
       if (uuid) {
-        const res = await axios.post(apiUrl + "/auth/create-token", { uuid });
-        token = res.data.accessToken as string;
-        await SecureStore.setItemAsync("token", token);
+        try {
+          const res = await axios.post(apiUrl + "/auth/create-token", { uuid });
+          token = res.data.accessToken as string;
+          await SecureStore.setItemAsync("token", token);
+        } catch (err: any) {
+          console.log(err?.response?.data);
+          Toast.show({
+            type: "error",
+            text1: err?.response?.data.statusMessage,
+            text2: err?.response?.data.message,
+          });
+        }
       }
     }
 

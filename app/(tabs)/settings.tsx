@@ -18,7 +18,6 @@ import ThemeSwitcher from "@/components/settings/personal/ThemeSwitcher";
 import LanguageSwitcher from "@/components/settings/personal/LanguageSwitcher";
 import { useAppSelector } from "@/store/hooks";
 import ModelSwitcher from "@/components/settings/ai/ModelSwitcher";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import PersonalSettingsBlock from "@/components/settings/personal/PersonalSettingsBlock";
 import ActivitySwitcher from "@/components/settings/personal/ActivitySwitcher";
 import TimeFormatSwitcher from "@/components/settings/personal/TimeFormatSwitcher";
@@ -26,6 +25,9 @@ import FontSwitcher from "@/components/settings/personal/FontSwitcher";
 import { Portal } from "@gorhom/portal";
 import NemoryLogo from "@/components/ui/logo/NemoryLogo";
 import Background from "@/components/Background";
+import AiSettingsBlock from "@/components/settings/ai/AiSettingsBlock";
+import SubscriptionSettingsBlock from "@/components/settings/subscription/SubscriptionSettingsBlock";
+import PlansSettings from "@/components/settings/subscription/PlansSettings";
 
 export default function Settings() {
   const themeSwitcherRef = useRef<SideSheetRef>(null);
@@ -33,6 +35,7 @@ export default function Settings() {
   const activitySwitcherRef = useRef<SideSheetRef>(null);
   const languageSwitcherRef = useRef<SideSheetRef>(null);
   const fontSwitcherRef = useRef<SideSheetRef>(null);
+  const plansRef = useRef<SideSheetRef>(null);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -41,7 +44,7 @@ export default function Settings() {
   const aiModel = useAppSelector((state) => state.settings.aiModel);
 
   return (
-    <Background background={colors.background} paddingTop={40}>
+    <Background background={colors.backgroundImage} paddingTop={40}>
       <ParallaxScrollView>
         <View
           style={{
@@ -61,37 +64,10 @@ export default function Settings() {
           activitySwitcherRef={activitySwitcherRef}
           languageSwitcherRef={languageSwitcherRef}
         />
-
-        <TouchableOpacity
-          onPress={() => {
-            modelSwitcherRef.current?.open();
-          }}
-        >
-          <ThemedView
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <ThemedText>{t("settings.model.title")}</ThemedText>
-            <ThemedView
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-              }}
-            >
-              <ThemedText>{t(`settings.model.${aiModel}`)}</ThemedText>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={28}
-                color={colors.text}
-              />
-            </ThemedView>
-          </ThemedView>
-        </TouchableOpacity>
+        <ThemedText type="subtitleXL">{t("settings.ai")}</ThemedText>
+        <AiSettingsBlock modelSwitcherRef={modelSwitcherRef} />
+        <ThemedText type="subtitleXL">{t("settings.subscription")}</ThemedText>
+        <SubscriptionSettingsBlock plansRef={plansRef} />
       </ParallaxScrollView>
       <Portal>
         <ThemeSwitcher ref={themeSwitcherRef} />
@@ -100,6 +76,7 @@ export default function Settings() {
         <ActivitySwitcher ref={activitySwitcherRef} />
         <LanguageSwitcher ref={languageSwitcherRef} />
         <ModelSwitcher ref={modelSwitcherRef} />
+        <PlansSettings ref={plansRef} />
       </Portal>
     </Background>
   );

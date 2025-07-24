@@ -22,7 +22,7 @@ export default function SizeSetting({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: colors.backgroundColor,
+        backgroundColor: colors.background,
       }}
     >
       <ScrollView
@@ -46,7 +46,7 @@ export default function SizeSetting({
               justifyContent: "center",
               alignItems: "center",
               elevation: 5,
-              backgroundColor: colors.backgroundColor,
+              backgroundColor: colors.background,
               borderRadius: 2,
             }}
           >

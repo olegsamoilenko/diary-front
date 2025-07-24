@@ -2,6 +2,7 @@
   "expo": {
     "name": "Nemory",
     "slug": "nemory",
+    "owner": "soniac12",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -12,6 +13,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.soniac12.nemory",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -26,6 +28,12 @@
     "plugins": [
       "expo-router",
       "expo-localization",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.com.googleusercontent.apps.328496914085-v457ftd508li5e4g35n1rj9s0b5douvu"
+        }
+      ],
       [
         "expo-splash-screen",
         {

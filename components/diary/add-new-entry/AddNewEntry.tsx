@@ -205,12 +205,10 @@ const AddNewEntry = forwardRef<
   };
 
   const handleFocus = () => {
-    console.log(111);
     setIsFocusTitleRichEditor(true);
   };
 
   const handleBlur = () => {
-    console.log(222);
     setIsFocusTitleRichEditor(false);
   };
 
@@ -239,14 +237,11 @@ const AddNewEntry = forwardRef<
   }, []);
 
   const handleSave = async () => {
-    console.log("handleSave called");
     setLoading(true);
     setIsFocusTitleRichEditor(false);
     setIsFocusTextRichEditor(false);
     setTextReachEditorKey((k) => k + 1);
     setTitleReachEditorKey((k) => k + 1);
-
-    console.log("Saving entry:", entry);
 
     try {
       const res = await apiRequest({
@@ -332,6 +327,12 @@ const AddNewEntry = forwardRef<
     } catch (error) {
       console.error("Error generating AI content:", error);
       setAiLoading(false);
+      if (error.response && error.response.data) {
+        console.log("error.response", error.response);
+        console.log("response.data", error.response.data);
+      } else if (error.message) {
+        console.log("error.message", error.message);
+      }
     }
   };
 

@@ -180,7 +180,6 @@ export default function TextReachEditor({
   }, [isOrderedListAction]);
 
   useEffect(() => {
-    console.log("Color action changed:", colorAction);
     // @ts-ignore
     richText.current?.setForeColor(colorAction);
   }, [colorAction]);
@@ -207,7 +206,6 @@ export default function TextReachEditor({
   }, [selectedFont]);
 
   const onFocus = () => {
-    console.log("Editor focused");
     handleFocus();
     // @ts-ignore
     richText.current?.commandDOM(`
@@ -231,7 +229,6 @@ export default function TextReachEditor({
       }`,
         );
       }
-      console.log("String(colors.text)", String(colors.text));
     }, 100);
   };
 

@@ -31,10 +31,8 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const format = useSelector((state: RootState) => state.timeFormat);
 
   async function handleFormat(format: { key: 12 | 24; value: "12h" | "24h" }) {
-    console.log("Selected time format:", format);
     dispatch(saveTimeFormat(format));
     await SecureStore.setItemAsync("timeFormat", JSON.stringify(format));
-    console.log("Current time format:", format);
   }
 
   return (
@@ -42,43 +40,37 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
       <View style={styles.container}>
         <BackArrow ref={ref} />
         <ThemedText type={"titleLG"}>
-          {t("settings.timeFormat.title")}
+          {t("settings.timeFormat.titlePlural")}
         </ThemedText>
         <ScrollView style={{ marginBottom: 0 }}>
-          {timeFormatOptions.map((f) => {
-            console.log("Rendering format option:", f);
-            console.log("Current format key:", format);
-            return (
-              <TouchableOpacity
-                key={f.key}
-                style={styles.row}
-                onPress={() => handleFormat(f as any)}
+          {timeFormatOptions.map((f) => (
+            <TouchableOpacity
+              key={f.key}
+              style={styles.row}
+              onPress={() => handleFormat(f as any)}
+            >
+              <View
+                style={[
+                  styles.radio,
+                  Number(format.key) === Number(f.key) && {
+                    borderColor: Colors[colorScheme].primary,
+                  },
+                ]}
               >
-                <View
-                  style={[
-                    styles.radio,
-                    // Number(format.key) === Number(f.key) && {
-                    //   borderColor: Colors[colorScheme].primary,
-                    // },
-                  ]}
-                >
-                  {Number(format.key) === Number(f.key) && (
-                    <View
-                      style={[
-                        styles.radioDot,
-                        { backgroundColor: Colors[colorScheme].primary },
-                      ]}
-                    />
-                  )}
-                </View>
-                <Text
-                  style={[styles.label, { color: Colors[colorScheme].text }]}
-                >
-                  {t(`settings.timeFormat.${f.key}`)}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+                {Number(format.key) === Number(f.key) && (
+                  <View
+                    style={[
+                      styles.radioDot,
+                      { backgroundColor: Colors[colorScheme].primary },
+                    ]}
+                  />
+                )}
+              </View>
+              <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+                {t(`settings.timeFormat.${f.key}`)}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </View>
     </SideSheet>

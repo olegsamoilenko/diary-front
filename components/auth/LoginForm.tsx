@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   View,
   TextInput,
-  Text,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
@@ -10,86 +9,305 @@ import {
 import axios from "axios";
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
-import * as Updates from "expo-updates";
-import { useNavigation } from "@react-navigation/native";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import { ThemedText } from "@/components/ThemedText";
+import type { ColorTheme } from "@/types";
+import { ErrorMessages } from "@/types";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import { useTranslation } from "react-i18next";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { passwordRules } from "@/utils/";
+import Toast from "react-native-toast-message";
 
-export default function LoginForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+type LoginFormProps = {
+  forPlanSelect?: boolean;
+  onSuccessSignWithGoogle: () => void;
+  setShowForgotPasswordForm: (show: boolean) => void;
+};
+export default function LoginForm({
+  forPlanSelect,
+  onSuccessSignWithGoogle,
+  setShowForgotPasswordForm,
+}: LoginFormProps) {
   const [loading, setLoading] = useState(false);
   const apiUrl = Constants.expoConfig?.extra?.API_URL;
+  const { t } = useTranslation();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  const styles = getStyles(colors);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async () => {
-    setError(null);
-    if (!/^[^@]+@[^@]+\.[^@]+$/.test(email))
-      return setError("Некоректний email");
-    if (!password) return setError("Введіть пароль");
+  const loginSchema = Yup.object().shape({
+    email: Yup.string()
+      .email(t("auth.enterValidEmailAddress"))
+      .required(t("auth.emailIsRequired")),
+    password: Yup.string()
+      .matches(passwordRules, t("auth.thePasswordMustContain"))
+      .required(t("auth.passwordRequired")),
+  });
 
+  const handleLogin = async (
+    values: { email: string; password: string },
+    {
+      setSubmitting,
+      resetForm,
+    }: { setSubmitting: (submitting: boolean) => void; resetForm: () => void },
+  ) => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/login`, { email, password });
-      const { accessToken } = res.data;
+      const res = await axios.post(`${apiUrl}/auth/login`, {
+        email: values.email,
+        password: values.password,
+      });
+      console.log("Login response:", res);
+      const { accessToken, user } = res.data;
 
       await SecureStore.setItemAsync("token", accessToken);
-      setLoading(false);
+      await SecureStore.setItemAsync("user", JSON.stringify(user));
 
-      await Updates.reloadAsync();
-    } catch (err) {
-      setError("Помилка входу");
+      setLoading(false);
+      resetForm();
+      setSubmitting(false);
+      Toast.show({
+        type: "success",
+        text1: t("toast.successfullyLogged"),
+        text2: t("toast.youHaveSuccessfullyLoggedIn"),
+      });
+    } catch (err: any) {
+      console.log(err?.response?.data);
+      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
+      const errorKey = ErrorMessages[code];
+      setError(t(`errors.${errorKey}`));
       setLoading(false);
     }
   };
 
+  const handleForgotYourPassword = async () => {
+    setShowForgotPasswordForm(true);
+    // setForgotYourPasswordLoading(true);
+    // try {
+    //   const res = await axios.post(`${apiUrl}/auth/forgot-password`, {
+    //     email: "",
+    //   });
+    //   if (res && res.status !== 200) {
+    //     throw new Error("Failed to send forgot password email");
+    //   }
+    //   Toast.show({
+    //     type: "success",
+    //     text1: t("toast.forgotPasswordEmailSent"),
+    //     text2: t("toast.checkYourEmailForInstructions"),
+    //   });
+    // } catch (err) {
+    //   console.error("Error during forgot password:", err);
+    //   Toast.show({
+    //     type: "error",
+    //     text1: t("toast.failedToSendForgotPasswordEmail"),
+    //     text2: t("toast.somethingWentWrongPleaseTryAgain"),
+    //   });
+    // } finally {
+    //   setForgotYourPasswordLoading(false);
+    // }
+  };
+
   return (
     <View>
-      <TextInput
-        placeholder="Email"
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
+      <GoogleSignInButton
+        onSuccessSignWithGoogle={onSuccessSignWithGoogle}
+        forPlanSelect={forPlanSelect}
       />
-      <TextInput
-        placeholder="Пароль"
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      {error && <Text style={styles.error}>{error}</Text>}
-      <TouchableOpacity
-        style={styles.btn}
-        onPress={handleLogin}
-        disabled={loading}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.btnText}>Увійти</Text>
+        <View
+          style={{
+            flex: 1,
+            height: 1,
+            backgroundColor: colors.border,
+            marginRight: 8,
+          }}
+        ></View>
+        <ThemedText
+          style={{
+            textAlign: "center",
+            marginVertical: 16,
+            color: colors.text,
+          }}
+        >
+          {t("common.or")}
+        </ThemedText>
+        <View
+          style={{
+            flex: 1,
+            height: 1,
+            backgroundColor: colors.border,
+            marginLeft: 8,
+          }}
+        ></View>
+      </View>
+      <View
+        style={{
+          marginBottom: 20,
+        }}
+      >
+        <ThemedText
+          type="subtitleXL"
+          style={{
+            textAlign: "center",
+          }}
+        >
+          {t("auth.signUpWithEmail")}
+        </ThemedText>
+      </View>
+
+      <Formik
+        initialValues={{ email: "", password: "" }}
+        validationSchema={loginSchema}
+        onSubmit={handleLogin}
+      >
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+          isSubmitting,
+        }) => (
+          <>
+            <View
+              style={{
+                marginBottom: 20,
+              }}
+            >
+              <ThemedText style={styles.label}>{t("auth.email")}</ThemedText>
+              <TextInput
+                placeholder={t("auth.email")}
+                style={styles.input}
+                value={values.email}
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              {touched.email && errors.email && (
+                <ThemedText
+                  type={"small"}
+                  style={{
+                    color: colors.error,
+                    marginTop: -10,
+                    marginBottom: 20,
+                  }}
+                >
+                  {errors.email}
+                </ThemedText>
+              )}
+              <ThemedText style={styles.label}>{t("auth.password")}</ThemedText>
+              <TextInput
+                placeholder={t("auth.password")}
+                style={styles.input}
+                value={values.password}
+                onChangeText={handleChange("password")}
+                onBlur={handleBlur("password")}
+                secureTextEntry
+                autoCapitalize="none"
+              />
+              {touched.password && errors.password && (
+                <ThemedText
+                  type={"small"}
+                  style={{
+                    color: colors.error,
+                    marginTop: -10,
+                    marginBottom: 20,
+                  }}
+                >
+                  {errors.password}
+                </ThemedText>
+              )}
+            </View>
+            {error && (
+              <ThemedText
+                type={"small"}
+                style={{
+                  color: colors.error,
+                  marginTop: -10,
+                  marginBottom: 20,
+                }}
+              >
+                {error}
+              </ThemedText>
+            )}
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 18,
+                paddingVertical: 10,
+                borderRadius: 12,
+                marginBottom: 16,
+              }}
+              onPress={() => {
+                setShowForgotPasswordForm(true);
+              }}
+            >
+              <ThemedText
+                type="subtitleLG"
+                style={{
+                  color: colors.text,
+                  textAlign: "center",
+                }}
+              >
+                {t("auth.forgotYourPassword")}
+              </ThemedText>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btn}
+              onPress={() => handleSubmit()}
+              disabled={isSubmitting}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <ThemedText
+                  style={{
+                    color: colors.textInPrimary,
+                    textAlign: "center",
+                  }}
+                >
+                  {t("auth.login")}
+                </ThemedText>
+              )}
+            </TouchableOpacity>
+          </>
         )}
-      </TouchableOpacity>
+      </Formik>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    backgroundColor: "#f2f3f7",
-    padding: 14,
-    borderRadius: 8,
-    marginBottom: 12,
-    fontSize: 16,
-  },
-  error: { color: "#e53935", marginBottom: 12 },
-  btn: {
-    backgroundColor: "#6C47FF",
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  btnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-});
+const getStyles = (colors: ColorTheme) =>
+  StyleSheet.create({
+    input: {
+      backgroundColor: colors.inputBackground,
+      padding: 14,
+      borderRadius: 8,
+      marginBottom: 12,
+      fontSize: 16,
+      minWidth: "100%",
+    },
+    label: {
+      marginBottom: 16,
+      textAlign: "left",
+    },
+    btn: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      textAlign: "center",
+    },
+  });

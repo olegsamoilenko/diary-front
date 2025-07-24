@@ -51,7 +51,7 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
             marginBottom: 16,
           }}
         >
-          {t("settings.font.title")}
+          {t("settings.font.titlePlural")}
         </ThemedText>
         <ScrollView style={{ marginBottom: 0 }}>
           <View

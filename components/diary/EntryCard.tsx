@@ -27,7 +27,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
-  const format = useSelector((state: RootState) => state.timeFormat.value);
+  const format = useSelector((state: RootState) => state.timeFormat.key);
   const [key, setKey] = useState<number>(0);
   const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
   const { t } = useTranslation();

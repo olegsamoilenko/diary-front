@@ -8,6 +8,8 @@ import type { TokenUsageHistory, UserTokenUsage } from "./token";
 import type { Theme, ThemeContextType, LogoTheme } from "./theme";
 import type { MoodByDate } from "./moodByDate";
 import type { EntrySettings, BackgroundSettings } from "./entrySettings";
+import { ErrorMessages } from "./messages";
+import type { ErrorsType } from "./errors";
 
 export type {
   ColorTheme,
@@ -24,4 +26,7 @@ export type {
   EntrySettings,
   BackgroundSettings,
   LogoTheme,
+  ErrorsType,
 };
+
+export { ErrorMessages };

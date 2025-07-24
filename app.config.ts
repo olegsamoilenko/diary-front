@@ -4,6 +4,7 @@ export default {
   expo: {
     name: "Nemory",
     slug: "nemory",
+    owner: "soniac12",
     scheme: "nemory",
     version: "1.0.1",
     plugins: ["expo-localization", "expo-router"],

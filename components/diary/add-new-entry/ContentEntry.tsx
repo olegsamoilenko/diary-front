@@ -37,10 +37,6 @@ export default function ContentEntry({
     }
   }, [animatedAiComment, idx, isEntrySaved, aiDialogLoading]);
 
-  useEffect(() => {
-    console.log("ContentEntry mounted", entry.dialogs);
-  }, [entry.dialogs]);
-
   return (
     <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
       <View

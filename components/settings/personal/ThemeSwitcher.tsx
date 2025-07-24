@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { useThemeCustom } from "@/context/ThemeContext";
 import { useTranslation } from "react-i18next";
-import { THEME_OPTIONS } from "@/constants/ThemeOptions";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -89,7 +88,7 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
             marginBottom: 16,
           }}
         >
-          {t("settings.theme.title")}
+          {t("settings.theme.titlePlural")}
         </ThemedText>
         <ScrollView style={{ marginBottom: 0 }}>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>

@@ -50,7 +50,7 @@ export default function BackgroundSetting({
             alignItems: "center",
             padding: 20,
             gap: 10,
-            backgroundColor: colors.backgroundColor,
+            backgroundColor: colors.background,
           }}
           pointerEvents="auto"
         >
@@ -86,7 +86,7 @@ export default function BackgroundSetting({
         style={{
           height: 250,
           width: "105%",
-          backgroundColor: colors.backgroundColor,
+          backgroundColor: colors.background,
         }}
       >
         <ScrollView

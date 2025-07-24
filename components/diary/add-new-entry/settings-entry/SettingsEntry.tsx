@@ -148,7 +148,7 @@ const getStyles = (colors: ColorTheme, keyboardHeight: number) =>
       padding: 10,
       // height: 50,
       // bottom: keyboardHeight,
-      backgroundColor: colors.backgroundColor,
+      backgroundColor: colors.background,
       width: "100%",
       // zIndex: 80,
       // borderWidth: 0,

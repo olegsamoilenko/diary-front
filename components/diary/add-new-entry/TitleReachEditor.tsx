@@ -102,7 +102,6 @@ export default function TitleReachEditor({
   }, [isItalicAction]);
 
   useEffect(() => {
-    console.log("Color action changed fot title:", colorAction);
     // @ts-ignore
     richTitle.current?.setForeColor(colorAction);
   }, [colorAction]);
@@ -134,7 +133,6 @@ export default function TitleReachEditor({
   }, [selectedFont]);
 
   const onFocus = () => {
-    console.log("Editor title focused", colorAction);
     handleFocus();
     // @ts-ignore
     richTitle.current?.commandDOM(`
@@ -143,7 +141,6 @@ export default function TitleReachEditor({
 
     setTimeout(() => {
       if (richTitle.current) {
-        console.log("Setting focus on richTitle editor", colorAction);
         // @ts-ignore
         richTitle.current.commandDOM(
           `document.execCommand('foreColor', false, '${colorAction}')`,

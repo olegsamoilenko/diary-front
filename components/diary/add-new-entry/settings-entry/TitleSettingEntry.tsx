@@ -37,7 +37,7 @@ const getStyles = (colors: ColorTheme) =>
       justifyContent: "space-between",
       alignItems: "center",
       padding: 10,
-      backgroundColor: colors.backgroundColor,
+      backgroundColor: colors.background,
     },
     checkmarkIcon: {
       // position: "absolute",

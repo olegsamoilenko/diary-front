@@ -71,7 +71,7 @@ export default function EmojiSetting({ setEmoji }: EmojiSettingProps) {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: colors.backgroundColor,
+        backgroundColor: colors.background,
         width: "100%",
       }}
     >

@@ -11,7 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { ThemeProviderCustom } from "@/context/ThemeContext";
+import { ThemeProviderCustom, useThemeCustom } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/utils";
@@ -20,16 +20,18 @@ import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
 import { store } from "@/store";
 import { Provider, useDispatch } from "react-redux";
-import SelectPlanModal from "@/components/SelectPlanModal";
+import SelectPlan from "@/components/SelectPlan";
 import { Plan, User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
 import { PortalProvider } from "@gorhom/portal";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { setFont } from "@/store/slices/settings/fontSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { saveTimeFormat } from "@/store/slices/settings/timeFormatSlice";
+import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 import AuthGate from "@/components/auth/AuthGate";
 import { Colors } from "@/constants/Colors";
+import { NavigationThemes } from "@/constants/Theme";
+import AuthForm from "@/components/auth/AuthForm";
+import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -57,6 +59,7 @@ export default function RootLayout() {
     "Tinos-Bold": require("@/assets/fonts/Tinos-Bold.ttf"),
     "Ubuntu-Regular": require("@/assets/fonts/Ubuntu-Regular.ttf"),
     "Ubuntu-Bold": require("@/assets/fonts/Ubuntu-Bold.ttf"),
+    "Ostrich Black": require("@/assets/fonts/Ostrich-black.ttf"),
     "Marck Script": require("@/assets/fonts/entry/MarckScript-Regular.ttf"),
     Neucha: require("@/assets/fonts/entry/Neucha-Regular.ttf"),
     Pacifico: require("@/assets/fonts/entry/Pacifico-Regular.ttf"),
@@ -66,11 +69,16 @@ export default function RootLayout() {
 
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { theme } = useThemeCustom();
+  const navTheme = NavigationThemes[theme] || NavigationThemes.light;
+  const [showAuthForm, setShowAuthForm] = useState(false);
 
   useEffect(() => {
     // const clearUserFromSecureStore = async () => {
     //   await SecureStore.deleteItemAsync("token");
     //   await SecureStore.deleteItemAsync("user");
+    //   await SecureStore.deleteItemAsync("user_pin");
+    //   await SecureStore.deleteItemAsync("biometry_enabled");
     //   return;
     // };
     // clearUserFromSecureStore();
@@ -97,6 +105,11 @@ export default function RootLayout() {
           data: { uuid: newUuid },
         });
 
+        if (!res || res.status !== 201) {
+          console.log("No data returned from server");
+          return;
+        }
+
         const data = await res.data;
 
         userObj = data.user;
@@ -120,6 +133,20 @@ export default function RootLayout() {
 
     initLanguage();
   }, []);
+
+  const handleSubscribePlan = async (plan: Plan) => {
+    const userString = await SecureStore.getItemAsync("user");
+    const user: User = userString ? JSON.parse(userString) : null;
+    console.log("handleSubscribePlan user:", user);
+    if (plan.name === "Start") {
+      await subscribePlan(plan);
+    } else if (user && user.isRegistered) {
+      console.log("Subscribing to plan:", plan);
+      //   TODO: Payment processing logic
+    } else {
+      setShowAuthForm(true);
+    }
+  };
 
   const subscribePlan = async (plan: Plan) => {
     try {
@@ -149,7 +176,16 @@ export default function RootLayout() {
   }
 
   if (!isAuthenticated) {
-    return <AuthGate onAuthenticated={() => setIsAuthenticated(true)} />;
+    return (
+      <Provider store={store}>
+        <ThemeProviderCustom>
+          <ThemeProvider value={navTheme}>
+            <AuthGate onAuthenticated={() => setIsAuthenticated(true)} />
+            <Toast />
+          </ThemeProvider>
+        </ThemeProviderCustom>
+      </Provider>
+    );
   }
 
   return (
@@ -157,13 +193,19 @@ export default function RootLayout() {
       <ThemeProviderCustom>
         <AuthProvider>
           <PortalProvider>
-            {!user?.plan ? (
-              <SelectPlanModal visible onSelect={subscribePlan} />
+            {showAuthForm ? (
+              <AuthForm
+                forPlanSelect={true}
+                onSuccessSignWithGoogle={() => setShowAuthForm(false)}
+                onSuccessEmailCode={() => setShowAuthForm(false)}
+                // onSuccessPhoneCode={() => setShowAuthForm(false)}
+              />
+            ) : !user?.plan ? (
+              <SelectPlan visible onSelect={handleSubscribePlan} />
             ) : (
-              <>
-                <RootLayoutInner />
-              </>
+              <RootLayoutInner />
             )}
+            <Toast />
           </PortalProvider>
         </AuthProvider>
       </ThemeProviderCustom>
@@ -173,7 +215,8 @@ export default function RootLayout() {
 
 function RootLayoutInner() {
   const colorScheme = useColorScheme();
-  const navTheme = colorScheme === "dark" ? DarkTheme : DefaultTheme;
+  const { theme } = useThemeCustom();
+  const navTheme = NavigationThemes[theme] || NavigationThemes.light;
   const colors = Colors[colorScheme ?? "light"];
 
   const dispatch = useDispatch();
@@ -190,7 +233,7 @@ function RootLayoutInner() {
     const loadTimeFormat = async () => {
       const timeFormat = await SecureStore.getItemAsync("timeFormat");
       if (timeFormat) {
-        dispatch(saveTimeFormat(JSON.parse(timeFormat)));
+        dispatch(setTimeFormat(JSON.parse(timeFormat)));
       }
     };
 

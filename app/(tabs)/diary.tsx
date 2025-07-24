@@ -165,7 +165,7 @@ export default function Diary() {
   };
 
   return (
-    <Background background={colors.background} paddingTop={40}>
+    <Background background={colors.backgroundImage} paddingTop={40}>
       {loading ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

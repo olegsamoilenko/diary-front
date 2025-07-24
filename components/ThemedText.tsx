@@ -8,6 +8,8 @@ import { getFont } from "@/utils";
 
 export type ThemedTextProps = TextProps & {
   type?:
+    | "logo"
+    | "slogan"
     | "titleXL"
     | "titleLG"
     | "subtitleXL"
@@ -35,6 +37,8 @@ export function ThemedText({
   return (
     <Text
       style={[
+        type === "logo" ? styles.logo : undefined,
+        type === "slogan" ? styles.slogan : undefined,
         type === "titleXL" ? styles.titleXL : undefined,
         type === "titleLG" ? styles.titleLG : undefined,
         type === "subtitleXL" ? styles.subtitleXL : undefined,
@@ -62,6 +66,18 @@ const getStyles = (
   font: { title: string; name: string },
 ) => {
   return StyleSheet.create({
+    logo: {
+      fontSize: 55,
+      fontFamily: getFont(font.name, "bold"),
+      lineHeight: 60,
+      letterSpacing: 2,
+    },
+    slogan: {
+      fontSize: 30,
+      fontFamily: getFont(font.name, "bold"),
+      lineHeight: 34,
+      letterSpacing: 6,
+    },
     titleXL: {
       fontSize: 24,
       fontFamily: getFont(font.name, "bold"),

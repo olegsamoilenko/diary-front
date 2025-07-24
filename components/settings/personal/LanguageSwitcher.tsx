@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { THEME_OPTIONS } from "@/constants/ThemeOptions";
 import { Colors } from "@/constants/Colors";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
@@ -49,7 +48,7 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
       <View style={styles.container}>
         <BackArrow ref={ref} />
         <ThemedText type={"titleLG"}>
-          {t("settings.languages.title")}
+          {t("settings.languages.titlePlural")}
         </ThemedText>
         <ScrollView style={{ marginBottom: 0 }}>
           {languages.map((option) => (
@@ -78,9 +77,11 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                   />
                 )}
               </View>
-              <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
+              <ThemedText
+                style={[styles.label, { color: Colors[colorScheme].text }]}
+              >
                 {t(`settings.languages.${option.key}`)}
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -119,10 +120,9 @@ const getStyles = (colors: any) =>
       width: 10,
       height: 10,
       borderRadius: 6,
-      backgroundColor: "#0284c7",
     },
     label: {
       fontSize: 16,
-      color: "#18181b",
+      color: colors.text,
     },
   });

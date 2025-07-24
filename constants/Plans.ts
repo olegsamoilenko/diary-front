@@ -3,24 +3,24 @@ export const Plans = [
     name: "Start",
     price: 0,
     tokensLimit: 350000,
-    descriptionKey: "tariffModal.start.description",
+    descriptionKey: "plans.start.description",
   },
   {
     name: "Lite",
     price: 10,
     tokensLimit: 850000,
-    descriptionKey: "tariffModal.lite.description",
+    descriptionKey: "plans.lite.description",
   },
   {
     name: "Base",
     price: 20,
     tokensLimit: 1700000,
-    descriptionKey: "tariffModal.base.description",
+    descriptionKey: "plans.base.description",
   },
   {
     name: "Pro",
     price: 40,
     tokensLimit: 3400000,
-    descriptionKey: "tariffModal.pro.description",
+    descriptionKey: "plans.pro.description",
   },
 ];

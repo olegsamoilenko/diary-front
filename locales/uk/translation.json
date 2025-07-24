@@ -1,4 +1,52 @@
 {
+  "slogan": "Розумний Щоденник",
+  "auth": {
+    "name": "Ім'я",
+    "enterName": "Введіть Ім'я",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "confirmPassword": "Підтвердіть Пароль",
+    "login": "Увійти",
+    "register": "Зареєструватися",
+    "registration": "Реєстрація",
+    "enterValidEmailAddress": "Введіть коректний email",
+    "emailIsRequired": "Email обов'язковий",
+    "thePasswordMustContain": "Пароль має містити мінімум 8 символів, одну велику, одну маленьку літеру, одну цифру та один спецсимвол",
+    "passwordRequired": "Пароль обов'язковий",
+    "confirmYourPassword": "Підтвердіть пароль",
+    "passwordsDoNotMatch": "Паролі не співпадають",
+    "setPin": "Встановіть PIN-код (мін. 4 цифри)",
+    "confirmPin": "Підтвердіть PIN-код",
+    "enableFingerprint": "Увімкнути вхід по відбитку / FaceID?",
+    "youCanChangeThis": "Ви можете змінити це в налаштуваннях",
+    "enterPin": "Введіть PIN-код",
+    "pinMustContainAtLeast4Digits": "PIN має містити мінімум 4 цифри",
+    "pinMustContainAMaximumOf6Digits": "PIN має містити максимум 6 цифр",
+    "pinMustContainOnlyDigits": "PIN має містити лише цифри",
+    "confirmThePinCode": "Підтвердіть PIN-код",
+    "pinCodesDoNotMatch": "PIN-коди не співпадають",
+    "useBiometricsToLogIn": "Використайте біометрію для входу",
+    "incorrectPin": "Невірний PIN",
+    "waitingForBiometrics": "Очікуємо біометрію...",
+    "signIn": "Увійти",
+    "tryBiometricsAgain": "Спробувати знову біометрію",
+    "pinIsIncorrect": "PIN невірний",
+    "signInWithGoogle": "Увійти через Google",
+    "signUpWithEmail": "Зареєструватися через Email",
+    "signInWithPhone": "Увійти через Телефон",
+    "phoneMustBeInFormat": "Номер телефону має бути у форматі: код країни + номер. Наприклад 38XXXXXXXXXX",
+    "sendCode": "Надіслати Код",
+    "weHaveSentYouCodeByEmail": "Ми надіслали Вам код для підтвердження на пошту. Будь ласка, введіть код для продовження",
+    "weHaveSentYouCodeToYourPhone": "Ми надіслали Вам код на телефон. Будь ласка, введіть свій код для продовження",
+    "confirm": "Підтвердити",
+    "resendCode": "Надіслати код знову",
+    "forgotYourPassword": "Забули пароль?",
+    "sendPasswordResetCodeToYourEmail": "Надіслати код для скидання пароля на вашу електронну пошту",
+    "code": "Код",
+    "changePassword": "Змінити пароль",
+    "codeMustBe6Digits": "Код має бути 6 цифр",
+    "codeRequired": "Код обов'язковий"
+  },
   "diary": {
     "title": "Щоденник",
     "addEntryTitle": "Заголовок",
@@ -25,13 +73,10 @@
   },
   "settings": {
     "title": "Налаштування",
-    "common": {
-      "timeFormat": "Формат часу",
-      "activeHours": "Час активності"
-    },
     "personal": "Особисті налаштування",
     "theme": {
-      "title": "Теми",
+      "title": "Тема",
+      "titlePlural": "Теми",
       "themes": {
         "light": "Світла",
         "calmMind": "Спокійний розум",
@@ -42,30 +87,47 @@
       }
     },
     "font": {
-      "title": "Шрифти"
+      "title": "Шрифт",
+      "titlePlural": "Шрифти"
     },
     "timeFormat": {
       "title": "Формат часу",
+      "titlePlural": "Формати часу",
       "12": "12-годинний формат",
       "24": "24-годинний формат",
       "h": "- годин"
     },
+    "activeHours": {
+      "title": "Час активності"
+    },
     "languages": {
       "title": "Мова",
+      "titlePlural": "Мови",
       "en": "English",
       "uk": "Українська"
     },
+    "ai": "AI Налаштування",
     "model": {
       "title": "Модель",
+      "titlePlural": "Моделі",
       "gpt-4o": "GPT-4o (швидка і розумна)",
       "gpt-4-turbo": "GPT-4 Turbo"
+    },
+    "subscription": "Налаштування підписки",
+    "plans": {
+      "title": "План",
+      "titlePlural": "Плани",
+      "subscribe": "Підписатися",
+      "unsubscribe": "Відписатися"
     }
   },
-  "tariffModal": {
-    "title": "Оберіть ваш тариф",
+  "planModal": {
+    "title": "Оберіть ваш план",
     "month": "міс",
     "free": "Безкоштовно",
-    "tokensPerMonth": "Токенів/міс",
+    "tokensPerMonth": "Токенів/міс"
+  },
+  "plans": {
     "start": {
       "description": "Пробний період 7 днів"
     },
@@ -76,7 +138,7 @@
       "description": "Оптимально для щоденника"
     },
     "pro": {
-      "description": "Максимальний тариф"
+      "description": "Максимальний"
     }
   },
   "toolTips": {
@@ -89,8 +151,33 @@
     "save": "Зберегти",
     "delete": "Видалити",
     "edit": "Редагувати",
+    "send": "Надіслати",
     "close": "Закрити",
     "yes": "Так",
-    "no": "Ні"
+    "no": "Ні",
+    "loading": "Завантаження...",
+    "or": "або"
+  },
+  "errors": {
+    "invalidPassword": "Ви ввели невірний пароль",
+    "userNotFound": "Користувача не знайдено",
+    "emailNotVerified": "Електронна пошта не підтверджена",
+    "invalidCode": "Наданий код є недійсним або простроченим",
+    "emailAlreadyVerified": "Електронна пошта вже підтверджена",
+    "userAlreadyExists": "Користувач з такою електронною поштою вже існує",
+  },
+  "toast": {
+    "successfullyLogged": "Успішно увійшли",
+    "youHaveSuccessfullyLoggedIn": "Ви успішно увійшли в додаток",
+    "youHaveSuccessfullyRegistered": "Ви успішно зареєструвалися. Ми надіслали Вам код для підтвердження пошти",
+    "successfullyRegistered": "Успішно зареєстровано",
+    "failedToConfirmEmail": "Не вдалося підтвердити електронну пошту",
+    "emailConfirmed": "Електронна пошта підтверджена",
+    "youHaveSuccessfullyVerifiedYourEmail": "Ви успішно підтвердили свою електронну пошту",
+    "failedToResendCode": "Не вдалося надіслати код знову",
+    "codeResent": "Код надіслано знову",
+    "weHaveSentYouCodeByEmail": "Ми надіслали вам код на електронну пошту. Будь ласка, введіть цей код для продовження",
+    "successfullySend": "Код успішно надіслано",
+    "weHaveSuccessfullySentTheCodeToYourEmail": "Ми успішно надіслали код на вашу електронну пошту"
   }
 }

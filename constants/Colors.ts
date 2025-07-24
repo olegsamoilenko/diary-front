@@ -1,13 +1,13 @@
 import type { ColorTheme } from "@/types";
 const Base = {
   light: {
-    background: {
+    background: "#",
+    backgroundImage: {
       id: 0,
       value: "#0",
       type: "color | image",
       url: undefined,
     },
-    backgroundColor: "#",
     backgroundAdditional: "#",
     primary: "#",
     secondary: "#",
@@ -17,6 +17,7 @@ const Base = {
     link: "#0000ff",
     border: "#",
     error: "#B9130F",
+    notification: "",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#",
@@ -33,6 +34,7 @@ const Base = {
     diaryNotesBackground: "#",
     aiCommentBackground: "#",
     questionBackground: "#",
+    answerBackground: "#",
     // settings
     blockBackground: "#",
     // barStyle
@@ -46,13 +48,13 @@ const Base = {
 export const Colors: Record<string, ColorTheme> = {
   light: {
     // General
-    background: {
+    background: "#FFFFFF",
+    backgroundImage: {
       id: 201,
       value: "#FFFFFF",
       type: "image",
       url: require("@/assets/images//background/light.jpg"),
     },
-    backgroundColor: "#FFFFFF",
     backgroundAdditional: "#babfc8",
 
     primary: "#344360",
@@ -63,6 +65,7 @@ export const Colors: Record<string, ColorTheme> = {
     link: "#0000ff",
     border: "#E0E0E0",
     error: "#B9130F",
+    notification: "#ff5252",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#bfbdbd",
@@ -80,6 +83,7 @@ export const Colors: Record<string, ColorTheme> = {
     diaryNotesBackground: "#EFE7DA",
     aiCommentBackground: "#ffffff33",
     questionBackground: "#FFFFFF",
+    answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
@@ -90,13 +94,13 @@ export const Colors: Record<string, ColorTheme> = {
   },
 
   calmMind: {
-    background: {
+    background: "#F6F7F9",
+    backgroundImage: {
       id: 202,
       value: "#F6F7F9",
       type: "image",
       url: require("@/assets/images//background/calmMind.jpg"),
     },
-    backgroundColor: "#F6F7F9",
     backgroundAdditional: "#cdd3df",
     primary: "#5BA9A6",
     secondary: "#FFC97A",
@@ -106,6 +110,7 @@ export const Colors: Record<string, ColorTheme> = {
     link: "#5BA9A6",
     border: "#E5E7EB",
     error: "#FF7A7A",
+    notification: "#ff5252",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#5BA9A6",
@@ -119,9 +124,10 @@ export const Colors: Record<string, ColorTheme> = {
     inputBackground: "#F0F2F6",
     // diary
     card: "#FFFFFF",
-    aiCommentBackground: "#E7FAF8",
     diaryNotesBackground: "#FFFBEA",
+    aiCommentBackground: "#ffffff33",
     questionBackground: "#F6F7F9",
+    answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
@@ -132,13 +138,13 @@ export const Colors: Record<string, ColorTheme> = {
   },
 
   orange: {
-    background: {
+    background: "##FFF9F4",
+    backgroundImage: {
       id: 203,
       value: "#FFF9F4",
       type: "image",
       url: require("@/assets/images//background/orange.jpg"),
     },
-    backgroundColor: "#FFF9F4",
     backgroundAdditional: "#dcd0c5",
     primary: "#FF8200",
     secondary: "#FFB354",
@@ -148,6 +154,7 @@ export const Colors: Record<string, ColorTheme> = {
     link: "#FF8200",
     border: "#FFD09A",
     error: "#D7263D",
+    notification: "#ff5252",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#FF8200",
@@ -176,12 +183,12 @@ export const Colors: Record<string, ColorTheme> = {
 
   dark: {
     // General
-    background: {
+    background: "#151718",
+    backgroundImage: {
       id: 204,
       value: "#151718",
       type: "color",
     },
-    backgroundColor: "#151718",
     backgroundAdditional: "#282c2e",
     primary: "#344360",
     secondary: "",
@@ -191,6 +198,7 @@ export const Colors: Record<string, ColorTheme> = {
     link: "#",
     border: "#2A2D2F",
     error: "#B9130F",
+    notification: "#ff5252",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#5b6165",
@@ -219,13 +227,13 @@ export const Colors: Record<string, ColorTheme> = {
 
   sandDune: {
     // General
-    background: {
+    background: "#8e8680",
+    backgroundImage: {
       id: 205,
       value: "#8e8680",
       type: "image",
       url: require("@/assets/images//background/sandDune.jpg"),
     },
-    backgroundColor: "#8e8680",
     backgroundAdditional: "#bab0a9",
     primary: "#604d3f",
     secondary: "#4a5365",
@@ -233,8 +241,9 @@ export const Colors: Record<string, ColorTheme> = {
     textAdditional: "#687076",
     textInPrimary: "#FFFFFF",
     link: "#0000ff",
-    border: "#E0E0E0",
+    border: "#604d3f",
     error: "#B9130F",
+    notification: "#ff5252",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#f4f4f4",
@@ -264,13 +273,13 @@ export const Colors: Record<string, ColorTheme> = {
 
   yellowBokeh: {
     // General
-    background: {
+    background: "#222020",
+    backgroundImage: {
       id: 206,
       value: "#222020",
       type: "image",
       url: require("@/assets/images/background/yellowBokeh.jpg"),
     },
-    backgroundColor: "#222020",
     backgroundAdditional: "#534f4f",
     primary: "#a59f37",
     secondary: "#4a5365",
@@ -280,6 +289,7 @@ export const Colors: Record<string, ColorTheme> = {
     link: "#0000ff",
     border: "#E0E0E0",
     error: "#B9130F",
+    notification: "#ff5252",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#f4f4f4",

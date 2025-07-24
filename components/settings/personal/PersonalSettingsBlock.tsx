@@ -160,7 +160,7 @@ export default function PersonalSettingsBlock({
             justifyContent: "space-between",
           }}
         >
-          <ThemedText>{t("settings.common.activeHours")}</ThemedText>
+          <ThemedText>{t("settings.activeHours.title")}</ThemedText>
           <View
             style={{
               display: "flex",

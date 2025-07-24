@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+
+export type TimeFormat = {
+  key: number;
+  value: string;
+};
 
 const initialState = {
   key: 12,
@@ -10,7 +15,7 @@ export const timeFormatSlice = createSlice({
   initialState,
   reducers: {
     setTimeFormat: (state, action) => {
-      state = action.payload;
+      return action.payload;
     },
   },
 });

@@ -20,7 +20,6 @@ export const ThemeProviderCustom = ({
 
   useEffect(() => {
     AsyncStorage.getItem("APP_THEME").then((t) => {
-      console.log("Current theme from storage:", t);
       setTheme(t);
     });
   }, []);

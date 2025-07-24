@@ -1,4 +1,10 @@
-export type Theme = "light" | "calmMind" | "lightMint" | "lightPeach" | "dark";
+export type Theme =
+  | "light"
+  | "calmMind"
+  | "orange"
+  | "dark"
+  | "sandDune"
+  | "yellowBokeh";
 export type ThemeContextType = {
   theme: Theme;
   setTheme: (theme: Theme) => void;

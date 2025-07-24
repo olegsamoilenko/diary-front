@@ -2,8 +2,8 @@ import { BackgroundSettings } from "@/types";
 
 export type ColorTheme = {
   // General
-  background: BackgroundSettings;
-  backgroundColor: string;
+  background: string;
+  backgroundImage: BackgroundSettings;
   backgroundAdditional: string;
   primary: string;
   secondary: string;
@@ -13,6 +13,7 @@ export type ColorTheme = {
   link: string;
   border: string;
   error: string;
+  notification: string;
   // calendar
   calendarBackground?: string;
   calendarEnableDayBorder: string;
@@ -29,6 +30,7 @@ export type ColorTheme = {
   diaryNotesBackground: string;
   aiCommentBackground: string;
   questionBackground: string;
+  answerBackground: string;
   //  settings
   blockBackground: string;
   // barStyle
