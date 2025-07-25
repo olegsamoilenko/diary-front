@@ -67,9 +67,9 @@ export const Colors: Record<string, ColorTheme> = {
     error: "#B9130F",
     notification: "#ff5252",
     // calendar
-    calendarBackground: "#",
-    calendarEnableDayBorder: "#bfbdbd",
-    calendarDisableDayBorder: "#f4f4f4",
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#f4f4f4",
+    calendarDisableDayBorder: "#bfbdbd",
     calendarDayLabels: "#888",
 
     // tabs
@@ -112,7 +112,7 @@ export const Colors: Record<string, ColorTheme> = {
     error: "#FF7A7A",
     notification: "#ff5252",
     // calendar
-    calendarBackground: "#",
+    calendarBackground: "transparent",
     calendarEnableDayBorder: "#5BA9A6",
     calendarDisableDayBorder: "#E5E7EB",
     calendarDayLabels: "#888",
@@ -156,7 +156,7 @@ export const Colors: Record<string, ColorTheme> = {
     error: "#D7263D",
     notification: "#ff5252",
     // calendar
-    calendarBackground: "#",
+    calendarBackground: "transparent",
     calendarEnableDayBorder: "#FF8200",
     calendarDisableDayBorder: "#FFD09A",
     calendarDayLabels: "#888",
@@ -200,7 +200,7 @@ export const Colors: Record<string, ColorTheme> = {
     error: "#B9130F",
     notification: "#ff5252",
     // calendar
-    calendarBackground: "#",
+    calendarBackground: "transparent",
     calendarEnableDayBorder: "#5b6165",
     calendarDisableDayBorder: "#1e2022",
     calendarDayLabels: "#888",
@@ -245,7 +245,7 @@ export const Colors: Record<string, ColorTheme> = {
     error: "#B9130F",
     notification: "#ff5252",
     // calendar
-    calendarBackground: "#",
+    calendarBackground: "transparent",
     calendarEnableDayBorder: "#f4f4f4",
     calendarDisableDayBorder: "#bfbdbd",
     calendarDayLabels: "#888",
@@ -291,7 +291,7 @@ export const Colors: Record<string, ColorTheme> = {
     error: "#B9130F",
     notification: "#ff5252",
     // calendar
-    calendarBackground: "#",
+    calendarBackground: "transparent",
     calendarEnableDayBorder: "#f4f4f4",
     calendarDisableDayBorder: "#989696",
     calendarDayLabels: "#888",

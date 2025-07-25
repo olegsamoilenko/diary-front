@@ -85,33 +85,6 @@ export default function LoginForm({
     }
   };
 
-  const handleForgotYourPassword = async () => {
-    setShowForgotPasswordForm(true);
-    // setForgotYourPasswordLoading(true);
-    // try {
-    //   const res = await axios.post(`${apiUrl}/auth/forgot-password`, {
-    //     email: "",
-    //   });
-    //   if (res && res.status !== 200) {
-    //     throw new Error("Failed to send forgot password email");
-    //   }
-    //   Toast.show({
-    //     type: "success",
-    //     text1: t("toast.forgotPasswordEmailSent"),
-    //     text2: t("toast.checkYourEmailForInstructions"),
-    //   });
-    // } catch (err) {
-    //   console.error("Error during forgot password:", err);
-    //   Toast.show({
-    //     type: "error",
-    //     text1: t("toast.failedToSendForgotPasswordEmail"),
-    //     text2: t("toast.somethingWentWrongPleaseTryAgain"),
-    //   });
-    // } finally {
-    //   setForgotYourPasswordLoading(false);
-    // }
-  };
-
   return (
     <View>
       <GoogleSignInButton

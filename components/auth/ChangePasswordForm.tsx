@@ -10,7 +10,6 @@ import { Formik } from "formik";
 import React, { useState } from "react";
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
-import i18n from "i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme, ErrorMessages } from "@/types";
@@ -26,7 +25,6 @@ export default function ChangePasswordForm({
 }) {
   const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();
-  const lang = useState<string | null>(i18n.language)[0];
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);

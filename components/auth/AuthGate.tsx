@@ -24,11 +24,16 @@ import Background from "@/components/Background";
 import { ThemedText } from "@/components/ThemedText";
 import NemoryLogo from "@/components/ui/logo/NemoryLogo";
 import { apiRequest } from "@/utils";
+import Toast from "react-native-toast-message";
 
 const PIN_KEY = "user_pin";
 const BIOMETRY_KEY = "biometry_enabled";
 
-export default function AuthGate({ onAuthenticated }) {
+export default function AuthGate({
+  onAuthenticated,
+}: {
+  onAuthenticated: () => void;
+}) {
   const [step, setStep] = useState<
     "loading" | "name" | "setup" | "biometry-ask" | "biometry" | "pin"
   >("loading");
@@ -67,8 +72,6 @@ export default function AuthGate({ onAuthenticated }) {
     };
 
     fetchUser();
-
-    console.log("AuthGate mounted, fetching); user data", user);
   }, []);
 
   useEffect(() => {
@@ -79,7 +82,15 @@ export default function AuthGate({ onAuthenticated }) {
     }
   }, [user]);
 
-  const handleSetName = async (values, { setSubmitting, resetForm }) => {
+  const handleSetName = async (
+    values: {
+      name: string;
+    },
+    {
+      setSubmitting,
+      resetForm,
+    }: { setSubmitting: (submitting: boolean) => void; resetForm: () => void },
+  ) => {
     setNameLoading(true);
     const userString = await SecureStore.getItemAsync("user");
     const user: User = userString ? JSON.parse(userString) : null;
@@ -96,14 +107,20 @@ export default function AuthGate({ onAuthenticated }) {
         return;
       }
 
+      Toast.show({
+        type: "success",
+        text1: t("toast.successfullySaved"),
+        text2: t("toast.youHaveSuccessfullySavedYourName"),
+      });
+
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));
       setSubmitting(false);
       resetForm();
       setNameLoading(false);
       init();
-    } catch (error) {
+    } catch (err: any) {
       setNameLoading(false);
-      console.error("Error setting plan:", error);
+      console.log(err?.response?.data);
     }
   };
 
@@ -117,7 +134,13 @@ export default function AuthGate({ onAuthenticated }) {
     setBiometryEnabled(bioFlag === "true");
   };
 
-  const handleSetPin = async (values, { setSubmitting, resetForm }) => {
+  const handleSetPin = async (
+    values: { pin: string },
+    {
+      setSubmitting,
+      resetForm,
+    }: { setSubmitting: (submitting: boolean) => void; resetForm: () => void },
+  ) => {
     setPinLoading(true);
     await SecureStore.setItemAsync(PIN_KEY, values.pin);
     setSavedPin(pin);
@@ -151,7 +174,7 @@ export default function AuthGate({ onAuthenticated }) {
 
   const handleCheckPin = useCallback(async () => {
     const storedPin = await SecureStore.getItemAsync(PIN_KEY);
-    console.log("Checking PIN:", pin, "Saved PIN:", storedPin);
+
     if (pin === storedPin) {
       onAuthenticated();
     } else {
@@ -524,6 +547,7 @@ export default function AuthGate({ onAuthenticated }) {
               keyboardType="number-pad"
               maxLength={6}
               style={[styles.input, { letterSpacing: 5 }]}
+              placeholder="******"
             />
             {errorPin && (
               <ThemedText

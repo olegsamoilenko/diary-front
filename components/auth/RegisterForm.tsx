@@ -29,15 +29,15 @@ import Toast from "react-native-toast-message";
 interface RegisterFormProps {
   forPlanSelect: boolean;
   onSuccessSignWithGoogle: () => void;
-  setShowCodeForm: (show: boolean) => void;
-  // setShowPhoneForm: (show: boolean) => void;
+  setShowEmailVerificationCodeForm: (show: boolean) => void;
+  // setShowPhoneVerificationCodeForm: (show: boolean) => void;
 }
 
 export default function RegisterForm({
   forPlanSelect,
   onSuccessSignWithGoogle,
-  setShowCodeForm,
-  // setShowPhoneForm,
+  setShowEmailVerificationCodeForm,
+  // setShowPhoneVerificationCodeForm,
 }: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
   const lang = useState<string | null>(i18n.language)[0];
@@ -86,7 +86,7 @@ export default function RegisterForm({
         uuid: user.uuid,
       });
       setLoading(false);
-      setShowCodeForm(true);
+      setShowEmailVerificationCodeForm(true);
       resetForm();
       setSubmitting(false);
       await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
@@ -112,7 +112,7 @@ export default function RegisterForm({
   //       phone: values.phone,
   //     });
   //     setLoading(false);
-  //     setShowPhoneForm(true);
+  //     setShowPhoneVerificationCodeForm(true);
   //     resetForm();
   //     setSubmitting(false);
   //   } catch (err: any) {

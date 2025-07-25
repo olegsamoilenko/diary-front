@@ -178,6 +178,10 @@
     "codeResent": "Code resent",
     "weHaveSentYouCodeByEmail": "We have sent you a code by email. Please enter this code to proceed",
     "successfullySend": "Successfully sent",
-    "weHaveSuccessfullySentTheCodeToYourEmail": "We have successfully sent the code to your email"
+    "weHaveSuccessfullySentTheCodeToYourEmail": "We have successfully sent the code to your email",
+    "successfullySaved": "Successfully saved",
+    "youHaveSuccessfullySavedYourName": "You have successfully saved your name",
+    "phoneConfirmed": "Phone confirmed",
+    "youHaveSuccessfullyVerifiedYourPhone": "You have successfully verified your phone"
   }
 }

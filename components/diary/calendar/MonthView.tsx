@@ -81,7 +81,7 @@ export default function MonthView({
         firstDay={firstDayOfWeek}
         hideDayNames={true}
         theme={{
-          calendarBackground: colors.background,
+          calendarBackground: colors.calendarBackground,
           arrowColor: colors.primary,
           monthTextColor: colors.text,
           textDayHeaderFontFamily: getFont(font.name, "regular"),

@@ -7,22 +7,23 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import React, { useState } from "react";
-import { ColorTheme } from "@/types";
+import { ColorTheme, ErrorMessages } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
+import Toast from "react-native-toast-message";
 
-type PhoneFormProps = {
+type PhoneVerificationCodeFormProps = {
   forPlanSelect: boolean;
   onSuccessPhoneCode: () => void;
 };
-export default function PhoneForm({
+export default function PhoneVerificationCodeForm({
   forPlanSelect,
   onSuccessPhoneCode,
-}: PhoneFormProps) {
+}: PhoneVerificationCodeFormProps) {
   const [code, setCode] = useState("");
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -30,6 +31,7 @@ export default function PhoneForm({
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const apiUrl = Constants.expoConfig?.extra?.API_URL;
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (code.length !== 6) {
@@ -50,13 +52,20 @@ export default function PhoneForm({
       await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
       await SecureStore.setItemAsync("token", res.data.accessToken);
 
-      console.log("Code submission response:", res.data);
+      Toast.show({
+        type: "success",
+        text1: t("toast.phoneConfirmed"),
+        text2: t("toast.youHaveSuccessfullyVerifiedYourPhone"),
+      });
+
       if (forPlanSelect) {
         onSuccessPhoneCode();
       }
-    } catch (error) {
-      console.error("Error submitting code:", error);
-      alert("Failed to submit code. Please try again.");
+    } catch (err: any) {
+      console.log(err?.response?.data);
+      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
+      const errorKey = ErrorMessages[code];
+      setError(t(`errors.${errorKey}`));
     } finally {
       setLoading(false);
     }
@@ -75,6 +84,18 @@ export default function PhoneForm({
         style={[styles.input, { letterSpacing: 5 }]}
         placeholder="******"
       />
+      {error && (
+        <ThemedText
+          type={"small"}
+          style={{
+            color: colors.error,
+            marginTop: -10,
+            marginBottom: 20,
+          }}
+        >
+          {error}
+        </ThemedText>
+      )}
       <TouchableOpacity
         style={styles.btn}
         onPress={() => handleSubmit()}

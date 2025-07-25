@@ -15,10 +15,10 @@ import RegisterForm from "./RegisterForm";
 import React, { useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { useTranslation } from "react-i18next";
-import CodeForm from "./CodeForm";
-import PhoneForm from "./PhoneForm";
+import PhoneVerificationCodeForm from "./PhoneVerificationCodeForm";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 import ChangePasswordForm from "@/components/auth/ChangePasswordForm";
+import EmailVerificationCodeForm from "@/components/auth/EmailVerificationCodeForm";
 
 export default function AuthForm({
   forPlanSelect = false,
@@ -35,9 +35,10 @@ export default function AuthForm({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
-  const [showCodeForm, setShowCodeForm] = useState(false);
+  const [showEmailVerificationCodeForm, setShowEmailVerificationCodeForm] =
+    useState(false);
   const { t } = useTranslation();
-  // const [showPhoneForm, setShowPhoneForm] = useState(false);
+  // const [showPhoneVerificationCodeForm, setShowPhoneVerificationCodeForm] = useState(false);
   const [showForgotPasswordForm, setShowForgotPasswordForm] = useState(false);
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
 
@@ -76,8 +77,8 @@ export default function AuthForm({
           >
             <NemoryLogo />
           </View>
-          {showCodeForm ? (
-            <CodeForm
+          {showEmailVerificationCodeForm ? (
+            <EmailVerificationCodeForm
               onSuccessEmailCode={onSuccessEmailCode}
               forPlanSelect={forPlanSelect}
             />
@@ -86,9 +87,9 @@ export default function AuthForm({
           ) : showChangePasswordForm ? (
             <ChangePasswordForm onSuccess={onSuccessChangePassword} />
           ) : (
-            //   showPhoneForm ? (
-            //   <PhoneForm
-            //     onSuccessPhoneCode={onSuccessPhoneCode}
+            //   showPhoneVerificationCodeForm ? (
+            //   <PhoneVerificationCodeForm
+            //     onSuccessPhoneVerificationCodeCode={onSuccessPhoneVerificationCodeCode}
             //     forPlanSelect={forPlanSelect}
             //   />
             // ) :
@@ -141,8 +142,10 @@ export default function AuthForm({
                   <RegisterForm
                     forPlanSelect={forPlanSelect}
                     onSuccessSignWithGoogle={onSuccessSignWithGoogle}
-                    setShowCodeForm={setShowCodeForm}
-                    // setShowPhoneForm={setShowPhoneForm}
+                    setShowEmailVerificationCodeForm={
+                      setShowEmailVerificationCodeForm
+                    }
+                    // setShowPhoneVerificationCodeForm={setShowPhoneVerificationCodeForm}
                   />
                 )}
               </View>

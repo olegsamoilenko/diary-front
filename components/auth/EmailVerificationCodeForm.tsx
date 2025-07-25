@@ -17,14 +17,14 @@ import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 
-type CodeFormProps = {
+type EmailVerificationCodeFormProps = {
   forPlanSelect: boolean;
   onSuccessEmailCode: () => void;
 };
-export default function CodeForm({
+export default function EmailVerificationCodeForm({
   forPlanSelect,
   onSuccessEmailCode,
-}: CodeFormProps) {
+}: EmailVerificationCodeFormProps) {
   const [code, setCode] = useState("");
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -37,6 +37,7 @@ export default function CodeForm({
 
   const handleSubmit = async () => {
     if (code.length !== 6) {
+      setError(t("auth.codeMustBe6Digits"));
       return;
     }
     setLoading(true);

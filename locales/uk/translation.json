@@ -178,6 +178,10 @@
     "codeResent": "Код надіслано знову",
     "weHaveSentYouCodeByEmail": "Ми надіслали вам код на електронну пошту. Будь ласка, введіть цей код для продовження",
     "successfullySend": "Код успішно надіслано",
-    "weHaveSuccessfullySentTheCodeToYourEmail": "Ми успішно надіслали код на вашу електронну пошту"
+    "weHaveSuccessfullySentTheCodeToYourEmail": "Ми успішно надіслали код на вашу електронну пошту",
+    "successfullySaved": "Успішно збережено",
+    "youHaveSuccessfullySavedYourName": "Ви успішно зберегли своє ім'я",
+    "phoneConfirmed": "Телефон підтверджено",
+    "youHaveSuccessfullyVerifiedYourPhone": "Ви успішно підтвердили свій телефон"
   }
 }

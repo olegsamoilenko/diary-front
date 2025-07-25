@@ -62,8 +62,8 @@ export default function GoogleSignInButton({
       if (forPlanSelect) {
         onSuccessSignWithGoogle();
       }
-    } catch (err) {
-      console.error("Error during Google sign-in:", err);
+    } catch (err: any) {
+      console.error("Error during Google sign-in:", err?.response?.data);
     }
   };
 
