@@ -2,22 +2,22 @@ import { TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { RefObject } from "react";
+import { RefObject, useEffect, useState } from "react";
 import { SideSheetRef } from "@/components/SideSheet";
-import { useAppSelector } from "@/store/hooks";
+import { useBiometry } from "@/context/BiometryContext";
 
-export default function AiSettingsBlock({
-  modelSwitcherRef,
+export default function SecuritySettingsBlock({
+  biometryRef,
 }: {
-  modelSwitcherRef: RefObject<SideSheetRef | null>;
+  biometryRef: RefObject<SideSheetRef | null>;
 }) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const aiModel = useAppSelector((state) => state.settings.aiModel);
+  const { biometryEnabled } = useBiometry();
+
   return (
     <View
       style={{
@@ -39,7 +39,7 @@ export default function AiSettingsBlock({
     >
       <TouchableOpacity
         onPress={() => {
-          modelSwitcherRef.current?.open();
+          biometryRef.current?.open();
         }}
       >
         <View
@@ -49,7 +49,7 @@ export default function AiSettingsBlock({
             justifyContent: "space-between",
           }}
         >
-          <ThemedText>{t("settings.model.title")}</ThemedText>
+          <ThemedText>{t("settings.biometry.title")}</ThemedText>
           <View
             style={{
               display: "flex",
@@ -58,7 +58,11 @@ export default function AiSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>{t(`settings.model.${aiModel}`)}</ThemedText>
+            {biometryEnabled ? (
+              <ThemedText>{t(`settings.biometry.on`)}</ThemedText>
+            ) : (
+              <ThemedText>{t(`settings.biometry.off`)}</ThemedText>
+            )}
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}

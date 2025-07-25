@@ -15,6 +15,7 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { Plans } from "@/constants/Plans";
 import { ColorTheme } from "@/types";
+import Background from "@/components/Background";
 
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
@@ -28,67 +29,71 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   };
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText type={"titleLG"}>
-          {t("settings.plans.titlePlural")}
-        </ThemedText>
-        <ScrollView>
-          {Plans.slice(1).map((plan) => (
-            <Pressable
-              key={plan.name}
-              style={styles.card}
-              onPress={() => onSelect(plan)}
-            >
-              <Text style={styles.planName}>{plan.name}</Text>
-              <Text style={styles.desc}>{t(plan.descriptionKey)}</Text>
-              <Text style={styles.price}>
-                {plan.price > 0
-                  ? `${plan.price} $ / ${t("planModal.month")}`
-                  : t("planModal.free")}
-              </Text>
-              <Text style={styles.tokens}>
-                {plan.tokensLimit.toLocaleString()}{" "}
-                {t("planModal.tokensPerMonth")}
-              </Text>
-            </Pressable>
-          ))}
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText type={"titleLG"}>
+            {t("settings.plans.titlePlural")}
+          </ThemedText>
+          <ScrollView>
+            {Plans.slice(1).map((plan) => (
+              <Pressable
+                key={plan.name}
+                style={styles.card}
+                onPress={() => onSelect(plan)}
+              >
+                <Text style={styles.planName}>{plan.name}</Text>
+                <Text style={styles.desc}>{t(plan.descriptionKey)}</Text>
+                <Text style={styles.price}>
+                  {plan.price > 0
+                    ? `${plan.price} $ / ${t("planModal.month")}`
+                    : t("planModal.free")}
+                </Text>
+                <Text style={styles.tokens}>
+                  {plan.tokensLimit.toLocaleString()}{" "}
+                  {t("planModal.tokensPerMonth")}
+                </Text>
+              </Pressable>
+            ))}
 
-          <TouchableOpacity>
-            <View style={[styles.button, { backgroundColor: colors.primary }]}>
-              <ThemedText
-                type="subtitleLG"
-                style={{
-                  color: colors.textInPrimary,
-                }}
+            <TouchableOpacity>
+              <View
+                style={[styles.button, { backgroundColor: colors.primary }]}
               >
-                {t("settings.plans.subscribe")}
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <View
-              style={[
-                styles.button,
-                {
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  borderRadius: 12,
-                },
-              ]}
-            >
-              <ThemedText
-                type="subtitleLG"
-                style={{
-                  color: colors.text,
-                }}
+                <ThemedText
+                  type="subtitleLG"
+                  style={{
+                    color: colors.textInPrimary,
+                  }}
+                >
+                  {t("settings.plans.subscribe")}
+                </ThemedText>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View
+                style={[
+                  styles.button,
+                  {
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    borderRadius: 12,
+                  },
+                ]}
               >
-                {t("settings.plans.unsubscribe")}
-              </ThemedText>
-            </View>
-          </TouchableOpacity>
-        </ScrollView>
-      </View>
+                <ThemedText
+                  type="subtitleLG"
+                  style={{
+                    color: colors.text,
+                  }}
+                >
+                  {t("settings.plans.unsubscribe")}
+                </ThemedText>
+              </View>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });

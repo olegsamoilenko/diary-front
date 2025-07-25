@@ -110,7 +110,7 @@
     "model": {
       "title": "Model",
       "titlePlural": "Models",
-      "gpt-4o": "GPT-4o (fast and smart)",
+      "gpt-4o": "GPT-4o",
       "gpt-4-turbo": "GPT-4 Turbo"
     },
     "subscription": "Subscription settings",
@@ -119,7 +119,13 @@
       "titlePlural": "Plans",
       "subscribe": "Subscribe",
       "unsubscribe": "Unsubscribe"
-    }
+    },
+    "security": "Security",
+    "biometry": {
+      "title": "Biometric Authentication",
+      "on": "On",
+        "off": "Off",
+    },
   },
   "planModal": {
     "title": "Choose your Plan",

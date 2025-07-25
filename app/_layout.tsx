@@ -32,6 +32,7 @@ import { Colors } from "@/constants/Colors";
 import { NavigationThemes } from "@/constants/Theme";
 import AuthForm from "@/components/auth/AuthForm";
 import Toast from "react-native-toast-message";
+import { BiometryProvider } from "@/context/BiometryContext";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -192,21 +193,23 @@ export default function RootLayout() {
     <Provider store={store}>
       <ThemeProviderCustom>
         <AuthProvider>
-          <PortalProvider>
-            {showAuthForm ? (
-              <AuthForm
-                forPlanSelect={true}
-                onSuccessSignWithGoogle={() => setShowAuthForm(false)}
-                onSuccessEmailCode={() => setShowAuthForm(false)}
-                // onSuccessPhoneCode={() => setShowAuthForm(false)}
-              />
-            ) : !user?.plan ? (
-              <SelectPlan visible onSelect={handleSubscribePlan} />
-            ) : (
-              <RootLayoutInner />
-            )}
-            <Toast />
-          </PortalProvider>
+          <BiometryProvider>
+            <PortalProvider>
+              {showAuthForm ? (
+                <AuthForm
+                  forPlanSelect={true}
+                  onSuccessSignWithGoogle={() => setShowAuthForm(false)}
+                  onSuccessEmailCode={() => setShowAuthForm(false)}
+                  // onSuccessPhoneCode={() => setShowAuthForm(false)}
+                />
+              ) : !user?.plan ? (
+                <SelectPlan visible onSelect={handleSubscribePlan} />
+              ) : (
+                <RootLayoutInner />
+              )}
+              <Toast />
+            </PortalProvider>
+          </BiometryProvider>
         </AuthProvider>
       </ThemeProviderCustom>
     </Provider>

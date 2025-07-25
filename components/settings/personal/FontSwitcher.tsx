@@ -9,7 +9,6 @@ import {
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { forwardRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -19,6 +18,7 @@ import { setFont } from "@/store/slices/settings/fontSlice";
 import type { RootState } from "@/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getFont } from "@/utils";
+import Background from "@/components/Background";
 
 const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const font = useSelector((state: RootState) => state.font.font);
@@ -43,60 +43,62 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText
-          type="titleLG"
-          style={{
-            marginBottom: 16,
-          }}
-        >
-          {t("settings.font.titlePlural")}
-        </ThemedText>
-        <ScrollView style={{ marginBottom: 0 }}>
-          <View
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText
+            type="titleLG"
             style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              rowGap: 16,
-              columnGap: 6,
-              justifyContent: "space-between",
+              marginBottom: 16,
             }}
           >
-            {Fonts.map((f) => {
-              return (
-                <TouchableOpacity key={f.name} onPress={() => handleFont(f)}>
-                  <View style={styles.fontContainer}>
-                    <Text
+            {t("settings.font.titlePlural")}
+          </ThemedText>
+          <ScrollView style={{ marginBottom: 0 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                rowGap: 16,
+                columnGap: 6,
+                justifyContent: "space-between",
+              }}
+            >
+              {Fonts.map((f) => {
+                return (
+                  <TouchableOpacity key={f.name} onPress={() => handleFont(f)}>
+                    <View style={styles.fontContainer}>
+                      <Text
+                        style={{
+                          fontFamily: getFont(f.name, "regular"),
+                          color: colors.text,
+                          textAlign: "center",
+                          fontSize: 16,
+                        }}
+                      >
+                        {f.title}
+                      </Text>
+                    </View>
+                    <View
                       style={{
-                        fontFamily: getFont(f.name, "regular"),
-                        color: colors.text,
-                        textAlign: "center",
-                        fontSize: 16,
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        borderRadius: 10,
+                        borderWidth: 3,
+                        borderColor:
+                          f.name === font.name ? colors.primary : "transparent",
                       }}
-                    >
-                      {f.title}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      borderRadius: 10,
-                      borderWidth: 3,
-                      borderColor:
-                        f.name === font.name ? colors.primary : "transparent",
-                    }}
-                  />
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </ScrollView>
-      </View>
+                    />
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });
@@ -110,7 +112,6 @@ const getStyles = (colors: any) =>
       flexDirection: "column",
       flex: 1,
       paddingHorizontal: 15,
-      backgroundColor: colors.background,
       marginBottom: -6,
     },
     fontContainer: {

@@ -55,6 +55,7 @@ export default function Diary() {
   const handleNewEntryOpen = () => {
     setIsAddNewEntryOpen(true);
     addNewEntryRef.current?.open();
+    setForceUpdate(false);
   };
 
   const fetchDiaryEntries = async (back = false) => {
@@ -62,9 +63,9 @@ export default function Diary() {
 
     if (!user) return;
 
-    if (!back) {
-      setLoading(true);
-    }
+    // if (!back) {
+    //   setLoading(true);
+    // }
 
     try {
       const response = await apiRequest({
@@ -75,6 +76,8 @@ export default function Diary() {
           timeZone,
         },
       });
+
+      console.log("response.data", response.data);
 
       setDiaryEntries((prev) => ({
         ...prev,
@@ -103,10 +106,15 @@ export default function Diary() {
   };
 
   useEffect(() => {
+    console.log("forceUpdate111", forceUpdate);
+    console.log("selectedDay", forceUpdate);
+    console.log("timeZone", forceUpdate);
     if (selectedDay && timeZone && forceUpdate) {
+      console.log("forceUpdate", forceUpdate);
       fetchDiaryEntries(true);
     }
     if (selectedDay && timeZone && !forceUpdate) {
+      console.log("selectedDay", selectedDay);
       fetchDiaryEntries();
     }
   }, [selectedDay, timeZone, forceUpdate]);

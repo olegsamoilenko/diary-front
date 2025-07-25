@@ -110,7 +110,7 @@
     "model": {
       "title": "Модель",
       "titlePlural": "Моделі",
-      "gpt-4o": "GPT-4o (швидка і розумна)",
+      "gpt-4o": "GPT-4o",
       "gpt-4-turbo": "GPT-4 Turbo"
     },
     "subscription": "Налаштування підписки",
@@ -119,6 +119,12 @@
       "titlePlural": "Плани",
       "subscribe": "Підписатися",
       "unsubscribe": "Відписатися"
+    },
+    "security": "Безпека",
+    "biometry": {
+      "title": "Біометрія",
+      "on": "Увімкнена",
+      "off": "Вимкнена"
     }
   },
   "planModal": {

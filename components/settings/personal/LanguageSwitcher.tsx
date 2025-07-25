@@ -15,6 +15,7 @@ import * as SecureStore from "expo-secure-store";
 import { LocaleConfig } from "react-native-calendars";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
+import Background from "@/components/Background";
 
 const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [lang, setLang] = useState<string | null>(i18n.language);
@@ -45,47 +46,49 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText type={"titleLG"}>
-          {t("settings.languages.titlePlural")}
-        </ThemedText>
-        <ScrollView style={{ marginBottom: 0 }}>
-          {languages.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              style={styles.row}
-              onPress={() => setValue(option.value as any)}
-            >
-              <View
-                style={[
-                  styles.radio,
-                  lang === option.value && {
-                    borderColor: Colors[colorScheme].primary,
-                  },
-                  {
-                    borderColor: Colors[colorScheme].primary,
-                  },
-                ]}
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText type={"titleLG"}>
+            {t("settings.languages.titlePlural")}
+          </ThemedText>
+          <ScrollView style={{ marginBottom: 0 }}>
+            {languages.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={styles.row}
+                onPress={() => setValue(option.value as any)}
               >
-                {lang === option.value && (
-                  <View
-                    style={[
-                      styles.radioDot,
-                      { backgroundColor: Colors[colorScheme].primary },
-                    ]}
-                  />
-                )}
-              </View>
-              <ThemedText
-                style={[styles.label, { color: Colors[colorScheme].text }]}
-              >
-                {t(`settings.languages.${option.key}`)}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+                <View
+                  style={[
+                    styles.radio,
+                    lang === option.value && {
+                      borderColor: Colors[colorScheme].primary,
+                    },
+                    {
+                      borderColor: Colors[colorScheme].primary,
+                    },
+                  ]}
+                >
+                  {lang === option.value && (
+                    <View
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: Colors[colorScheme].primary },
+                      ]}
+                    />
+                  )}
+                </View>
+                <ThemedText
+                  style={[styles.label, { color: Colors[colorScheme].text }]}
+                >
+                  {t(`settings.languages.${option.key}`)}
+                </ThemedText>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });
@@ -98,7 +101,6 @@ const getStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       paddingLeft: 20,
-      backgroundColor: colors.background,
       flex: 1,
       marginBottom: -6,
     },

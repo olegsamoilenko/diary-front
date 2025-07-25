@@ -15,57 +15,61 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { setAiModel } from "@/store/slices/settings/settingsSlice";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
+import Background from "@/components/Background";
 
 const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const aiModel = useAppSelector((state) => state.settings.aiModel);
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
   const styles = getStyles(Colors[colorScheme]);
 
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText type={"titleLG"}>
-          {t("settings.model.titlePlural")}
-        </ThemedText>
-        <ScrollView style={{ marginBottom: 0 }}>
-          {AI_MODELS.map((model) => (
-            <TouchableOpacity
-              key={model.value}
-              style={styles.row}
-              onPress={() => dispatch(setAiModel(model.key))}
-            >
-              <View
-                style={[
-                  styles.radio,
-                  aiModel === model.key && {
-                    borderColor: Colors[colorScheme].primary,
-                  },
-                  {
-                    borderColor: Colors[colorScheme].primary,
-                  },
-                ]}
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText type={"titleLG"}>
+            {t("settings.model.titlePlural")}
+          </ThemedText>
+          <ScrollView style={{ marginBottom: 0 }}>
+            {AI_MODELS.map((model) => (
+              <TouchableOpacity
+                key={model.value}
+                style={styles.row}
+                onPress={() => dispatch(setAiModel(model.key))}
               >
-                {aiModel === model.key && (
-                  <View
-                    style={[
-                      styles.radioDot,
-                      { backgroundColor: Colors[colorScheme].primary },
-                    ]}
-                  />
-                )}
-              </View>
-              <ThemedText
-                style={[styles.label, { color: Colors[colorScheme].text }]}
-              >
-                {t(`settings.model.${model.key}`)}
-              </ThemedText>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+                <View
+                  style={[
+                    styles.radio,
+                    aiModel === model.key && {
+                      borderColor: Colors[colorScheme].primary,
+                    },
+                    {
+                      borderColor: Colors[colorScheme].primary,
+                    },
+                  ]}
+                >
+                  {aiModel === model.key && (
+                    <View
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: Colors[colorScheme].primary },
+                      ]}
+                    />
+                  )}
+                </View>
+                <ThemedText
+                  style={[styles.label, { color: Colors[colorScheme].text }]}
+                >
+                  {t(`settings.model.${model.key}`)}
+                </ThemedText>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });
@@ -76,7 +80,6 @@ const getStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       paddingLeft: 20,
-      backgroundColor: colors.background,
       flex: 1,
       marginBottom: -6,
     },

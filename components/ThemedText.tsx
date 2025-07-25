@@ -67,16 +67,16 @@ const getStyles = (
 ) => {
   return StyleSheet.create({
     logo: {
-      fontSize: 55,
+      fontSize: 40,
       fontFamily: getFont(font.name, "bold"),
       lineHeight: 60,
       letterSpacing: 2,
     },
     slogan: {
-      fontSize: 30,
+      fontSize: 20,
       fontFamily: getFont(font.name, "bold"),
-      lineHeight: 34,
-      letterSpacing: 6,
+      lineHeight: 24,
+      letterSpacing: 3,
     },
     titleXL: {
       fontSize: 24,

@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveTimeFormat } from "@/store/thunks/timeFormatThunks";
 import type { AppDispatch, RootState } from "@/store";
 import BackArrow from "@/components/ui/BackArrow";
+import Background from "@/components/Background";
 
 const timeFormatOptions = [
   { key: 12, value: "12h" },
@@ -37,42 +38,46 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText type={"titleLG"}>
-          {t("settings.timeFormat.titlePlural")}
-        </ThemedText>
-        <ScrollView style={{ marginBottom: 0 }}>
-          {timeFormatOptions.map((f) => (
-            <TouchableOpacity
-              key={f.key}
-              style={styles.row}
-              onPress={() => handleFormat(f as any)}
-            >
-              <View
-                style={[
-                  styles.radio,
-                  Number(format.key) === Number(f.key) && {
-                    borderColor: Colors[colorScheme].primary,
-                  },
-                ]}
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText type={"titleLG"}>
+            {t("settings.timeFormat.titlePlural")}
+          </ThemedText>
+          <ScrollView style={{ marginBottom: 0 }}>
+            {timeFormatOptions.map((f) => (
+              <TouchableOpacity
+                key={f.key}
+                style={styles.row}
+                onPress={() => handleFormat(f as any)}
               >
-                {Number(format.key) === Number(f.key) && (
-                  <View
-                    style={[
-                      styles.radioDot,
-                      { backgroundColor: Colors[colorScheme].primary },
-                    ]}
-                  />
-                )}
-              </View>
-              <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-                {t(`settings.timeFormat.${f.key}`)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+                <View
+                  style={[
+                    styles.radio,
+                    Number(format.key) === Number(f.key) && {
+                      borderColor: Colors[colorScheme].primary,
+                    },
+                  ]}
+                >
+                  {Number(format.key) === Number(f.key) && (
+                    <View
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: Colors[colorScheme].primary },
+                      ]}
+                    />
+                  )}
+                </View>
+                <Text
+                  style={[styles.label, { color: Colors[colorScheme].text }]}
+                >
+                  {t(`settings.timeFormat.${f.key}`)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });
@@ -85,7 +90,6 @@ const getStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       paddingLeft: 20,
-      backgroundColor: colors.background,
       flex: 1,
       marginBottom: -6,
     },

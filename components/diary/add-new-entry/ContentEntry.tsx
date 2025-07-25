@@ -33,7 +33,10 @@ export default function ContentEntry({
 
   useEffect(() => {
     if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
+      setTimeout(() => {
+        console.log("Scrolling to end");
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     }
   }, [animatedAiComment, idx, isEntrySaved, aiDialogLoading]);
 

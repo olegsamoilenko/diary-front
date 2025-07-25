@@ -3,8 +3,6 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Switch,
-  Pressable,
   Image,
   ScrollView,
 } from "react-native";
@@ -13,19 +11,10 @@ import { useTranslation } from "react-i18next";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { lightenColor } from "@/utils";
 import { ThemedText } from "@/components/ThemedText";
 import { Theme } from "@/types";
-import WeekView from "@/components/diary/calendar/WeekView";
-import { getEmojiByMood, MoodEmoji } from "@/constants/Mood";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import i18n from "i18next";
 import BackArrow from "@/components/ui/BackArrow";
-import EntryCard from "@/components/diary/EntryCard";
-import ViewReachEditor from "@/components/diary/ViewReachEditor";
-import ModalPortal from "@/components/ui/Modal";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
+import Background from "@/components/Background";
 
 const themes = [
   {
@@ -60,17 +49,6 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
-  const lang = useState<string | null>(i18n.language)[0];
-  const format = useSelector((state: RootState) => state.timeFormat.value);
-
-  function getMonthName(locale = "uk") {
-    const date = new Date();
-    const month = new Intl.DateTimeFormat(locale, { month: "long" }).format(
-      date,
-    );
-
-    return month.charAt(0).toUpperCase() + month.slice(1);
-  }
 
   const handleTheme = (themeName: string) => {
     setTheme(themeName as Theme);
@@ -80,48 +58,50 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText
-          type="titleLG"
-          style={{
-            marginBottom: 16,
-          }}
-        >
-          {t("settings.theme.titlePlural")}
-        </ThemedText>
-        <ScrollView style={{ marginBottom: 0 }}>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
-            {themes.map((theme) => {
-              return (
-                <View
-                  key={theme.name}
-                  style={{
-                    width: "45%",
-                  }}
-                >
-                  <ThemedText
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText
+            type="titleLG"
+            style={{
+              marginBottom: 16,
+            }}
+          >
+            {t("settings.theme.titlePlural")}
+          </ThemedText>
+          <ScrollView style={{ marginBottom: 0 }}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
+              {themes.map((theme) => {
+                return (
+                  <View
+                    key={theme.name}
                     style={{
-                      marginBottom: 5,
+                      width: "45%",
                     }}
                   >
-                    {t(`settings.theme.themes.${theme.name}`)}
-                  </ThemedText>
-                  <TouchableOpacity onPress={() => handleTheme(theme.name)}>
-                    <Image
-                      source={theme.img}
+                    <ThemedText
                       style={{
-                        width: "100%",
-                        height: 315,
+                        marginBottom: 5,
                       }}
-                    />
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
-          </View>
-        </ScrollView>
-      </View>
+                    >
+                      {t(`settings.theme.themes.${theme.name}`)}
+                    </ThemedText>
+                    <TouchableOpacity onPress={() => handleTheme(theme.name)}>
+                      <Image
+                        source={theme.img}
+                        style={{
+                          width: "100%",
+                          height: 315,
+                        }}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </View>
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });
@@ -135,7 +115,6 @@ const getStyles = (colors: any) =>
       flexDirection: "column",
       flex: 1,
       paddingLeft: 20,
-      backgroundColor: colors.background,
       marginBottom: -6,
     },
     row: {
