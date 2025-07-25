@@ -19,7 +19,6 @@ import LanguageSwitcher from "@/components/settings/personal/LanguageSwitcher";
 import { useAppSelector } from "@/store/hooks";
 import ModelSwitcher from "@/components/settings/ai/ModelSwitcher";
 import PersonalSettingsBlock from "@/components/settings/personal/PersonalSettingsBlock";
-import ActivitySwitcher from "@/components/settings/personal/ActivitySwitcher";
 import TimeFormatSwitcher from "@/components/settings/personal/TimeFormatSwitcher";
 import FontSwitcher from "@/components/settings/personal/FontSwitcher";
 import { Portal } from "@gorhom/portal";
@@ -34,7 +33,6 @@ import BiometrySettings from "@/components/settings/security/BiometrySettings";
 export default function Settings() {
   const themeSwitcherRef = useRef<SideSheetRef>(null);
   const timeFormatSwitcherRef = useRef<SideSheetRef>(null);
-  const activitySwitcherRef = useRef<SideSheetRef>(null);
   const languageSwitcherRef = useRef<SideSheetRef>(null);
   const fontSwitcherRef = useRef<SideSheetRef>(null);
   const plansRef = useRef<SideSheetRef>(null);
@@ -65,7 +63,6 @@ export default function Settings() {
           themeSwitcherRef={themeSwitcherRef}
           fontSwitcherRef={fontSwitcherRef}
           timeFormatSwitcherRef={timeFormatSwitcherRef}
-          activitySwitcherRef={activitySwitcherRef}
           languageSwitcherRef={languageSwitcherRef}
         />
         <ThemedText type="subtitleXL">{t("settings.ai")}</ThemedText>
@@ -79,7 +76,6 @@ export default function Settings() {
         <ThemeSwitcher ref={themeSwitcherRef} />
         <FontSwitcher ref={fontSwitcherRef} />
         <TimeFormatSwitcher ref={timeFormatSwitcherRef} />
-        <ActivitySwitcher ref={activitySwitcherRef} />
         <LanguageSwitcher ref={languageSwitcherRef} />
         <ModelSwitcher ref={modelSwitcherRef} />
         <PlansSettings ref={plansRef} />

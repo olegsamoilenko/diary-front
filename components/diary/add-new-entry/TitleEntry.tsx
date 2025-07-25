@@ -81,6 +81,7 @@ export default function TitleEntry({
   };
 
   const handleMood = (mood: string) => {
+    console.log("Selected mood:", mood);
     onChangeEntry((prev: Entry) => ({ ...prev, mood }));
     setShowTip(false);
     setVisibleEmojiModal(false);

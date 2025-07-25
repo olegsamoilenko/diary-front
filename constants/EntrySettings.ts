@@ -55,34 +55,9 @@ export const AddEntryBackgroundColors: BackgroundSettings[] = [
 
 export const AddEntryBackgroundImage: BackgroundSettings[] = [
   {
-    id: 101,
-    type: "image",
-    url: require("@/assets/images/entry-backgrund/373394.jpg"),
-  },
-  {
-    id: 102,
-    type: "image",
-    url: require("@/assets/images/entry-backgrund/937980.jpg"),
-  },
-  {
     id: 103,
     type: "image",
     url: require("@/assets/images/entry-backgrund/1172849.jpg"),
-  },
-  {
-    id: 104,
-    type: "image",
-    url: require("@/assets/images/entry-backgrund/1366919.jpg"),
-  },
-  {
-    id: 105,
-    type: "image",
-    url: require("@/assets/images/entry-backgrund/1693095.jpg"),
-  },
-  {
-    id: 106,
-    type: "image",
-    url: require("@/assets/images/entry-backgrund/1784578.jpg"),
   },
   {
     id: 107,
@@ -90,13 +65,45 @@ export const AddEntryBackgroundImage: BackgroundSettings[] = [
     url: require("@/assets/images/entry-backgrund/2088170.jpg"),
   },
   {
-    id: 108,
+    id: 110,
     type: "image",
-    url: require("@/assets/images/entry-backgrund/2088210.jpg"),
+    url: require("@/assets/images/entry-backgrund/459335.jpg"),
   },
+  // {
+  //   id: 108,
+  //   type: "image",
+  //   url: require("@/assets/images/entry-backgrund/2088210.jpg"),
+  // },
+  {
+    id: 106,
+    type: "image",
+    url: require("@/assets/images/entry-backgrund/1784578.jpg"),
+  },
+  {
+    id: 101,
+    type: "image",
+    url: require("@/assets/images/entry-backgrund/373394.jpg"),
+  },
+  {
+    id: 104,
+    type: "image",
+    url: require("@/assets/images/entry-backgrund/1366919.jpg"),
+  },
+
+  {
+    id: 105,
+    type: "image",
+    url: require("@/assets/images/entry-backgrund/1693095.jpg"),
+  },
+
   {
     id: 109,
     type: "image",
     url: require("@/assets/images/entry-backgrund/3849167.jpg"),
+  },
+  {
+    id: 102,
+    type: "image",
+    url: require("@/assets/images/entry-backgrund/937980.jpg"),
   },
 ];

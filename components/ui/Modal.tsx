@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Dimensions,
+  ScrollView,
 } from "react-native";
 
 type ModalPortalProps = {
@@ -21,6 +22,7 @@ export default function ModalPortal({
   onClose,
   children,
 }: ModalPortalProps) {
+  const { height: SCREEN_HEIGHT } = Dimensions.get("window");
   return (
     <Modal
       animationType="fade"
@@ -37,9 +39,15 @@ export default function ModalPortal({
           >
             <Pressable
               onPress={(e) => e.stopPropagation()}
-              style={styles.modalView}
+              style={[styles.modalView, { maxHeight: SCREEN_HEIGHT * 0.8 }]}
             >
-              {children}
+              <ScrollView
+                contentContainerStyle={{ flexGrow: 1 }}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+              >
+                {children}
+              </ScrollView>
             </Pressable>
           </KeyboardAvoidingView>
         </View>

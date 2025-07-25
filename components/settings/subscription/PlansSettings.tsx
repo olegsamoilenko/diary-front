@@ -1,6 +1,6 @@
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   Pressable,
@@ -16,16 +16,36 @@ import { useTranslation } from "react-i18next";
 import { Plans } from "@/constants/Plans";
 import { ColorTheme } from "@/types";
 import Background from "@/components/Background";
+import * as SecureStore from "@/utils/store/secureStore";
+import type { User } from "@/types";
 
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const { t } = useTranslation();
+  const [user, setUser] = useState<User | null>(null);
 
-  const onSelect = (plan: (typeof Plans)[number]) => {
+  useEffect(() => {
+    const getUser = async () => {
+      const storedUser = await SecureStore.getItemAsync("user");
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    console.log("user", user);
+  }, [user]);
+
+  const onSubscribe = (plan: (typeof Plans)[number]) => {
     // Handle plan selection logic here
     console.log("Selected plan:", plan);
+  };
+
+  const onUnsubscribe = () => {
+    // Handle unsubscribe logic here
+    console.log("Unsubscribed from plan");
   };
   return (
     <SideSheet ref={ref}>
@@ -36,13 +56,50 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
             {t("settings.plans.titlePlural")}
           </ThemedText>
           <ScrollView>
-            {Plans.slice(1).map((plan) => (
-              <Pressable
-                key={plan.name}
-                style={styles.card}
-                onPress={() => onSelect(plan)}
-              >
-                <Text style={styles.planName}>{plan.name}</Text>
+            {Plans.map((plan) => (
+              <View key={plan.name} style={styles.card}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <ThemedText type="subtitleLG">{plan.name}</ThemedText>
+                  {user?.plan?.name === plan.name ? (
+                    <View
+                      style={{
+                        backgroundColor: colors.primary,
+                        paddingVertical: 4,
+                        paddingHorizontal: 8,
+                        borderRadius: 16,
+                      }}
+                    >
+                      <ThemedText
+                        style={{
+                          color: colors.textInPrimary,
+                        }}
+                      >
+                        {t("settings.plans.youCurrentPlan")}
+                      </ThemedText>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: colors.background,
+                        paddingVertical: 4,
+                        paddingHorizontal: 8,
+                        borderRadius: 16,
+                      }}
+                      onPress={() => onSubscribe(plan)}
+                    >
+                      <ThemedText>
+                        {t("settings.plans.getTheVersion")}
+                        {" " + plan.name}
+                      </ThemedText>
+                    </TouchableOpacity>
+                  )}
+                </View>
                 <Text style={styles.desc}>{t(plan.descriptionKey)}</Text>
                 <Text style={styles.price}>
                   {plan.price > 0
@@ -53,24 +110,9 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                   {plan.tokensLimit.toLocaleString()}{" "}
                   {t("planModal.tokensPerMonth")}
                 </Text>
-              </Pressable>
-            ))}
-
-            <TouchableOpacity>
-              <View
-                style={[styles.button, { backgroundColor: colors.primary }]}
-              >
-                <ThemedText
-                  type="subtitleLG"
-                  style={{
-                    color: colors.textInPrimary,
-                  }}
-                >
-                  {t("settings.plans.subscribe")}
-                </ThemedText>
               </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={onUnsubscribe}>
               <View
                 style={[
                   styles.button,

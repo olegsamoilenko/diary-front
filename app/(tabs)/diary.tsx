@@ -106,9 +106,6 @@ export default function Diary() {
   };
 
   useEffect(() => {
-    console.log("forceUpdate111", forceUpdate);
-    console.log("selectedDay", forceUpdate);
-    console.log("timeZone", forceUpdate);
     if (selectedDay && timeZone && forceUpdate) {
       console.log("forceUpdate", forceUpdate);
       fetchDiaryEntries(true);

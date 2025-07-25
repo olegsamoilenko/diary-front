@@ -117,6 +117,8 @@
     "plans": {
       "title": "Plan",
       "titlePlural": "Plans",
+      "youCurrentPlan": "Your current plan",
+      "getTheVersion": "Get the version",
       "subscribe": "Subscribe",
       "unsubscribe": "Unsubscribe"
     },

@@ -117,6 +117,8 @@
     "plans": {
       "title": "План",
       "titlePlural": "Плани",
+      "youCurrentPlan": "Ваш поточний план",
+      "getTheVersion": "Отримати версію",
       "subscribe": "Підписатися",
       "unsubscribe": "Відписатися"
     },

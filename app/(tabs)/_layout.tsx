@@ -12,11 +12,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { getFont } from "@/utils/common/getFont";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { t } = useTranslation();
   const font = useSelector((state: RootState) => state.font.font);
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -28,6 +30,7 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: {
           backgroundColor: Colors[colorScheme ?? "light"].tabBackground,
+          height: 60,
           ...Platform.select({
             ios: { position: "absolute" },
             default: {},

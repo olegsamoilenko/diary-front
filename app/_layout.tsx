@@ -52,6 +52,10 @@ export default function RootLayout() {
     "Nunito-Bold": require("@/assets/fonts/Nunito-Bold.ttf"),
     "Oswald-Regular": require("@/assets/fonts/Oswald-Regular.ttf"),
     "Oswald-Bold": require("@/assets/fonts/Oswald-Bold.ttf"),
+    "OpenSans-Regular": require("@/assets/fonts/OpenSans-Regular.ttf"),
+    "OpenSans-Bold": require("@/assets/fonts/OpenSans-Bold.ttf"),
+    "SourceCodePro-Regular": require("@/assets/fonts/SourceCodePro-Regular.ttf"),
+    "SourceCodePro-Bold": require("@/assets/fonts/SourceCodePro-Bold.ttf"),
     "Roboto-Regular": require("@/assets/fonts/Roboto-Regular.ttf"),
     "Roboto-Bold": require("@/assets/fonts/Roboto-Bold.ttf"),
     "Rubik-Regular": require("@/assets/fonts/Rubik-Regular.ttf"),
@@ -64,8 +68,12 @@ export default function RootLayout() {
     "Marck Script": require("@/assets/fonts/entry/MarckScript-Regular.ttf"),
     Neucha: require("@/assets/fonts/entry/Neucha-Regular.ttf"),
     Pacifico: require("@/assets/fonts/entry/Pacifico-Regular.ttf"),
-    Caveat: require("@/assets/fonts/entry/Caveat-VariableFont_wght.ttf"), // Bold
-    "Amatic SC": require("@/assets/fonts/entry/AmaticSC-Regular.ttf"), // bold
+    Caveat: require("@/assets/fonts/entry/Caveat-VariableFont_wght.ttf"),
+    "Amatic SC": require("@/assets/fonts/entry/AmaticSC-Regular.ttf"),
+    "PT Mono": require("@/assets/fonts/entry/PTMono.ttf"),
+    "Comforter Brush": require("@/assets/fonts/entry/ComforterBrush-Regular.ttf"),
+    "Bad Script": require("@/assets/fonts/entry/BadScript-Regular.ttf"),
+    "Yeseva One": require("@/assets/fonts/entry/YesevaOne-Regular.ttf"),
   });
 
   const [user, setUser] = useState<User | null>(null);
@@ -246,7 +254,7 @@ function RootLayoutInner() {
   return (
     <ThemeProvider value={navTheme}>
       <Stack screenOptions={{ headerShown: false }}></Stack>
-      <StatusBar style={colors.barStyle} translucent />
+      <StatusBar translucent />
     </ThemeProvider>
   );
 }
