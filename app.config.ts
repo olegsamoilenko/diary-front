@@ -5,7 +5,7 @@ export default () => ({
     name: "Nemory",
     slug: "nemory",
     owner: "soniac12",
-    version: "1.0.7",
+    version: "1.0.8",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "nemory",
@@ -42,11 +42,11 @@ export default () => ({
     ios: {
       supportsTablet: true,
       jsEngine: "jsc",
-      buildNumber: "1.0.7",
+      buildNumber: "1.0.8",
     },
     android: {
       package: "com.soniac12.nemory",
-      versionCode: 7,
+      versionCode: 8,
       adaptiveIcon: {
         foregroundImage: "./assets/images/icon.png",
         backgroundColor: "#ffffff",
