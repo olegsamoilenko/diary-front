@@ -59,5 +59,9 @@ export default {
         projectId: "be6994c0-5be5-4005-b6e4-1385174eecc3",
       },
     },
+    updates: {
+      url: "https://u.expo.dev/be6994c0-5be5-4005-b6e4-1385174eecc3",
+      fallbackToCacheTimeout: 0,
+    },
   },
 };
