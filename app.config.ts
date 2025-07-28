@@ -35,9 +35,7 @@ export default () => ({
     experiments: {
       typedRoutes: true,
     },
-    runtimeVersion: {
-      policy: "appVersion",
-    },
+    runtimeVersion: "1.0.8",
     jsEngine: "hermes",
     ios: {
       supportsTablet: true,
