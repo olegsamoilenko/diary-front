@@ -5,7 +5,7 @@ export default {
     name: "Nemory",
     slug: "nemory",
     owner: "soniac12",
-    version: "1.0.2",
+    version: "1.0.7",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "nemory",
@@ -39,7 +39,7 @@ export default {
     ios: {
       supportsTablet: true,
       jsEngine: "jsc",
-      buildNumber: "1.0.2",
+      buildNumber: "1.0.7",
     },
     android: {
       package: "com.soniac12.nemory",
