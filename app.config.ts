@@ -39,9 +39,11 @@ export default {
     ios: {
       supportsTablet: true,
       jsEngine: "jsc",
+      buildNumber: "1.0.2",
     },
     android: {
       package: "com.soniac12.nemory",
+      versionCode: 7,
       adaptiveIcon: {
         foregroundImage: "./assets/images/icon.png",
         backgroundColor: "#ffffff",
