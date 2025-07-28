@@ -9,7 +9,7 @@ type EmojiSettingProps = {
 };
 export default function EmojiSetting({ setEmoji }: EmojiSettingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
 
   return (
     <View

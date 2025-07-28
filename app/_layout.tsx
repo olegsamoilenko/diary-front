@@ -146,7 +146,6 @@ export default function RootLayout() {
   const handleSubscribePlan = async (plan: Plan) => {
     const userString = await SecureStore.getItemAsync("user");
     const user: User = userString ? JSON.parse(userString) : null;
-    console.log("handleSubscribePlan user:", user);
     if (plan.name === "Start") {
       await subscribePlan(plan);
     } else if (user && user.isRegistered) {

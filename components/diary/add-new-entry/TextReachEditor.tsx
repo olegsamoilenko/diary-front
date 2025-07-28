@@ -77,7 +77,7 @@ export default function TextReachEditor({
   emoji,
 }: TextReachEditorProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const richText = useRef(null);
   const scrollRef = useRef(null);
 

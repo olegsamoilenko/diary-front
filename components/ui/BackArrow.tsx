@@ -14,7 +14,7 @@ type BackArrowProps = {
 
 export default function BackArrow({ ref, style, onClose }: BackArrowProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
 
   function closeSheet() {
     if (isRefObject<SideSheetRef>(ref) && ref.current) {

@@ -37,7 +37,7 @@ export default function ColorSetting({
   selectedColor,
 }: ColorSettingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
 
   return (
     <View

@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme] ?? Colors.system;
   const { t } = useTranslation();
   const font = useSelector((state: RootState) => state.font.font);
   const insets = useSafeAreaInsets();
@@ -23,13 +24,13 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].primary,
-        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIcon,
+        tabBarActiveTintColor: colors.tabIconSelected,
+        tabBarInactiveTintColor: colors.tabIcon,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? "light"].tabBackground,
+          backgroundColor: colors.tabBackground,
           height: 60,
           ...Platform.select({
             ios: { position: "absolute" },
@@ -63,31 +64,31 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="chat"
-        options={{
-          tabBarLabel: ({ color }) => {
-            return (
-              <Text
-                style={{
-                  fontFamily: getFont(font.name, "regular"),
-                  color,
-                  fontSize: 13,
-                }}
-              >
-                {t("chat.title")}
-              </Text>
-            );
-          },
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons
-              name="robot-outline"
-              size={28}
-              color={color}
-            />
-          ),
-        }}
-      />
+      {/*<Tabs.Screen*/}
+      {/*  name="chat"*/}
+      {/*  options={{*/}
+      {/*    tabBarLabel: ({ color }) => {*/}
+      {/*      return (*/}
+      {/*        <Text*/}
+      {/*          style={{*/}
+      {/*            fontFamily: getFont(font.name, "regular"),*/}
+      {/*            color,*/}
+      {/*            fontSize: 13,*/}
+      {/*          }}*/}
+      {/*        >*/}
+      {/*          {t("chat.title")}*/}
+      {/*        </Text>*/}
+      {/*      );*/}
+      {/*    },*/}
+      {/*    tabBarIcon: ({ color }) => (*/}
+      {/*      <MaterialCommunityIcons*/}
+      {/*        name="robot-outline"*/}
+      {/*        size={28}*/}
+      {/*        color={color}*/}
+      {/*      />*/}
+      {/*    ),*/}
+      {/*  }}*/}
+      {/*/>*/}
       <Tabs.Screen
         name="settings"
         options={{

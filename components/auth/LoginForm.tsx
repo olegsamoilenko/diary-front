@@ -35,7 +35,7 @@ export default function LoginForm({
   const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,7 +62,6 @@ export default function LoginForm({
         email: values.email,
         password: values.password,
       });
-      console.log("Login response:", res);
       const { accessToken, user } = res.data;
 
       await SecureStore.setItemAsync("token", accessToken);

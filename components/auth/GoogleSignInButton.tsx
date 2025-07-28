@@ -18,7 +18,7 @@ export default function GoogleSignInButton({
   onSuccessSignWithGoogle: () => void;
 }) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const googleLogo = require("@/assets/images/logo/google_logo.webp");
   const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();

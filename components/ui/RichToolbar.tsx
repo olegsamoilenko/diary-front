@@ -57,7 +57,7 @@ export default function RichToolbar({
   handlePhotoAction,
 }: RichToolbarProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   return (
     <View

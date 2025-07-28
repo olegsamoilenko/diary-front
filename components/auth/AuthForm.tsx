@@ -33,7 +33,7 @@ export default function AuthForm({
 }) {
   const [activeTab, setActiveTab] = useState<"login" | "register">("register");
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const [showEmailVerificationCodeForm, setShowEmailVerificationCodeForm] =
     useState(false);

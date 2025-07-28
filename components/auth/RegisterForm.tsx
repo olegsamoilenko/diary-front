@@ -44,7 +44,7 @@ export default function RegisterForm({
   const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const [error, setError] = useState<string | null>(null);
 

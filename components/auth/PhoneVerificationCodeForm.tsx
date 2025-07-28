@@ -26,7 +26,7 @@ export default function PhoneVerificationCodeForm({
 }: PhoneVerificationCodeFormProps) {
   const [code, setCode] = useState("");
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();

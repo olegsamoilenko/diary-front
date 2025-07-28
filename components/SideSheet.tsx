@@ -39,6 +39,7 @@ const SideSheet = forwardRef<SideSheetRef, SideSheetProps>(
     ).current;
     const insets = useSafeAreaInsets();
     const colorScheme = useColorScheme();
+    const colors = Colors[colorScheme] ?? Colors.system;
 
     const openSideScreen = () => {
       setVisible(true);
@@ -84,7 +85,7 @@ const SideSheet = forwardRef<SideSheetRef, SideSheetProps>(
           style,
         ]}
       >
-        <Background background={Colors[colorScheme].background}>
+        <Background background={colors.background}>
           <View style={styles.content}>{children}</View>
         </Background>
       </Animated.View>

@@ -13,7 +13,6 @@ export default function Background({
   background,
   paddingTop = 0,
 }: EntryCardBackgroundProps) {
-  console.log("Background component rendered with background:", background);
   if (background.type === "image" && background.url) {
     return (
       <ImageBackground

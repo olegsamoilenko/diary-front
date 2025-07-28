@@ -22,8 +22,8 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const dispatch = useAppDispatch();
   const aiModel = useAppSelector((state) => state.settings.aiModel);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const styles = getStyles(Colors[colorScheme]);
+  const colors = Colors[colorScheme] ?? Colors.system;
+  const styles = getStyles(colors);
 
   return (
     <SideSheet ref={ref}>
@@ -44,10 +44,10 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                   style={[
                     styles.radio,
                     aiModel === model.key && {
-                      borderColor: Colors[colorScheme].primary,
+                      borderColor: colors.primary,
                     },
                     {
-                      borderColor: Colors[colorScheme].primary,
+                      borderColor: colors.primary,
                     },
                   ]}
                 >
@@ -55,14 +55,12 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                     <View
                       style={[
                         styles.radioDot,
-                        { backgroundColor: Colors[colorScheme].primary },
+                        { backgroundColor: colors.primary },
                       ]}
                     />
                   )}
                 </View>
-                <ThemedText
-                  style={[styles.label, { color: Colors[colorScheme].text }]}
-                >
+                <ThemedText style={[styles.label, { color: colors.text }]}>
                   {t(`settings.model.${model.key}`)}
                 </ThemedText>
               </TouchableOpacity>

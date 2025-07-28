@@ -25,7 +25,7 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
 
   const handleFont = async (font: { title: string; name: string }) => {

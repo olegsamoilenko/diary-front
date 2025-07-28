@@ -13,26 +13,46 @@ export default function NemoryLogo({
 }) {
   const colorScheme = useColorScheme();
   const { t } = useTranslation();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const logos: LogoTheme = {
+    system: require("@/assets/images/logo/system.png"),
+    avocado: require("@/assets/images/logo/avocado.png"),
+    heart: require("@/assets/images/logo/heart.png"),
     light: require("@/assets/images/logo/light.png"),
     calmMind: require("@/assets/images/logo/calmMind.png"),
     orange: require("@/assets/images/logo/orange.png"),
     dark: require("@/assets/images/logo/dark.png"),
     sandDune: require("@/assets/images/logo/sandDune.png"),
+    ball: require("@/assets/images/logo/ball.png"),
     yellowBokeh: require("@/assets/images/logo/yellowBokeh.png"),
   };
   return (
     <>
       <Image
-        source={logos[colorScheme]}
+        source={logos[colorScheme ?? "system"]}
         style={{ width: width, height: height }}
         resizeMode="contain"
       />
-      <ThemedText type="logo" style={{ color: colors.primary }}>
+      <ThemedText
+        type="logo"
+        style={{
+          color: colors.primary,
+          textShadowColor: "#00000080",
+          textShadowOffset: { width: 1, height: 1 },
+          textShadowRadius: 5,
+        }}
+      >
         Nemory
       </ThemedText>
-      <ThemedText type="slogan" style={{ color: colors.primary }}>
+      <ThemedText
+        type="slogan"
+        style={{
+          color: colors.primary,
+          textShadowColor: "#00000080",
+          textShadowOffset: { width: 1, height: 1 },
+          textShadowRadius: 5,
+        }}
+      >
         {t("slogan")}
       </ThemedText>
     </>

@@ -35,7 +35,7 @@ export default function MonthView({
 }: MonthViewProps) {
   const lang = i18n.language || "uk";
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const localeArr = Localization.getLocales();
   const locale =
     localeArr!.find((loc) => loc.languageCode === lang)?.languageTag ?? "en-US";

@@ -42,7 +42,7 @@ export default function AuthGate({
   const [biometryEnabled, setBiometryEnabled] = useState(false);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const [errorPin, setErrorPin] = useState("");
   const [user, setUser] = useState<User | null>(null);

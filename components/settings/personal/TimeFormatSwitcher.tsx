@@ -26,7 +26,7 @@ const timeFormatOptions = [
 const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const dispatch = useDispatch<AppDispatch>();
   const format = useSelector((state: RootState) => state.timeFormat);
@@ -55,7 +55,7 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                   style={[
                     styles.radio,
                     Number(format.key) === Number(f.key) && {
-                      borderColor: Colors[colorScheme].primary,
+                      borderColor: colors.primary,
                     },
                   ]}
                 >
@@ -63,14 +63,12 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                     <View
                       style={[
                         styles.radioDot,
-                        { backgroundColor: Colors[colorScheme].primary },
+                        { backgroundColor: colors.primary },
                       ]}
                     />
                   )}
                 </View>
-                <Text
-                  style={[styles.label, { color: Colors[colorScheme].text }]}
-                >
+                <Text style={[styles.label, { color: colors.text }]}>
                   {t(`settings.timeFormat.${f.key}`)}
                 </Text>
               </TouchableOpacity>

@@ -29,7 +29,7 @@ import Background from "@/components/Background";
 export default function Diary() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const addNewEntryRef = useRef<SideSheetRef>(null);
   const [selectedDay, setSelectedDay] = useState<
     string | number | Date | undefined

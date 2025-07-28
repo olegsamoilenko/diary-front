@@ -13,7 +13,7 @@ export default function SubscriptionSettingsBlock({
   plansRef: RefObject<SideSheetRef | null>;
 }) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const { t } = useTranslation();
   return (
     <View

@@ -78,11 +78,15 @@
       "title": "Тема",
       "titlePlural": "Теми",
       "themes": {
-        "light": "Світла",
+        "system": "Системна",
+        "avocado": "Авокадо",
+        "heart": "Три Серця",
+        "light": "Космос",
         "calmMind": "Спокійний розум",
         "orange": "Помаранчева",
         "dark": "Темна",
         "sandDune": "Піщана дюна",
+        "ball": "Шар",
         "yellowBokeh": "Жовтий боке"
       }
     },

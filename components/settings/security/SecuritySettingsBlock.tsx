@@ -15,7 +15,7 @@ export default function SecuritySettingsBlock({
 }) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const { biometryEnabled } = useBiometry();
 
   return (

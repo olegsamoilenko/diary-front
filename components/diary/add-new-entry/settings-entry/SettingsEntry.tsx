@@ -57,7 +57,7 @@ export default function SettingsEntry({
   addEmoji,
 }: SettingsEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors, keyboardHeight);
   const { t } = useTranslation();
 

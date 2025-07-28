@@ -47,7 +47,7 @@ const AddNewEntry = forwardRef<
 >((props, ref) => {
   const aiModel = useAppSelector((state) => state.settings.aiModel);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const lang = i18n.language || "uk";

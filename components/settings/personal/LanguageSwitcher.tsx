@@ -21,7 +21,7 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [lang, setLang] = useState<string | null>(i18n.language);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
 
   const languages = Object.keys(i18n.options.resources ?? { en: {} }).map(
@@ -63,10 +63,10 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                   style={[
                     styles.radio,
                     lang === option.value && {
-                      borderColor: Colors[colorScheme].primary,
+                      borderColor: colors.primary,
                     },
                     {
-                      borderColor: Colors[colorScheme].primary,
+                      borderColor: colors.primary,
                     },
                   ]}
                 >
@@ -74,14 +74,12 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                     <View
                       style={[
                         styles.radioDot,
-                        { backgroundColor: Colors[colorScheme].primary },
+                        { backgroundColor: colors.primary },
                       ]}
                     />
                   )}
                 </View>
-                <ThemedText
-                  style={[styles.label, { color: Colors[colorScheme].text }]}
-                >
+                <ThemedText style={[styles.label, { color: colors.text }]}>
                   {t(`settings.languages.${option.key}`)}
                 </ThemedText>
               </TouchableOpacity>

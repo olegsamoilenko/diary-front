@@ -60,7 +60,7 @@ export default function TitleEntry({
   titleEmoji,
 }: TitleEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const [showTip, setShowTip] = useState(false);
@@ -131,6 +131,7 @@ export default function TitleEntry({
 
         <ModalPortal
           visible={visibleEmojiModal}
+          maxHeight={true}
           onClose={() => setVisibleEmojiModal(false)}
         >
           <Emoji

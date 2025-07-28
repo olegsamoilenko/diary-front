@@ -64,7 +64,7 @@ export default function TitleReachEditor({
   const richTitle = useRef(null);
   const [editorHeight, setEditorHeight] = useState(40);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const { t } = useTranslation();
 
   const handleEditorMessage = (event: any) => {
@@ -189,6 +189,7 @@ export default function TitleReachEditor({
       placeholder={t("diary.addEntryTitle")}
       editorStyle={{
         backgroundColor: "transparent",
+        placeholderColor: colors.text,
         color: "#6c6b6b",
         initialCSSText: `
             ${MarckScriptFontStylesheet}google

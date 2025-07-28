@@ -26,7 +26,7 @@ export default function ContentEntry({
   isEntrySaved,
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const animatedAiComment = useTypewriter(entry.aiComment.content, 30);
   const scrollViewRef = useRef(null);
   const [idx, setIdx] = useState<number>(0);
@@ -34,7 +34,6 @@ export default function ContentEntry({
   useEffect(() => {
     if (scrollViewRef.current) {
       setTimeout(() => {
-        console.log("Scrolling to end");
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
@@ -170,14 +169,14 @@ export default function ContentEntry({
                       <NemoryIcon width={50} height={60} />
                     )}
 
-                    <TypewriterAIResponse
-                      response={dialog.answer}
-                      style={{ color: colors.text }}
-                      setIdx={setIdx}
-                    />
-                    {/*<ThemedText style={{ color: colors.text }}>*/}
-                    {/*  {dialog.answer}*/}
-                    {/*</ThemedText>*/}
+                    {/*<TypewriterAIResponse*/}
+                    {/*  response={dialog.answer}*/}
+                    {/*  style={{ color: colors.text }}*/}
+                    {/*  setIdx={setIdx}*/}
+                    {/*/>*/}
+                    <ThemedText style={{ color: colors.text }}>
+                      {animatedAiComment}
+                    </ThemedText>
                   </View>
                 </View>
               );

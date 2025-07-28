@@ -25,7 +25,7 @@ export default function PersonalSettingsBlock({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const { theme } = useThemeCustom();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const format = useSelector((state: RootState) => state.timeFormat.value);
   const font = useSelector((state: RootState) => state.font.font);
 

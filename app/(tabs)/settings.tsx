@@ -40,7 +40,7 @@ export default function Settings() {
   const biometryRef = useRef<SideSheetRef>(null);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
 
   const modelSwitcherRef = useRef<SideSheetRef>(null);
   const aiModel = useAppSelector((state) => state.settings.aiModel);

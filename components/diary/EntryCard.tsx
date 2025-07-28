@@ -25,7 +25,7 @@ import { ExpandableSection } from "@/components/ExpandableSection";
 type EntryCardProps = { entry: Entry; deleteEntry: (id: number) => void };
 export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
   const format = useSelector((state: RootState) => state.timeFormat.key);
   const [key, setKey] = useState<number>(0);

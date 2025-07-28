@@ -18,6 +18,18 @@ import Background from "@/components/Background";
 
 const themes = [
   {
+    name: "system",
+    img: require("@/assets/images/theme/system.jpg"),
+  },
+  {
+    name: "avocado",
+    img: require("@/assets/images/theme/avocado.jpg"),
+  },
+  {
+    name: "heart",
+    img: require("@/assets/images/theme/heart.jpg"),
+  },
+  {
     name: "light",
     img: require("@/assets/images/theme/light.jpg"),
   },
@@ -30,10 +42,6 @@ const themes = [
     img: require("@/assets/images/theme/orange.jpg"),
   },
   {
-    name: "dark",
-    img: require("@/assets/images/theme/dark.jpg"),
-  },
-  {
     name: "sandDune",
     img: require("@/assets/images/theme/sandDune.jpg"),
   },
@@ -41,13 +49,21 @@ const themes = [
     name: "yellowBokeh",
     img: require("@/assets/images/theme/yellowBokeh.jpg"),
   },
+  {
+    name: "ball",
+    img: require("@/assets/images/theme/ball.jpg"),
+  },
+  {
+    name: "dark",
+    img: require("@/assets/images/theme/dark.jpg"),
+  },
 ];
 
 const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { theme, setTheme } = useThemeCustom();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
 
   const handleTheme = (themeName: string) => {

@@ -27,7 +27,7 @@ export default function ForgotPasswordForm({
   const { t } = useTranslation();
   const lang = useState<string | null>(i18n.language)[0];
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

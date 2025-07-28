@@ -12,7 +12,7 @@ import { useBiometry } from "@/context/BiometryContext";
 
 const BiometrySettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const { biometryEnabled, setBiometry } = useBiometry();

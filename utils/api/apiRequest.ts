@@ -39,12 +39,40 @@ export async function apiRequest<T = any>({
           token = res.data.accessToken as string;
           await SecureStore.setItemAsync("token", token);
         } catch (err: any) {
-          console.log(err?.response?.data);
-          Toast.show({
-            type: "error",
-            text1: err?.response?.data.statusMessage,
-            text2: err?.response?.data.message,
-          });
+          console.log(111);
+
+          if (axios.isAxiosError(err)) {
+            if (err.response && err.response.data) {
+              const { statusMessage, message } = err.response.data;
+              Toast.show({
+                type: "error",
+                text1: statusMessage || "Server error",
+                text2: message || "Unknown error from server",
+              });
+              console.error("Axios response error:", err.response.data);
+            } else if (err.request) {
+              Toast.show({
+                type: "error",
+                text1: "Network error",
+                text2: "No response from server. Check your connection.",
+              });
+              console.error("Axios request error:", err.request);
+            } else {
+              Toast.show({
+                type: "error",
+                text1: "Request error",
+                text2: err.message,
+              });
+              console.error("Axios config error:", err.message);
+            }
+          } else {
+            Toast.show({
+              type: "error",
+              text1: "Unexpected error",
+              text2: String(err),
+            });
+            console.error("Unexpected error:", err);
+          }
         }
       }
     }
@@ -68,12 +96,42 @@ export async function apiRequest<T = any>({
     };
 
     return await axios<T>(requestConfig);
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(error);
-      throw error;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      if (!err.response) {
+        console.error("Network or Axios error:", err.message, err.code);
+        Toast.show({
+          type: "error",
+          text1: "Network Error",
+          text2: err.message,
+        });
+        throw err;
+      }
+
+      const status = err.response.status;
+      const statusText = err.response.statusText;
+      const errorMessage =
+        err.response.data?.message || err.response.data?.error || statusText;
+
+      console.error(
+        `Axios error ${status}: ${errorMessage}`,
+        err.response.data,
+      );
+
+      Toast.show({
+        type: "error",
+        text1: `Error ${status}`,
+        text2: errorMessage,
+      });
+
+      throw err;
     } else {
-      console.error("Unexpected Error:", error);
+      console.error("Unexpected Error:", err);
+      Toast.show({
+        type: "error",
+        text1: "Unexpected Error",
+        text2: String(err),
+      });
       throw new Error("An unexpected error occurred");
     }
   }

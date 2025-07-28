@@ -18,6 +18,7 @@ export const AILoader = ({
   dotFontSize = 16,
 }: AILoaderProps) => {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme] ?? Colors.system;
   const [step, setStep] = useState(0);
   const interval = useRef<NodeJS.Timeout | null>(null);
 
@@ -49,7 +50,7 @@ export const AILoader = ({
         <Text
           style={[
             styles.text,
-            { color: Colors[colorScheme].primary, fontSize: dotFontSize },
+            { color: colors.primary, fontSize: dotFontSize },
           ]}
         >
           {dots[step]}

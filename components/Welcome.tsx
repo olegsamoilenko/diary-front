@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 export default function Welcome() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const [name, setName] = useState("");
   const { t } = useTranslation();

@@ -21,7 +21,7 @@ import type { User } from "@/types";
 
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);

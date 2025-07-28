@@ -21,7 +21,7 @@ type Props = {
 
 export default function SelectPlan({ visible, onSelect }: Props) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const { t } = useTranslation();
   return (

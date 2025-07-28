@@ -13,7 +13,7 @@ export default function Emoji({
 }) {
   const [selectedEmoji, setSelectedEmoji] = useState<string | undefined>(mood);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
 
   const handleEmoji = (emoji: string) => {
     setSelectedEmoji(emoji);

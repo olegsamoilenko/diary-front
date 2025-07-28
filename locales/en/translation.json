@@ -78,11 +78,15 @@
       "title": "Theme",
       "titlePlural": "Themes",
       "themes": {
-        "light": "Light",
+        "system": "System",
+        "avocado": "Avocado",
+        "heart": "Three Hearts",
+        "light": "Space",
         "calmMind": "Calm Mind",
         "orange": "Orange",
         "dark": "Dark",
         "sandDune": "Sand Dune",
+        "ball": "Ball",
         "yellowBokeh": "Yellow Bokeh"
       }
     },
