@@ -24,7 +24,7 @@ export default {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/images/icon.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff",
@@ -57,6 +57,7 @@ export default {
       API_URL: process.env.API_URL,
       eas: {
         projectId: "be6994c0-5be5-4005-b6e4-1385174eecc3",
+        branch: "production",
       },
     },
     updates: {
