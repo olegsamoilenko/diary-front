@@ -20,6 +20,21 @@ type InputEntryProps = {
   onHandleSave: () => void;
   tooltipVisible: boolean;
   entrySettings: EntrySettings;
+  textReachEditorKey: number;
+  showBackgroundSetting: boolean;
+  setShowBackgroundSetting: (show: boolean) => void;
+  showSizeSetting: boolean;
+  setShowSizeSetting: (show: boolean) => void;
+  showFontSetting: boolean;
+  setShowFontSetting: (show: boolean) => void;
+  showColorSetting: boolean;
+  setShowColorSetting: (show: boolean) => void;
+  showEmojiSetting: boolean;
+  setShowEmojiSetting: (show: boolean) => void;
+  isFocusTextRichEditor: boolean;
+  setIsFocusTextRichEditor: (focus: boolean) => void;
+  emoji: string;
+  addEmoji: (emoji: string) => void;
 };
 
 export default function AddContentInputEntry({
@@ -30,14 +45,24 @@ export default function AddContentInputEntry({
   onChangeEntrySettings,
   tooltipVisible,
   entrySettings,
+  textReachEditorKey,
+  showBackgroundSetting,
+  setShowBackgroundSetting,
+  showSizeSetting,
+  setShowSizeSetting,
+  showFontSetting,
+  setShowFontSetting,
+  showColorSetting,
+  setShowColorSetting,
+  showEmojiSetting,
+  setShowEmojiSetting,
+  isFocusTextRichEditor,
+  setIsFocusTextRichEditor,
+  emoji,
+  addEmoji,
 }: InputEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const [showBackgroundSetting, setShowBackgroundSetting] = useState(false);
-  const [showSizeSetting, setShowSizeSetting] = useState(false);
-  const [showFontSetting, setShowFontSetting] = useState(false);
-  const [showColorSetting, setShowColorSetting] = useState(false);
-  const [showEmojiSetting, setShowEmojiSetting] = useState(false);
+  const colors = Colors[colorScheme] ?? Colors.system;
   const [showImageSetting, setShowImageSetting] = useState(false);
   const [showPhotoSetting, setShowPhotoSetting] = useState(false);
   const [selectedColor, setSelectedColor] = useState(colors.text);
@@ -50,7 +75,7 @@ export default function AddContentInputEntry({
   const [isBulletedListAction, setIsBulletedListAction] = useState(false);
   const [isOrderedListAction, setIsOrderedListAction] = useState(false);
   const [sizeAction, setSizeAction] = useState(16);
-  const [colorAction, setColorAction] = useState("");
+  const [colorAction, setColorAction] = useState(colors.text);
   const [activeActions, setActiveActions] = useState<Record<string, boolean>>(
     {},
   );
@@ -62,7 +87,7 @@ export default function AddContentInputEntry({
   const debouncedSave = useCallback(
     debounce((content: string) => {
       setEntryContent(content);
-    }, 800),
+    }, 300),
     [],
   );
 
@@ -124,13 +149,21 @@ export default function AddContentInputEntry({
     setSelectedFont(font);
   };
 
-  const [isFocusRichEditor, setIsFocusRichEditor] = useState(false);
+  const handleEmojiAction = () => {
+    setShowEmojiSetting(true);
+  };
+
+  const handleEmoji = (emoji: string) => {
+    addEmoji(emoji);
+    setShowEmojiSetting(false);
+  };
+
   const handleFocus = () => {
-    setIsFocusRichEditor(true);
+    setIsFocusTextRichEditor(true);
   };
 
   const handleBlur = () => {
-    setIsFocusRichEditor(false);
+    setIsFocusTextRichEditor(false);
   };
 
   const handleImageAction = () => {
@@ -156,6 +189,7 @@ export default function AddContentInputEntry({
       }}
     >
       <TextReachEditor
+        textReachEditorKey={textReachEditorKey}
         content={content}
         setContent={setContent}
         isKeyboardOpen={isKeyboardOpen}
@@ -174,9 +208,10 @@ export default function AddContentInputEntry({
         setShowImageSetting={setShowImageSetting}
         showPhotoSetting={showPhotoSetting}
         setShowPhotoSetting={setShowPhotoSetting}
+        emoji={emoji}
       />
 
-      {isKeyboardOpen && isFocusRichEditor && (
+      {isKeyboardOpen && isFocusTextRichEditor && (
         <RichToolbar
           actions={{
             background: true,
@@ -188,6 +223,7 @@ export default function AddContentInputEntry({
             font: true,
             bulletedList: true,
             orderedList: true,
+            emoji: true,
             photo: true,
             image: true,
           }}
@@ -201,6 +237,7 @@ export default function AddContentInputEntry({
           handleFontAction={handleFontAction}
           handleBulletedListAction={handleBulletedListAction}
           handleOrderedListAction={handleOrderedListAction}
+          handleEmojiAction={handleEmojiAction}
           handleImageAction={handleImageAction}
           handlePhotoAction={handlePhotoAction}
         ></RichToolbar>
@@ -223,6 +260,9 @@ export default function AddContentInputEntry({
         setSize={setSize}
         setFont={setFont}
         selectedFont={selectedFont}
+        setShowEmojiSetting={setShowEmojiSetting}
+        showEmojiSetting={showEmojiSetting}
+        addEmoji={handleEmoji}
       />
     </View>
   );

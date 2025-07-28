@@ -8,19 +8,23 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Dimensions,
+  ScrollView,
 } from "react-native";
 
 type ModalPortalProps = {
   visible: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  maxHeight?: boolean;
 };
 
 export default function ModalPortal({
   visible,
   onClose,
   children,
+  maxHeight = false,
 }: ModalPortalProps) {
+  const { height: SCREEN_HEIGHT } = Dimensions.get("window");
   return (
     <Modal
       animationType="fade"
@@ -35,12 +39,27 @@ export default function ModalPortal({
             behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={styles.centeredView}
           >
-            <Pressable
-              onPress={(e) => e.stopPropagation()}
-              style={styles.modalView}
-            >
-              {children}
-            </Pressable>
+            {maxHeight ? (
+              <Pressable
+                onPress={(e) => e.stopPropagation()}
+                style={[styles.modalView, { maxHeight: SCREEN_HEIGHT * 0.8 }]}
+              >
+                <ScrollView
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  showsVerticalScrollIndicator={false}
+                  bounces={false}
+                >
+                  {children}
+                </ScrollView>
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={(e) => e.stopPropagation()}
+                style={styles.modalView}
+              >
+                {children}
+              </Pressable>
+            )}
           </KeyboardAvoidingView>
         </View>
       </TouchableWithoutFeedback>
@@ -50,7 +69,8 @@ export default function ModalPortal({
 
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1,
+    height: "100%",
+    width: "100%",
     backgroundColor: "rgba(0,0,0,0.27)",
     justifyContent: "center",
     alignItems: "center",

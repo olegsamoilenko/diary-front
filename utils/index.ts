@@ -9,6 +9,7 @@ import { isRefObject } from "./common/isRefObject";
 import { getTodayDateStr } from "./diary/getTodayDateStr";
 import { getFont } from "./common/getFont";
 import { uploadImageToServer } from "./files/uploadImageToServer";
+import { passwordRules } from "./auth/passwordRules";
 
 export {
   apiRequest,
@@ -22,4 +23,5 @@ export {
   getTodayDateStr,
   getFont,
   uploadImageToServer,
+  passwordRules,
 };

@@ -10,11 +10,12 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { AiComment, ColorTheme, Entry } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { apiRequest, getTodayDateStr } from "@/utils";
+import { apiRequest, getFont, getTodayDateStr } from "@/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -29,6 +30,8 @@ import { ThemedText } from "@/components/ThemedText";
 import RichToolbar from "@/components/ui/RichToolbar";
 import SettingsEntry from "@/components/diary/add-new-entry/settings-entry/SettingsEntry";
 import { FONTS } from "@/assets/fonts/entry";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -44,24 +47,36 @@ const AddNewEntry = forwardRef<
 >((props, ref) => {
   const aiModel = useAppSelector((state) => state.settings.aiModel);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const lang = i18n.language || "uk";
   const [isBoldAction, setIsBoldAction] = useState(false);
   const [isItalicAction, setIsItalicAction] = useState(false);
   const [sizeAction, setSizeAction] = useState(16);
-  const [colorAction, setColorAction] = useState("");
+  const [colorAction, setColorAction] = useState(colors.text);
+  const [showBackgroundSetting, setShowBackgroundSetting] = useState(false);
   const [showFontSetting, setShowFontSetting] = useState(false);
   const [showSizeSetting, setShowSizeSetting] = useState(false);
   const [showColorSetting, setShowColorSetting] = useState(false);
+  const [showEmojiSetting, setShowEmojiSetting] = useState(false);
+  const [showTitleFontSetting, setShowTitleFontSetting] = useState(false);
+  const [showTitleSizeSetting, setShowTitleSizeSetting] = useState(false);
+  const [showTitleColorSetting, setShowTitleColorSetting] = useState(false);
+  const [showTitleEmojiSetting, setShowTitleEmojiSetting] = useState(false);
   const [selectedColor, setSelectedColor] = useState(colors.text);
   const [selectedFont, setSelectedFont] = useState(FONTS[0]);
   const [selectedSize, setSelectedSize] = useState(16);
+  const [emoji, setEmoji] = useState<string>("");
+  const [titleEmoji, setTitleEmoji] = useState<string>("");
   const [aiDialogLoading, setAiDialogLoading] = useState(false);
+  const [textReachEditorKey, setTextReachEditorKey] = useState(0);
+  const [titleReachEditorKey, setTitleReachEditorKey] = useState(0);
+  const [isFocusTextRichEditor, setIsFocusTextRichEditor] = useState(false);
+  const font = useSelector((state: RootState) => state.font.font);
 
   const [entry, setEntry] = useState<Entry>({
-    id: "0",
+    id: 0,
     title: "",
     content: "",
     mood: "",
@@ -78,7 +93,7 @@ const AddNewEntry = forwardRef<
     background: {
       id: 0,
       type: "color",
-      value: colors.diaryNotesBackground,
+      value: colors.card,
       url: undefined,
     },
   });
@@ -99,23 +114,37 @@ const AddNewEntry = forwardRef<
   const [dialogQuestion, setDialogQuestion] = useState("");
 
   useEffect(() => {
+    setColorAction(colors.text);
+  }, [colorScheme]);
+
+  useEffect(() => {
     if (!isAddNewEntryOpen) {
       setIsEntrySaved(false);
-      setEntry({
-        id: "0",
-        title: "",
-        content: "",
-        mood: "",
-        aiComment: {
-          content: "",
-          aiModel: aiModel,
-        },
-        embedding: [],
-        dialogs: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
     }
+
+    setEntry({
+      id: 0,
+      title: "",
+      content: "",
+      mood: "",
+      aiComment: {
+        content: "",
+        aiModel: aiModel,
+      },
+      embedding: [],
+      dialogs: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    setEntrySettings({
+      background: {
+        id: 0,
+        type: "color",
+        value: colors.card,
+        url: undefined,
+      },
+    });
   }, [isAddNewEntryOpen]);
 
   useEffect(() => {
@@ -156,19 +185,23 @@ const AddNewEntry = forwardRef<
   };
 
   const handleFontAction = () => {
-    setShowFontSetting(true);
+    setShowTitleFontSetting(true);
   };
 
   const handleColorAction = () => {
     if (isKeyboardOpen) {
-      setShowColorSetting(true);
+      setShowTitleColorSetting(true);
     }
   };
 
   const handleSizeAction = () => {
     if (isKeyboardOpen) {
-      setShowSizeSetting(true);
+      setShowTitleSizeSetting(true);
     }
+  };
+
+  const handleEmojiAction = () => {
+    setShowTitleEmojiSetting(true);
   };
 
   const handleFocus = () => {
@@ -177,6 +210,11 @@ const AddNewEntry = forwardRef<
 
   const handleBlur = () => {
     setIsFocusTitleRichEditor(false);
+  };
+
+  const handleTitleEmoji = (emoji: string) => {
+    setTitleEmoji(emoji);
+    setShowTitleEmojiSetting(false);
   };
 
   useEffect(() => {
@@ -200,6 +238,10 @@ const AddNewEntry = forwardRef<
 
   const handleSave = async () => {
     setLoading(true);
+    setIsFocusTitleRichEditor(false);
+    setIsFocusTextRichEditor(false);
+    setTextReachEditorKey((k) => k + 1);
+    setTitleReachEditorKey((k) => k + 1);
 
     try {
       const res = await apiRequest({
@@ -285,6 +327,12 @@ const AddNewEntry = forwardRef<
     } catch (error) {
       console.error("Error generating AI content:", error);
       setAiLoading(false);
+      if (error.response && error.response.data) {
+        console.log("error.response", error.response);
+        console.log("response.data", error.response.data);
+      } else if (error.message) {
+        console.log("error.message", error.message);
+      }
     }
   };
 
@@ -315,9 +363,16 @@ const AddNewEntry = forwardRef<
 
       setEntry((prev) => ({
         ...prev,
-        dialogs: prev.dialogs?.length
-          ? [...prev.dialogs, response.data]
-          : [response.data],
+        dialogs: prev.dialogs.map((dialog) => {
+          if (dialog.question === dialogQuestion) {
+            const { question, ...restData } = response.data;
+            return {
+              ...dialog,
+              ...restData,
+            };
+          }
+          return dialog;
+        }),
       }));
       setAiDialogLoading(false);
     } catch (error) {
@@ -329,12 +384,33 @@ const AddNewEntry = forwardRef<
   function handleCloseSheet() {
     setIsFocusTitleRichEditor(false);
     props.handleBack(true);
+    setEmoji("");
+    setTitleEmoji("");
   }
 
   const handleSend = async () => {
+    setEntry((prev) => ({
+      ...prev,
+      dialogs:
+        prev.dialogs && prev.dialogs.length
+          ? [...prev.dialogs, { question: dialogQuestion, answer: "" }]
+          : [{ question: dialogQuestion, answer: "" }],
+    }));
     Keyboard.dismiss();
+    setDialogQuestion("");
     await handleDialog();
   };
+
+  const anySettingOpen =
+    showTitleColorSetting ||
+    showColorSetting ||
+    showTitleSizeSetting ||
+    showSizeSetting ||
+    showTitleFontSetting ||
+    showFontSetting ||
+    showBackgroundSetting ||
+    showEmojiSetting ||
+    showTitleEmojiSetting;
 
   return (
     <SideSheet ref={ref} onOpenChange={setIsAddNewEntryOpen}>
@@ -398,6 +474,7 @@ const AddNewEntry = forwardRef<
               )}
             </View>
             <TitleEntry
+              titleReachEditorKey={titleReachEditorKey}
               disabledTitleReachEditor={isEntrySaved}
               onChangeEntry={setEntry}
               entry={entry}
@@ -413,6 +490,7 @@ const AddNewEntry = forwardRef<
               colorAction={colorAction}
               sizeAction={sizeAction}
               selectedFont={selectedFont}
+              titleEmoji={titleEmoji}
             />
 
             {entry && entry.content && isEntrySaved ? (
@@ -421,10 +499,24 @@ const AddNewEntry = forwardRef<
                 aiLoading={aiLoading}
                 aiDialogLoading={aiDialogLoading}
                 isKeyboardOpen={isKeyboardOpen}
+                isEntrySaved={isEntrySaved}
               />
             ) : (
               <>
                 <AddContentInputEntry
+                  isFocusTextRichEditor={isFocusTextRichEditor}
+                  setIsFocusTextRichEditor={setIsFocusTextRichEditor}
+                  showFontSetting={showFontSetting}
+                  setShowFontSetting={setShowFontSetting}
+                  showSizeSetting={showSizeSetting}
+                  setShowSizeSetting={setShowSizeSetting}
+                  showColorSetting={showColorSetting}
+                  setShowColorSetting={setShowColorSetting}
+                  showBackgroundSetting={showBackgroundSetting}
+                  setShowBackgroundSetting={setShowBackgroundSetting}
+                  showEmojiSetting={showEmojiSetting}
+                  setShowEmojiSetting={setShowEmojiSetting}
+                  textReachEditorKey={textReachEditorKey}
                   isKeyboardOpen={isKeyboardOpen}
                   entry={entry}
                   isEntrySaved={isEntrySaved}
@@ -440,6 +532,8 @@ const AddNewEntry = forwardRef<
                   onHandleSave={handleSave}
                   tooltipVisible={tooltipVisible}
                   entrySettings={entrySettings}
+                  addEmoji={setEmoji}
+                  emoji={emoji}
                 />
               </>
             )}
@@ -452,6 +546,7 @@ const AddNewEntry = forwardRef<
                   color: true,
                   size: true,
                   font: true,
+                  emoji: true,
                 }}
                 activeActions={activeActions}
                 handleBoldAction={handleBoldAction}
@@ -459,50 +554,56 @@ const AddNewEntry = forwardRef<
                 handleColorAction={handleColorAction}
                 handleSizeAction={handleSizeAction}
                 handleFontAction={handleFontAction}
+                handleEmojiAction={handleEmojiAction}
               ></RichToolbar>
             )}
 
             <SettingsEntry
               keyboardHeight={keyboardHeight}
               entrySettings={entrySettings}
-              setShowColorSetting={setShowColorSetting}
-              showColorSetting={showColorSetting}
+              setShowColorSetting={setShowTitleColorSetting}
+              showColorSetting={showTitleColorSetting}
               setColor={setColor}
               selectedColor={selectedColor}
-              setShowSizeSetting={setShowSizeSetting}
-              showSizeSetting={showSizeSetting}
-              setShowFontSetting={setShowFontSetting}
-              showFontSetting={showFontSetting}
+              setShowSizeSetting={setShowTitleSizeSetting}
+              showSizeSetting={showTitleSizeSetting}
+              setShowFontSetting={setShowTitleFontSetting}
+              showFontSetting={showTitleFontSetting}
+              showEmojiSetting={showTitleEmojiSetting}
+              setShowEmojiSetting={setShowTitleEmojiSetting}
               setSize={setSize}
               setFont={setFont}
               selectedFont={selectedFont}
               selectedSize={selectedSize}
+              addEmoji={handleTitleEmoji}
             />
 
             {isEntrySaved && (
               <View
                 style={{
                   position: "relative",
-                  bottom: isKeyboardOpen ? 0 : -32,
+                  bottom: isKeyboardOpen ? 7 : -25,
                   left: 0,
                   right: 0,
                   elevation: 10,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  backgroundColor: colors.diaryNotesBackground,
+                  borderRadius: 20,
+                  backgroundColor: colors.backgroundAdditional,
                   marginTop: isKeyboardOpen ? 0 : -33,
                   padding: 10,
+                  marginHorizontal: 10,
                 }}
               >
                 <TextInput
                   multiline
                   onChangeText={setDialogQuestion}
+                  value={dialogQuestion}
                   placeholder="Enter text"
                   scrollEnabled={true}
+                  placeholderTextColor={colors.textAdditional}
                   style={{
                     maxHeight: ROW_HEIGHT * 10,
+                    color: colors.text,
+                    fontFamily: getFont(font.name, "regular"),
                   }}
                 />
                 <View
@@ -526,6 +627,30 @@ const AddNewEntry = forwardRef<
             )}
           </KeyboardAvoidingView>
         </View>
+        {anySettingOpen && (
+          <Pressable
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.07)",
+              zIndex: 0,
+            }}
+            onPress={() => {
+              setShowBackgroundSetting(false);
+              setShowColorSetting(false);
+              setShowSizeSetting(false);
+              setShowFontSetting(false);
+              setShowEmojiSetting(false);
+              setShowTitleColorSetting(false);
+              setShowTitleSizeSetting(false);
+              setShowTitleFontSetting(false);
+              setShowTitleEmojiSetting(false);
+            }}
+          />
+        )}
       </View>
     </SideSheet>
   );

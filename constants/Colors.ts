@@ -2,8 +2,13 @@ import type { ColorTheme } from "@/types";
 const Base = {
   light: {
     background: "#",
+    backgroundImage: {
+      id: 0,
+      value: "#0",
+      type: "color | image",
+      url: undefined,
+    },
     backgroundAdditional: "#",
-    card: "#",
     primary: "#",
     secondary: "#",
     text: "#",
@@ -11,163 +16,486 @@ const Base = {
     textInPrimary: "",
     link: "#0000ff",
     border: "#",
+    error: "#B9130F",
+    notification: "",
     // calendar
     calendarBackground: "#",
     calendarEnableDayBorder: "#",
     calendarDisableDayBorder: "#",
-    error: "#B9130F",
+    calendarDayLabels: "#",
+    // tabs
+    tabBackground: "#",
     tabIcon: "#",
     tabIconSelected: "#",
+    // input
     inputBackground: "#",
+    // diary
+    card: "#",
     diaryNotesBackground: "#",
     aiCommentBackground: "#",
+    questionBackground: "#",
+    answerBackground: "#",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "",
+    // rich
+    toolbarBackground: "#",
+    toolbarIcon: "#",
   },
 };
 
-const tintColorLight = "#344360";
-const tintColorDark = "#fff";
-const primaryColorDark = "#344360";
-
 export const Colors: Record<string, ColorTheme> = {
+  system: {
+    // General
+    background: "#FFFFFF",
+    backgroundImage: {
+      id: 201,
+      value: "#FFFFFF",
+      type: "image",
+      url: require("@/assets/images//background/system.jpeg"),
+    },
+    backgroundAdditional: "#6ebbbd",
+
+    primary: "#14E6ED",
+    secondary: "#0d888c",
+    text: "#063739",
+    textAdditional: "#687076",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
+    border: "#E0E0E0",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#5a5a5a",
+    calendarDisableDayBorder: "#a6a6a6",
+    calendarDayLabels: "#888",
+
+    // tabs
+    tabBackground: "#FFFFFF",
+    tabIcon: "#687076",
+    tabIconSelected: "#14E6ED",
+    // input
+    inputBackground: "#ffffff",
+    // diary
+    card: "#dcfbfb",
+    diaryNotesBackground: "#EFE7DA",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "#FFFFFF",
+    answerBackground: "#ffffff33",
+    //  settings
+    blockBackground: "#FFFFFF",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#FFFFFF",
+    toolbarIcon: "#344360",
+  },
+  avocado: {
+    // General
+    background: "#FFFFFF",
+    backgroundImage: {
+      id: 201,
+      value: "#FFFFFF",
+      type: "image",
+      url: require("@/assets/images//background/avocado.jpeg"),
+    },
+    backgroundAdditional: "#badd9f",
+
+    primary: "#839179",
+    secondary: "#586151",
+    text: "#30352c",
+    textAdditional: "#6f7768",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
+    border: "#E0E0E0",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#5a5a5a",
+    calendarDisableDayBorder: "#a6a6a6",
+    calendarDayLabels: "#888",
+
+    // tabs
+    tabBackground: "#FFFFFF",
+    tabIcon: "#687076",
+    tabIconSelected: "#839179",
+    // input
+    inputBackground: "#ffffff",
+    // diary
+    card: "#e7f8db",
+    diaryNotesBackground: "#EFE7DA",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "#FFFFFF",
+    answerBackground: "#ffffff33",
+    //  settings
+    blockBackground: "#FFFFFF",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#FFFFFF",
+    toolbarIcon: "#344360",
+  },
+  heart: {
+    // General
+    background: "#FFFFFF",
+    backgroundImage: {
+      id: 201,
+      value: "#FFFFFF",
+      type: "image",
+      url: require("@/assets/images//background/heart.jpg"),
+    },
+    backgroundAdditional: "#d86668",
+
+    primary: "#DD0103",
+    secondary: "#0d888c",
+    text: "#220101",
+    textAdditional: "#687076",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
+    border: "#E0E0E0",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#5a5a5a",
+    calendarDisableDayBorder: "#a6a6a6",
+    calendarDayLabels: "#888",
+
+    // tabs
+    tabBackground: "#FFFFFF",
+    tabIcon: "#687076",
+    tabIconSelected: "#DD0103",
+    // input
+    inputBackground: "#ffffff",
+    // diary
+    card: "#ecb8b8",
+    diaryNotesBackground: "#EFE7DA",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "#FFFFFF",
+    answerBackground: "#ffffff33",
+    //  settings
+    blockBackground: "#FFFFFF",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#FFFFFF",
+    toolbarIcon: "#344360",
+  },
   light: {
     // General
     background: "#FFFFFF",
+    backgroundImage: {
+      id: 201,
+      value: "#FFFFFF",
+      type: "image",
+      url: require("@/assets/images//background/light.jpg"),
+    },
     backgroundAdditional: "#babfc8",
-    card: "#FFFFFF",
+
     primary: "#344360",
-    secondary: "",
+    secondary: "#4a5365",
     text: "#2E3A59",
     textAdditional: "#687076",
     textInPrimary: "#FFFFFF",
     link: "#0000ff",
     border: "#E0E0E0",
-    calendarEnableDayBorder: "#bfbdbd",
-    calendarDisableDayBorder: "#f4f4f4",
     error: "#B9130F",
-    // icon
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#f4f4f4",
+    calendarDisableDayBorder: "#bfbdbd",
+    calendarDayLabels: "#888",
+
+    // tabs
+    tabBackground: "#FFFFFF",
     tabIcon: "#687076",
-    tabIconSelected: tintColorLight,
+    tabIconSelected: "#344360",
     // input
     inputBackground: "#ffffff",
     // diary
+    card: "#c3d0dc",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ECECEC",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "#FFFFFF",
+    answerBackground: "#ffffff33",
+    //  settings
+    blockBackground: "#FFFFFF",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#FFFFFF",
+    toolbarIcon: "#344360",
   },
 
-  lightModern: {
-    background: "#F9F6F2",
-    backgroundAdditional: "#EFE7E3",
-    card: "#FFFFFF",
-    primary: "#FFAB91",
-    secondary: "#F5E3E0",
-    text: "#303336",
-    textAdditional: "#AD9B8E",
+  calmMind: {
+    background: "#F6F7F9",
+    backgroundImage: {
+      id: 202,
+      value: "#F6F7F9",
+      type: "image",
+      url: require("@/assets/images//background/calmMind.jpg"),
+    },
+    backgroundAdditional: "#cdd3df",
+    primary: "#5BA9A6",
+    secondary: "#FFC97A",
+    text: "#23272F",
+    textAdditional: "#8899AA",
     textInPrimary: "#FFFFFF",
-    link: "#FF5722",
-    border: "#E1D3CA",
-    calendarEnableDayBorder: "#FFAB91",
-    calendarDisableDayBorder: "#F3DDD8",
-    error: "#F07167",
-    tabIcon: "#E7BFA9",
-    tabIconSelected: "#FFAB91",
-    inputBackground: "#F5EDEB",
-    diaryNotesBackground: "#FFF7F0",
-    aiCommentBackground: "#F9E1DA",
+    link: "#5BA9A6",
+    border: "#E5E7EB",
+    error: "#FF7A7A",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#5BA9A6",
+    calendarDisableDayBorder: "#E5E7EB",
+    calendarDayLabels: "#888",
+    // tabs
+    tabBackground: "#F6F7F9",
+    tabIcon: "#85a6a5",
+    tabIconSelected: "#5BA9A6",
+    // input
+    inputBackground: "#F0F2F6",
+    // diary
+    card: "#BED0DA",
+    diaryNotesBackground: "#FFFBEA",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "#F6F7F9",
+    answerBackground: "#ffffff33",
+    //  settings
+    blockBackground: "#FFFFFF",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#F6F7F9",
+    toolbarIcon: "#5BA9A6",
   },
 
-  chocolateBrownie: {
-    background: "#d8cbb8",
-    backgroundAdditional: "#b19f84",
-    card: "#fff",
-    primary: "#523634",
-    secondary: "#523634",
-    text: "#242833",
+  orange: {
+    background: "#FFF9F4",
+    backgroundImage: {
+      id: 203,
+      value: "#FFF9F4",
+      type: "image",
+      url: require("@/assets/images//background/orange.jpg"),
+    },
+    backgroundAdditional: "#dcd0c5",
+    primary: "#FF8200",
+    secondary: "#FFB354",
+    text: "#2E2E2E",
+    textAdditional: "#A86800",
+    textInPrimary: "#FFF",
+    link: "#FF8200",
+    border: "#FFD09A",
+    error: "#D7263D",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#FF8200",
+    calendarDisableDayBorder: "#FFD09A",
+    calendarDayLabels: "#888",
+    // tabs
+    tabBackground: "#FFF9F4",
+    tabIcon: "#FFB354",
+    tabIconSelected: "#FF8200",
+    // input
+    inputBackground: "#FFF4E3",
+    // diary
+    card: "#FFF1DB",
+    diaryNotesBackground: "#FFE9D1",
+    aiCommentBackground: "#ffffff33",
+    questionBackground: "transparent",
+    answerBackground: "#ffffff33",
+    //  settings
+    blockBackground: "#FFFFFF",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#FFE4C7",
+    toolbarIcon: "#FF8200",
+  },
+
+  sandDune: {
+    // General
+    background: "#8e8680",
+    backgroundImage: {
+      id: 205,
+      value: "#8e8680",
+      type: "image",
+      url: require("@/assets/images//background/sandDune.jpg"),
+    },
+    backgroundAdditional: "#bab0a9",
+    primary: "#604d3f",
+    secondary: "#4a5365",
+    text: "#344360",
     textAdditional: "#687076",
     textInPrimary: "#FFFFFF",
-    link: "#2D7FF9",
-    border: "#E5EAF0",
-    calendarEnableDayBorder: "#8e6f6d",
-    calendarDisableDayBorder: "#a39494",
-    error: "#FF5151",
-    tabIcon: "#717375",
-    tabIconSelected: "#2D7FF9",
-    inputBackground: "#F1F4F8",
-    diaryNotesBackground: "#ede6dc",
-    aiCommentBackground: "#F7F9FB",
+    link: "#0000ff",
+    border: "#604d3f",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#f4f4f4",
+    calendarDisableDayBorder: "#bfbdbd",
+    calendarDayLabels: "#888",
+
+    // tabs
+    tabBackground: "#FFFFFF",
+    tabIcon: "#687076",
+    tabIconSelected: "#604d3f",
+    // input
+    inputBackground: "#ffffff",
+    // diary
+    card: "#b5aea8",
+    diaryNotesBackground: "#EFE7DA",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
+    //  settings
+    blockBackground: "#b5aea8",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#8e8680",
+    toolbarIcon: "#604d3f",
+  },
+
+  yellowBokeh: {
+    // General
+    background: "#222020",
+    backgroundImage: {
+      id: 206,
+      value: "#222020",
+      type: "image",
+      url: require("@/assets/images/background/yellowBokeh.jpg"),
+    },
+    backgroundAdditional: "#534f4f",
+    primary: "#a59f37",
+    secondary: "#4a5365",
+    text: "#b6bcca",
+    textAdditional: "#687076",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
+    border: "#E0E0E0",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#f4f4f4",
+    calendarDisableDayBorder: "#989696",
+    calendarDayLabels: "#888",
+    // tabs
+    tabBackground: "#222020",
+    tabIcon: "#687076",
+    tabIconSelected: "#a59f37",
+    // input
+    inputBackground: "#ffffff",
+    // diary
+    card: "#494545",
+    diaryNotesBackground: "#EFE7DA",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
+    //  settings
+    blockBackground: "#222020",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#222020",
+    toolbarIcon: "#a59f37",
+  },
+
+  ball: {
+    // General
+    background: "#222020",
+    backgroundImage: {
+      id: 206,
+      value: "#222020",
+      type: "image",
+      url: require("@/assets/images/background/ball.jpeg"),
+    },
+    backgroundAdditional: "#534f4f",
+    primary: "#202020",
+    secondary: "#4a5365",
+    text: "#b6bcca",
+    textAdditional: "#687076",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
+    border: "#E0E0E0",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#f4f4f4",
+    calendarDisableDayBorder: "#989696",
+    calendarDayLabels: "#888",
+    // tabs
+    tabBackground: "#222020",
+    tabIcon: "#687076",
+    tabIconSelected: "#121212",
+    // input
+    inputBackground: "#ffffff",
+    // diary
+    card: "#494545",
+    diaryNotesBackground: "#EFE7DA",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
+    //  settings
+    blockBackground: "#222020",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#222020",
+    toolbarIcon: "#7e7d6f",
   },
 
   dark: {
     // General
     background: "#151718",
+    backgroundImage: {
+      id: 204,
+      value: "#151718",
+      type: "color",
+    },
     backgroundAdditional: "#282c2e",
-    card: "#151718",
     primary: "#344360",
     secondary: "",
     text: "#ECEDEE",
     textAdditional: "#a5a5a6",
     textInPrimary: "#FFFFFF",
-    link: "#",
+    link: "#0000ff",
     border: "#2A2D2F",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
     calendarEnableDayBorder: "#5b6165",
     calendarDisableDayBorder: "#1e2022",
-    error: "#B9130F",
-    // icon
+    calendarDayLabels: "#888",
+    // tabs
+    tabBackground: "#151718",
     tabIcon: "#9BA1A6",
-    tabIconSelected: tintColorDark,
+    tabIconSelected: "#344360",
     // input
     inputBackground: "#000000",
     // diary
-    diaryNotesBackground: "#4b5255",
-    aiCommentBackground: "",
-  },
-
-  dark2: {
-    // General
-    background: "#151718",
-    backgroundAdditional: "#282c2e",
     card: "#151718",
-    primary: "#344360",
-    secondary: "",
-    text: "#ECEDEE",
-    textAdditional: "#a5a5a6",
-    textInPrimary: "#FFFFFF",
-    link: "#",
-    border: "#2A2D2F",
-    calendarEnableDayBorder: "#5b6165",
-    calendarDisableDayBorder: "#1e2022",
-    error: "#B9130F",
-    // icon
-    tabIcon: "#9BA1A6",
-    tabIconSelected: tintColorDark,
-    // input
-    inputBackground: "#000000",
-    // diary
     diaryNotesBackground: "#4b5255",
-    aiCommentBackground: "",
-  },
-
-  dark3: {
-    // General
-    background: "#151718",
-    backgroundAdditional: "#282c2e",
-    card: "#151718",
-    primary: "#344360",
-    secondary: "",
-    text: "#ECEDEE",
-    textAdditional: "#a5a5a6",
-    textInPrimary: "#FFFFFF",
-    link: "#",
-    border: "#2A2D2F",
-    calendarEnableDayBorder: "#5b6165",
-    calendarDisableDayBorder: "#1e2022",
-    error: "#B9130F",
-    // icon
-    tabIcon: "#9BA1A6",
-    tabIconSelected: tintColorDark,
-    // input
-    inputBackground: "#000000",
-    // diary
-    diaryNotesBackground: "#4b5255",
-    aiCommentBackground: "",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
+    //  settings
+    blockBackground: "#FFFFFF",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#151718",
+    toolbarIcon: "#344360",
   },
 };

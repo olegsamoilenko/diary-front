@@ -14,7 +14,7 @@ export default function SizeSetting({
   selectedFont,
 }: SizeSettingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
 
   return (
     <View
@@ -27,7 +27,7 @@ export default function SizeSetting({
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{ maxHeight: 350, width: "100%" }} // Або просто flex: 1
+        style={{ maxHeight: 350, width: "100%" }}
         contentContainerStyle={{
           flexDirection: "row",
           flexWrap: "wrap",
@@ -46,7 +46,7 @@ export default function SizeSetting({
               justifyContent: "center",
               alignItems: "center",
               elevation: 5,
-              backgroundColor: colors.backgroundAdditional,
+              backgroundColor: colors.background,
               borderRadius: 2,
             }}
           >

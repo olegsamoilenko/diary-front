@@ -1,6 +1,12 @@
 import React, { forwardRef, useEffect, useState } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -10,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { saveTimeFormat } from "@/store/thunks/timeFormatThunks";
 import type { AppDispatch, RootState } from "@/store";
 import BackArrow from "@/components/ui/BackArrow";
+import Background from "@/components/Background";
 
 const timeFormatOptions = [
   { key: 12, value: "12h" },
@@ -19,7 +26,7 @@ const timeFormatOptions = [
 const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const dispatch = useDispatch<AppDispatch>();
   const format = useSelector((state: RootState) => state.timeFormat);
@@ -31,45 +38,44 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText type={"titleLG"}>
-          {t("settings.timeFormat.title")}
-        </ThemedText>
-        {timeFormatOptions.map((f) => (
-          <TouchableOpacity
-            key={f.key}
-            style={styles.row}
-            onPress={() => handleFormat(f as any)}
-          >
-            <View
-              style={[
-                styles.radio,
-                Number(format) === Number(f.key) && {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].primary,
-                },
-                {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].background,
-                },
-              ]}
-            >
-              {Number(format.key) === Number(f.key) && (
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText type={"titleLG"}>
+            {t("settings.timeFormat.titlePlural")}
+          </ThemedText>
+          <ScrollView style={{ marginBottom: 0 }}>
+            {timeFormatOptions.map((f) => (
+              <TouchableOpacity
+                key={f.key}
+                style={styles.row}
+                onPress={() => handleFormat(f as any)}
+              >
                 <View
                   style={[
-                    styles.radioDot,
-                    { backgroundColor: Colors[colorScheme].primary },
+                    styles.radio,
+                    Number(format.key) === Number(f.key) && {
+                      borderColor: colors.primary,
+                    },
                   ]}
-                />
-              )}
-            </View>
-            <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-              {t(`settings.timeFormat.${f.key}`)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+                >
+                  {Number(format.key) === Number(f.key) && (
+                    <View
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: colors.primary },
+                      ]}
+                    />
+                  )}
+                </View>
+                <Text style={[styles.label, { color: colors.text }]}>
+                  {t(`settings.timeFormat.${f.key}`)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });
@@ -82,7 +88,6 @@ const getStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       paddingLeft: 20,
-      backgroundColor: colors.background,
       flex: 1,
       marginBottom: -6,
     },

@@ -12,7 +12,13 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "developmentClient": false,
+      "distribution": "store",
+      "channel": "production",
+      "env": {
+        "EAS_BRANCH": "production"
+      },
+      "autoIncrement": true,
     }
   },
   "submit": {

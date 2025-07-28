@@ -20,7 +20,7 @@ export const ThemeProviderCustom = ({
 
   useEffect(() => {
     AsyncStorage.getItem("APP_THEME").then((t) => {
-      if (t === "light" || t === "dark" || t === "light") setTheme(t);
+      setTheme(t);
     });
   }, []);
 

@@ -8,10 +8,19 @@ import NeuchaFontStylesheet from "@/assets/fonts/entry/NeuchaFontStylesheet";
 import CaveatFontStylesheet from "@/assets/fonts/entry/CaveatFontStylesheet";
 import AmaticSCFontStylesheet from "@/assets/fonts/entry/AmaticSCFontStylesheet";
 import PacificoFontStylesheet from "@/assets/fonts/entry/PacificoFontStylesheet";
+import UbuntuFontStylesheet from "@/assets/fonts/entry/UbuntuFontStylesheet";
+import RobotoFontStylesheet from "@/assets/fonts/entry/RobotoFontStylesheet";
+import OpenSansFontStylesheet from "@/assets/fonts/entry/OpenSansFontStylesheet";
+import PTMonoFontStylesheet from "@/assets/fonts/entry/PTMonoFontStylesheet";
+import ComforterBrushFontStylesheet from "@/assets/fonts/entry/ComforterBrushFontStylesheet";
+import BadScriptFontStylesheet from "@/assets/fonts/entry/BadScriptFontStylesheet";
+import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStylesheet";
+
 import * as ImagePicker from "expo-image-picker";
 import { uploadImageToServer } from "@/utils";
 
 type TextReachEditorProps = {
+  textReachEditorKey: number;
   content: string;
   setContent: (content: string) => void;
   isKeyboardOpen: boolean;
@@ -34,6 +43,7 @@ type TextReachEditorProps = {
   setShowImageSetting: (show: boolean) => void;
   showPhotoSetting: boolean;
   setShowPhotoSetting: (show: boolean) => void;
+  emoji?: string;
 };
 
 const sizeMap: Record<number, number> = {
@@ -45,6 +55,7 @@ const sizeMap: Record<number, number> = {
 };
 
 export default function TextReachEditor({
+  textReachEditorKey,
   content,
   setContent,
   isKeyboardOpen,
@@ -63,9 +74,10 @@ export default function TextReachEditor({
   setShowImageSetting,
   showPhotoSetting,
   setShowPhotoSetting,
+  emoji,
 }: TextReachEditorProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const richText = useRef(null);
   const scrollRef = useRef(null);
 
@@ -107,6 +119,11 @@ export default function TextReachEditor({
   `);
     }
   }, [isBoldAction]);
+
+  useEffect(() => {
+    // @ts-ignore
+    richText.current?.insertText(emoji);
+  }, [emoji]);
 
   useEffect(() => {
     if (isKeyboardOpen) {
@@ -202,6 +219,25 @@ export default function TextReachEditor({
     richText.current?.commandDOM(`
         document.execCommand("fontName", false, "${selectedFont.name}");
       `);
+    setTimeout(() => {
+      if (richText.current) {
+        // @ts-ignore
+        richText.current.commandDOM(
+          `document.execCommand('foreColor', false, '${colorAction}')`,
+        );
+        // @ts-ignore
+        richText.current?.commandDOM(
+          `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
+      var fontElements = document.getElementsByTagName("font");
+      for (var i = 0; i < fontElements.length; ++i) {
+        if (fontElements[i].size == "7") {
+          fontElements[i].removeAttribute("size");
+          fontElements[i].style.fontSize = "${sizeAction}px";
+        }
+      }`,
+        );
+      }
+    }, 100);
   };
 
   useEffect(() => {
@@ -362,27 +398,36 @@ export default function TextReachEditor({
   return (
     <ScrollView ref={scrollRef} style={{ flex: 1 }}>
       <RichEditor
+        key={textReachEditorKey}
         ref={richText}
         initialContentHTML={content}
         onChange={setContent}
         style={{ flex: 1, height: 300 }}
         onFocus={onFocus}
         onBlur={handleBlur}
+        editorInitializedCallback={() => {}}
         editorStyle={{
           backgroundColor: "transparent",
-          color: colors.text,
+          color: "#6c6b6b",
           initialCSSText: `
             ${MarckScriptFontStylesheet}
             ${NeuchaFontStylesheet}
             ${CaveatFontStylesheet}
             ${PacificoFontStylesheet}
             ${AmaticSCFontStylesheet}
+            ${UbuntuFontStylesheet}
+            ${RobotoFontStylesheet}
+            ${OpenSansFontStylesheet}
+            ${PTMonoFontStylesheet}
+            ${ComforterBrushFontStylesheet}
+            ${BadScriptFontStylesheet}
+            ${YesevaOneFontStylesheet}
           `,
           contentCSSText: `font-family: '${selectedFont.name}', sans-serif; position: absolute; display: flex; 
             flex-direction: column; 
             min-height: 200px; top: 0; right: 0; bottom: 0; left: 0;`,
         }}
-        useContainer={true}
+        // useContainer={true}
         onCursorPosition={(scrollY) => {
           // @ts-ignore
           scrollRef.current?.scrollTo({ y: scrollY - 30, animated: true });

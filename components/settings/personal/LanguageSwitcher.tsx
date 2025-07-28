@@ -1,7 +1,12 @@
 import React, { forwardRef, useCallback, useState } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { THEME_OPTIONS } from "@/constants/ThemeOptions";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Colors } from "@/constants/Colors";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
@@ -10,12 +15,13 @@ import * as SecureStore from "expo-secure-store";
 import { LocaleConfig } from "react-native-calendars";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
+import Background from "@/components/Background";
 
 const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [lang, setLang] = useState<string | null>(i18n.language);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
 
   const languages = Object.keys(i18n.options.resources ?? { en: {} }).map(
@@ -40,45 +46,47 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   return (
     <SideSheet ref={ref}>
-      <View style={styles.container}>
-        <BackArrow ref={ref} />
-        <ThemedText type={"titleLG"}>
-          {t("settings.languages.title")}
-        </ThemedText>
-        {languages.map((option) => (
-          <TouchableOpacity
-            key={option.value}
-            style={styles.row}
-            onPress={() => setValue(option.value as any)}
-          >
-            <View
-              style={[
-                styles.radio,
-                lang === option.value && {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].primary,
-                },
-                {
-                  borderColor: Colors[colorScheme].primary,
-                  backgroundColor: Colors[colorScheme].background,
-                },
-              ]}
-            >
-              {lang === option.value && (
+      <Background background={colors.backgroundImage} paddingTop={10}>
+        <View style={styles.container}>
+          <BackArrow ref={ref} />
+          <ThemedText type={"titleLG"}>
+            {t("settings.languages.titlePlural")}
+          </ThemedText>
+          <ScrollView style={{ marginBottom: 0 }}>
+            {languages.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={styles.row}
+                onPress={() => setValue(option.value as any)}
+              >
                 <View
                   style={[
-                    styles.radioDot,
-                    { backgroundColor: Colors[colorScheme].primary },
+                    styles.radio,
+                    lang === option.value && {
+                      borderColor: colors.primary,
+                    },
+                    {
+                      borderColor: colors.primary,
+                    },
                   ]}
-                />
-              )}
-            </View>
-            <Text style={[styles.label, { color: Colors[colorScheme].text }]}>
-              {t(`settings.languages.${option.key}`)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+                >
+                  {lang === option.value && (
+                    <View
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: colors.primary },
+                      ]}
+                    />
+                  )}
+                </View>
+                <ThemedText style={[styles.label, { color: colors.text }]}>
+                  {t(`settings.languages.${option.key}`)}
+                </ThemedText>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </Background>
     </SideSheet>
   );
 });
@@ -91,7 +99,6 @@ const getStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       paddingLeft: 20,
-      backgroundColor: colors.background,
       flex: 1,
       marginBottom: -6,
     },
@@ -113,10 +120,9 @@ const getStyles = (colors: any) =>
       width: 10,
       height: 10,
       borderRadius: 6,
-      backgroundColor: "#0284c7",
     },
     label: {
       fontSize: 16,
-      color: "#18181b",
+      color: colors.text,
     },
   });

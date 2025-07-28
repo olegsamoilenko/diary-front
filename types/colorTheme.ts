@@ -1,46 +1,41 @@
+import { BackgroundSettings } from "@/types";
+
 export type ColorTheme = {
   // General
   background: string;
+  backgroundImage: BackgroundSettings;
   backgroundAdditional: string;
-  card: string;
-  secondaryBackground: string;
-  additionalBackground: string;
   primary: string;
   secondary: string;
-  additional: string;
   text: string;
   textAdditional: string;
   textInPrimary: string;
-  secondaryText: string;
-  additionalText: string;
   link: string;
   border: string;
+  error: string;
+  notification: string;
+  // calendar
+  calendarBackground?: string;
   calendarEnableDayBorder: string;
   calendarDisableDayBorder: string;
-  error: string;
-  // icon
-  icon: string;
+  calendarDayLabels: string;
+  // tabs
+  tabBackground: string;
   tabIcon: string;
-  tabIconDefault: string;
   tabIconSelected: string;
   // input
   inputBackground: string;
-  inputBorder: string;
-  // radio
-  radioBackground: string;
-  radioBorder: string;
-  radioSelectedBorder: string;
-  radioSelectedBackground: string;
-  radioSelectedDot: string;
-  // plans Modal
-  tariff: string;
-  tokens: string;
-  // settings
-  settingsBlockBackground: string;
   // diary
+  card: string;
   diaryNotesBackground: string;
   aiCommentBackground: string;
-  entryBackground: string;
-  // calendar
-  calendarBackground: string;
+  questionBackground: string;
+  answerBackground: string;
+  //  settings
+  blockBackground: string;
+  // barStyle
+  barStyle: string;
+  // rich
+  toolbarBackground: string;
+  toolbarIcon: string;
 };

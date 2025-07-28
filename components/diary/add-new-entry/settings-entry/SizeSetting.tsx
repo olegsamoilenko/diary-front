@@ -2,7 +2,6 @@ import { TouchableOpacity, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { green } from "react-native-reanimated/lib/typescript/Colors";
 
 const FONT_SIZES = [12, 16, 18, 22, 28];
 
@@ -15,7 +14,7 @@ export default function SizeSetting({
   selectedSize,
 }: SizeSettingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   return (
     <View
       style={{

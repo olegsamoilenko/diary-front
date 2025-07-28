@@ -24,7 +24,7 @@ export default function BackgroundSetting({
   onChangeBackground,
 }: BackgroundSettingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
 
   const handleBackground = (background: BackgroundSettings) => {

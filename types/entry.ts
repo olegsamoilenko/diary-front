@@ -3,14 +3,14 @@ import { ImageSourcePropType } from "react-native";
 import { Dialog } from "@/types/dialog";
 
 export type Entry = {
-  id: string;
+  id: number;
   title: string;
   content: string;
   previewContent?: string;
   aiComment: AiComment;
   mood: string;
   embedding: number[];
-  dialogs?: Dialog[];
+  dialogs: Dialog[];
   settings?: {
     background: {
       id: number;

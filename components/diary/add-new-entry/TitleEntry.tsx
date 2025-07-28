@@ -38,6 +38,8 @@ type TitleEntryProps = {
     isInsertOrderedList?: boolean;
   } | null;
   disabledTitleReachEditor?: boolean;
+  titleReachEditorKey: number;
+  titleEmoji: string;
 };
 export default function TitleEntry({
   onChangeEntry,
@@ -54,9 +56,11 @@ export default function TitleEntry({
   handleBlur,
   setActiveActions,
   disabledTitleReachEditor,
+  titleReachEditorKey,
+  titleEmoji,
 }: TitleEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const [showTip, setShowTip] = useState(false);
@@ -77,6 +81,7 @@ export default function TitleEntry({
   };
 
   const handleMood = (mood: string) => {
+    console.log("Selected mood:", mood);
     onChangeEntry((prev: Entry) => ({ ...prev, mood }));
     setShowTip(false);
     setVisibleEmojiModal(false);
@@ -126,6 +131,7 @@ export default function TitleEntry({
 
         <ModalPortal
           visible={visibleEmojiModal}
+          maxHeight={true}
           onClose={() => setVisibleEmojiModal(false)}
         >
           <Emoji
@@ -148,6 +154,7 @@ export default function TitleEntry({
         </Portal>
       </View>
       <TitleRichEditor
+        titleReachEditorKey={titleReachEditorKey}
         disabledTitleReachEditor={disabledTitleReachEditor}
         title={entry.title}
         setTitle={setTitle}
@@ -160,6 +167,7 @@ export default function TitleEntry({
         handleFocus={handleFocus}
         handleBlur={handleBlur}
         setActiveActions={setActiveActions}
+        titleEmoji={titleEmoji}
       />
     </View>
   );

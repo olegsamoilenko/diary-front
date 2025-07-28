@@ -16,6 +16,7 @@ type RichToolbarProps = {
     font?: boolean;
     bulletedList?: boolean;
     orderedList?: boolean;
+    emoji?: boolean;
     image?: boolean;
     photo?: boolean;
   };
@@ -35,6 +36,7 @@ type RichToolbarProps = {
   handleFontAction?: () => void;
   handleBulletedListAction?: () => void;
   handleOrderedListAction?: () => void;
+  handleEmojiAction?: () => void;
   handleImageAction?: () => void;
   handlePhotoAction?: () => void;
 };
@@ -50,11 +52,12 @@ export default function RichToolbar({
   handleFontAction,
   handleBulletedListAction,
   handleOrderedListAction,
+  handleEmojiAction,
   handleImageAction,
   handlePhotoAction,
 }: RichToolbarProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   return (
     <View
@@ -70,7 +73,11 @@ export default function RichToolbar({
       >
         {actions?.background && (
           <TouchableOpacity onPress={handleBackgroundAction}>
-            <MaterialIcons name="texture" size={24} color={colors.primary} />
+            <MaterialIcons
+              name="texture"
+              size={24}
+              color={colors.toolbarIcon}
+            />
           </TouchableOpacity>
         )}
 
@@ -86,7 +93,7 @@ export default function RichToolbar({
             <MaterialIcons
               name="format-bold"
               size={24}
-              color={colors.primary}
+              color={colors.toolbarIcon}
             />
           </TouchableOpacity>
         )}
@@ -103,7 +110,7 @@ export default function RichToolbar({
             <MaterialIcons
               name="format-italic"
               size={24}
-              color={colors.primary}
+              color={colors.toolbarIcon}
             />
           </TouchableOpacity>
         )}
@@ -120,14 +127,18 @@ export default function RichToolbar({
             <MaterialIcons
               name="format-underlined"
               size={24}
-              color={colors.primary}
+              color={colors.toolbarIcon}
             />
           </TouchableOpacity>
         )}
 
         {actions?.color && (
           <TouchableOpacity onPress={handleColorAction}>
-            <MaterialIcons name="color-lens" size={24} color={colors.primary} />
+            <MaterialIcons
+              name="color-lens"
+              size={24}
+              color={colors.toolbarIcon}
+            />
           </TouchableOpacity>
         )}
 
@@ -136,7 +147,7 @@ export default function RichToolbar({
             <MaterialIcons
               name="format-size"
               size={24}
-              color={colors.primary}
+              color={colors.toolbarIcon}
             />
           </TouchableOpacity>
         )}
@@ -146,7 +157,7 @@ export default function RichToolbar({
             <MaterialIcons
               name="text-format"
               size={24}
-              color={colors.primary}
+              color={colors.toolbarIcon}
             />
           </TouchableOpacity>
         )}
@@ -163,7 +174,7 @@ export default function RichToolbar({
             <MaterialIcons
               name="format-list-bulleted"
               size={24}
-              color={colors.primary}
+              color={colors.toolbarIcon}
             />
           </TouchableOpacity>
         )}
@@ -180,20 +191,38 @@ export default function RichToolbar({
             <MaterialIcons
               name="format-list-numbered"
               size={24}
-              color={colors.primary}
+              color={colors.toolbarIcon}
+            />
+          </TouchableOpacity>
+        )}
+
+        {actions?.emoji && (
+          <TouchableOpacity onPress={handleEmojiAction}>
+            <MaterialIcons
+              name="sentiment-satisfied-alt"
+              size={24}
+              color={colors.toolbarIcon}
             />
           </TouchableOpacity>
         )}
 
         {actions?.image && (
           <TouchableOpacity onPress={handleImageAction}>
-            <Ionicons name="image-outline" size={24} color={colors.primary} />
+            <Ionicons
+              name="image-outline"
+              size={24}
+              color={colors.toolbarIcon}
+            />
           </TouchableOpacity>
         )}
 
         {actions?.photo && (
           <TouchableOpacity onPress={handlePhotoAction}>
-            <Ionicons name="camera-outline" size={24} color={colors.primary} />
+            <Ionicons
+              name="camera-outline"
+              size={24}
+              color={colors.toolbarIcon}
+            />
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -208,7 +237,7 @@ const getStyles = (colors: ColorTheme) =>
       justifyContent: "space-between",
       padding: 10,
       gap: 15,
-      backgroundColor: colors.background,
+      backgroundColor: colors.toolbarBackground,
       minWidth: "100%",
     },
   });

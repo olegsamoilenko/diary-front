@@ -16,18 +16,16 @@ export default function PersonalSettingsBlock({
   fontSwitcherRef,
   timeFormatSwitcherRef,
   languageSwitcherRef,
-  activitySwitcherRef,
 }: {
   themeSwitcherRef: RefObject<SideSheetRef | null>;
   fontSwitcherRef: RefObject<SideSheetRef | null>;
   timeFormatSwitcherRef: RefObject<SideSheetRef | null>;
   languageSwitcherRef: RefObject<SideSheetRef | null>;
-  activitySwitcherRef: RefObject<SideSheetRef | null>;
 }) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const { theme } = useThemeCustom();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const format = useSelector((state: RootState) => state.timeFormat.value);
   const font = useSelector((state: RootState) => state.font.font);
 
@@ -42,7 +40,7 @@ export default function PersonalSettingsBlock({
 
         // Android
         borderRadius: 10,
-        backgroundColor: colors.background,
+        backgroundColor: colors.backgroundAdditional,
         padding: 20,
         display: "flex",
         flexDirection: "column",
@@ -139,37 +137,6 @@ export default function PersonalSettingsBlock({
             <ThemedText>
               {format} {t("settings.timeFormat.h")}{" "}
             </ThemedText>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={28}
-              color={colors.text}
-            />
-          </View>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => {
-          // @ts-ignore
-          activitySwitcherRef!.current?.open();
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <ThemedText>{t("settings.common.activeHours")}</ThemedText>
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <ThemedText>Test</ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}

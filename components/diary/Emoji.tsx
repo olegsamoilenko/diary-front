@@ -1,5 +1,5 @@
 import { MoodEmoji } from "@/constants/Mood";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -13,7 +13,7 @@ export default function Emoji({
 }) {
   const [selectedEmoji, setSelectedEmoji] = useState<string | undefined>(mood);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
 
   const handleEmoji = (emoji: string) => {
     setSelectedEmoji(emoji);

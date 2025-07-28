@@ -1,27 +1,31 @@
 export const Fonts = [
   {
-    title: "Inter",
-    name: "Inter",
-  },
-  {
-    title: "Fira Sans",
-    name: "FiraSans",
-  },
-  {
     title: "Roboto",
     name: "Roboto",
   },
   {
-    title: "Lato",
-    name: "Lato",
+    title: "Open Sans",
+    name: "OpenSans",
   },
   {
     title: "Montserrat",
     name: "Montserrat",
   },
   {
-    title: "Alegreya Sans",
-    name: "AlegreyaSans",
+    title: "Lato",
+    name: "Lato",
+  },
+  {
+    title: "Nunito",
+    name: "Nunito",
+  },
+  {
+    title: "Source Code Pro",
+    name: "SourceCodePro",
+  },
+  {
+    title: "Fira Sans",
+    name: "FiraSans",
   },
   {
     title: "Tinos",
@@ -42,9 +46,5 @@ export const Fonts = [
   {
     title: "Rubik",
     name: "Rubik",
-  },
-  {
-    title: "Nunito",
-    name: "Nunito",
   },
 ];

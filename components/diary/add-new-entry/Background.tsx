@@ -8,7 +8,7 @@ type BackgroundProps = {
 };
 export default function Background({ background }: BackgroundProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   if (background.type === "image" && background.url) {
     return (
       <ImageBackground

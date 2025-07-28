@@ -29,7 +29,7 @@ export default function ToolTip({
   onClose?: () => void;
 }) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const [lines, setLines] = useState(0);
   const styles = getStyles(
     colors,

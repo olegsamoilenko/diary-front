@@ -32,7 +32,7 @@ export default function ParallaxScrollView({
         contentContainerStyle={[{ paddingBottom: bottom, flexGrow: 1 }]}
         keyboardShouldPersistTaps="always"
       >
-        <View style={[styles.content, { padding: isPadding ? 20 : 0 }, style]}>
+        <View style={[styles.content, { padding: isPadding ? 10 : 0 }, style]}>
           {children}
         </View>
       </Animated.ScrollView>

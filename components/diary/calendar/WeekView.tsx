@@ -64,7 +64,7 @@ export default function WeekView({
   onBackToMonth,
 }: WeekViewProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const localeArr = Localization.getLocales();
   const locale = localeArr!.find((loc) => {
     return loc.languageCode === (i18n.language || "uk");
@@ -118,7 +118,7 @@ export default function WeekView({
         >
           <MaterialCommunityIcons
             name="triangle"
-            size={8}
+            size={12}
             color={colors.primary}
             style={{
               transform: [
@@ -130,7 +130,7 @@ export default function WeekView({
             }}
           />
         </Pressable>
-        <ThemedText style={{ fontSize: 18, color: colors.text }}>
+        <ThemedText style={{ fontSize: 18 }}>
           {monthYearStr.slice(0, 1).toUpperCase() + monthYearStr.slice(1)}
         </ThemedText>
         <Pressable
@@ -144,7 +144,7 @@ export default function WeekView({
         >
           <MaterialCommunityIcons
             name="triangle"
-            size={8}
+            size={12}
             color={colors.primary}
             style={{
               transform: [
@@ -171,7 +171,7 @@ export default function WeekView({
             style={{
               width: 40,
               textAlign: "center",
-              color: "#888",
+              color: colors.calendarDayLabels,
               fontSize: 14,
             }}
           >
@@ -201,9 +201,11 @@ export default function WeekView({
                 justifyContent: "center",
                 backgroundColor: isSelected ? colors.primary : "transparent",
                 borderColor:
-                  itemMonth === month
+                  itemMonth === month && !isSelected
                     ? colors.calendarEnableDayBorder
-                    : colors.calendarDisableDayBorder,
+                    : itemMonth !== month && !isSelected
+                      ? colors.calendarDisableDayBorder
+                      : colors.primary,
                 borderWidth: 1,
                 width: CLOCK_RADIUS * 2,
                 height: CLOCK_RADIUS * 2,
@@ -218,7 +220,7 @@ export default function WeekView({
                       ? "gray"
                       : isSelected
                         ? "#ffffff"
-                        : Colors[colorScheme].text,
+                        : colors.text,
                   fontWeight: isSelected ? "bold" : "normal",
                   fontSize: 14,
                   position: "absolute",

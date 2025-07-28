@@ -1,13 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, View, Text, StyleSheet } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 
 const dots = ["", ".", "..", "..."];
 
-export const AILoader = () => {
+type AILoaderProps = {
+  width?: number;
+  height?: number;
+  dotFontSize?: number;
+};
+
+export const AILoader = ({
+  width = 25,
+  height = 30,
+  dotFontSize = 16,
+}: AILoaderProps) => {
   const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme] ?? Colors.system;
   const [step, setStep] = useState(0);
   const interval = useRef<NodeJS.Timeout | null>(null);
 
@@ -25,18 +36,26 @@ export const AILoader = () => {
     <View
       style={[
         styles.container,
-        { backgroundColor: Colors[colorScheme].aiCommentBackground },
+        { backgroundColor: "transparent", width: width * 1.2 },
       ]}
     >
-      <MaterialCommunityIcons
-        name="robot"
-        size={22}
-        color={Colors[colorScheme].primary}
-        style={{ marginRight: 8 }}
-      />
-      <Text style={[styles.text, { color: Colors[colorScheme].text }]}>
-        AI думає{dots[step]}
-      </Text>
+      <NemoryIcon width={width} height={height} />
+      <View
+        style={{
+          marginLeft: 2,
+          alignItems: "flex-end",
+          marginBottom: -7,
+        }}
+      >
+        <Text
+          style={[
+            styles.text,
+            { color: colors.primary, fontSize: dotFontSize },
+          ]}
+        >
+          {dots[step]}
+        </Text>
+      </View>
     </View>
   );
 };
@@ -44,18 +63,10 @@ export const AILoader = () => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     borderRadius: 18,
-    paddingLeft: 8,
-    paddingVertical: 6,
-    marginTop: 8,
-    marginBottom: 8,
-    elevation: 3,
-    minHeight: 40,
-    minWidth: 120,
   },
   text: {
-    fontSize: 16,
     fontStyle: "italic",
     fontWeight: "500",
     letterSpacing: 0.2,

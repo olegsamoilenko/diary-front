@@ -8,10 +8,18 @@ import NeuchaFontStylesheet from "@/assets/fonts/entry/NeuchaFontStylesheet";
 import CaveatFontStylesheet from "@/assets/fonts/entry/CaveatFontStylesheet";
 import PacificoFontStylesheet from "@/assets/fonts/entry/PacificoFontStylesheet";
 import AmaticSCFontStylesheet from "@/assets/fonts/entry/AmaticSCFontStylesheet";
+import UbuntuFontStylesheet from "@/assets/fonts/entry/UbuntuFontStylesheet";
+import RobotoFontStylesheet from "@/assets/fonts/entry/RobotoFontStylesheet";
+import OpenSansFontStylesheet from "@/assets/fonts/entry/OpenSansFontStylesheet";
+import PTMonoFontStylesheet from "@/assets/fonts/entry/PTMonoFontStylesheet";
+import ComforterBrushFontStylesheet from "@/assets/fonts/entry/ComforterBrushFontStylesheet";
+import BadScriptFontStylesheet from "@/assets/fonts/entry/BadScriptFontStylesheet";
+import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStylesheet";
 
 type TitleReachEditorProps = {
   disabledTitleReachEditor?: boolean;
   title: string;
+  titleReachEditorKey: number;
   setTitle: (title: string) => void;
   isKeyboardOpen: boolean;
   isBoldAction: boolean;
@@ -26,6 +34,7 @@ type TitleReachEditorProps = {
     css: string;
   };
   setActiveActions: (actions: (prev: any) => any) => void;
+  titleEmoji: string;
 };
 
 const sizeMap: Record<number, number> = {
@@ -49,11 +58,13 @@ export default function TitleReachEditor({
   handleBlur,
   selectedFont,
   setActiveActions,
+  titleReachEditorKey,
+  titleEmoji,
 }: TitleReachEditorProps) {
   const richTitle = useRef(null);
   const [editorHeight, setEditorHeight] = useState(40);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const { t } = useTranslation();
 
   const handleEditorMessage = (event: any) => {
@@ -118,6 +129,11 @@ export default function TitleReachEditor({
 
   useEffect(() => {
     // @ts-ignore
+    richTitle.current?.insertText(titleEmoji);
+  }, [titleEmoji]);
+
+  useEffect(() => {
+    // @ts-ignore
     richTitle.current?.commandDOM(`
     document.execCommand("fontName", false, "${selectedFont.name}");
   `);
@@ -126,12 +142,34 @@ export default function TitleReachEditor({
   const onFocus = () => {
     handleFocus();
     // @ts-ignore
-    richText.current?.commandDOM(`
+    richTitle.current?.commandDOM(`
         document.execCommand("fontName", false, "${selectedFont.name}");
       `);
+
+    setTimeout(() => {
+      if (richTitle.current) {
+        // @ts-ignore
+        richTitle.current.commandDOM(
+          `document.execCommand('foreColor', false, '${colorAction}')`,
+        );
+        // @ts-ignore
+        richTitle.current?.commandDOM(
+          `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
+      var fontElements = document.getElementsByTagName("font");
+      for (var i = 0; i < fontElements.length; ++i) {
+        if (fontElements[i].size == "7") {
+          fontElements[i].removeAttribute("size");
+          fontElements[i].style.fontSize = "${sizeAction}px";
+        }
+      }`,
+        );
+      }
+    }, 100);
   };
+
   return (
     <RichEditor
+      key={titleReachEditorKey}
       disabled={disabledTitleReachEditor}
       ref={richTitle}
       initialContentHTML={title}
@@ -151,13 +189,21 @@ export default function TitleReachEditor({
       placeholder={t("diary.addEntryTitle")}
       editorStyle={{
         backgroundColor: "transparent",
-        color: colors.text,
+        placeholderColor: colors.text,
+        color: "#6c6b6b",
         initialCSSText: `
-            ${MarckScriptFontStylesheet}
+            ${MarckScriptFontStylesheet}google
             ${NeuchaFontStylesheet}
             ${CaveatFontStylesheet}
             ${PacificoFontStylesheet}
             ${AmaticSCFontStylesheet}
+            ${UbuntuFontStylesheet}
+            ${RobotoFontStylesheet}
+            ${OpenSansFontStylesheet}
+            ${PTMonoFontStylesheet}
+            ${ComforterBrushFontStylesheet}
+            ${BadScriptFontStylesheet}
+            ${YesevaOneFontStylesheet}
           `,
         contentCSSText: `font-family: '${selectedFont.name}', sans-serif;`,
       }}

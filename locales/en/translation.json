@@ -1,4 +1,52 @@
 {
+  "slogan": "Smart Diary",
+  "auth": {
+    "name": "Name",
+    "enterName": "Enter Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "login": "Login",
+    "registration": "Registration",
+    "register": "Register",
+    "enterValidEmailAddress": "Enter a valid email address",
+    "emailIsRequired": "Email is required",
+    "thePasswordMustContain": "The password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number and one special character",
+    "passwordRequired": "Password required",
+    "confirmYourPassword": "Confirm your password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "setPin": "Set a PIN (min. 4 digits)",
+    "confirmPin": "Confirm PIN",
+    "enableFingerprint": "Enable fingerprint / FaceID login?",
+    "youCanChangeThis": "You can change this in the settings",
+    "enterPin": "Enter the PIN code",
+    "pinMustContainAtLeast4Digits": "PIN must contain at least 4 digits",
+    "pinMustContainAMaximumOf6Digits": "PIN must contain a maximum of 6 digits",
+    "pinMustContainOnlyDigits": "PIN must contain only digits",
+    "confirmThePinCode": "Confirm the PIN code",
+    "pinCodesDoNotMatch": "PIN codes do not match",
+    "useBiometricsToLogIn": "Use biometrics to log in",
+    "incorrectPin": "Incorrect PIN",
+    "waitingForBiometrics": "Waiting for biometrics...",
+    "signIn": "Sign in",
+    "tryBiometricsAgain": "Try biometrics again",
+    "pinIsIncorrect": "PIN is incorrect",
+    "signInWithGoogle": "Sign in with Google",
+    "signUpWithEmail": "Sign up with Email",
+    "signInWithPhone": "Sign in with Phone",
+    "phoneMustBeInFormat": "Phone number must be in the format: code country + number. Example 38XXXXXXXXXX",
+    "sendCode": "Send Code",
+    "weHaveSentYouCodeByEmail": "We have sent you a confirmation code by email. Please enter the code to proceed",
+    "weHaveSentYouCodeToYourPhone": "We have sent you a code to your phone. Please enter this code to proceed",
+    "confirm": "Confirm",
+    "resendCode": "Resend Code",
+    "forgotYourPassword": "Forgot your password?",
+    "sendPasswordResetCodeToYourEmail": "Send password reset code to your email",
+    "code": "Code",
+    "changePassword": "Change Password",
+    "codeMustBe6Digits": "Code must be 6 digits",
+    "codeRequired": "Code is required",
+  },
   "diary": {
     "title": "Diary",
     "addEntryTitle": "Title",
@@ -6,6 +54,7 @@
     "addEntryButton": "Save",
     "noRecords": "There are no records for this day",
     "entry": {
+      "deleteEntryConfirmation": "Are you sure you want to delete this entry?",
       "settings": {
         "background": "Background",
         "color": "Colors",
@@ -24,43 +73,73 @@
   },
   "settings": {
     "title": "Settings",
-    "common": {
-      "activeHours": "Active Hours"
-    },
     "personal": "Personal settings",
     "theme": {
-      "title": "Themes",
+      "title": "Theme",
+      "titlePlural": "Themes",
       "themes": {
-        "light": "Light",
-        "chocolateBrownie": "Chocolate Brownie",
-        "dark": "Dark"
+        "system": "System",
+        "avocado": "Avocado",
+        "heart": "Three Hearts",
+        "light": "Space",
+        "calmMind": "Calm Mind",
+        "orange": "Orange",
+        "dark": "Dark",
+        "sandDune": "Sand Dune",
+        "ball": "Ball",
+        "yellowBokeh": "Yellow Bokeh"
       }
     },
     "font": {
-      "title": "Fonts"
+      "title": "Font",
+      "titlePlural": "Fonts"
     },
     "timeFormat": {
       "title": "Time Format",
+      "titlePlural": "Time Formats",
       "12": "12-hour format",
       "24": "24-hour format",
       "h": "- hours"
     },
+    "activeHours": {
+      "title": "Active Hours"
+    },
     "languages": {
       "title": "Language",
+      "titlePlural": "Languages",
       "en": "English",
       "uk": "Українська"
     },
+    "ai": "AI settings",
     "model": {
       "title": "Model",
-      "gpt-4o": "GPT-4o (fast and smart)",
+      "titlePlural": "Models",
+      "gpt-4o": "GPT-4o",
       "gpt-4-turbo": "GPT-4 Turbo"
-    }
+    },
+    "subscription": "Subscription settings",
+    "plans": {
+      "title": "Plan",
+      "titlePlural": "Plans",
+      "youCurrentPlan": "Your current plan",
+      "getTheVersion": "Get the version",
+      "subscribe": "Subscribe",
+      "unsubscribe": "Unsubscribe"
+    },
+    "security": "Security",
+    "biometry": {
+      "title": "Biometric Authentication",
+      "on": "On",
+        "off": "Off",
+    },
   },
-  "tariffModal": {
-    "title": "Choose your tariff",
+  "planModal": {
+    "title": "Choose your Plan",
     "month": "month",
     "free": "Free",
-    "tokensPerMonth": "Tokens/month",
+    "tokensPerMonth": "Tokens/month"
+  },
+  "plans": {
     "start": {
       "description": "Trial period 7 days"
     },
@@ -68,14 +147,53 @@
       "description": "For a small amount of notes"
     },
     "base": {
-        "description": "Optimal for a diary"
+      "description": "Optimal for a diary"
     },
     "pro": {
-        "description": "Maximum tariff"
+      "description": "Maximum"
     }
   },
   "toolTips": {
     "title": "Tips",
     "howAreYouFeeling": "How are you feeling?"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "send": "Send",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "ok": "OK",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "or": "or"
+  },
+  "errors": {
+    "invalidPassword": "The password you entered is incorrect",
+    "userNotFound": "User not found",
+    "emailNotVerified": "Email not verified",
+    "invalidCode": "The provided code is invalid or has expired",
+    "emailAlreadyVerified": "An account with this email already verified",
+    "userAlreadyExists": "An account with this email already exists",
+  },
+  "toast": {
+    "successfullyLogged": "Successfully logged in",
+    "youHaveSuccessfullyLoggedIn": "You have successfully logged in",
+    "youHaveSuccessfullyRegistered": "You have successfully registered. We have sent you a code to confirm your mail",
+    "successfullyRegistered": "Successfully registered",
+    "failedToConfirmEmail": "Failed to confirm email",
+    "emailConfirmed": "Email confirmed",
+    "youHaveSuccessfullyVerifiedYourEmail": "You have successfully verified your email",
+    "failedToResendCode": "Failed to resend code",
+    "codeResent": "Code resent",
+    "weHaveSentYouCodeByEmail": "We have sent you a code by email. Please enter this code to proceed",
+    "successfullySend": "Successfully sent",
+    "weHaveSuccessfullySentTheCodeToYourEmail": "We have successfully sent the code to your email",
+    "successfullySaved": "Successfully saved",
+    "youHaveSuccessfullySavedYourName": "You have successfully saved your name",
+    "phoneConfirmed": "Phone confirmed",
+    "youHaveSuccessfullyVerifiedYourPhone": "You have successfully verified your phone"
   }
 }

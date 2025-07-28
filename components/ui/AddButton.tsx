@@ -6,7 +6,7 @@ import { Colors } from "@/constants/Colors";
 
 export default function AddButton({ onPress }: { onPress: () => void }) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   return (
     <TouchableOpacity style={styles.fab} onPress={onPress} activeOpacity={0.8}>

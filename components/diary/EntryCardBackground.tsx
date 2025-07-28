@@ -11,7 +11,6 @@ export default function EntryCardBackground({ children, background }) {
   const [imageHeight, setImageHeight] = useState<number | null>(null);
   const [contentHeight, setContentHeight] = useState<number>(0);
 
-  // 1. Дізнаємося висоту картинки
   useEffect(() => {
     if (background.type === "image" && background.url) {
       if (typeof background.url === "number") {
@@ -65,7 +64,7 @@ export default function EntryCardBackground({ children, background }) {
     <View
       style={{
         // flex: 1,
-        backgroundColor: background.value || "#fff",
+        backgroundColor: String(background.value) || "#fff",
         marginBottom: 20,
         borderRadius: 8,
       }}
