@@ -105,7 +105,11 @@ export default function RootLayout() {
     // clearFontFromStore();
 
     // const clearThemeFromStore = async () => {
+    //   const storedTheme = await AsyncStorage.getItem("APP_THEME");
+    //   console.log("Clearing theme from store:", storedTheme);
     //   await AsyncStorage.removeItem("APP_THEME");
+    //   const afterClearTheme = await AsyncStorage.getItem("APP_THEME");
+    //   console.log("After clearing theme from store:", afterClearTheme);
     // };
     // clearThemeFromStore();
 

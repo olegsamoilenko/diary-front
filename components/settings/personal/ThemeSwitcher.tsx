@@ -18,8 +18,12 @@ import Background from "@/components/Background";
 
 const themes = [
   {
-    name: "system",
-    img: require("@/assets/images/theme/system.jpg"),
+    name: "light",
+    img: require("@/assets/images/theme/light.jpg"),
+  },
+  {
+    name: "neonIce",
+    img: require("@/assets/images/theme/neonIce.jpg"),
   },
   {
     name: "avocado",
@@ -30,8 +34,8 @@ const themes = [
     img: require("@/assets/images/theme/heart.jpg"),
   },
   {
-    name: "light",
-    img: require("@/assets/images/theme/light.jpg"),
+    name: "space",
+    img: require("@/assets/images/theme/space.jpg"),
   },
   {
     name: "calmMind",

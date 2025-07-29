@@ -46,14 +46,59 @@ const Base = {
 };
 
 export const Colors: Record<string, ColorTheme> = {
-  system: {
+  light: {
+    // General
+    background: "#8e8680",
+    backgroundImage: {
+      id: 201,
+      value: "#8e8680",
+      type: "image",
+      url: require("@/assets/images//background/light.jpg"),
+    },
+    backgroundAdditional: "#bab0a9",
+    primary: "#604d3f",
+    secondary: "#4a5365",
+    text: "#1e140c",
+    textAdditional: "#8e7868",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
+    border: "#604d3f",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#1e140c",
+    calendarDisableDayBorder: "#c1aea0",
+    calendarDayLabels: "#888",
+
+    // tabs
+    tabBackground: "#FFFFFF",
+    tabIcon: "#687076",
+    tabIconSelected: "#604d3f",
+    // input
+    inputBackground: "#ffffff",
+    // diary
+    card: "#b5aea8",
+    diaryNotesBackground: "#EFE7DA",
+    aiCommentBackground: "#00000033",
+    questionBackground: "transparent",
+    answerBackground: "#00000033",
+    //  settings
+    blockBackground: "#b5aea8",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#8e8680",
+    toolbarIcon: "#604d3f",
+  },
+  neonIce: {
     // General
     background: "#FFFFFF",
     backgroundImage: {
       id: 201,
       value: "#FFFFFF",
       type: "image",
-      url: require("@/assets/images//background/system.jpeg"),
+      url: require("@/assets/images//background/neonIce.jpeg"),
     },
     backgroundAdditional: "#6ebbbd",
 
@@ -184,14 +229,14 @@ export const Colors: Record<string, ColorTheme> = {
     toolbarBackground: "#FFFFFF",
     toolbarIcon: "#344360",
   },
-  light: {
+  space: {
     // General
     background: "#FFFFFF",
     backgroundImage: {
       id: 201,
       value: "#FFFFFF",
       type: "image",
-      url: require("@/assets/images//background/light.jpg"),
+      url: require("@/assets/images//background/space.jpg"),
     },
     backgroundAdditional: "#babfc8",
 

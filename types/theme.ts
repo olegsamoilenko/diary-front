@@ -1,8 +1,9 @@
 export type Theme =
-  | "system"
+  | "light"
+  | "neonIce"
   | "avocado"
   | "heart"
-  | "light"
+  | "space"
   | "calmMind"
   | "orange"
   | "dark"
@@ -16,10 +17,11 @@ export type ThemeContextType = {
 };
 
 export type LogoTheme = {
-  system?: any;
+  light?: any;
+  neonIce?: any;
   avocado?: any;
   heart?: any;
-  light?: any;
+  space?: any;
   calmMind: any;
   orange?: any;
   dark?: any;

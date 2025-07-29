@@ -78,10 +78,12 @@
       "title": "Theme",
       "titlePlural": "Themes",
       "themes": {
+        "light": "Light",
         "system": "System",
+        "neonIce": "Neon Ice",
         "avocado": "Avocado",
         "heart": "Three Hearts",
-        "light": "Space",
+        "space": "Space",
         "calmMind": "Calm Mind",
         "orange": "Orange",
         "dark": "Dark",
