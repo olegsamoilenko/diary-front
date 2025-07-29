@@ -1,5 +1,5 @@
 import "dotenv/config";
-
+console.log("CONFIG ENV API_URL:", process.env.API_URL);
 export default ({ config }: { config: any }) => ({
   expo: {
     ...config,
