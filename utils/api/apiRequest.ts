@@ -27,6 +27,13 @@ export async function apiRequest<T = any>({
   config = {},
 }: ApiRequestOptions): Promise<AxiosResponse<T>> {
   try {
+    console.log("[API REQUEST]", {
+      url: apiUrl + url,
+      method,
+      data,
+      params,
+      headers,
+    });
     let token = await SecureStore.getItemAsync("token");
 
     if (isTokenExpired(token)) {

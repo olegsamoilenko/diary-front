@@ -80,5 +80,18 @@
     "prettier": "^3.5.3",
     "typescript": "~5.8.3"
   },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-keyboard-aware-scroll-view",
+          "react-native-pell-rich-editor",
+          "@gorhom/portal",
+          "expo-random"
+        ],
+        "listUnknownPackages": false
+      }
+    }
+  },
   "private": true
 }

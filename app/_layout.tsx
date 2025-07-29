@@ -83,6 +83,10 @@ export default function RootLayout() {
   const [showAuthForm, setShowAuthForm] = useState(false);
 
   useEffect(() => {
+    console.log("APP LOADED!"); // <-- тут
+  }, []);
+
+  useEffect(() => {
     // const clearUserFromSecureStore = async () => {
     //   await SecureStore.deleteItemAsync("token");
     //   await SecureStore.deleteItemAsync("user");
@@ -103,6 +107,7 @@ export default function RootLayout() {
     // clearThemeFromStore();
 
     const initUser = async () => {
+      console.log("Initializing user...");
       let storedUser = await SecureStore.getItemAsync("user");
       let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;
       if (!userObj) {
