@@ -1,5 +1,5 @@
 import "dotenv/config";
-console.log("CONFIG ENV API_URL:", process.env.API_URL);
+console.log("CONFIG ENV API_URL:", process.env.EXPO_PUBLIC_API_URL);
 export default ({ config }: { config: any }) => ({
   expo: {
     ...config,
@@ -59,10 +59,11 @@ export default ({ config }: { config: any }) => ({
     },
     extra: {
       ...config.extra,
-      API_URL: "https://nemoryai.com/api",
-      GOOGLE_CLIENT_WEB_ID: process.env.GOOGLE_CLIENT_WEB_ID,
-      GOOGLE_CLIENT_ANDROID_ID: process.env.GOOGLE_CLIENT_ANDROID_ID,
-      GOOGLE_CLIENT_IOS_ID: process.env.GOOGLE_CLIENT_IOS_ID,
+      // API_URL: process.env.EXPO_PUBLIC_API_URL,
+      // GOOGLE_CLIENT_WEB_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_WEB_ID,
+      // GOOGLE_CLIENT_ANDROID_ID:
+      //   process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ANDROID_ID,
+      // GOOGLE_CLIENT_IOS_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_IOS_ID,
       eas: {
         projectId: "be6994c0-5be5-4005-b6e4-1385174eecc3",
         branch: "production",

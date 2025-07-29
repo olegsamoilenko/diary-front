@@ -3,7 +3,7 @@ import * as SecureStore from "@/utils/store/secureStore";
 import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
 
-const apiUrl = Constants.expoConfig?.extra?.API_URL;
+const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 export interface ApiRequestOptions
   extends Omit<
