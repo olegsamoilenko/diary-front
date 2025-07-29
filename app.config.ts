@@ -1,7 +1,8 @@
 import "dotenv/config";
 
-export default () => ({
+export default ({ config }: { config: any }) => ({
   expo: {
+    ...config,
     name: "Nemory",
     slug: "nemory",
     owner: "soniac12",
@@ -57,6 +58,7 @@ export default () => ({
       favicon: "./assets/images/favicon.png",
     },
     extra: {
+      ...config.extra,
       API_URL: process.env.API_URL,
       GOOGLE_CLIENT_WEB_ID: process.env.GOOGLE_CLIENT_WEB_ID,
       GOOGLE_CLIENT_ANDROID_ID: process.env.GOOGLE_CLIENT_ANDROID_ID,

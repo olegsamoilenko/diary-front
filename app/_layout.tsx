@@ -33,6 +33,7 @@ import { NavigationThemes } from "@/constants/Theme";
 import AuthForm from "@/components/auth/AuthForm";
 import Toast from "react-native-toast-message";
 import { BiometryProvider } from "@/context/BiometryContext";
+import Constants from "expo-constants";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -83,7 +84,8 @@ export default function RootLayout() {
   const [showAuthForm, setShowAuthForm] = useState(false);
 
   useEffect(() => {
-    console.log("APP LOADED!"); // <-- тут
+    console.log("APP LOADED!");
+    console.log("EXPO EXTRA:", Constants.expoConfig?.extra);
   }, []);
 
   useEffect(() => {
