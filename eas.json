@@ -1,25 +1,23 @@
 {
   "cli": {
-    "version": ">= 16.14.1",
-    "appVersionSource": "remote"
+    "version": ">= 16.14.1"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://192.168.0.102:3001"
+      }
     },
     "production": {
       "developmentClient": false,
       "distribution": "store",
       "channel": "production",
       "env": {
-        "EAS_BRANCH": "production"
+        "EXPO_PUBLIC_API_URL": "https://nemoryai.com/api"
       },
-      "autoIncrement": true,
-      "environment": "production"
+      "autoIncrement": true
     }
   },
   "submit": {

@@ -2,8 +2,9 @@ import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 import * as SecureStore from "@/utils/store/secureStore";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
+import Constants from "expo-constants";
 
-const apiUrl2 = process.env.EXPO_PUBLIC_API_URL;
+const apiUrl2 = Constants?.expoConfig?.extra?.API_URL;
 
 export interface ApiRequestOptions
   extends Omit<

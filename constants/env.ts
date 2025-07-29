@@ -1,10 +1,7 @@
-import Constants from "expo-constants";
-
-export const apiUrl =
-  Constants?.expoConfig?.extra?.API_URL || "https://nemoryai.com/api";
+export const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 export const GOOGLE_CLIENT_WEB_ID =
-  Constants?.expoConfig?.extra?.GOOGLE_CLIENT_WEB_ID;
+  process.env.EXPO_PUBLIC_GOOGLE_CLIENT_WEB_ID ?? "";
 export const GOOGLE_CLIENT_ANDROID_ID =
-  Constants?.expoConfig?.extra?.GOOGLE_CLIENT_ANDROID_ID;
+  process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ANDROID_ID ?? "";
 export const GOOGLE_CLIENT_IOS_ID =
-  Constants?.expoConfig?.extra?.GOOGLE_CLIENT_IOS_ID;
+  process.env.EXPO_PUBLIC_GOOGLE_CLIENT_IOS_ID ?? "";
