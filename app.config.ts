@@ -1,7 +1,5 @@
 import "dotenv/config";
-import { apiUrl } from "@/constants/env";
 
-console.log("CONFIG ENV API_URL:", apiUrl);
 console.log("CONFIG ENV API_URL2:", process.env.EXPO_PUBLIC_API_URL);
 export default ({ config }: { config: any }) => ({
   expo: {
