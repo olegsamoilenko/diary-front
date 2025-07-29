@@ -85,7 +85,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     console.log("APP LOADED!");
-    console.log("EXPO EXTRA:", Constants.expoConfig?.extra);
+    console.log("API_URL", process.env.EXPO_PUBLIC_API_URL);
   }, []);
 
   useEffect(() => {
