@@ -19,6 +19,7 @@
         "EAS_BRANCH": "production"
       },
       "autoIncrement": true,
+      "environment": "production"
     }
   },
   "submit": {
