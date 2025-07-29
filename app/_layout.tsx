@@ -33,7 +33,7 @@ import { NavigationThemes } from "@/constants/Theme";
 import AuthForm from "@/components/auth/AuthForm";
 import Toast from "react-native-toast-message";
 import { BiometryProvider } from "@/context/BiometryContext";
-import Constants from "expo-constants";
+import { apiUrl } from "@/constants/env";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -85,7 +85,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     console.log("APP LOADED!");
-    console.log("API_URL", process.env.EXPO_PUBLIC_API_URL);
+    console.log("API_URL", apiUrl);
+    console.log("API_URL2", process.env.EXPO_PUBLIC_API_URL);
   }, []);
 
   useEffect(() => {

@@ -13,9 +13,9 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
+import { apiUrl } from "@/constants/env";
 
 type EmailVerificationCodeFormProps = {
   forPlanSelect: boolean;
@@ -32,7 +32,6 @@ export default function EmailVerificationCodeForm({
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const { t } = useTranslation();
-  const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {

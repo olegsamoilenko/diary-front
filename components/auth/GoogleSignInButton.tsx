@@ -6,9 +6,9 @@ import { Colors } from "@/constants/Colors";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import Constants from "expo-constants";
 import { User } from "@/types";
 import { useTranslation } from "react-i18next";
+import { apiUrl } from "@/constants/env";
 
 export default function GoogleSignInButton({
   forPlanSelect,
@@ -20,7 +20,6 @@ export default function GoogleSignInButton({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
   const googleLogo = require("@/assets/images/logo/google_logo.webp");
-  const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();
 
   GoogleSignin.configure({

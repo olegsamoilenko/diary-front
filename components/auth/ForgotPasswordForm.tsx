@@ -9,7 +9,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { Formik } from "formik";
 import React, { useState } from "react";
 import { ColorTheme, ErrorMessages } from "@/types";
-import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -17,13 +16,13 @@ import * as Yup from "yup";
 import axios from "axios";
 import i18n from "i18next";
 import Toast from "react-native-toast-message";
+import { apiUrl } from "@/constants/env";
 
 export default function ForgotPasswordForm({
   onSuccess,
 }: {
   onSuccess: () => void;
 }) {
-  const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();
   const lang = useState<string | null>(i18n.language)[0];
   const colorScheme = useColorScheme();

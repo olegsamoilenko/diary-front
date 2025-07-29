@@ -7,7 +7,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { ThemedText } from "@/components/ThemedText";
@@ -20,6 +19,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
+import { apiUrl } from "@/constants/env";
 
 type LoginFormProps = {
   forPlanSelect?: boolean;
@@ -32,7 +32,6 @@ export default function LoginForm({
   setShowForgotPasswordForm,
 }: LoginFormProps) {
   const [loading, setLoading] = useState(false);
-  const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;

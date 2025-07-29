@@ -1,5 +1,8 @@
 import "dotenv/config";
-console.log("CONFIG ENV API_URL:", process.env.EXPO_PUBLIC_API_URL);
+import { apiUrl } from "@/constants/env";
+
+console.log("CONFIG ENV API_URL:", apiUrl);
+console.log("CONFIG ENV API_URL2:", process.env.EXPO_PUBLIC_API_URL);
 export default ({ config }: { config: any }) => ({
   expo: {
     ...config,
@@ -59,11 +62,14 @@ export default ({ config }: { config: any }) => ({
     },
     extra: {
       ...config.extra,
-      // API_URL: process.env.EXPO_PUBLIC_API_URL,
-      // GOOGLE_CLIENT_WEB_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_WEB_ID,
-      // GOOGLE_CLIENT_ANDROID_ID:
-      //   process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ANDROID_ID,
-      // GOOGLE_CLIENT_IOS_ID: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_IOS_ID,
+      API_URL: "https://nemoryai.com/api",
+      // API_URL: "http://192.168.0.102:3001",
+      GOOGLE_CLIENT_WEB_ID:
+        "203981333495-fjift3o1qr4q35tv5hscsuutbouspfir.apps.googleusercontent.com",
+      GOOGLE_CLIENT_ANDROID_ID:
+        "203981333495-8n59u2q1abopsh3nrnpbal3kn0olcf56.apps.googleusercontent.com",
+      GOOGLE_CLIENT_IOS_ID:
+        "203981333495-55s91bj0jmma2dl1mrnkku56s8i34ckg.apps.googleusercontent.com",
       eas: {
         projectId: "be6994c0-5be5-4005-b6e4-1385174eecc3",
         branch: "production",

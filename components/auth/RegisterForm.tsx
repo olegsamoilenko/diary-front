@@ -15,7 +15,6 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import i18n from "i18next";
 import axios from "axios";
-import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -25,6 +24,7 @@ import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import * as SecureStore from "@/utils/store/secureStore";
 import { passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
+import { apiUrl } from "@/constants/env";
 
 interface RegisterFormProps {
   forPlanSelect: boolean;
@@ -41,7 +41,6 @@ export default function RegisterForm({
 }: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
   const lang = useState<string | null>(i18n.language)[0];
-  const apiUrl = Constants.expoConfig?.extra?.API_URL;
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
