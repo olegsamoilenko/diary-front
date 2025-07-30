@@ -44,6 +44,10 @@ export default function ContentEntry({
     }
   }, [idx, isEntrySaved, aiDialogLoading]);
 
+  useEffect(() => {
+    console.log("ContentEntry entry dialogs:", entry.dialogs);
+  }, [entry]);
+
   return (
     <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
       <View
@@ -152,7 +156,7 @@ export default function ContentEntry({
                       borderRadius: 8,
                     }}
                   >
-                    {aiDialogLoading ? (
+                    {aiDialogLoading && dialog.loading ? (
                       <AILoader width={50} height={60} dotFontSize={24} />
                     ) : (
                       <NemoryIcon width={50} height={60} />

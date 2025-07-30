@@ -344,6 +344,7 @@ const AddNewEntry = forwardRef<
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const handleDialog = async () => {
+    console.log("entry.id", entry.id);
     setAiDialogLoading(true);
     try {
       const response = await apiRequest({
@@ -360,6 +361,8 @@ const AddNewEntry = forwardRef<
         setAiDialogLoading(false);
         return;
       }
+
+      console.log("response.data", response.data);
 
       setEntry((prev) => ({
         ...prev,
@@ -393,8 +396,11 @@ const AddNewEntry = forwardRef<
       ...prev,
       dialogs:
         prev.dialogs && prev.dialogs.length
-          ? [...prev.dialogs, { question: dialogQuestion, answer: "" }]
-          : [{ question: dialogQuestion, answer: "" }],
+          ? [
+              ...prev.dialogs,
+              { question: dialogQuestion, answer: "", loading: true },
+            ]
+          : [{ question: dialogQuestion, answer: "", loading: true }],
     }));
     Keyboard.dismiss();
     setDialogQuestion("");
