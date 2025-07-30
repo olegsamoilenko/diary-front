@@ -7,8 +7,8 @@ import { Colors } from "@/constants/Colors";
 import { Entry } from "@/types";
 import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
-import { useTypewriter } from "@/hooks/useTypewriter";
-import TypewriterAIResponse from "@/components/diary/add-new-entry/TypewriterAIResponse";
+// import { useTypewriter } from "@/hooks/useTypewriter";
+// import TypewriterAIResponse from "@/components/diary/add-new-entry/TypewriterAIResponse";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -27,7 +27,7 @@ export default function ContentEntry({
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
-  const animatedAiComment = useTypewriter(entry.aiComment.content, 30);
+  // const animatedAiComment = useTypewriter(entry.aiComment.content, 30);
   const scrollViewRef = useRef(null);
   const [idx, setIdx] = useState<number>(0);
 
@@ -42,7 +42,7 @@ export default function ContentEntry({
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
-  }, [animatedAiComment, idx, isEntrySaved, aiDialogLoading]);
+  }, [idx, isEntrySaved, aiDialogLoading]);
 
   return (
     <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
@@ -123,7 +123,7 @@ export default function ContentEntry({
                     {/*>*/}
                     {/*  {"        "}*/}
                     {/*</ThemedText>*/}
-                    {animatedAiComment}
+                    {entry.aiComment.content}
                   </ThemedText>
                 </View>
               )}

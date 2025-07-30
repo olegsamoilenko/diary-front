@@ -6,7 +6,6 @@ export function useTypewriter(text: string, speed = 30) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    console.time("typewriter");
     setDisplayed("");
     iRef.current = 0;
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -23,8 +22,6 @@ export function useTypewriter(text: string, speed = 30) {
         }
       });
     }, speed);
-
-    console.timeEnd("typewriter");
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
