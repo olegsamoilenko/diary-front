@@ -32,8 +32,13 @@ export default function ContentEntry({
   const [idx, setIdx] = useState<number>(0);
 
   useEffect(() => {
-    if (scrollViewRef.current) {
+    if (
+      scrollViewRef.current &&
+      // @ts-ignore
+      typeof scrollViewRef.current.scrollToEnd === "function"
+    ) {
       setTimeout(() => {
+        // @ts-ignore
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }
