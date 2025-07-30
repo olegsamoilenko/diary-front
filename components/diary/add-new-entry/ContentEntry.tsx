@@ -8,7 +8,7 @@ import { Entry } from "@/types";
 import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 // import { useTypewriter } from "@/hooks/useTypewriter";
-// import TypewriterAIResponse from "@/components/diary/add-new-entry/TypewriterAIResponse";
+import TypewriterText from "@/components/diary/add-new-entry/TypewriterText";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -98,33 +98,17 @@ export default function ContentEntry({
                     <NemoryIcon width={50} height={60} />
                   </View>
 
-                  {/*<ThemedText*/}
-                  {/*  style={{*/}
-                  {/*    fontWeight: "bold",*/}
-                  {/*    color: colors.primary,*/}
-                  {/*    marginRight: 5,*/}
-                  {/*    position: "absolute",*/}
-                  {/*    top: 10,*/}
-                  {/*    left: 0,*/}
-                  {/*  }}*/}
-                  {/*>*/}
-                  {/*  <NemoryIcon /> <ThemedText> </ThemedText>*/}
-                  {/*</ThemedText>*/}
-                  <ThemedText
-                    style={{
-                      color: colors.text,
-                      padding: 10,
+                  <TypewriterText
+                    text={entry.aiComment.content}
+                    speed={30}
+                    style={{ color: colors.text, padding: 10 }}
+                    onChange={() => {
+                      setTimeout(() => {
+                        // @ts-ignore
+                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                      }, 20);
                     }}
-                  >
-                    {/*<ThemedText*/}
-                    {/*  style={{*/}
-                    {/*    paddingLeft: 300,*/}
-                    {/*  }}*/}
-                    {/*>*/}
-                    {/*  {"        "}*/}
-                    {/*</ThemedText>*/}
-                    {entry.aiComment.content}
-                  </ThemedText>
+                  />
                 </View>
               )}
             </View>
@@ -174,14 +158,20 @@ export default function ContentEntry({
                       <NemoryIcon width={50} height={60} />
                     )}
 
-                    {/*<TypewriterAIResponse*/}
-                    {/*  response={dialog.answer}*/}
-                    {/*  style={{ color: colors.text }}*/}
-                    {/*  setIdx={setIdx}*/}
-                    {/*/>*/}
-                    <ThemedText style={{ color: colors.text }}>
-                      {animatedAiComment}
-                    </ThemedText>
+                    <TypewriterText
+                      key={dialog.id || dialog.question}
+                      text={dialog.answer ?? ""}
+                      speed={30}
+                      style={{ color: colors.text, padding: 10 }}
+                      onChange={() => {
+                        setTimeout(() => {
+                          // @ts-ignore
+                          scrollViewRef.current?.scrollToEnd({
+                            animated: true,
+                          });
+                        }, 20);
+                      }}
+                    />
                   </View>
                 </View>
               );
