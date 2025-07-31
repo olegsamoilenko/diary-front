@@ -27,7 +27,6 @@ export default function ContentEntry({
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
-  // const animatedAiComment = useTypewriter(entry.aiComment.content, 30);
   const scrollViewRef = useRef(null);
   const [idx, setIdx] = useState<number>(0);
 
@@ -40,9 +39,9 @@ export default function ContentEntry({
       setTimeout(() => {
         // @ts-ignore
         scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      }, 1000);
     }
-  }, [idx, isEntrySaved, aiDialogLoading]);
+  }, [idx, isEntrySaved, aiDialogLoading, entry.content]);
 
   return (
     <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
