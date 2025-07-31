@@ -28,20 +28,6 @@ export async function apiRequest<T = any>({
   config = {},
 }: ApiRequestOptions): Promise<AxiosResponse<T>> {
   try {
-    console.log("[API REQUEST]", {
-      url: apiUrl + url,
-      method,
-      data,
-      params,
-      headers,
-    });
-    console.log("[API REQUEST2]", {
-      url: apiUrl2 + url,
-      method,
-      data,
-      params,
-      headers,
-    });
     let token = await SecureStore.getItemAsync("token");
 
     if (isTokenExpired(token)) {
@@ -54,8 +40,6 @@ export async function apiRequest<T = any>({
           token = res.data.accessToken as string;
           await SecureStore.setItemAsync("token", token);
         } catch (err: any) {
-          console.log(111);
-
           if (axios.isAxiosError(err)) {
             if (err.response && err.response.data) {
               const { statusMessage, message } = err.response.data;
@@ -132,6 +116,8 @@ export async function apiRequest<T = any>({
         `Axios error ${status}: ${errorMessage}`,
         err.response.data,
       );
+
+      console.log(2323);
 
       Toast.show({
         type: "error",

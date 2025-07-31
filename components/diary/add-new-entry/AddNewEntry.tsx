@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Pressable,
 } from "react-native";
-import { AiComment, ColorTheme, Entry } from "@/types";
+import { AiComment, ColorTheme, Entry, StatusCode } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { apiRequest, getFont, getTodayDateStr } from "@/utils";
@@ -324,14 +324,14 @@ const AddNewEntry = forwardRef<
       setEntry((prev) => ({ ...prev, aiComment: aiComment }));
 
       setAiLoading(false);
-    } catch (error) {
-      console.error("Error generating AI content:", error);
+    } catch (err: any) {
       setAiLoading(false);
-      if (error.response && error.response.data) {
-        console.log("error.response", error.response);
-        console.log("response.data", error.response.data);
-      } else if (error.message) {
-        console.log("error.message", error.message);
+      if (err.response && err.response.data) {
+        console.log("response.data", err.response.data);
+        if (err.response.data.statusCode === StatusCode.PLAN_HAS_EXPIRED) {
+        }
+      } else if (err.message) {
+        console.log("error.message", err.message);
       }
     }
   };
@@ -344,7 +344,6 @@ const AddNewEntry = forwardRef<
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const handleDialog = async () => {
-    console.log("entry.id", entry.id);
     setAiDialogLoading(true);
     try {
       const response = await apiRequest({
@@ -361,8 +360,6 @@ const AddNewEntry = forwardRef<
         setAiDialogLoading(false);
         return;
       }
-
-      console.log("response.data", response.data);
 
       setEntry((prev) => ({
         ...prev,

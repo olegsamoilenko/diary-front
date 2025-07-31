@@ -45,7 +45,7 @@
     "code": "Code",
     "changePassword": "Change Password",
     "codeMustBe6Digits": "Code must be 6 digits",
-    "codeRequired": "Code is required",
+    "codeRequired": "Code is required"
   },
   "diary": {
     "title": "Diary",
@@ -132,8 +132,8 @@
     "biometry": {
       "title": "Biometric Authentication",
       "on": "On",
-        "off": "Off",
-    },
+        "off": "Off"
+    }
   },
   "planModal": {
     "title": "Choose your Plan",
@@ -170,7 +170,8 @@
     "yes": "Yes",
     "no": "No",
     "loading": "Loading...",
-    "or": "or"
+    "or": "or",
+    "continue": "Continue",
   },
   "errors": {
     "invalidPassword": "The password you entered is incorrect",
@@ -178,7 +179,7 @@
     "emailNotVerified": "Email not verified",
     "invalidCode": "The provided code is invalid or has expired",
     "emailAlreadyVerified": "An account with this email already verified",
-    "userAlreadyExists": "An account with this email already exists",
+    "userAlreadyExists": "An account with this email already exists"
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",

@@ -44,10 +44,6 @@ export default function ContentEntry({
     }
   }, [idx, isEntrySaved, aiDialogLoading]);
 
-  useEffect(() => {
-    console.log("ContentEntry entry dialogs:", entry.dialogs);
-  }, [entry]);
-
   return (
     <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
       <View

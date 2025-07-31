@@ -127,7 +127,7 @@ export const Colors: Record<string, ColorTheme> = {
     card: "#dcfbfb",
     diaryNotesBackground: "#EFE7DA",
     aiCommentBackground: "#ffffff33",
-    questionBackground: "#FFFFFF",
+    questionBackground: "transparent",
     answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",
@@ -173,7 +173,7 @@ export const Colors: Record<string, ColorTheme> = {
     card: "#e7f8db",
     diaryNotesBackground: "#EFE7DA",
     aiCommentBackground: "#ffffff33",
-    questionBackground: "#FFFFFF",
+    questionBackground: "transparent",
     answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",
@@ -219,7 +219,7 @@ export const Colors: Record<string, ColorTheme> = {
     card: "#ecb8b8",
     diaryNotesBackground: "#EFE7DA",
     aiCommentBackground: "#ffffff33",
-    questionBackground: "#FFFFFF",
+    questionBackground: "transparent",
     answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",
@@ -265,7 +265,7 @@ export const Colors: Record<string, ColorTheme> = {
     card: "#c3d0dc",
     diaryNotesBackground: "#EFE7DA",
     aiCommentBackground: "#ffffff33",
-    questionBackground: "#FFFFFF",
+    questionBackground: "transparent",
     answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",
@@ -309,7 +309,7 @@ export const Colors: Record<string, ColorTheme> = {
     card: "#BED0DA",
     diaryNotesBackground: "#FFFBEA",
     aiCommentBackground: "#ffffff33",
-    questionBackground: "#F6F7F9",
+    questionBackground: "transparent",
     answerBackground: "#ffffff33",
     //  settings
     blockBackground: "#FFFFFF",

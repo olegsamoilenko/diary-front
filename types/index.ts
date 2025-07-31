@@ -10,6 +10,7 @@ import type { MoodByDate } from "./moodByDate";
 import type { EntrySettings, BackgroundSettings } from "./entrySettings";
 import { ErrorMessages } from "./messages";
 import type { ErrorsType } from "./errors";
+import { StatusCode } from "./statusCode";
 
 export type {
   ColorTheme,
@@ -29,4 +30,4 @@ export type {
   ErrorsType,
 };
 
-export { ErrorMessages };
+export { ErrorMessages, StatusCode };

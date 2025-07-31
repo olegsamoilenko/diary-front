@@ -77,8 +77,6 @@ export default function Diary() {
         },
       });
 
-      console.log("response.data", response.data);
-
       setDiaryEntries((prev) => ({
         ...prev,
         [selectedDay?.toString() || "unknown"]: response.data,
@@ -107,11 +105,9 @@ export default function Diary() {
 
   useEffect(() => {
     if (selectedDay && timeZone && forceUpdate) {
-      console.log("forceUpdate", forceUpdate);
       fetchDiaryEntries(true);
     }
     if (selectedDay && timeZone && !forceUpdate) {
-      console.log("selectedDay", selectedDay);
       fetchDiaryEntries();
     }
   }, [selectedDay, timeZone, forceUpdate]);

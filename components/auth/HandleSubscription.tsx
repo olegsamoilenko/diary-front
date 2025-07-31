@@ -7,67 +7,55 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { Plans } from "@/constants/Plans";
 import { ColorTheme, Plan } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import Background from "@/components/Background";
+import Plans from "@/components/subscription/Plans";
+import Payment from "@/components/subscription/Payment";
 
-type Props = {
-  visible: boolean;
-  onSelect: (plan: Plan) => void;
+type SelectPlanProps = {
+  setShowAuthForm?: (show: boolean) => void;
+  onSuccess?: () => void;
 };
 
-export default function SelectPlan({ visible, onSelect }: Props) {
+export default function HandleSubscription({
+  setShowAuthForm,
+  onSuccess,
+}: SelectPlanProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
   const { t } = useTranslation();
+  const [showPayment, setShowPayment] = React.useState(false);
+  const [plan, setPlan] = React.useState<Plan | null>(null);
+  const [successPaymentPlan, setSuccessPaymentPlan] =
+    React.useState<Plan | null>(null);
+
+  const onSuccessPayment = () => {
+    setSuccessPaymentPlan(plan);
+    setShowPayment(false);
+  };
   return (
-    // <Modal visible={visible} transparent animationType="fade">
     <Background background={colors.backgroundImage}>
       <View style={styles.container}>
-        <Text style={styles.title}>{t("planModal.title")}</Text>
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            paddingBottom: 20,
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "column",
-              width: "100%",
-              paddingHorizontal: 16,
-              paddingBottom: 20,
-            }}
-          >
-            {Plans.map((plan) => (
-              <Pressable key={plan.name} onPress={() => onSelect(plan)}>
-                <View style={styles.card}>
-                  <Text style={styles.planName}>{plan.name}</Text>
-                  <Text style={styles.desc}>{t(plan.descriptionKey)}</Text>
-                  <Text style={styles.price}>
-                    {plan.price > 0
-                      ? `${plan.price} $ / ${t("planModal.month")}`
-                      : t("planModal.free")}
-                  </Text>
-                  <Text style={styles.tokens}>
-                    {plan.tokensLimit.toLocaleString()}{" "}
-                    {t("planModal.tokensPerMonth")}
-                  </Text>
-                </View>
-              </Pressable>
-            ))}
-          </View>
-        </ScrollView>
+        {showPayment ? (
+          <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
+        ) : (
+          <>
+            <Text style={styles.title}>{t("planModal.title")}</Text>
+            <Plans
+              setShowAuthForm={setShowAuthForm}
+              setShowPayment={setShowPayment}
+              onSuccess={onSuccess}
+              setPlan={setPlan}
+              successPaymentPlan={successPaymentPlan}
+            />
+          </>
+        )}
       </View>
     </Background>
-    // </Modal>
   );
 }
 

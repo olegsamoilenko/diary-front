@@ -84,7 +84,6 @@ export default function EmailVerificationCodeForm({
     const rowUser = await SecureStore.getItemAsync("user");
     const user = rowUser ? JSON.parse(rowUser) : null;
     setCode("");
-    console.log("user", user);
     setResendLoading(true);
     try {
       const res = await axios.post(`${apiUrl}/auth/resend-code`, {

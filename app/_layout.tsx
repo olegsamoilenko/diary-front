@@ -20,7 +20,7 @@ import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
 import { store } from "@/store";
 import { Provider, useDispatch } from "react-redux";
-import SelectPlan from "@/components/SelectPlan";
+import HandleSubscription from "@/components/auth/HandleSubscription";
 import { Plan, User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
 import { PortalProvider } from "@gorhom/portal";
@@ -82,12 +82,7 @@ export default function RootLayout() {
   const { theme } = useThemeCustom();
   const navTheme = NavigationThemes[theme] || NavigationThemes.light;
   const [showAuthForm, setShowAuthForm] = useState(false);
-
-  useEffect(() => {
-    console.log("APP LOADED!");
-    console.log("API_URL", apiUrl);
-    console.log("API_URL2", process.env.EXPO_PUBLIC_API_URL);
-  }, []);
+  const [showDoPayment, setShowDoPayment] = useState(false);
 
   useEffect(() => {
     // const clearUserFromSecureStore = async () => {
@@ -114,7 +109,6 @@ export default function RootLayout() {
     // clearThemeFromStore();
 
     const initUser = async () => {
-      console.log("Initializing user...");
       let storedUser = await SecureStore.getItemAsync("user");
       let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;
       if (!userObj) {
@@ -155,40 +149,13 @@ export default function RootLayout() {
     initLanguage();
   }, []);
 
-  const handleSubscribePlan = async (plan: Plan) => {
-    const userString = await SecureStore.getItemAsync("user");
-    const user: User = userString ? JSON.parse(userString) : null;
-    if (plan.name === "Start") {
-      await subscribePlan(plan);
-    } else if (user && user.isRegistered) {
-      console.log("Subscribing to plan:", plan);
-      //   TODO: Payment processing logic
-    } else {
-      setShowAuthForm(true);
-    }
-  };
+  const onSuccessHandleSubscription = async () => {
+    console.log(444);
 
-  const subscribePlan = async (plan: Plan) => {
-    try {
-      const { name, price, tokensLimit, ...rest } = plan;
-      const res = await apiRequest({
-        url: `/plans/subscribe`,
-        method: "POST",
-        data: {
-          name,
-          price,
-          tokensLimit,
-        },
-      });
-      const storedUser = await SecureStore.getItemAsync("user");
-      const userObj = JSON.parse(storedUser!);
+    const storedUser = await SecureStore.getItemAsync("user");
+    const userObj = JSON.parse(storedUser!);
 
-      userObj.plan = res.data;
-      setUser(userObj);
-      await SecureStore.setItemAsync("user", JSON.stringify(userObj));
-    } catch (error) {
-      console.error("Error setting plan:", error);
-    }
+    setUser(userObj);
   };
 
   if (!loaded) {
@@ -222,15 +189,18 @@ export default function RootLayout() {
                   // onSuccessPhoneCode={() => setShowAuthForm(false)}
                 />
               ) : !user?.plan ? (
-                <SelectPlan visible onSelect={handleSubscribePlan} />
+                <HandleSubscription
+                  setShowAuthForm={setShowAuthForm}
+                  onSuccess={onSuccessHandleSubscription}
+                />
               ) : (
                 <RootLayoutInner />
               )}
-              <Toast />
             </PortalProvider>
           </BiometryProvider>
         </AuthProvider>
       </ThemeProviderCustom>
+      <Toast />
     </Provider>
   );
 }

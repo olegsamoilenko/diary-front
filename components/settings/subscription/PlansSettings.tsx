@@ -13,11 +13,15 @@ import {
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import { Plans } from "@/constants/Plans";
-import { ColorTheme } from "@/types";
+import { PLANS } from "@/constants/Plans";
+import { ColorTheme, Plan } from "@/types";
 import Background from "@/components/Background";
 import * as SecureStore from "@/utils/store/secureStore";
 import type { User } from "@/types";
+import Plans from "@/components/subscription/Plans";
+import Payment from "@/components/subscription/Payment";
+import AuthForm from "@/components/auth/AuthForm";
+import { apiRequest } from "@/utils";
 
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
@@ -25,6 +29,11 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
+  const [showPayment, setShowPayment] = React.useState(false);
+  const [successPaymentPlan, setSuccessPaymentPlan] =
+    React.useState<Plan | null>(null);
+  const [plan, setPlan] = React.useState<Plan | null>(null);
+  const [showAuthForm, setShowAuthForm] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -35,106 +44,104 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   }, []);
 
   useEffect(() => {
-    console.log("user", user);
-  }, [user]);
+    console.log("showAuthForm", showAuthForm);
+  }, [showAuthForm]);
 
-  const onSubscribe = (plan: (typeof Plans)[number]) => {
-    // Handle plan selection logic here
-    console.log("Selected plan:", plan);
+  const onSuccessPayment = () => {
+    setSuccessPaymentPlan(plan);
+    setShowPayment(false);
   };
 
-  const onUnsubscribe = () => {
-    // Handle unsubscribe logic here
-    console.log("Unsubscribed from plan");
+  const onAuthSuccess = () => {
+    setShowAuthForm(false);
+  };
+
+  const onSuccess = async () => {
+    console.log("Selected plan:", plan);
+    setUser({ ...user, plan: plan });
+  };
+
+  const onUnsubscribe = async () => {
+    console.log(111);
+    if (user && user.isRegistered) {
+      console.log(222);
+      try {
+        await apiRequest({
+          url: "/plans/unsubscribe",
+          method: "POST",
+        });
+        setUser({ ...user, plan: null });
+        await SecureStore.setItemAsync(
+          "user",
+          JSON.stringify({ ...user, plan: null }),
+        );
+      } catch (error) {
+        console.error("Error unsubscribing:", error);
+      }
+    }
   };
   return (
     <SideSheet ref={ref}>
       <Background background={colors.backgroundImage} paddingTop={10}>
-        <View style={styles.container}>
-          <BackArrow ref={ref} />
-          <ThemedText type={"titleLG"}>
-            {t("settings.plans.titlePlural")}
-          </ThemedText>
-          <ScrollView>
-            {Plans.map((plan) => (
-              <View key={plan.name} style={styles.card}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <ThemedText type="subtitleLG">{plan.name}</ThemedText>
-                  {user?.plan?.name === plan.name ? (
-                    <View
-                      style={{
-                        backgroundColor: colors.primary,
-                        paddingVertical: 4,
-                        paddingHorizontal: 8,
-                        borderRadius: 16,
-                      }}
-                    >
-                      <ThemedText
-                        style={{
-                          color: colors.textInPrimary,
-                        }}
-                      >
-                        {t("settings.plans.youCurrentPlan")}
-                      </ThemedText>
-                    </View>
-                  ) : (
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: colors.background,
-                        paddingVertical: 4,
-                        paddingHorizontal: 8,
-                        borderRadius: 16,
-                      }}
-                      onPress={() => onSubscribe(plan)}
-                    >
-                      <ThemedText>
-                        {t("settings.plans.getTheVersion")}
-                        {" " + plan.name}
-                      </ThemedText>
-                    </TouchableOpacity>
-                  )}
-                </View>
-                <Text style={styles.desc}>{t(plan.descriptionKey)}</Text>
-                <Text style={styles.price}>
-                  {plan.price > 0
-                    ? `${plan.price} $ / ${t("planModal.month")}`
-                    : t("planModal.free")}
-                </Text>
-                <Text style={styles.tokens}>
-                  {plan.tokensLimit.toLocaleString()}{" "}
-                  {t("planModal.tokensPerMonth")}
-                </Text>
-              </View>
-            ))}
-            <TouchableOpacity onPress={onUnsubscribe}>
+        {showPayment ? (
+          <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
+        ) : showAuthForm ? (
+          <AuthForm
+            forPlanSelect={true}
+            onSuccessSignWithGoogle={onAuthSuccess}
+            onSuccessEmailCode={onAuthSuccess}
+          />
+        ) : (
+          <View style={styles.container}>
+            <BackArrow ref={ref} />
+            <ThemedText
+              type={"titleLG"}
+              style={{
+                marginBottom: 20,
+              }}
+            >
+              {t("settings.plans.titlePlural")}
+            </ThemedText>
+            <ScrollView>
               <View
-                style={[
-                  styles.button,
-                  {
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    borderRadius: 12,
-                  },
-                ]}
+                style={{
+                  flex: 1,
+                  justifyContent: "space-between",
+                }}
               >
-                <ThemedText
-                  type="subtitleLG"
-                  style={{
-                    color: colors.text,
-                  }}
-                >
-                  {t("settings.plans.unsubscribe")}
-                </ThemedText>
+                <Plans
+                  setShowPayment={setShowPayment}
+                  onSuccess={onSuccess}
+                  setPlan={setPlan}
+                  successPaymentPlan={successPaymentPlan}
+                  setSuccessPaymentPlan={setSuccessPaymentPlan}
+                  setShowAuthForm={setShowAuthForm}
+                />
+                <TouchableOpacity onPress={onUnsubscribe}>
+                  <View
+                    style={[
+                      styles.button,
+                      {
+                        borderWidth: 1,
+                        borderColor: colors.border,
+                        borderRadius: 12,
+                      },
+                    ]}
+                  >
+                    <ThemedText
+                      type="subtitleLG"
+                      style={{
+                        color: colors.text,
+                      }}
+                    >
+                      {t("settings.plans.unsubscribe")}
+                    </ThemedText>
+                  </View>
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
+            </ScrollView>
+          </View>
+        )}
       </Background>
     </SideSheet>
   );

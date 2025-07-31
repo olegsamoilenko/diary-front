@@ -6,6 +6,26 @@ export const NavigationThemes = {
     colors: Colors["light"],
     fonts: {},
   },
+  neonIce: {
+    dark: false,
+    colors: Colors["neonIce"],
+    fonts: {},
+  },
+  avocado: {
+    dark: false,
+    colors: Colors["avocado"],
+    fonts: {},
+  },
+  heart: {
+    dark: false,
+    colors: Colors["heart"],
+    fonts: {},
+  },
+  space: {
+    dark: false,
+    colors: Colors["space"],
+    fonts: {},
+  },
   calmMind: {
     dark: false,
     colors: Colors["calmMind"],
@@ -14,6 +34,11 @@ export const NavigationThemes = {
   orange: {
     dark: false,
     colors: Colors["orange"],
+    fonts: {},
+  },
+  ball: {
+    dark: true,
+    colors: Colors["ball"],
     fonts: {},
   },
   dark: {

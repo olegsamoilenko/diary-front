@@ -52,9 +52,6 @@ export default function GoogleSignInButton({
         throw new Error("Failed to sign in with Google");
       }
 
-      console.log("Google sign-in response:", res.status);
-
-      console.log("Google sign-in response111:", res.data);
       await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
       await SecureStore.setItemAsync("token", res.data.accessToken);
 
@@ -69,7 +66,6 @@ export default function GoogleSignInButton({
   const googleSignIn = async () => {
     try {
       const response = await GoogleLogin();
-      console.log("Google Sign-In response:", response);
 
       // retrieve user data
       const { idToken, user } = response.data ?? {};
