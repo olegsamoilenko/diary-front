@@ -117,8 +117,6 @@ export async function apiRequest<T = any>({
         err.response.data,
       );
 
-      console.log(2323);
-
       Toast.show({
         type: "error",
         text1: `Error ${status}`,

@@ -51,6 +51,7 @@ export default function HandleSubscription({
               onSuccess={onSuccess}
               setPlan={setPlan}
               successPaymentPlan={successPaymentPlan}
+              setSuccessPaymentPlan={setSuccessPaymentPlan}
             />
           </>
         )}

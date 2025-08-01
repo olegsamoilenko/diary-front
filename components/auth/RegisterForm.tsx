@@ -77,6 +77,7 @@ export default function RegisterForm({
     const userString = await SecureStore.getItemAsync("user");
     const user: User = userString ? JSON.parse(userString) : null;
     setLoading(true);
+    setError(null);
     try {
       const res = await axios.post(`${apiUrl}/auth/registration`, {
         email: values.email,

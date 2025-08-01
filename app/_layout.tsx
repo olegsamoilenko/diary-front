@@ -111,6 +111,7 @@ export default function RootLayout() {
     const initUser = async () => {
       let storedUser = await SecureStore.getItemAsync("user");
       let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;
+      console.log("Stored user:", userObj);
       if (!userObj) {
         const newUuid = uuid.v4();
 

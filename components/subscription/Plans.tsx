@@ -9,10 +9,10 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import { ColorTheme, Plan, User } from "@/types";
+import { ColorTheme, Plan, PlanStatus, User } from "@/types";
 import { PLANS } from "@/constants/Plans";
 import { ThemedText } from "@/components/ThemedText";
-import { apiRequest } from "@/utils";
+import { apiRequest, getStatusColor, UserEvents } from "@/utils";
 import * as SecureStore from "@/utils/store/secureStore";
 
 type PlansProps = {
@@ -22,6 +22,7 @@ type PlansProps = {
   setPlan: (plan: User["plan"]) => void;
   successPaymentPlan: Plan | null;
   setSuccessPaymentPlan: (plan: Plan | null) => void;
+  showStartPlan?: boolean;
 };
 export default function Plans({
   onSuccess,
@@ -30,6 +31,7 @@ export default function Plans({
   setPlan,
   successPaymentPlan,
   setSuccessPaymentPlan,
+  showStartPlan = true,
 }: PlansProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
@@ -47,13 +49,13 @@ export default function Plans({
         setShowPayment(true);
       }
     } else if (user && !user.isRegistered) {
+      console.log("User is not registered, showing auth form", user);
       if (setShowAuthForm) {
-        console.log("setShowAuthForm", setShowAuthForm);
+        console.log("setShowAuthForm");
         setShowAuthForm(true);
       }
     }
   };
-  console.log("successPaymentPlan1", successPaymentPlan);
 
   useEffect(() => {
     const handlePlan = async () => {
@@ -70,6 +72,7 @@ export default function Plans({
 
   const saveToDatabase = useCallback(
     async (plan: (typeof PLANS)[0]) => {
+      console.log("saveToDatabase", plan);
       setLoading(true);
       try {
         const { name, ...rest } = plan;
@@ -85,6 +88,9 @@ export default function Plans({
 
         userObj.plan = res.data;
         await SecureStore.setItemAsync("user", JSON.stringify(userObj));
+
+        UserEvents.emit("userChanged");
+
         if (onSuccess) {
           onSuccess();
         }
@@ -123,8 +129,6 @@ export default function Plans({
           contentContainerStyle={{
             flexGrow: 1,
             width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
           }}
         >
           <View
@@ -142,10 +146,19 @@ export default function Plans({
               ) {
                 return null;
               }
+              if (plan.name === "Start" && !showStartPlan) {
+                return null;
+              }
               return (
                 <TouchableOpacity
                   key={plan.name}
-                  disabled={user && user.plan && plan.name === user.plan.name}
+                  disabled={
+                    user &&
+                    user.plan &&
+                    plan.name === user.plan.name &&
+                    (user.plan.status === PlanStatus.ACTIVE ||
+                      user.plan.status === PlanStatus.REFUNDED)
+                  }
                   onPress={() => onSelect(plan)}
                 >
                   <View
@@ -170,7 +183,7 @@ export default function Plans({
                       {user?.plan?.name === plan.name && (
                         <View
                           style={{
-                            backgroundColor: colors.primary,
+                            backgroundColor: getStatusColor(user?.plan?.status),
                             paddingVertical: 4,
                             paddingHorizontal: 8,
                             borderRadius: 16,
@@ -181,7 +194,8 @@ export default function Plans({
                               color: colors.textInPrimary,
                             }}
                           >
-                            {t("settings.plans.youCurrentPlan")}
+                            {user?.plan?.status.slice(0, 1).toUpperCase() +
+                              user?.plan?.status.slice(1)}
                           </ThemedText>
                         </View>
                       )}

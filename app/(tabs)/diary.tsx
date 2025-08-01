@@ -58,6 +58,11 @@ export default function Diary() {
     setForceUpdate(false);
   };
 
+  const handleCloseAddNewEntry = () => {
+    setIsAddNewEntryOpen(false);
+    addNewEntryRef.current?.close();
+  };
+
   const fetchDiaryEntries = async (back = false) => {
     const user = await SecureStore.getItemAsync("user");
 
@@ -220,6 +225,7 @@ export default function Diary() {
               isOpen={isAddNewEntryOpen}
               handleBack={(back) => handleBack(back)}
               tabBarHeight={tabBarHeight}
+              onClose={handleCloseAddNewEntry}
             />
           </Portal>
         </>

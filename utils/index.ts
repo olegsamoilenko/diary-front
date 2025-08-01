@@ -10,6 +10,8 @@ import { getTodayDateStr } from "./diary/getTodayDateStr";
 import { getFont } from "./common/getFont";
 import { uploadImageToServer } from "./files/uploadImageToServer";
 import { passwordRules } from "./auth/passwordRules";
+import { getStatusColor } from "./colors/getStatusColor";
+import { UserEvents } from "./events/userEvents";
 
 export {
   apiRequest,
@@ -24,4 +26,6 @@ export {
   getFont,
   uploadImageToServer,
   passwordRules,
+  getStatusColor,
+  UserEvents,
 };

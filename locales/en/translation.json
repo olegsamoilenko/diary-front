@@ -179,7 +179,8 @@
     "emailNotVerified": "Email not verified",
     "invalidCode": "The provided code is invalid or has expired",
     "emailAlreadyVerified": "An account with this email already verified",
-    "userAlreadyExists": "An account with this email already exists"
+    "userAlreadyExists": "An account with this email already exists",
+    "undefined": "An unexpected error occurred"
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",

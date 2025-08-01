@@ -11,6 +11,7 @@ import type { EntrySettings, BackgroundSettings } from "./entrySettings";
 import { ErrorMessages } from "./messages";
 import type { ErrorsType } from "./errors";
 import { StatusCode } from "./statusCode";
+import { PlanStatus } from "./plan";
 
 export type {
   ColorTheme,
@@ -30,4 +31,4 @@ export type {
   ErrorsType,
 };
 
-export { ErrorMessages, StatusCode };
+export { ErrorMessages, StatusCode, PlanStatus };

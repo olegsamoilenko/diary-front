@@ -53,11 +53,13 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   };
 
   const onAuthSuccess = () => {
+    console.log("onAuthSuccess");
+    console.log("onAuthSuccess user", user);
     setShowAuthForm(false);
   };
 
   const onSuccess = async () => {
-    console.log("Selected plan:", plan);
+    console.log("onSuccess Selected plan:", plan);
     setUser({ ...user, plan: plan });
   };
 

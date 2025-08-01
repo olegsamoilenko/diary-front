@@ -1,11 +1,14 @@
 import { TouchableOpacity, View } from "react-native";
+import React, { useState, RefObject, useEffect } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { RefObject } from "react";
 import { SideSheetRef } from "@/components/SideSheet";
 import { useTranslation } from "react-i18next";
+import type { User } from "@/types";
+import * as SecureStore from "@/utils/store/secureStore";
+import { UserEvents } from "@/utils";
 
 export default function SubscriptionSettingsBlock({
   plansRef,
@@ -15,6 +18,25 @@ export default function SubscriptionSettingsBlock({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
   const { t } = useTranslation();
+  const [user, setUser] = useState<User | null>(null);
+
+  const getUser = async () => {
+    const storedUser = await SecureStore.getItemAsync("user");
+    setUser(storedUser ? JSON.parse(storedUser) : null);
+
+    console.log("User in SubscriptionSettingsBlock:", storedUser);
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    const handler = () => getUser();
+    UserEvents.on("userChanged", handler);
+    return () => UserEvents.off("userChanged", handler);
+  }, []);
+
   return (
     <View
       style={{
@@ -57,7 +79,7 @@ export default function SubscriptionSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>Plan</ThemedText>
+            <ThemedText>{user?.plan?.name}</ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}
