@@ -42,6 +42,7 @@ const SideSheet = forwardRef<SideSheetRef, SideSheetProps>(
     const colors = Colors[colorScheme] ?? Colors.system;
 
     const openSideScreen = () => {
+      translateX.setValue(Dimensions.get("window").width);
       setVisible(true);
       Animated.timing(translateX, {
         toValue: 0,

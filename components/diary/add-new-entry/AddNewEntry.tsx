@@ -7,12 +7,11 @@ import {
   Keyboard,
   Platform,
   KeyboardAvoidingView,
-  TouchableHighlight,
   TouchableOpacity,
   ActivityIndicator,
   Pressable,
 } from "react-native";
-import { AiComment, ColorTheme, Entry, StatusCode } from "@/types";
+import { AiComment, ColorTheme, Entry, PlanStatus, StatusCode } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { apiRequest, getFont, getTodayDateStr } from "@/utils";
@@ -32,7 +31,7 @@ import SettingsEntry from "@/components/diary/add-new-entry/settings-entry/Setti
 import { FONTS } from "@/assets/fonts/entry";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import Subscription from "@/components/diary/add-new-entry/Subscription";
+import * as SecureStore from "@/utils/store/secureStore";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -49,6 +48,7 @@ const AddNewEntry = forwardRef<
     handleBack: (back: boolean) => void;
     onClose: () => void;
     tabBarHeight: number;
+    onPlanExpiredErrorOccurred: () => void;
   }
 >((props, ref) => {
   const aiModel = useAppSelector((state) => state.settings.aiModel);
@@ -118,7 +118,6 @@ const AddNewEntry = forwardRef<
   );
   const [isFocusTitleRichEditor, setIsFocusTitleRichEditor] = useState(false);
   const [dialogQuestion, setDialogQuestion] = useState("");
-  const [showSubscription, setShowSubscription] = useState(false);
 
   useEffect(() => {
     setColorAction(colors.text);
@@ -339,8 +338,8 @@ const AddNewEntry = forwardRef<
           err.response.data.statusCode === StatusCode.PLAN_HAS_EXPIRED ||
           err.response.data.statusCode === StatusCode.TRIAL_PLAN_HAS_EXPIRED
         ) {
-          handleCloseSheet();
-          props.onClose();
+          props.onPlanExpiredErrorOccurred();
+          await changeUserPlanStatus(PlanStatus.EXPIRED);
         }
       } else if (err.message) {
         console.log("error.message", err.message);
@@ -395,8 +394,8 @@ const AddNewEntry = forwardRef<
           err.response.data.statusCode === StatusCode.PLAN_HAS_EXPIRED ||
           err.response.data.statusCode === StatusCode.TRIAL_PLAN_HAS_EXPIRED
         ) {
-          handleCloseSheet();
-          props.onClose();
+          props.onPlanExpiredErrorOccurred();
+          await changeUserPlanStatus(PlanStatus.EXPIRED);
         }
       } else if (err.message) {
         console.log("error.message", err.message);
@@ -404,8 +403,14 @@ const AddNewEntry = forwardRef<
     }
   };
 
-  const onSuccessRenewPlan = async () => {
-    setShowSubscription(false);
+  const changeUserPlanStatus = async (status: PlanStatus) => {
+    const rowUser = await SecureStore.getItemAsync("user");
+    if (!rowUser) return;
+    const user = JSON.parse(rowUser);
+
+    user.plan.status = status;
+
+    await SecureStore.setItemAsync("user", JSON.stringify(user));
   };
 
   function handleCloseSheet() {
@@ -444,248 +449,244 @@ const AddNewEntry = forwardRef<
 
   return (
     <SideSheet ref={ref} onOpenChange={setIsAddNewEntryOpen}>
-      {showSubscription ? (
-        <Subscription onSuccessRenewPlan={onSuccessRenewPlan} />
-      ) : (
-        <View style={{ flex: 1 }}>
-          <Background background={entrySettings.background} />
-          <View
+      <View style={{ flex: 1 }}>
+        <Background background={entrySettings.background} />
+        <View
+          style={{
+            flex: 1,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            marginBottom: -50,
+          }}
+        >
+          <BackArrow
+            ref={ref}
             style={{
-              flex: 1,
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              marginBottom: -50,
+              paddingLeft: 10,
             }}
+            onClose={handleCloseSheet}
+          />
+          <KeyboardAvoidingView
+            style={{ flex: 1, position: "relative" }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 44 : 0}
           >
-            <BackArrow
-              ref={ref}
+            <View
               style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
                 paddingLeft: 10,
+                paddingRight: 20,
               }}
-              onClose={handleCloseSheet}
-            />
-            <KeyboardAvoidingView
-              style={{ flex: 1, position: "relative" }}
-              behavior={Platform.OS === "ios" ? "padding" : "height"}
-              keyboardVerticalOffset={Platform.OS === "ios" ? 44 : 0}
             >
+              <ThemedText>{todayDate}</ThemedText>
+              {!isEntrySaved && (
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    borderRadius: 50,
+                    backgroundColor: colors.primary,
+                  }}
+                  onPress={handleSave}
+                >
+                  {loading ? (
+                    <ActivityIndicator color={colors.textInPrimary} />
+                  ) : (
+                    <ThemedText
+                      style={{
+                        color: colors.textInPrimary,
+                      }}
+                    >
+                      {t("diary.addEntryButton")}
+                    </ThemedText>
+                  )}
+                </TouchableOpacity>
+              )}
+            </View>
+            <TitleEntry
+              titleReachEditorKey={titleReachEditorKey}
+              disabledTitleReachEditor={isEntrySaved}
+              onChangeEntry={setEntry}
+              entry={entry}
+              isAddNewEntryOpen={isAddNewEntryOpen}
+              onHandleTooltip={onHandleTooltip}
+              isKeyboardOpen={isKeyboardOpen}
+              setActiveActions={setActiveActions}
+              activeActions={activeActions}
+              handleFocus={handleFocus}
+              handleBlur={handleBlur}
+              isBoldAction={isBoldAction}
+              isItalicAction={isItalicAction}
+              colorAction={colorAction}
+              sizeAction={sizeAction}
+              selectedFont={selectedFont}
+              titleEmoji={titleEmoji}
+            />
+
+            {entry && entry.content && isEntrySaved ? (
+              <ContentEntry
+                entry={entry}
+                aiLoading={aiLoading}
+                aiDialogLoading={aiDialogLoading}
+                isKeyboardOpen={isKeyboardOpen}
+                isEntrySaved={isEntrySaved}
+              />
+            ) : (
+              <>
+                <AddContentInputEntry
+                  isFocusTextRichEditor={isFocusTextRichEditor}
+                  setIsFocusTextRichEditor={setIsFocusTextRichEditor}
+                  showFontSetting={showFontSetting}
+                  setShowFontSetting={setShowFontSetting}
+                  showSizeSetting={showSizeSetting}
+                  setShowSizeSetting={setShowSizeSetting}
+                  showColorSetting={showColorSetting}
+                  setShowColorSetting={setShowColorSetting}
+                  showBackgroundSetting={showBackgroundSetting}
+                  setShowBackgroundSetting={setShowBackgroundSetting}
+                  showEmojiSetting={showEmojiSetting}
+                  setShowEmojiSetting={setShowEmojiSetting}
+                  textReachEditorKey={textReachEditorKey}
+                  isKeyboardOpen={isKeyboardOpen}
+                  entry={entry}
+                  isEntrySaved={isEntrySaved}
+                  loading={loading}
+                  keyboardHeight={keyboardHeight}
+                  onChangeEntry={setEntry}
+                  onChangeEntrySettings={(entrySettings: EntrySettings) =>
+                    setEntrySettings((prev) => ({
+                      ...prev,
+                      ...entrySettings,
+                    }))
+                  }
+                  onHandleSave={handleSave}
+                  tooltipVisible={tooltipVisible}
+                  entrySettings={entrySettings}
+                  addEmoji={setEmoji}
+                  emoji={emoji}
+                />
+              </>
+            )}
+
+            {isKeyboardOpen && isFocusTitleRichEditor && (
+              <RichToolbar
+                actions={{
+                  bold: true,
+                  italic: true,
+                  color: true,
+                  size: true,
+                  font: true,
+                  emoji: true,
+                }}
+                activeActions={activeActions}
+                handleBoldAction={handleBoldAction}
+                handleItalicAction={handleItalicAction}
+                handleColorAction={handleColorAction}
+                handleSizeAction={handleSizeAction}
+                handleFontAction={handleFontAction}
+                handleEmojiAction={handleEmojiAction}
+              ></RichToolbar>
+            )}
+
+            <SettingsEntry
+              keyboardHeight={keyboardHeight}
+              entrySettings={entrySettings}
+              setShowColorSetting={setShowTitleColorSetting}
+              showColorSetting={showTitleColorSetting}
+              setColor={setColor}
+              selectedColor={selectedColor}
+              setShowSizeSetting={setShowTitleSizeSetting}
+              showSizeSetting={showTitleSizeSetting}
+              setShowFontSetting={setShowTitleFontSetting}
+              showFontSetting={showTitleFontSetting}
+              showEmojiSetting={showTitleEmojiSetting}
+              setShowEmojiSetting={setShowTitleEmojiSetting}
+              setSize={setSize}
+              setFont={setFont}
+              selectedFont={selectedFont}
+              selectedSize={selectedSize}
+              addEmoji={handleTitleEmoji}
+            />
+
+            {isEntrySaved && entry.aiComment.content && (
               <View
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  paddingLeft: 10,
-                  paddingRight: 20,
+                  position: "relative",
+                  bottom: isKeyboardOpen ? 7 : -25,
+                  left: 0,
+                  right: 0,
+                  elevation: 10,
+                  borderRadius: 20,
+                  backgroundColor: colors.backgroundAdditional,
+                  marginTop: isKeyboardOpen ? 0 : -33,
+                  padding: 10,
+                  marginHorizontal: 10,
                 }}
               >
-                <ThemedText>{todayDate}</ThemedText>
-                {!isEntrySaved && (
-                  <TouchableOpacity
-                    style={{
-                      paddingVertical: 5,
-                      paddingHorizontal: 10,
-                      borderRadius: 50,
-                      backgroundColor: colors.primary,
-                    }}
-                    onPress={handleSave}
-                  >
-                    {loading ? (
-                      <ActivityIndicator color={colors.textInPrimary} />
-                    ) : (
-                      <ThemedText
-                        style={{
-                          color: colors.textInPrimary,
-                        }}
-                      >
-                        {t("diary.addEntryButton")}
-                      </ThemedText>
-                    )}
-                  </TouchableOpacity>
-                )}
-              </View>
-              <TitleEntry
-                titleReachEditorKey={titleReachEditorKey}
-                disabledTitleReachEditor={isEntrySaved}
-                onChangeEntry={setEntry}
-                entry={entry}
-                isAddNewEntryOpen={isAddNewEntryOpen}
-                onHandleTooltip={onHandleTooltip}
-                isKeyboardOpen={isKeyboardOpen}
-                setActiveActions={setActiveActions}
-                activeActions={activeActions}
-                handleFocus={handleFocus}
-                handleBlur={handleBlur}
-                isBoldAction={isBoldAction}
-                isItalicAction={isItalicAction}
-                colorAction={colorAction}
-                sizeAction={sizeAction}
-                selectedFont={selectedFont}
-                titleEmoji={titleEmoji}
-              />
-
-              {entry && entry.content && isEntrySaved ? (
-                <ContentEntry
-                  entry={entry}
-                  aiLoading={aiLoading}
-                  aiDialogLoading={aiDialogLoading}
-                  isKeyboardOpen={isKeyboardOpen}
-                  isEntrySaved={isEntrySaved}
-                />
-              ) : (
-                <>
-                  <AddContentInputEntry
-                    isFocusTextRichEditor={isFocusTextRichEditor}
-                    setIsFocusTextRichEditor={setIsFocusTextRichEditor}
-                    showFontSetting={showFontSetting}
-                    setShowFontSetting={setShowFontSetting}
-                    showSizeSetting={showSizeSetting}
-                    setShowSizeSetting={setShowSizeSetting}
-                    showColorSetting={showColorSetting}
-                    setShowColorSetting={setShowColorSetting}
-                    showBackgroundSetting={showBackgroundSetting}
-                    setShowBackgroundSetting={setShowBackgroundSetting}
-                    showEmojiSetting={showEmojiSetting}
-                    setShowEmojiSetting={setShowEmojiSetting}
-                    textReachEditorKey={textReachEditorKey}
-                    isKeyboardOpen={isKeyboardOpen}
-                    entry={entry}
-                    isEntrySaved={isEntrySaved}
-                    loading={loading}
-                    keyboardHeight={keyboardHeight}
-                    onChangeEntry={setEntry}
-                    onChangeEntrySettings={(entrySettings: EntrySettings) =>
-                      setEntrySettings((prev) => ({
-                        ...prev,
-                        ...entrySettings,
-                      }))
-                    }
-                    onHandleSave={handleSave}
-                    tooltipVisible={tooltipVisible}
-                    entrySettings={entrySettings}
-                    addEmoji={setEmoji}
-                    emoji={emoji}
-                  />
-                </>
-              )}
-
-              {isKeyboardOpen && isFocusTitleRichEditor && (
-                <RichToolbar
-                  actions={{
-                    bold: true,
-                    italic: true,
-                    color: true,
-                    size: true,
-                    font: true,
-                    emoji: true,
+                <TextInput
+                  multiline
+                  onChangeText={setDialogQuestion}
+                  value={dialogQuestion}
+                  placeholder="Enter text"
+                  scrollEnabled={true}
+                  placeholderTextColor={colors.textAdditional}
+                  style={{
+                    maxHeight: ROW_HEIGHT * 10,
+                    color: colors.text,
+                    fontFamily: getFont(font.name, "regular"),
                   }}
-                  activeActions={activeActions}
-                  handleBoldAction={handleBoldAction}
-                  handleItalicAction={handleItalicAction}
-                  handleColorAction={handleColorAction}
-                  handleSizeAction={handleSizeAction}
-                  handleFontAction={handleFontAction}
-                  handleEmojiAction={handleEmojiAction}
-                ></RichToolbar>
-              )}
-
-              <SettingsEntry
-                keyboardHeight={keyboardHeight}
-                entrySettings={entrySettings}
-                setShowColorSetting={setShowTitleColorSetting}
-                showColorSetting={showTitleColorSetting}
-                setColor={setColor}
-                selectedColor={selectedColor}
-                setShowSizeSetting={setShowTitleSizeSetting}
-                showSizeSetting={showTitleSizeSetting}
-                setShowFontSetting={setShowTitleFontSetting}
-                showFontSetting={showTitleFontSetting}
-                showEmojiSetting={showTitleEmojiSetting}
-                setShowEmojiSetting={setShowTitleEmojiSetting}
-                setSize={setSize}
-                setFont={setFont}
-                selectedFont={selectedFont}
-                selectedSize={selectedSize}
-                addEmoji={handleTitleEmoji}
-              />
-
-              {isEntrySaved && entry.aiComment.content && (
+                />
                 <View
                   style={{
-                    position: "relative",
-                    bottom: isKeyboardOpen ? 7 : -25,
-                    left: 0,
-                    right: 0,
-                    elevation: 10,
-                    borderRadius: 20,
-                    backgroundColor: colors.backgroundAdditional,
-                    marginTop: isKeyboardOpen ? 0 : -33,
-                    padding: 10,
-                    marginHorizontal: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    paddingHorizontal: 15,
                   }}
                 >
-                  <TextInput
-                    multiline
-                    onChangeText={setDialogQuestion}
-                    value={dialogQuestion}
-                    placeholder="Enter text"
-                    scrollEnabled={true}
-                    placeholderTextColor={colors.textAdditional}
-                    style={{
-                      maxHeight: ROW_HEIGHT * 10,
-                      color: colors.text,
-                      fontFamily: getFont(font.name, "regular"),
-                    }}
-                  />
-                  <View
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      justifyContent: "flex-end",
-                      alignItems: "center",
-                      paddingHorizontal: 15,
-                    }}
-                  >
-                    <TouchableOpacity onPress={handleSend}>
-                      <MaterialCommunityIcons
-                        name="send"
-                        size={28}
-                        color="#4A90E2"
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity onPress={handleSend}>
+                    <MaterialCommunityIcons
+                      name="send"
+                      size={28}
+                      color="#4A90E2"
+                    />
+                  </TouchableOpacity>
                 </View>
-              )}
-            </KeyboardAvoidingView>
-          </View>
-          {anySettingOpen && (
-            <Pressable
-              style={{
-                position: "absolute",
-                left: 0,
-                top: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(0,0,0,0.07)",
-                zIndex: 0,
-              }}
-              onPress={() => {
-                setShowBackgroundSetting(false);
-                setShowColorSetting(false);
-                setShowSizeSetting(false);
-                setShowFontSetting(false);
-                setShowEmojiSetting(false);
-                setShowTitleColorSetting(false);
-                setShowTitleSizeSetting(false);
-                setShowTitleFontSetting(false);
-                setShowTitleEmojiSetting(false);
-              }}
-            />
-          )}
+              </View>
+            )}
+          </KeyboardAvoidingView>
         </View>
-      )}
+        {anySettingOpen && (
+          <Pressable
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.07)",
+              zIndex: 0,
+            }}
+            onPress={() => {
+              setShowBackgroundSetting(false);
+              setShowColorSetting(false);
+              setShowSizeSetting(false);
+              setShowFontSetting(false);
+              setShowEmojiSetting(false);
+              setShowTitleColorSetting(false);
+              setShowTitleSizeSetting(false);
+              setShowTitleFontSetting(false);
+              setShowTitleEmojiSetting(false);
+            }}
+          />
+        )}
+      </View>
     </SideSheet>
   );
 });

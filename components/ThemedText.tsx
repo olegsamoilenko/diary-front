@@ -17,6 +17,7 @@ export type ThemedTextProps = TextProps & {
     | "extraSmall"
     | "small"
     | "default"
+    | "bold"
     | "extraSmallLink"
     | "smallLink"
     | "link";
@@ -46,6 +47,7 @@ export function ThemedText({
         type === "extraSmall" ? styles.extraSmall : undefined,
         type === "small" ? styles.small : undefined,
         type === "default" ? styles.default : undefined,
+        type === "bold" ? styles.bold : undefined,
         type === "extraSmallLink" ? styles.extraSmallLink : undefined,
         type === "smallLink" ? styles.smallLink : undefined,
         type === "link" ? styles.link : undefined,
@@ -111,6 +113,11 @@ const getStyles = (
     default: {
       fontSize: 16,
       fontFamily: getFont(font.name, "regular"),
+      lineHeight: 24,
+    },
+    bold: {
+      fontSize: 16,
+      fontFamily: getFont(font.name, "bold"),
       lineHeight: 24,
     },
     extraSmallLink: {

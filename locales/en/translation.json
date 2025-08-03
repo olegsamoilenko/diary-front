@@ -133,6 +133,14 @@
       "title": "Biometric Authentication",
       "on": "On",
         "off": "Off"
+    },
+    "profile": {
+      "title": "Profile",
+      "identifier": "Identifier",
+      "name": "Name",
+      "signOut": "Sign Out",
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
     }
   },
   "planModal": {

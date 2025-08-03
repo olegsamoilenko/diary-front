@@ -10,10 +10,10 @@ import type { User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
 import { UserEvents } from "@/utils";
 
-export default function SubscriptionSettingsBlock({
-  plansRef,
+export default function ProfileSettingsBlock({
+  profileRef,
 }: {
-  plansRef: RefObject<SideSheetRef | null>;
+  profileRef: RefObject<SideSheetRef | null>;
 }) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
@@ -59,7 +59,7 @@ export default function SubscriptionSettingsBlock({
       <TouchableOpacity
         onPress={() => {
           // @ts-ignore
-          plansRef!.current?.open();
+          profileRef!.current?.open();
         }}
       >
         <View
@@ -70,7 +70,7 @@ export default function SubscriptionSettingsBlock({
             justifyContent: "space-between",
           }}
         >
-          <ThemedText>{t("settings.plans.title")}</ThemedText>
+          <ThemedText>{t("settings.profile.title")}</ThemedText>
           <View
             style={{
               display: "flex",
@@ -79,7 +79,7 @@ export default function SubscriptionSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>{user?.plan?.name}</ThemedText>
+            <ThemedText>{user?.name}</ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}

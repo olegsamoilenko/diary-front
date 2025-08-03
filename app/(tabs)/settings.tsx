@@ -29,6 +29,8 @@ import SubscriptionSettingsBlock from "@/components/settings/subscription/Subscr
 import PlansSettings from "@/components/settings/subscription/PlansSettings";
 import SecuritySettingsBlock from "@/components/settings/security/SecuritySettingsBlock";
 import BiometrySettings from "@/components/settings/security/BiometrySettings";
+import ProfileSettings from "@/components/settings/profile/ProfileSettings";
+import ProfileSettingsBlock from "@/components/settings/profile/ProfileSettingsBlock";
 
 export default function Settings() {
   const themeSwitcherRef = useRef<SideSheetRef>(null);
@@ -38,6 +40,7 @@ export default function Settings() {
   const plansRef = useRef<SideSheetRef>(null);
   const securityRef = useRef<SideSheetRef>(null);
   const biometryRef = useRef<SideSheetRef>(null);
+  const profileRef = useRef<SideSheetRef>(null);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
@@ -71,6 +74,8 @@ export default function Settings() {
         <SubscriptionSettingsBlock plansRef={plansRef} />
         <ThemedText type="subtitleXL">{t("settings.security")}</ThemedText>
         <SecuritySettingsBlock biometryRef={biometryRef} />
+        <ThemedText type="subtitleXL">{t("settings.profile.title")}</ThemedText>
+        <ProfileSettingsBlock profileRef={profileRef} />
       </ParallaxScrollView>
       <Portal>
         <ThemeSwitcher ref={themeSwitcherRef} />
@@ -80,6 +85,7 @@ export default function Settings() {
         <ModelSwitcher ref={modelSwitcherRef} />
         <PlansSettings ref={plansRef} />
         <BiometrySettings ref={biometryRef} />
+        <ProfileSettings ref={profileRef} />
       </Portal>
     </Background>
   );

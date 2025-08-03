@@ -1,16 +1,10 @@
-import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  Platform,
-  StatusBar,
-} from "react-native";
+import { StyleSheet, View, ActivityIndicator } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AddButton from "@/components/ui/AddButton";
 import { SideSheetRef } from "@/components/SideSheet";
 import AddNewEntry from "@/components/diary/add-new-entry/AddNewEntry";
@@ -25,12 +19,14 @@ import EntryCard from "@/components/diary/EntryCard";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Portal } from "@gorhom/portal";
 import Background from "@/components/Background";
+import SubscriptionErrors from "@/components/errors/SubscriptionErrors";
 
 export default function Diary() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
   const addNewEntryRef = useRef<SideSheetRef>(null);
+  const subscriptionErrorsRef = useRef<SideSheetRef>(null);
   const [selectedDay, setSelectedDay] = useState<
     string | number | Date | undefined
   >(new Date().toISOString().split("T")[0]);
@@ -51,17 +47,25 @@ export default function Diary() {
   const [loading, setLoading] = useState(true);
   const [isAddNewEntryOpen, setIsAddNewEntryOpen] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(false);
+  const [planExpiredError, setPlanExpiredError] = useState<boolean>(false);
 
-  const handleNewEntryOpen = () => {
+  const handleNewEntryOpen = useCallback(() => {
     setIsAddNewEntryOpen(true);
     addNewEntryRef.current?.open();
     setForceUpdate(false);
-  };
+  }, []);
 
-  const handleCloseAddNewEntry = () => {
-    setIsAddNewEntryOpen(false);
-    addNewEntryRef.current?.close();
-  };
+  const onPlanExpiredErrorOccurred = useCallback(() => {
+    subscriptionErrorsRef.current?.open();
+    setTimeout(() => {
+      addNewEntryRef.current?.close();
+    }, 100);
+  }, []);
+
+  const onSuccessRenewPlan = useCallback(() => {
+    setPlanExpiredError(false);
+    subscriptionErrorsRef.current?.close();
+  }, []);
 
   const fetchDiaryEntries = async (back = false) => {
     const user = await SecureStore.getItemAsync("user");
@@ -96,17 +100,20 @@ export default function Diary() {
     }
   };
 
-  const handleBack = async (back: boolean) => {
-    setForceUpdate(new Date().toISOString().split("T")[0] === selectedDay);
-    if (back) {
-      setSelectedDay(new Date().toISOString().split("T")[0]);
-      await fetchMoodsByDate();
+  const handleBack = useCallback(
+    async (back: boolean) => {
+      setForceUpdate(new Date().toISOString().split("T")[0] === selectedDay);
+      if (back) {
+        setSelectedDay(new Date().toISOString().split("T")[0]);
+        await fetchMoodsByDate();
 
-      setTimeout(() => {
-        scrollRef.current?.scrollToEnd({ animated: true });
-      }, 0);
-    }
-  };
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 0);
+      }
+    },
+    [selectedDay],
+  );
 
   useEffect(() => {
     if (selectedDay && timeZone && forceUpdate) {
@@ -144,31 +151,34 @@ export default function Diary() {
 
   const tabBarHeight = useBottomTabBarHeight();
 
-  const deleteEntry = async (id: number) => {
-    try {
-      const response = await apiRequest({
-        url: `/diary-entries/${id}`,
-        method: "DELETE",
-      });
+  const deleteEntry = useCallback(
+    async (id: number) => {
+      try {
+        const response = await apiRequest({
+          url: `/diary-entries/${id}`,
+          method: "DELETE",
+        });
 
-      if (!response || response.status !== 200) {
-        console.log("No data returned from server");
-        return;
+        if (!response || response.status !== 200) {
+          console.log("No data returned from server");
+          return;
+        }
+
+        setDiaryEntries((prev) => {
+          return {
+            ...prev,
+            [selectedDay]: prev[selectedDay]
+              ? prev[selectedDay].filter((entry: Entry) => entry.id !== id)
+              : [],
+          };
+        });
+        await fetchMoodsByDate();
+      } catch (error) {
+        console.error("Error deleting entry:", error);
       }
-
-      setDiaryEntries((prev) => {
-        return {
-          ...prev,
-          [selectedDay]: prev[selectedDay]
-            ? prev[selectedDay].filter((entry: Entry) => entry.id !== id)
-            : [],
-        };
-      });
-      await fetchMoodsByDate();
-    } catch (error) {
-      console.error("Error deleting entry:", error);
-    }
-  };
+    },
+    [selectedDay],
+  );
 
   return (
     <Background background={colors.backgroundImage} paddingTop={40}>
@@ -225,7 +235,14 @@ export default function Diary() {
               isOpen={isAddNewEntryOpen}
               handleBack={(back) => handleBack(back)}
               tabBarHeight={tabBarHeight}
-              onClose={handleCloseAddNewEntry}
+              onPlanExpiredErrorOccurred={onPlanExpiredErrorOccurred}
+            />
+          </Portal>
+          <Portal>
+            <SubscriptionErrors
+              onSuccessRenewPlan={onSuccessRenewPlan}
+              ref={subscriptionErrorsRef}
+              isOpen={planExpiredError}
             />
           </Portal>
         </>
