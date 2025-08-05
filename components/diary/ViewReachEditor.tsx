@@ -20,19 +20,19 @@ export default function ViewReachEditor({ content }: { content: string }) {
       editorStyle={{
         backgroundColor: "transparent",
         initialCSSText: `
-            ${MarckScriptFontStylesheet}
-            ${NeuchaFontStylesheet}
-            ${CaveatFontStylesheet}
-            ${PacificoFontStylesheet}
-            ${AmaticSCFontStylesheet}
-            ${UbuntuFontStylesheet}
-            ${RobotoFontStylesheet}
-            ${OpenSansFontStylesheet}
-            ${PTMonoFontStylesheet}
-            ${ComforterBrushFontStylesheet}
-            ${BadScriptFontStylesheet}
-            ${YesevaOneFontStylesheet}
-          `,
+          ${MarckScriptFontStylesheet}
+          ${NeuchaFontStylesheet}
+          ${CaveatFontStylesheet}
+          ${PacificoFontStylesheet}
+          ${AmaticSCFontStylesheet}
+          ${UbuntuFontStylesheet}
+          ${RobotoFontStylesheet}
+          ${OpenSansFontStylesheet}
+          ${PTMonoFontStylesheet}
+          ${ComforterBrushFontStylesheet}
+          ${BadScriptFontStylesheet}
+          ${YesevaOneFontStylesheet}
+        `,
       }}
     />
   );

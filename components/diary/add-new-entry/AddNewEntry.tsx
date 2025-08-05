@@ -46,7 +46,7 @@ const AddNewEntry = forwardRef<
   {
     isOpen: boolean;
     handleBack: (back: boolean) => void;
-    onClose: () => void;
+    onClose?: () => void;
     tabBarHeight: number;
     onPlanExpiredErrorOccurred: () => void;
   }
@@ -80,6 +80,7 @@ const AddNewEntry = forwardRef<
   const [titleReachEditorKey, setTitleReachEditorKey] = useState(0);
   const [isFocusTextRichEditor, setIsFocusTextRichEditor] = useState(false);
   const font = useSelector((state: RootState) => state.font.font);
+  const [contentLoading, setContentLoading] = useState(false);
 
   const [entry, setEntry] = useState<Entry>({
     id: 0,
@@ -248,6 +249,9 @@ const AddNewEntry = forwardRef<
     setIsFocusTextRichEditor(false);
     setTextReachEditorKey((k) => k + 1);
     setTitleReachEditorKey((k) => k + 1);
+    setContentLoading(true);
+
+    console.log("Saving entry:", entry);
 
     try {
       const res = await apiRequest({
@@ -282,6 +286,8 @@ const AddNewEntry = forwardRef<
 
       // if (props.onSuccess && entry) props.onSuccess(entry);
 
+      setContentLoading(false);
+
       await generateAiContent(
         Number(newEntry!.id),
         newEntry!.content,
@@ -292,6 +298,7 @@ const AddNewEntry = forwardRef<
     } catch (err) {
       console.log("Error saving entry.ts:", err);
       setLoading(false);
+      setContentLoading(false);
     }
   };
 
@@ -493,18 +500,15 @@ const AddNewEntry = forwardRef<
                     backgroundColor: colors.primary,
                   }}
                   onPress={handleSave}
+                  disabled={loading}
                 >
-                  {loading ? (
-                    <ActivityIndicator color={colors.textInPrimary} />
-                  ) : (
-                    <ThemedText
-                      style={{
-                        color: colors.textInPrimary,
-                      }}
-                    >
-                      {t("diary.addEntryButton")}
-                    </ThemedText>
-                  )}
+                  <ThemedText
+                    style={{
+                      color: colors.textInPrimary,
+                    }}
+                  >
+                    {t("diary.addEntryButton")}
+                  </ThemedText>
                 </TouchableOpacity>
               )}
             </View>
@@ -528,7 +532,17 @@ const AddNewEntry = forwardRef<
               titleEmoji={titleEmoji}
             />
 
-            {entry && entry.content && isEntrySaved ? (
+            {contentLoading ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color={colors.primary} />
+              </View>
+            ) : entry && entry.content && isEntrySaved && !contentLoading ? (
               <ContentEntry
                 entry={entry}
                 aiLoading={aiLoading}

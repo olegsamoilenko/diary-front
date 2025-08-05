@@ -29,6 +29,8 @@ const Base = {
     tabIconSelected: "#",
     // input
     inputBackground: "#",
+    // Icon
+    icon: "#",
     // diary
     card: "#",
     diaryNotesBackground: "#",
@@ -77,6 +79,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#604d3f",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#604d3f",
     // diary
     card: "#b5aea8",
     diaryNotesBackground: "#EFE7DA",
@@ -123,6 +127,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#14E6ED",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#14E6ED",
     // diary
     card: "#dcfbfb",
     diaryNotesBackground: "#EFE7DA",
@@ -169,6 +175,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#839179",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#839179",
     // diary
     card: "#e7f8db",
     diaryNotesBackground: "#EFE7DA",
@@ -215,6 +223,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#DD0103",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#DD0103",
     // diary
     card: "#ecb8b8",
     diaryNotesBackground: "#EFE7DA",
@@ -261,6 +271,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#344360",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#344360",
     // diary
     card: "#c3d0dc",
     diaryNotesBackground: "#EFE7DA",
@@ -305,6 +317,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#5BA9A6",
     // input
     inputBackground: "#F0F2F6",
+    // Icon
+    icon: "#5BA9A6",
     // diary
     card: "#BED0DA",
     diaryNotesBackground: "#FFFBEA",
@@ -349,6 +363,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#FF8200",
     // input
     inputBackground: "#FFF4E3",
+    // Icon
+    icon: "#FF8200",
     // diary
     card: "#FFF1DB",
     diaryNotesBackground: "#FFE9D1",
@@ -395,6 +411,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#604d3f",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#604d3f",
     // diary
     card: "#b5aea8",
     diaryNotesBackground: "#EFE7DA",
@@ -440,6 +458,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#a59f37",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#a59f37",
     // diary
     card: "#494545",
     diaryNotesBackground: "#EFE7DA",
@@ -485,6 +505,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#121212",
     // input
     inputBackground: "#ffffff",
+    // Icon
+    icon: "#202020",
     // diary
     card: "#494545",
     diaryNotesBackground: "#EFE7DA",
@@ -529,6 +551,8 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#344360",
     // input
     inputBackground: "#000000",
+    // Icon
+    icon: "#344360",
     // diary
     card: "#151718",
     diaryNotesBackground: "#4b5255",

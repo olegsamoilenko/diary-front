@@ -4,7 +4,7 @@ import { ThemedText } from "@/components/ThemedText";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import AddButton from "@/components/ui/AddButton";
 import { SideSheetRef } from "@/components/SideSheet";
 import AddNewEntry from "@/components/diary/add-new-entry/AddNewEntry";
@@ -46,13 +46,11 @@ export default function Diary() {
   const scrollRef = useRef<Animated.ScrollView>(null);
   const [loading, setLoading] = useState(true);
   const [isAddNewEntryOpen, setIsAddNewEntryOpen] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(false);
   const [planExpiredError, setPlanExpiredError] = useState<boolean>(false);
 
   const handleNewEntryOpen = useCallback(() => {
     setIsAddNewEntryOpen(true);
     addNewEntryRef.current?.open();
-    setForceUpdate(false);
   }, []);
 
   const onPlanExpiredErrorOccurred = useCallback(() => {
@@ -68,13 +66,12 @@ export default function Diary() {
   }, []);
 
   const fetchDiaryEntries = async (back = false) => {
-    const user = await SecureStore.getItemAsync("user");
-
-    if (!user) return;
-
-    // if (!back) {
-    //   setLoading(true);
-    // }
+    setDiaryEntries({});
+    // const user = await SecureStore.getItemAsync("user");
+    //
+    // if (!user) return;
+    setLoading(true);
+    console.log("Fetching diary entries for date:", selectedDay);
 
     try {
       const response = await apiRequest({
@@ -91,6 +88,8 @@ export default function Diary() {
         [selectedDay?.toString() || "unknown"]: response.data,
       }));
 
+      console.log("Diary entries fetched:", response.data);
+
       setWeekAnchorDay(selectedDay as string);
       setShowWeek(true);
     } catch (error) {
@@ -102,27 +101,31 @@ export default function Diary() {
 
   const handleBack = useCallback(
     async (back: boolean) => {
-      setForceUpdate(new Date().toISOString().split("T")[0] === selectedDay);
+      const today = new Date().toISOString().split("T")[0];
       if (back) {
-        setSelectedDay(new Date().toISOString().split("T")[0]);
-        await fetchMoodsByDate();
+        if (today === selectedDay) {
+          fetchDiaryEntries();
+        } else {
+          setSelectedDay(new Date().toISOString().split("T")[0]);
+        }
 
-        setTimeout(() => {
-          scrollRef.current?.scrollToEnd({ animated: true });
-        }, 0);
+        await fetchMoodsByDate();
+        if (!loading) {
+          setTimeout(() => {
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }, 1000);
+        }
       }
     },
     [selectedDay],
   );
 
   useEffect(() => {
-    if (selectedDay && timeZone && forceUpdate) {
-      fetchDiaryEntries(true);
-    }
-    if (selectedDay && timeZone && !forceUpdate) {
+    if (selectedDay && timeZone) {
+      console.log("Selected day changed:", selectedDay);
       fetchDiaryEntries();
     }
-  }, [selectedDay, timeZone, forceUpdate]);
+  }, [selectedDay, timeZone]);
 
   const fetchMoodsByDate = async () => {
     const user = await SecureStore.getItemAsync("user");
@@ -182,42 +185,53 @@ export default function Diary() {
 
   return (
     <Background background={colors.backgroundImage} paddingTop={40}>
-      {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      ) : (
-        <>
-          {!showWeek ? (
-            <MonthView
-              selectedDay={selectedDay}
-              onDayPress={(dayStr: string) => {
-                setSelectedDay(dayStr);
-                setWeekAnchorDay(dayStr);
-                setShowWeek(true);
-              }}
-              moodsByDate={moodsByDate}
-              setMonth={setMonth}
-              setYear={setYear}
-              setShowWeek={setShowWeek}
-            />
-          ) : (
-            <WeekView
-              weekAnchorDay={weekAnchorDay}
-              setWeekAnchorDay={setWeekAnchorDay}
-              selectedDay={selectedDay}
-              setSelectedDay={setSelectedDay}
-              moodsByDate={moodsByDate}
-              setMonth={setMonth}
-              setYear={setYear}
-              onBackToMonth={() => setShowWeek(false)}
-            />
-          )}
-          <ParallaxScrollView scrollRef={scrollRef}>
-            <View style={{ flex: 1 }}>
-              {(diaryEntries[selectedDay as string] &&
+      {/*{loading ? (*/}
+      {/*  <View*/}
+      {/*    style={{ flex: 1, justifyContent: "center", alignItems: "center" }}*/}
+      {/*  >*/}
+      {/*    <ActivityIndicator size="large" color={colors.primary} />*/}
+      {/*  </View>*/}
+      {/*) : (*/}
+      <>
+        {!showWeek ? (
+          <MonthView
+            selectedDay={selectedDay}
+            onDayPress={(dayStr: string) => {
+              setSelectedDay(dayStr);
+              setWeekAnchorDay(dayStr);
+              setShowWeek(true);
+            }}
+            moodsByDate={moodsByDate}
+            setMonth={setMonth}
+            setYear={setYear}
+            setShowWeek={setShowWeek}
+          />
+        ) : (
+          <WeekView
+            weekAnchorDay={weekAnchorDay}
+            setWeekAnchorDay={setWeekAnchorDay}
+            selectedDay={selectedDay}
+            setSelectedDay={setSelectedDay}
+            moodsByDate={moodsByDate}
+            setMonth={setMonth}
+            setYear={setYear}
+            onBackToMonth={() => setShowWeek(false)}
+          />
+        )}
+        <ParallaxScrollView scrollRef={scrollRef}>
+          <View style={{ flex: 1 }}>
+            {loading ? (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="large" color={colors.primary} />
+              </View>
+            ) : (
+              (diaryEntries[selectedDay as string] &&
                 diaryEntries[selectedDay as string].length > 0 &&
                 diaryEntries[selectedDay as string].map((entry: Entry) => (
                   <EntryCard
@@ -225,28 +239,29 @@ export default function Diary() {
                     key={entry.id}
                     deleteEntry={deleteEntry}
                   />
-                ))) || <ThemedText>{t("diary.noRecords")}</ThemedText>}
-            </View>
-          </ParallaxScrollView>
-          <AddButton onPress={handleNewEntryOpen} />
-          <Portal>
-            <AddNewEntry
-              ref={addNewEntryRef}
-              isOpen={isAddNewEntryOpen}
-              handleBack={(back) => handleBack(back)}
-              tabBarHeight={tabBarHeight}
-              onPlanExpiredErrorOccurred={onPlanExpiredErrorOccurred}
-            />
-          </Portal>
-          <Portal>
-            <SubscriptionErrors
-              onSuccessRenewPlan={onSuccessRenewPlan}
-              ref={subscriptionErrorsRef}
-              isOpen={planExpiredError}
-            />
-          </Portal>
-        </>
-      )}
+                ))) || <ThemedText>{t("diary.noRecords")}</ThemedText>
+            )}
+          </View>
+        </ParallaxScrollView>
+        <AddButton onPress={handleNewEntryOpen} />
+        <Portal>
+          <AddNewEntry
+            ref={addNewEntryRef}
+            isOpen={isAddNewEntryOpen}
+            handleBack={(back) => handleBack(back)}
+            tabBarHeight={tabBarHeight}
+            onPlanExpiredErrorOccurred={onPlanExpiredErrorOccurred}
+          />
+        </Portal>
+        <Portal>
+          <SubscriptionErrors
+            onSuccessRenewPlan={onSuccessRenewPlan}
+            ref={subscriptionErrorsRef}
+            isOpen={planExpiredError}
+          />
+        </Portal>
+      </>
+      {/*)}*/}
     </Background>
   );
 }

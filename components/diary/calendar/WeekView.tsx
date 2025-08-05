@@ -97,6 +97,12 @@ export default function WeekView({
     setYear(year);
   };
 
+  const handleDayPress = (item: string) => {
+    console.log("handleDayPress 111", item);
+    setSelectedDay(item);
+    console.log("handleDayPress 222", item);
+  };
+
   return (
     <View style={{ paddingHorizontal: 12, marginTop: 9 }}>
       <View
@@ -195,7 +201,7 @@ export default function WeekView({
           return (
             <Pressable
               key={item}
-              onPress={() => setSelectedDay(item)}
+              onPress={() => handleDayPress(item)}
               style={{
                 alignItems: "center",
                 justifyContent: "center",

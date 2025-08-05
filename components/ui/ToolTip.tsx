@@ -70,8 +70,8 @@ const getStyles = (
   StyleSheet.create({
     overlay: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0,0,0,0.27)",
-      zIndex: 98,
+      // backgroundColor: "rgba(0,0,0,0.27)",
+      // zIndex: 98,
     },
     tip: {
       position: "absolute",

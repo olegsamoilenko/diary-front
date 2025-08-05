@@ -25,6 +25,8 @@ export type ColorTheme = {
   tabIconSelected: string;
   // input
   inputBackground: string;
+  // Icon
+  icon: string;
   // diary
   card: string;
   diaryNotesBackground: string;

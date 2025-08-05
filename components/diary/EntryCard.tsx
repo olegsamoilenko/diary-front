@@ -1,10 +1,4 @@
-import {
-  Animated,
-  Pressable,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import { getEmojiByMood } from "@/constants/Mood";
 import { ThemedText } from "@/components/ThemedText";
 import type { Entry } from "@/types";
@@ -21,6 +15,9 @@ import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 import ModalPortal from "@/components/ui/Modal";
 import { useTranslation } from "react-i18next";
 import { ExpandableSection } from "@/components/ExpandableSection";
+import HtmlViewer from "@/components/ui/HtmlViewer";
+import { apiRequest } from "@/utils";
+import RotatingIcon from "@/components/ui/RotatingIcon";
 
 type EntryCardProps = { entry: Entry; deleteEntry: (id: number) => void };
 export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
@@ -31,13 +28,50 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
   const [key, setKey] = useState<number>(0);
   const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
   const { t } = useTranslation();
+  const [loadedEntry, setLoadedEntry] = useState<Entry>(entry);
 
-  const toggleExpand = (id: number) => {
-    setExpanded((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+  const toggleExpand = async (id: number) => {
+    const isNowExpanded = expanded[id];
+    if (!isNowExpanded) {
+      await loadEntryById(id).then(() => {
+        setExpanded((prev) => ({
+          ...prev,
+          [id]: !prev[id],
+        }));
+      });
+    } else {
+      setExpanded((prev) => ({
+        ...prev,
+        [id]: !prev[id],
+      }));
+      setLoadedEntry(entry);
+      console.log("закрито");
+    }
+
     setKey((prevKey) => prevKey + 1);
+  };
+
+  const loadEntryById = async (id: number) => {
+    try {
+      const response = await apiRequest({
+        url: `/diary-entries/get-by-id/${id}`,
+        method: "GET",
+      });
+
+      console.log("Loaded entry:", response.data);
+      setLoadedEntry((prev) => {
+        return {
+          ...prev,
+          content: response.data.content,
+          aiComment: response.data.aiComment,
+          dialogs: response.data.dialogs,
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching diary entries:", error);
+    } finally {
+      // setLoading(false);
+    }
   };
 
   const handleDeleteEntry = async (id: number) => {
@@ -51,14 +85,19 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
     if (height > 0) setContentHeight(height);
   };
 
+  console.log("EntryCard rendered for loadedEntry:", loadedEntry);
+
   return (
     <EntryCardBackground
       background={
-        entry.settings?.background ?? { type: "color", value: colors.card }
+        loadedEntry.settings?.background ?? {
+          type: "color",
+          value: colors.card,
+        }
       }
     >
       <View
-        key={entry.id}
+        key={loadedEntry.id}
         style={{
           backgroundColor: "transparent",
           borderRadius: 8,
@@ -93,7 +132,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                 paddingBottom: 5,
               }}
             >
-              {getEmojiByMood(entry.mood)}
+              {getEmojiByMood(loadedEntry.mood)}
             </ThemedText>
           </View>
           <View
@@ -102,7 +141,8 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               marginBottom: 8,
             }}
           >
-            <ViewReachEditor content={entry.title} />
+            <HtmlViewer htmlContent={loadedEntry.title} />
+            {/*<ViewReachEditor content={loadedEntry.title} />*/}
           </View>
           <View
             style={{
@@ -120,7 +160,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                 color: colors.textAdditional,
               }}
             >
-              {new Date(entry.createdAt)
+              {new Date(loadedEntry.createdAt)
                 .toLocaleTimeString(i18n.language!, {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -206,7 +246,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
         </View>
 
         <ExpandableSection
-          expanded={expanded[Number(entry.id)]}
+          expanded={expanded[Number(loadedEntry.id)]}
           collapsedHeight={115}
           expandedHeight={180}
           style={{
@@ -216,22 +256,49 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
           }}
         >
           <Pressable
-            key={entry.id}
-            onPress={() => toggleExpand(Number(entry.id))}
+            key={loadedEntry.id}
+            onPress={() => toggleExpand(Number(loadedEntry.id))}
+            style={{
+              marginBottom: 20,
+              position: "relative",
+              zIndex: 10,
+            }}
           >
             <View onLayout={onLayout}>
-              <ViewReachEditor
-                key={key}
-                content={
-                  expanded[Number(entry.id)]
-                    ? entry.content
-                    : entry.previewContent
+              <HtmlViewer
+                htmlContent={
+                  expanded[Number(loadedEntry.id)]
+                    ? loadedEntry.content
+                    : loadedEntry.previewContent
                 }
+              />
+              {/*<ViewReachEditor*/}
+              {/*  key={key}*/}
+              {/*  content={*/}
+              {/*    expanded[Number(loadedEntry.id)]*/}
+              {/*      ? loadedEntry.content*/}
+              {/*      : loadedEntry.previewContent*/}
+              {/*  }*/}
+              {/*/>*/}
+            </View>
+            <View
+              style={{
+                position: "absolute",
+                zIndex: 0,
+                top: 0,
+                right: 0,
+                marginTop: 10,
+                marginBottom: 10,
+              }}
+            >
+              <RotatingIcon
+                expanded={expanded[Number(loadedEntry.id)]}
+                onPress={() => toggleExpand(Number(loadedEntry.id))}
               />
             </View>
           </Pressable>
 
-          {expanded[Number(entry.id)] && entry.aiComment && (
+          {expanded[Number(loadedEntry.id)] && loadedEntry.aiComment && (
             <View
               style={{
                 backgroundColor: colors.aiCommentBackground,
@@ -269,14 +336,14 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                 {/*>*/}
                 {/*  {"        "}*/}
                 {/*</ThemedText>*/}
-                {entry.aiComment?.content}
+                {loadedEntry.aiComment?.content}
               </ThemedText>
             </View>
           )}
-          {expanded[Number(entry.id)] &&
-            entry.dialogs &&
-            entry.dialogs.length > 0 &&
-            entry.dialogs.map((dialog) => (
+          {expanded[Number(loadedEntry.id)] &&
+            loadedEntry.dialogs &&
+            loadedEntry.dialogs.length > 0 &&
+            loadedEntry.dialogs.map((dialog) => (
               <View
                 key={dialog.id}
                 style={{
@@ -327,7 +394,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
             ))}
         </ExpandableSection>
 
-        {/*<Pressable onPress={() => toggleExpand(Number(entry.id))}>*/}
+        {/*<Pressable onPress={() => toggleExpand(Number(loadedEntry.id))}>*/}
         {/*  <View*/}
         {/*    style={{*/}
         {/*      justifyContent: "center",*/}
@@ -339,7 +406,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
         {/*      name="chevron-down"*/}
         {/*      size={5}*/}
         {/*      style={{*/}
-        {/*        transform: expanded[Number(entry.id)]*/}
+        {/*        transform: expanded[Number(loadedEntry.id)]*/}
         {/*          ? [{ rotate: "180deg" }, { scaleX: 5.6 }, { scaleY: 6.9 }]*/}
         {/*          : [{ scaleX: 5.6 }, { scaleY: 6.9 }],*/}
         {/*        color: colors.tabIcon,*/}

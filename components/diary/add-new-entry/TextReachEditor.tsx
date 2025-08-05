@@ -1,6 +1,6 @@
 import { RichEditor } from "react-native-pell-rich-editor";
-import { ScrollView } from "react-native";
-import React, { useEffect, useRef } from "react";
+import { ActivityIndicator, ScrollView, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import MarckScriptFontStylesheet from "@/assets/fonts/entry/MarckScriptFontStylesheet";
@@ -15,6 +15,7 @@ import PTMonoFontStylesheet from "@/assets/fonts/entry/PTMonoFontStylesheet";
 import ComforterBrushFontStylesheet from "@/assets/fonts/entry/ComforterBrushFontStylesheet";
 import BadScriptFontStylesheet from "@/assets/fonts/entry/BadScriptFontStylesheet";
 import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStylesheet";
+import uuid from "react-native-uuid";
 
 import * as ImagePicker from "expo-image-picker";
 import { uploadImageToServer } from "@/utils";
@@ -80,6 +81,7 @@ export default function TextReachEditor({
   const colors = Colors[colorScheme] ?? Colors.system;
   const richText = useRef(null);
   const scrollRef = useRef(null);
+  const [imageLoading, setImageLoading] = useState(false);
 
   const handleEditorMessage = (event: any) => {
     try {
@@ -328,23 +330,51 @@ export default function TextReachEditor({
     }
   }, [showImageSetting]);
 
+  async function replaceImageSrcById(id: string, newUrl: string) {
+    if (!richText.current) return;
+
+    const currentHtml = await richText.current.getContentHtml();
+
+    const regex = new RegExp(
+      `(<img[^>]*id=["']${id}["'][^>]*src=["'])[^\"]*(["'][^>]*>)`,
+      "g",
+    );
+
+    const newHtml = currentHtml.replace(regex, `$1${newUrl}$2`);
+
+    await richText.current.setContentHTML(newHtml);
+  }
+
   const handleImageAndPhoto = async (result: any) => {
+    setImageLoading(true);
     const picked = result;
     const localUri = picked.uri;
+    const newUuid = uuid.v4();
+    const imageId = `img-${newUuid}`;
     if (picked.base64) {
       // @ts-ignore
       richText.current?.insertHTML(
-        `<img src="data:image/jpeg;base64,${picked.base64}" style="max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;" />`,
+        `<img id="${imageId}" src="data:image/jpeg;base64,${picked.base64}" style="visibility:hidden;max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;" />`,
       );
     }
 
     const uploaded = await uploadImageToServer(localUri);
 
+    console.log("Uploaded image:", uploaded);
+
     if (uploaded && uploaded.url) {
       // @ts-ignore
-      richText.current?.insertHTML(
-        `<img src="${uploaded.url}" style="max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;" />`,
-      );
+      await replaceImageSrcById(imageId, uploaded.url);
+      richText.current?.commandDOM(`
+        (function() {
+          var img = document.getElementById("${imageId}");
+          if(img) img.style.visibility = "visible";
+        })()
+      `);
+      setImageLoading(false);
+      // richText.current?.insertHTML(
+      //   `<img src="${uploaded.url}" style="max-width:70%;height: auto;object-fit:contain;border-radius:12px;margin:10px auto;display:block;" />`,
+      // );
       setTimeout(() => {
         // @ts-ignore
         richText.current?.commandDOM(`
@@ -396,20 +426,26 @@ export default function TextReachEditor({
   }, [isKeyboardOpen]);
 
   return (
-    <ScrollView ref={scrollRef} style={{ flex: 1 }}>
-      <RichEditor
-        key={textReachEditorKey}
-        ref={richText}
-        initialContentHTML={content}
-        onChange={setContent}
-        style={{ flex: 1, height: 300 }}
-        onFocus={onFocus}
-        onBlur={handleBlur}
-        editorInitializedCallback={() => {}}
-        editorStyle={{
-          backgroundColor: "transparent",
-          color: "#6c6b6b",
-          initialCSSText: `
+    <View
+      style={{
+        flex: 1,
+        position: "relative",
+      }}
+    >
+      <ScrollView ref={scrollRef} style={{ flex: 1 }}>
+        <RichEditor
+          key={textReachEditorKey}
+          ref={richText}
+          initialContentHTML={content}
+          onChange={setContent}
+          style={{ flex: 1, minHeight: 300 }}
+          onFocus={onFocus}
+          onBlur={handleBlur}
+          editorInitializedCallback={() => {}}
+          editorStyle={{
+            backgroundColor: "transparent",
+            color: "#6c6b6b",
+            initialCSSText: `
             ${MarckScriptFontStylesheet}
             ${NeuchaFontStylesheet}
             ${CaveatFontStylesheet}
@@ -423,17 +459,33 @@ export default function TextReachEditor({
             ${BadScriptFontStylesheet}
             ${YesevaOneFontStylesheet}
           `,
-          contentCSSText: `font-family: '${selectedFont.name}', sans-serif; position: absolute; display: flex; 
+            contentCSSText: `font-family: '${selectedFont.name}', sans-serif; position: absolute; display: flex; 
             flex-direction: column; 
             min-height: 200px; top: 0; right: 0; bottom: 0; left: 0;`,
-        }}
-        // useContainer={true}
-        onCursorPosition={(scrollY) => {
-          // @ts-ignore
-          scrollRef.current?.scrollTo({ y: scrollY - 30, animated: true });
-        }}
-        onMessage={handleEditorMessage}
-      />
-    </ScrollView>
+          }}
+          // useContainer={true}
+          onCursorPosition={(scrollY) => {
+            // @ts-ignore
+            scrollRef.current?.scrollTo({ y: scrollY - 30, animated: true });
+          }}
+          onMessage={handleEditorMessage}
+        />
+      </ScrollView>
+      {imageLoading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      )}
+    </View>
   );
 }
