@@ -251,8 +251,6 @@ const AddNewEntry = forwardRef<
     setTitleReachEditorKey((k) => k + 1);
     setContentLoading(true);
 
-    console.log("Saving entry:", entry);
-
     try {
       const res = await apiRequest({
         url: `/diary-entries/create`,
@@ -497,7 +495,9 @@ const AddNewEntry = forwardRef<
                     paddingVertical: 5,
                     paddingHorizontal: 10,
                     borderRadius: 50,
-                    backgroundColor: colors.primary,
+                    backgroundColor: loading
+                      ? colors.disabledPrimary
+                      : colors.primary,
                   }}
                   onPress={handleSave}
                   disabled={loading}

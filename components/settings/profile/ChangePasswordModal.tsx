@@ -1,56 +1,57 @@
+import Emoji from "@/components/diary/Emoji";
+import ModalPortal from "@/components/ui/Modal";
 import React, { useState } from "react";
+import { ThemedText } from "@/components/ThemedText";
 import {
-  View,
+  ActivityIndicator,
+  StyleSheet,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import axios from "axios";
-import * as SecureStore from "expo-secure-store";
-import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
-import { ThemedText } from "@/components/ThemedText";
-import type { ColorTheme } from "@/types";
-import { ErrorMessages } from "@/types";
+import { Formik } from "formik";
+import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { useTranslation } from "react-i18next";
-import { Formik } from "formik";
+import { ColorTheme, ErrorMessages } from "@/types";
 import * as Yup from "yup";
-import { passwordRules } from "@/utils/";
-import Toast from "react-native-toast-message";
+import { passwordRules, UserEvents } from "@/utils";
+import axios from "axios";
 import { apiUrl } from "@/constants/env";
+import * as SecureStore from "expo-secure-store";
 
-type LoginFormProps = {
-  forPlanSelect?: boolean;
-  onSuccessSignWithGoogle: () => void;
-  onSuccessSignIn: () => void;
-  setShowForgotPasswordForm: (show: boolean) => void;
+type ChangePasswordModalProps = {
+  showChangePasswordModal: boolean;
+  setShowChangePasswordModal: (show: boolean) => void;
+  onSuccessChangePassword: () => void;
 };
-export default function LoginForm({
-  forPlanSelect,
-  onSuccessSignWithGoogle,
-  onSuccessSignIn,
-  setShowForgotPasswordForm,
-}: LoginFormProps) {
+export default function ChangePasswordModal({
+  showChangePasswordModal,
+  setShowChangePasswordModal,
+  onSuccessChangePassword,
+}: ChangePasswordModalProps) {
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
+
   const [error, setError] = useState<string | null>(null);
 
-  const loginSchema = Yup.object().shape({
+  const changePasswordSchema = Yup.object().shape({
     email: Yup.string()
       .email(t("auth.enterValidEmailAddress"))
       .required(t("auth.emailIsRequired")),
     password: Yup.string()
       .matches(passwordRules, t("auth.thePasswordMustContain"))
       .required(t("auth.passwordRequired")),
+    newPassword: Yup.string()
+      .matches(passwordRules, t("auth.thePasswordMustContain"))
+      .required(t("auth.passwordRequired")),
   });
 
-  const handleLogin = async (
-    values: { email: string; password: string },
+  const handleChangePassword = async (
+    values: { email: string; password: string; newPassword: string },
     {
       setSubmitting,
       resetForm,
@@ -58,92 +59,48 @@ export default function LoginForm({
   ) => {
     setLoading(true);
     setError(null);
+    console.log("handleChangeName called with values:", values);
     try {
-      const res = await axios.post(`${apiUrl}/auth/login`, {
+      const res = await axios.post(`${apiUrl}/users/change`, {
         email: values.email,
         password: values.password,
+        newPassword: values.newPassword,
       });
-      const { accessToken, user } = res.data;
 
-      await SecureStore.setItemAsync("token", accessToken);
-      await SecureStore.setItemAsync("user", JSON.stringify(user));
+      await SecureStore.setItemAsync("user", JSON.stringify(res.data));
 
-      setLoading(false);
-      resetForm();
-      setSubmitting(false);
-      Toast.show({
-        type: "success",
-        text1: t("toast.successfullyLogged"),
-        text2: t("toast.youHaveSuccessfullyLoggedIn"),
-      });
-      onSuccessSignIn();
+      UserEvents.emit("userChanged");
+
+      onSuccessChangePassword();
     } catch (err: any) {
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(t(`errors.${errorKey}`));
       setLoading(false);
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <View>
-      <GoogleSignInButton
-        onSuccessSignWithGoogle={onSuccessSignWithGoogle}
-        forPlanSelect={forPlanSelect}
-      />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            height: 1,
-            backgroundColor: colors.border,
-            marginRight: 8,
-          }}
-        ></View>
-        <ThemedText
-          style={{
-            textAlign: "center",
-            marginVertical: 16,
-            color: colors.text,
-          }}
-        >
-          {t("common.or")}
-        </ThemedText>
-        <View
-          style={{
-            flex: 1,
-            height: 1,
-            backgroundColor: colors.border,
-            marginLeft: 8,
-          }}
-        ></View>
-      </View>
-      <View
+    <ModalPortal
+      visible={showChangePasswordModal}
+      onClose={() => setShowChangePasswordModal(false)}
+    >
+      <ThemedText
+        type="subtitleXL"
         style={{
           marginBottom: 20,
         }}
       >
-        <ThemedText
-          type="subtitleXL"
-          style={{
-            textAlign: "center",
-          }}
-        >
-          {t("auth.signInWithEmail")}
-        </ThemedText>
-      </View>
-
+        {t("settings.profile.changePassword")}
+      </ThemedText>
       <Formik
-        initialValues={{ email: "", password: "" }}
-        validationSchema={loginSchema}
-        onSubmit={handleLogin}
+        initialValues={{ email: "", password: "", newPassword: "" }}
+        validationSchema={changePasswordSchema}
+        onSubmit={handleChangePassword}
       >
         {({
           handleChange,
@@ -204,6 +161,30 @@ export default function LoginForm({
                   {errors.password}
                 </ThemedText>
               )}
+              <ThemedText style={styles.label}>
+                {t("settings.profile.newPassword")}
+              </ThemedText>
+              <TextInput
+                placeholder={t("settings.profile.newPassword")}
+                style={styles.input}
+                value={values.newPassword}
+                onChangeText={handleChange("newPassword")}
+                onBlur={handleBlur("newPassword")}
+                secureTextEntry
+                autoCapitalize="none"
+              />
+              {touched.newPassword && errors.newPassword && (
+                <ThemedText
+                  type={"small"}
+                  style={{
+                    color: colors.error,
+                    marginTop: -10,
+                    marginBottom: 20,
+                  }}
+                >
+                  {errors.newPassword}
+                </ThemedText>
+              )}
             </View>
             {error && (
               <ThemedText
@@ -218,27 +199,6 @@ export default function LoginForm({
               </ThemedText>
             )}
             <TouchableOpacity
-              style={{
-                paddingHorizontal: 18,
-                paddingVertical: 10,
-                borderRadius: 12,
-                marginBottom: 16,
-              }}
-              onPress={() => {
-                setShowForgotPasswordForm(true);
-              }}
-            >
-              <ThemedText
-                type="subtitleLG"
-                style={{
-                  color: colors.text,
-                  textAlign: "center",
-                }}
-              >
-                {t("auth.forgotYourPassword")}
-              </ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity
               style={styles.btn}
               onPress={() => handleSubmit()}
               disabled={isSubmitting}
@@ -252,14 +212,14 @@ export default function LoginForm({
                     textAlign: "center",
                   }}
                 >
-                  {t("auth.login")}
+                  {t("common.save")}
                 </ThemedText>
               )}
             </TouchableOpacity>
           </>
         )}
       </Formik>
-    </View>
+    </ModalPortal>
   );
 }
 
@@ -267,6 +227,8 @@ const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
     input: {
       backgroundColor: colors.inputBackground,
+      borderWidth: 1,
+      borderColor: colors.inputBorder,
       padding: 14,
       borderRadius: 8,
       marginBottom: 12,

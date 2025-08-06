@@ -111,7 +111,6 @@ export default function RootLayout() {
     const initUser = async () => {
       let storedUser = await SecureStore.getItemAsync("user");
       let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;
-      console.log("Stored user:", userObj);
       if (!userObj) {
         const newUuid = uuid.v4();
 
@@ -151,8 +150,6 @@ export default function RootLayout() {
   }, []);
 
   const onSuccessHandleSubscription = async () => {
-    console.log(444);
-
     const storedUser = await SecureStore.getItemAsync("user");
     const userObj = JSON.parse(storedUser!);
 
@@ -188,6 +185,7 @@ export default function RootLayout() {
                   onSuccessSignWithGoogle={() => setShowAuthForm(false)}
                   onSuccessEmailCode={() => setShowAuthForm(false)}
                   // onSuccessPhoneCode={() => setShowAuthForm(false)}
+                  onSuccessSignIn={() => setShowAuthForm(false)}
                 />
               ) : !user?.plan ? (
                 <HandleSubscription

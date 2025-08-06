@@ -10,6 +10,7 @@ const Base = {
     },
     backgroundAdditional: "#",
     primary: "#",
+    disabledPrimary: "#",
     secondary: "#",
     text: "#",
     textAdditional: "#",
@@ -23,12 +24,14 @@ const Base = {
     calendarEnableDayBorder: "#",
     calendarDisableDayBorder: "#",
     calendarDayLabels: "#",
+    calendarDayDisabled: "#",
     // tabs
     tabBackground: "#",
     tabIcon: "#",
     tabIconSelected: "#",
     // input
     inputBackground: "#",
+    inputBorder: "#",
     // Icon
     icon: "#",
     // diary
@@ -59,6 +62,7 @@ export const Colors: Record<string, ColorTheme> = {
     },
     backgroundAdditional: "#bab0a9",
     primary: "#604d3f",
+    disabledPrimary: "#a1958c",
     secondary: "#4a5365",
     text: "#1e140c",
     textAdditional: "#8e7868",
@@ -72,6 +76,7 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#1e140c",
     calendarDisableDayBorder: "#c1aea0",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#bfbfbf",
 
     // tabs
     tabBackground: "#FFFFFF",
@@ -79,6 +84,7 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#604d3f",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#a59285",
     // Icon
     icon: "#604d3f",
     // diary
@@ -107,6 +113,7 @@ export const Colors: Record<string, ColorTheme> = {
     backgroundAdditional: "#6ebbbd",
 
     primary: "#14E6ED",
+    disabledPrimary: "#0c7578",
     secondary: "#0d888c",
     text: "#063739",
     textAdditional: "#687076",
@@ -120,6 +127,7 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#5a5a5a",
     calendarDisableDayBorder: "#a6a6a6",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
 
     // tabs
     tabBackground: "#FFFFFF",
@@ -127,6 +135,7 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#14E6ED",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#95d4d6",
     // Icon
     icon: "#14E6ED",
     // diary
@@ -155,6 +164,7 @@ export const Colors: Record<string, ColorTheme> = {
     backgroundAdditional: "#badd9f",
 
     primary: "#839179",
+    disabledPrimary: "#51594c",
     secondary: "#586151",
     text: "#30352c",
     textAdditional: "#6f7768",
@@ -168,6 +178,7 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#5a5a5a",
     calendarDisableDayBorder: "#a6a6a6",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
 
     // tabs
     tabBackground: "#FFFFFF",
@@ -175,6 +186,7 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#839179",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#7e837a",
     // Icon
     icon: "#839179",
     // diary
@@ -203,6 +215,7 @@ export const Colors: Record<string, ColorTheme> = {
     backgroundAdditional: "#d86668",
 
     primary: "#DD0103",
+    disabledPrimary: "#7e0405",
     secondary: "#0d888c",
     text: "#220101",
     textAdditional: "#687076",
@@ -216,6 +229,7 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#5a5a5a",
     calendarDisableDayBorder: "#a6a6a6",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
 
     // tabs
     tabBackground: "#FFFFFF",
@@ -223,6 +237,7 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#DD0103",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#a64647",
     // Icon
     icon: "#DD0103",
     // diary
@@ -251,6 +266,7 @@ export const Colors: Record<string, ColorTheme> = {
     backgroundAdditional: "#babfc8",
 
     primary: "#344360",
+    disabledPrimary: "#272f3e",
     secondary: "#4a5365",
     text: "#2E3A59",
     textAdditional: "#687076",
@@ -264,6 +280,7 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#f4f4f4",
     calendarDisableDayBorder: "#bfbdbd",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
 
     // tabs
     tabBackground: "#FFFFFF",
@@ -271,6 +288,7 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#344360",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#6d788e",
     // Icon
     icon: "#344360",
     // diary
@@ -298,6 +316,7 @@ export const Colors: Record<string, ColorTheme> = {
     },
     backgroundAdditional: "#cdd3df",
     primary: "#5BA9A6",
+    disabledPrimary: "#4a7170",
     secondary: "#FFC97A",
     text: "#23272F",
     textAdditional: "#8899AA",
@@ -311,12 +330,14 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#5BA9A6",
     calendarDisableDayBorder: "#E5E7EB",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
     // tabs
     tabBackground: "#F6F7F9",
     tabIcon: "#85a6a5",
     tabIconSelected: "#5BA9A6",
     // input
     inputBackground: "#F0F2F6",
+    inputBorder: "#94bdbb",
     // Icon
     icon: "#5BA9A6",
     // diary
@@ -344,6 +365,7 @@ export const Colors: Record<string, ColorTheme> = {
     },
     backgroundAdditional: "#dcd0c5",
     primary: "#FF8200",
+    disabledPrimary: "#984f02",
     secondary: "#FFB354",
     text: "#2E2E2E",
     textAdditional: "#A86800",
@@ -357,12 +379,14 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#FF8200",
     calendarDisableDayBorder: "#FFD09A",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
     // tabs
     tabBackground: "#FFF9F4",
     tabIcon: "#FFB354",
     tabIconSelected: "#FF8200",
     // input
     inputBackground: "#FFF4E3",
+    inputBorder: "#a5805a",
     // Icon
     icon: "#FF8200",
     // diary
@@ -391,6 +415,7 @@ export const Colors: Record<string, ColorTheme> = {
     },
     backgroundAdditional: "#bab0a9",
     primary: "#604d3f",
+    disabledPrimary: "#453b34",
     secondary: "#4a5365",
     text: "#344360",
     textAdditional: "#687076",
@@ -404,6 +429,7 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#f4f4f4",
     calendarDisableDayBorder: "#bfbdbd",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
 
     // tabs
     tabBackground: "#FFFFFF",
@@ -411,6 +437,7 @@ export const Colors: Record<string, ColorTheme> = {
     tabIconSelected: "#604d3f",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#a59589",
     // Icon
     icon: "#604d3f",
     // diary
@@ -439,6 +466,7 @@ export const Colors: Record<string, ColorTheme> = {
     },
     backgroundAdditional: "#534f4f",
     primary: "#a59f37",
+    disabledPrimary: "#6a6732",
     secondary: "#4a5365",
     text: "#b6bcca",
     textAdditional: "#687076",
@@ -452,12 +480,14 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#f4f4f4",
     calendarDisableDayBorder: "#989696",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
     // tabs
     tabBackground: "#222020",
     tabIcon: "#687076",
     tabIconSelected: "#a59f37",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#716f4a",
     // Icon
     icon: "#a59f37",
     // diary
@@ -486,6 +516,7 @@ export const Colors: Record<string, ColorTheme> = {
     },
     backgroundAdditional: "#534f4f",
     primary: "#202020",
+    disabledPrimary: "#3e3e3e",
     secondary: "#4a5365",
     text: "#b6bcca",
     textAdditional: "#687076",
@@ -499,12 +530,14 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#f4f4f4",
     calendarDisableDayBorder: "#989696",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
     // tabs
     tabBackground: "#222020",
     tabIcon: "#687076",
     tabIconSelected: "#121212",
     // input
     inputBackground: "#ffffff",
+    inputBorder: "#615858",
     // Icon
     icon: "#202020",
     // diary
@@ -532,6 +565,7 @@ export const Colors: Record<string, ColorTheme> = {
     },
     backgroundAdditional: "#282c2e",
     primary: "#344360",
+    disabledPrimary: "#2d3340",
     secondary: "",
     text: "#ECEDEE",
     textAdditional: "#a5a5a6",
@@ -545,12 +579,14 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#5b6165",
     calendarDisableDayBorder: "#1e2022",
     calendarDayLabels: "#888",
+    calendarDayDisabled: "#",
     // tabs
     tabBackground: "#151718",
     tabIcon: "#9BA1A6",
     tabIconSelected: "#344360",
     // input
     inputBackground: "#000000",
+    inputBorder: "#73809a",
     // Icon
     icon: "#344360",
     // diary

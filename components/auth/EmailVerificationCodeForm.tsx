@@ -66,9 +66,7 @@ export default function EmailVerificationCodeForm({
         text2: t("toast.youHaveSuccessfullyVerifiedYourEmail"),
       });
 
-      if (forPlanSelect) {
-        onSuccessEmailCode();
-      }
+      onSuccessEmailCode();
     } catch (err: any) {
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;

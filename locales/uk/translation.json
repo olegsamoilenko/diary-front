@@ -33,6 +33,7 @@
     "pinIsIncorrect": "PIN невірний",
     "signInWithGoogle": "Увійти через Google",
     "signUpWithEmail": "Зареєструватися через Email",
+    "signInWithEmail": "Увійти через Email",
     "signInWithPhone": "Увійти через Телефон",
     "phoneMustBeInFormat": "Номер телефону має бути у форматі: код країни + номер. Наприклад 38XXXXXXXXXX",
     "sendCode": "Надіслати Код",
@@ -45,7 +46,8 @@
     "code": "Код",
     "changePassword": "Змінити пароль",
     "codeMustBe6Digits": "Код має бути 6 цифр",
-    "codeRequired": "Код обов'язковий"
+    "codeRequired": "Код обов'язковий",
+    "change": "Змінити"
   },
   "diary": {
     "title": "Щоденник",
@@ -137,10 +139,18 @@
     "profile": {
       "title": "Профіль",
       "name": "Ім'я",
+      "email": "Електронна пошта",
       "identifier": "Ідентифікатор",
       "signOut": "Вийти",
       "signIn": "Увійти",
-      "signUp": "Зареєструватися"
+      "signUp": "Зареєструватися",
+      "nameIsRequired": "Ім'я обов'язкове",
+      "changeName": "Змінити ім'я",
+      "newName": "Нове ім'я",
+      "changeEmail": "Змінити електронну пошту",
+      "newEmail": "Нова електронна пошта",
+      "changePassword": "Змінити пароль",
+      "newPassword": "Новий пароль"
     }
   },
   "planModal": {
@@ -206,6 +216,10 @@
     "successfullySaved": "Успішно збережено",
     "youHaveSuccessfullySavedYourName": "Ви успішно зберегли своє ім'я",
     "phoneConfirmed": "Телефон підтверджено",
-    "youHaveSuccessfullyVerifiedYourPhone": "Ви успішно підтвердили свій телефон"
+    "youHaveSuccessfullyVerifiedYourPhone": "Ви успішно підтвердили свій телефон",
+    "successfullyUpdated": "Успішно оновлено",
+    "youHaveSuccessfullyChangedYourName": "Ви успішно змінили своє ім'я",
+    "youHaveSuccessfullyChangedYourEmail": "Ви успішно змінили свою електронну пошту",
+    "youHaveSuccessfullyChangedYourPassword": "Ви успішно змінили свій пароль",
   }
 }

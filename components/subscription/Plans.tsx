@@ -49,9 +49,7 @@ export default function Plans({
         setShowPayment(true);
       }
     } else if (user && !user.isRegistered) {
-      console.log("User is not registered, showing auth form", user);
       if (setShowAuthForm) {
-        console.log("setShowAuthForm");
         setShowAuthForm(true);
       }
     }
@@ -59,7 +57,6 @@ export default function Plans({
 
   useEffect(() => {
     const handlePlan = async () => {
-      console.log("successPaymentPlan2", successPaymentPlan);
       if (successPaymentPlan) {
         await saveToDatabase(successPaymentPlan);
         setPlan(successPaymentPlan);
@@ -72,7 +69,6 @@ export default function Plans({
 
   const saveToDatabase = useCallback(
     async (plan: (typeof PLANS)[0]) => {
-      console.log("saveToDatabase", plan);
       setLoading(true);
       try {
         const { name, ...rest } = plan;

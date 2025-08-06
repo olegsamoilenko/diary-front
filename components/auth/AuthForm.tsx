@@ -24,11 +24,13 @@ export default function AuthForm({
   forPlanSelect = false,
   onSuccessSignWithGoogle,
   onSuccessEmailCode,
+  onSuccessSignIn,
   // onSuccessPhoneCode,
 }: {
   forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
   onSuccessEmailCode: () => void;
+  onSuccessSignIn: () => void;
   // onSuccessPhoneCode: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"login" | "register">("register");
@@ -137,6 +139,7 @@ export default function AuthForm({
                     forPlanSelect={forPlanSelect}
                     onSuccessSignWithGoogle={onSuccessSignWithGoogle}
                     setShowForgotPasswordForm={setShowForgotPasswordForm}
+                    onSuccessSignIn={onSuccessSignIn}
                   />
                 ) : (
                   <RegisterForm

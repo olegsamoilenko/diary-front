@@ -23,19 +23,17 @@ export default function ProfileSettingsBlock({
   const getUser = async () => {
     const storedUser = await SecureStore.getItemAsync("user");
     setUser(storedUser ? JSON.parse(storedUser) : null);
-
-    console.log("User in ProfileSettingsBlock:", storedUser);
   };
 
   useEffect(() => {
     getUser();
   }, []);
 
-  useEffect(() => {
-    const handler = () => getUser();
-    UserEvents.on("userChanged", handler);
-    return () => UserEvents.off("userChanged", handler);
-  }, []);
+  // useEffect(() => {
+  //   const handler = () => getUser();
+  //   UserEvents.on("userChanged", handler);
+  //   return () => UserEvents.off("userChanged", handler);
+  // }, []);
 
   return (
     <View

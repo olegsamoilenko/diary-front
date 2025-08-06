@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   View,
@@ -9,6 +9,7 @@ import {
   Pressable,
   Dimensions,
   ScrollView,
+  Keyboard,
 } from "react-native";
 
 type ModalPortalProps = {
@@ -25,6 +26,26 @@ export default function ModalPortal({
   maxHeight = false,
 }: ModalPortalProps) {
   const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(0);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const computedMaxHeight = maxHeight
+    ? SCREEN_HEIGHT * 0.8
+    : SCREEN_HEIGHT - keyboardHeight - 40;
   return (
     <Modal
       animationType="fade"
@@ -37,29 +58,45 @@ export default function ModalPortal({
         <View style={[styles.overlay]}>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : undefined}
-            style={styles.centeredView}
+            style={[
+              styles.centeredView,
+              {
+                maxHeight:
+                  keyboardHeight === 0 && !maxHeight
+                    ? contentHeight + 48
+                    : computedMaxHeight,
+              },
+            ]}
           >
-            {maxHeight ? (
-              <Pressable
-                onPress={(e) => e.stopPropagation()}
-                style={[styles.modalView, { maxHeight: SCREEN_HEIGHT * 0.8 }]}
+            <Pressable
+              onPress={(e) => e.stopPropagation()}
+              style={[
+                styles.modalView,
+                {
+                  maxHeight:
+                    keyboardHeight === 0 && !maxHeight
+                      ? contentHeight + 48
+                      : computedMaxHeight,
+                },
+              ]}
+            >
+              <ScrollView
+                contentContainerStyle={{
+                  flexGrow: keyboardHeight === 0 ? 0 : 1,
+                }}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
               >
-                <ScrollView
-                  contentContainerStyle={{ flexGrow: 1 }}
-                  showsVerticalScrollIndicator={false}
-                  bounces={false}
+                <View
+                  onLayout={(e) => {
+                    const h = e.nativeEvent.layout.height;
+                    setContentHeight(h);
+                  }}
                 >
                   {children}
-                </ScrollView>
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={(e) => e.stopPropagation()}
-                style={styles.modalView}
-              >
-                {children}
-              </Pressable>
-            )}
+                </View>
+              </ScrollView>
+            </Pressable>
           </KeyboardAvoidingView>
         </View>
       </TouchableWithoutFeedback>
@@ -76,7 +113,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   centeredView: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",

@@ -55,9 +55,7 @@ export default function GoogleSignInButton({
       await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
       await SecureStore.setItemAsync("token", res.data.accessToken);
 
-      if (forPlanSelect) {
-        onSuccessSignWithGoogle();
-      }
+      onSuccessSignWithGoogle();
     } catch (err: any) {
       console.error("Error during Google sign-in:", err?.response?.data);
     }
@@ -67,7 +65,6 @@ export default function GoogleSignInButton({
     try {
       const response = await GoogleLogin();
 
-      // retrieve user data
       const { idToken, user } = response.data ?? {};
       if (idToken) {
         await processUserData(idToken, user);

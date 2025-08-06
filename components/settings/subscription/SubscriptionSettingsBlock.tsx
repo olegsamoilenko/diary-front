@@ -23,8 +23,6 @@ export default function SubscriptionSettingsBlock({
   const getUser = async () => {
     const storedUser = await SecureStore.getItemAsync("user");
     setUser(storedUser ? JSON.parse(storedUser) : null);
-
-    console.log("User in ProfileSettingsBlock:", storedUser);
   };
 
   useEffect(() => {

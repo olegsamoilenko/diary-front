@@ -360,8 +360,6 @@ export default function TextReachEditor({
 
     const uploaded = await uploadImageToServer(localUri);
 
-    console.log("Uploaded image:", uploaded);
-
     if (uploaded && uploaded.url) {
       // @ts-ignore
       await replaceImageSrcById(imageId, uploaded.url);

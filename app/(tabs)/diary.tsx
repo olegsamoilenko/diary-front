@@ -47,10 +47,16 @@ export default function Diary() {
   const [loading, setLoading] = useState(true);
   const [isAddNewEntryOpen, setIsAddNewEntryOpen] = useState(false);
   const [planExpiredError, setPlanExpiredError] = useState<boolean>(false);
+  const [addNewEntryButtonDisabled, setAddNewEntryButtonDisabled] =
+    useState<boolean>(false);
 
   const handleNewEntryOpen = useCallback(() => {
+    setAddNewEntryButtonDisabled(true);
     setIsAddNewEntryOpen(true);
     addNewEntryRef.current?.open();
+    setTimeout(() => {
+      setAddNewEntryButtonDisabled(false);
+    }, 1000);
   }, []);
 
   const onPlanExpiredErrorOccurred = useCallback(() => {
@@ -67,11 +73,8 @@ export default function Diary() {
 
   const fetchDiaryEntries = async (back = false) => {
     setDiaryEntries({});
-    // const user = await SecureStore.getItemAsync("user");
-    //
-    // if (!user) return;
+
     setLoading(true);
-    console.log("Fetching diary entries for date:", selectedDay);
 
     try {
       const response = await apiRequest({
@@ -87,8 +90,6 @@ export default function Diary() {
         ...prev,
         [selectedDay?.toString() || "unknown"]: response.data,
       }));
-
-      console.log("Diary entries fetched:", response.data);
 
       setWeekAnchorDay(selectedDay as string);
       setShowWeek(true);
@@ -122,7 +123,6 @@ export default function Diary() {
 
   useEffect(() => {
     if (selectedDay && timeZone) {
-      console.log("Selected day changed:", selectedDay);
       fetchDiaryEntries();
     }
   }, [selectedDay, timeZone]);
@@ -185,13 +185,6 @@ export default function Diary() {
 
   return (
     <Background background={colors.backgroundImage} paddingTop={40}>
-      {/*{loading ? (*/}
-      {/*  <View*/}
-      {/*    style={{ flex: 1, justifyContent: "center", alignItems: "center" }}*/}
-      {/*  >*/}
-      {/*    <ActivityIndicator size="large" color={colors.primary} />*/}
-      {/*  </View>*/}
-      {/*) : (*/}
       <>
         {!showWeek ? (
           <MonthView
@@ -216,6 +209,7 @@ export default function Diary() {
             setMonth={setMonth}
             setYear={setYear}
             onBackToMonth={() => setShowWeek(false)}
+            loadingDays={loading}
           />
         )}
         <ParallaxScrollView scrollRef={scrollRef}>
@@ -243,7 +237,10 @@ export default function Diary() {
             )}
           </View>
         </ParallaxScrollView>
-        <AddButton onPress={handleNewEntryOpen} />
+        <AddButton
+          onPress={handleNewEntryOpen}
+          addNewEntryButtonDisabled={addNewEntryButtonDisabled}
+        />
         <Portal>
           <AddNewEntry
             ref={addNewEntryRef}

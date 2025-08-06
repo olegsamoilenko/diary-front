@@ -1,9 +1,14 @@
 import { ColorTheme } from "@/types";
-import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableWithoutFeedback,
+  Animated,
+} from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Position = "top" | "bottom" | "left" | "right";
 type ArrowPosition = "start" | "center" | "end";
@@ -42,16 +47,37 @@ export default function ToolTip({
     right,
     bottom,
   );
+  const animation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(animation, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [animation]);
+
+  const animatedStyle = {
+    opacity: animation,
+    transform: [
+      {
+        scale: animation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.8, 1],
+        }),
+      },
+    ],
+  };
 
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="box-none">
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay} />
       </TouchableWithoutFeedback>
-      <View style={styles.tip}>
+      <Animated.View style={[styles.tip, animatedStyle]}>
         <View style={styles.arrow}></View>
         <ThemedText onLinesCount={setLines}>{children}</ThemedText>
-      </View>
+      </Animated.View>
     </View>
   );
 }

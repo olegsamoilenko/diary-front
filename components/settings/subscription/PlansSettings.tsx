@@ -43,30 +43,21 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     getUser();
   }, []);
 
-  useEffect(() => {
-    console.log("showAuthForm", showAuthForm);
-  }, [showAuthForm]);
-
   const onSuccessPayment = () => {
     setSuccessPaymentPlan(plan);
     setShowPayment(false);
   };
 
   const onAuthSuccess = () => {
-    console.log("onAuthSuccess");
-    console.log("onAuthSuccess user", user);
     setShowAuthForm(false);
   };
 
   const onSuccess = async () => {
-    console.log("onSuccess Selected plan:", plan);
     setUser({ ...user, plan: plan });
   };
 
   const onUnsubscribe = async () => {
-    console.log(111);
     if (user && user.isRegistered) {
-      console.log(222);
       try {
         await apiRequest({
           url: "/plans/unsubscribe",

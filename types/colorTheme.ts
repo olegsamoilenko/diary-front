@@ -6,6 +6,7 @@ export type ColorTheme = {
   backgroundImage: BackgroundSettings;
   backgroundAdditional: string;
   primary: string;
+  disabledPrimary: string;
   secondary: string;
   text: string;
   textAdditional: string;
@@ -19,12 +20,14 @@ export type ColorTheme = {
   calendarEnableDayBorder: string;
   calendarDisableDayBorder: string;
   calendarDayLabels: string;
+  calendarDayDisabled: string;
   // tabs
   tabBackground: string;
   tabIcon: string;
   tabIconSelected: string;
   // input
   inputBackground: string;
+  inputBorder: string;
   // Icon
   icon: string;
   // diary

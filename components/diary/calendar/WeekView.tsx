@@ -51,6 +51,7 @@ type WeekViewProps = {
   setMonth: (month: number) => void;
   setYear: (year: number) => void;
   onBackToMonth: () => void;
+  loadingDays: boolean;
 };
 
 export default function WeekView({
@@ -62,6 +63,7 @@ export default function WeekView({
   setMonth,
   setYear,
   onBackToMonth,
+  loadingDays,
 }: WeekViewProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
@@ -98,9 +100,7 @@ export default function WeekView({
   };
 
   const handleDayPress = (item: string) => {
-    console.log("handleDayPress 111", item);
     setSelectedDay(item);
-    console.log("handleDayPress 222", item);
   };
 
   return (
@@ -205,7 +205,12 @@ export default function WeekView({
               style={{
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: isSelected ? colors.primary : "transparent",
+                backgroundColor:
+                  isSelected && !loadingDays
+                    ? colors.primary
+                    : isSelected && loadingDays
+                      ? colors.disabledPrimary
+                      : "transparent",
                 borderColor:
                   itemMonth === month && !isSelected
                     ? colors.calendarEnableDayBorder
@@ -218,6 +223,7 @@ export default function WeekView({
                 borderRadius: CLOCK_RADIUS,
                 position: "relative",
               }}
+              disabled={loadingDays}
             >
               <ThemedText
                 style={{

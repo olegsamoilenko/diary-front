@@ -45,7 +45,6 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
         [id]: !prev[id],
       }));
       setLoadedEntry(entry);
-      console.log("закрито");
     }
 
     setKey((prevKey) => prevKey + 1);
@@ -58,7 +57,6 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
         method: "GET",
       });
 
-      console.log("Loaded entry:", response.data);
       setLoadedEntry((prev) => {
         return {
           ...prev,
@@ -84,8 +82,6 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
     const height = e.nativeEvent.layout.height;
     if (height > 0) setContentHeight(height);
   };
-
-  console.log("EntryCard rendered for loadedEntry:", loadedEntry);
 
   return (
     <EntryCardBackground

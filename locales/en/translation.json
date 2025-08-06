@@ -33,6 +33,7 @@
     "pinIsIncorrect": "PIN is incorrect",
     "signInWithGoogle": "Sign in with Google",
     "signUpWithEmail": "Sign up with Email",
+    "signInWithEmail": "Sign in with Email",
     "signInWithPhone": "Sign in with Phone",
     "phoneMustBeInFormat": "Phone number must be in the format: code country + number. Example 38XXXXXXXXXX",
     "sendCode": "Send Code",
@@ -45,7 +46,8 @@
     "code": "Code",
     "changePassword": "Change Password",
     "codeMustBe6Digits": "Code must be 6 digits",
-    "codeRequired": "Code is required"
+    "codeRequired": "Code is required",
+    "change": "Change",
   },
   "diary": {
     "title": "Diary",
@@ -138,9 +140,17 @@
       "title": "Profile",
       "identifier": "Identifier",
       "name": "Name",
+      "email": "email",
       "signOut": "Sign Out",
       "signIn": "Sign In",
-      "signUp": "Sign Up"
+      "signUp": "Sign Up",
+      "nameIsRequired": "Name is required",
+      "changeName": "Change Name",
+      "newName": "New Name",
+      "changeEmail": "Change Email",
+      "newEmail": "New Email",
+      "changePassword": "Change Password",
+      "newPassword": "New Password"
     }
   },
   "planModal": {
@@ -206,6 +216,11 @@
     "successfullySaved": "Successfully saved",
     "youHaveSuccessfullySavedYourName": "You have successfully saved your name",
     "phoneConfirmed": "Phone confirmed",
-    "youHaveSuccessfullyVerifiedYourPhone": "You have successfully verified your phone"
+    "youHaveSuccessfullyVerifiedYourPhone": "You have successfully verified your phone",
+    "successfullyUpdated": "Successfully updated",
+    "youHaveSuccessfullyChangedYourName": "You have successfully changed your name",
+    "youHaveSuccessfullyChangedYourEmail": "You have successfully changed your email",
+    "youHaveSuccessfullyChangedYourPassword": "You have successfully changed your password",
+
   }
 }
