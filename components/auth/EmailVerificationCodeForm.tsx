@@ -16,6 +16,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
+import { UserEvents } from "@/utils";
 
 type EmailVerificationCodeFormProps = {
   forPlanSelect: boolean;
@@ -67,6 +68,7 @@ export default function EmailVerificationCodeForm({
       });
 
       onSuccessEmailCode();
+      UserEvents.emit("userRegistered");
     } catch (err: any) {
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;

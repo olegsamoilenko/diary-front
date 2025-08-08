@@ -25,7 +25,7 @@ export default function GoogleSignInButton({
   GoogleSignin.configure({
     webClientId:
       "203981333495-fjift3o1qr4q35tv5hscsuutbouspfir.apps.googleusercontent.com",
-    scopes: ["https://www.googleapis.com/auth/drive"],
+    scopes: ["openid", "email", "profile"],
     offlineAccess: true,
     forceCodeForRefreshToken: false,
     iosClientId:

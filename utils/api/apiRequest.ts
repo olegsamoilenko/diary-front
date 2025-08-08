@@ -29,16 +29,22 @@ export async function apiRequest<T = any>({
 }: ApiRequestOptions): Promise<AxiosResponse<T>> {
   try {
     let token = await SecureStore.getItemAsync("token");
+    console.log("apiRequest: token", token);
 
     if (isTokenExpired(token)) {
       const userRaw = await SecureStore.getItemAsync("user");
       const user = userRaw ? JSON.parse(userRaw) : {};
       const uuid = user.uuid;
+      const hash = user.hash;
       if (uuid) {
         try {
-          const res = await axios.post(apiUrl + "/auth/create-token", { uuid });
+          const res = await axios.post(apiUrl + "/auth/create-token", {
+            uuid,
+            hash,
+          });
           token = res.data.accessToken as string;
           await SecureStore.setItemAsync("token", token);
+          console.log("apiRequest: new token", token);
         } catch (err: any) {
           if (axios.isAxiosError(err)) {
             if (err.response && err.response.data) {
@@ -137,19 +143,22 @@ export async function apiRequest<T = any>({
 }
 
 function isTokenExpired(token: string | null): boolean {
-  if (!token) return true;
+  if (!token) return false;
   try {
     const payload = token.split(".")[1];
-    if (!payload) return true;
+    if (!payload) return false;
 
     const decoded = JSON.parse(
       atob(payload.replace(/-/g, "+").replace(/_/g, "/")),
     );
 
     const exp = decoded.exp;
-    if (!exp) return true;
+    if (!exp) return false;
 
     const now = Math.floor(Date.now() / 1000);
+
+    console.log("Token expiration time:", exp);
+    console.log("Current time:", now);
 
     return now >= exp;
   } catch (e) {

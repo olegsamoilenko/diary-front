@@ -48,6 +48,10 @@
     "codeMustBe6Digits": "Code must be 6 digits",
     "codeRequired": "Code is required",
     "change": "Change",
+    "logout": "Logout",
+    "deleteAccount": "Delete Account",
+    "continueWithoutRegistration": "Continue without registration",
+    "registerOrNotDescription": "If you continue without registering, your records will be lost if you uninstall the application or transfer it to another device."
   },
   "diary": {
     "title": "Diary",
@@ -150,7 +154,10 @@
       "changeEmail": "Change Email",
       "newEmail": "New Email",
       "changePassword": "Change Password",
-      "newPassword": "New Password"
+      "newPassword": "New Password",
+      "loggedIn": "Logged in",
+      "loggedOut": "Logged out",
+      "notRegister": "Not registered",
     }
   },
   "planModal": {
@@ -198,7 +205,8 @@
     "invalidCode": "The provided code is invalid or has expired",
     "emailAlreadyVerified": "An account with this email already verified",
     "userAlreadyExists": "An account with this email already exists",
-    "undefined": "An unexpected error occurred"
+    "undefined": "An unexpected error occurred",
+    "invalidHash": "Invalid hash",
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",
@@ -221,6 +229,19 @@
     "youHaveSuccessfullyChangedYourName": "You have successfully changed your name",
     "youHaveSuccessfullyChangedYourEmail": "You have successfully changed your email",
     "youHaveSuccessfullyChangedYourPassword": "You have successfully changed your password",
-
+    "successfullyLoggedOut": "Successfully logged out",
+  },
+  "welcome": {
+    "title": "Welcome to Smart Diary",
+    "description": {
+      "part1": "Hello! I am Nemory, your smart diary and faithful assistant on the path of self-development.",
+      "part2": "Here, you can easily record your events, thoughts, moods, and goals, and I will help you:",
+      "list1": "- understand your thoughts and feelings",
+      "list2": "- analyze records and give personalized advice",
+      "list3": "- plan and monitor your goals and habits",
+      "list4": "- track your mental and physical health through daily records",
+      "list5": "- foresee how your life will change if you continue in the same direction"
+    },
+    "doNotShowAnymore": "Do not show anymore",
   }
 }

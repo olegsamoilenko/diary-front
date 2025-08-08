@@ -12,9 +12,11 @@ import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
-import { Theme } from "@/types";
+import { Theme, User } from "@/types";
 import BackArrow from "@/components/ui/BackArrow";
 import Background from "@/components/Background";
+import * as SecureStore from "@/utils/store/secureStore";
+import { apiRequest } from "@/utils";
 
 const themes = [
   {
@@ -69,12 +71,41 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async () => {
+    const storedUser = await SecureStore.getItemAsync("user");
+    setUser(storedUser ? JSON.parse(storedUser) : null);
+  };
 
   const handleTheme = (themeName: string) => {
     setTheme(themeName as Theme);
   };
 
-  useEffect(() => {}, [theme]);
+  useEffect(() => {
+    updateTheme();
+  }, [theme]);
+
+  const updateTheme = async () => {
+    console.log("user?.id", user?.id);
+    if (!user?.id) {
+      console.warn("User id is not defined");
+      return;
+    }
+    try {
+      await apiRequest({
+        url: `/users/update/${user?.id}`,
+        method: "POST",
+        data: { theme },
+      });
+    } catch (error) {
+      console.warn("Failed to update theme", error);
+    }
+  };
 
   return (
     <SideSheet ref={ref}>

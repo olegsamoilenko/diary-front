@@ -22,6 +22,7 @@ import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
 import AuthForm from "@/components/auth/AuthForm";
 import { apiRequest } from "@/utils";
+import RegisterOrNot from "@/components/auth/RegisterOrNot";
 
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
@@ -34,6 +35,9 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     React.useState<Plan | null>(null);
   const [plan, setPlan] = React.useState<Plan | null>(null);
   const [showAuthForm, setShowAuthForm] = useState(false);
+  const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
+  const [continueWithoutRegistration, setContinueWithoutRegistration] =
+    useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -76,13 +80,22 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   return (
     <SideSheet ref={ref}>
       <Background background={colors.backgroundImage} paddingTop={10}>
-        {showPayment ? (
+        {showRegisterOrNot ? (
+          <RegisterOrNot
+            setShowAuthForm={setShowAuthForm}
+            setContinueWithoutRegistration={setContinueWithoutRegistration}
+            onChoice={() => {
+              setShowRegisterOrNot(false);
+            }}
+          />
+        ) : showPayment ? (
           <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
         ) : showAuthForm ? (
           <AuthForm
             forPlanSelect={true}
             onSuccessSignWithGoogle={onAuthSuccess}
             onSuccessEmailCode={onAuthSuccess}
+            onSuccessSignIn={() => setShowAuthForm(false)}
           />
         ) : (
           <View style={styles.container}>
@@ -108,7 +121,8 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                   setPlan={setPlan}
                   successPaymentPlan={successPaymentPlan}
                   setSuccessPaymentPlan={setSuccessPaymentPlan}
-                  setShowAuthForm={setShowAuthForm}
+                  setShowRegisterOrNot={setShowRegisterOrNot}
+                  continueWithoutRegistration={continueWithoutRegistration}
                 />
                 <TouchableOpacity onPress={onUnsubscribe}>
                   <View

@@ -195,7 +195,7 @@ export default function MonthView({
                           zIndex: Math.round(hour),
                         }}
                       >
-                        {getEmojiByMood(mood.mood)}
+                        {mood.mood}
                       </Text>
                       <Text
                         style={{

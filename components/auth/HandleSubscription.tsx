@@ -16,13 +16,15 @@ import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
 
 type SelectPlanProps = {
-  setShowAuthForm?: (show: boolean) => void;
+  setShowRegisterOrNot?: (show: boolean) => void;
   onSuccess?: () => void;
+  continueWithoutRegistration: boolean;
 };
 
 export default function HandleSubscription({
-  setShowAuthForm,
+  setShowRegisterOrNot,
   onSuccess,
+  continueWithoutRegistration,
 }: SelectPlanProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
@@ -46,12 +48,13 @@ export default function HandleSubscription({
           <>
             <Text style={styles.title}>{t("planModal.title")}</Text>
             <Plans
-              setShowAuthForm={setShowAuthForm}
+              setShowRegisterOrNot={setShowRegisterOrNot}
               setShowPayment={setShowPayment}
               onSuccess={onSuccess}
               setPlan={setPlan}
               successPaymentPlan={successPaymentPlan}
               setSuccessPaymentPlan={setSuccessPaymentPlan}
+              continueWithoutRegistration={continueWithoutRegistration}
             />
           </>
         )}

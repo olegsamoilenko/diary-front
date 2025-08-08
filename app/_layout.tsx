@@ -14,14 +14,14 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemeProviderCustom, useThemeCustom } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
-import { apiRequest } from "@/utils";
+import { apiRequest, UserEvents } from "@/utils";
 import uuid from "react-native-uuid";
 import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
 import { store } from "@/store";
 import { Provider, useDispatch } from "react-redux";
 import HandleSubscription from "@/components/auth/HandleSubscription";
-import { Plan, User } from "@/types";
+import { User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
 import { PortalProvider } from "@gorhom/portal";
 import { setFont } from "@/store/slices/settings/fontSlice";
@@ -34,6 +34,7 @@ import AuthForm from "@/components/auth/AuthForm";
 import Toast from "react-native-toast-message";
 import { BiometryProvider } from "@/context/BiometryContext";
 import { apiUrl } from "@/constants/env";
+import RegisterOrNot from "@/components/auth/RegisterOrNot";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -82,7 +83,9 @@ export default function RootLayout() {
   const { theme } = useThemeCustom();
   const navTheme = NavigationThemes[theme] || NavigationThemes.light;
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const [showDoPayment, setShowDoPayment] = useState(false);
+  const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
+  const [continueWithoutRegistration, setContinueWithoutRegistration] =
+    useState(false);
 
   useEffect(() => {
     // const clearUserFromSecureStore = async () => {
@@ -108,34 +111,65 @@ export default function RootLayout() {
     // };
     // clearThemeFromStore();
 
-    const initUser = async () => {
-      let storedUser = await SecureStore.getItemAsync("user");
-      let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;
-      if (!userObj) {
-        const newUuid = uuid.v4();
-
-        const res = await apiRequest({
-          url: `/users/create-by-uuid`,
-          method: "POST",
-          data: { uuid: newUuid },
-        });
-
-        if (!res || res.status !== 201) {
-          console.log("No data returned from server");
-          return;
-        }
-
-        const data = await res.data;
-
-        userObj = data.user;
-        await SecureStore.setItemAsync("token", data.accessToken);
-        await SecureStore.setItemAsync("user", JSON.stringify(data.user));
-      }
-
-      setUser(userObj);
-    };
     initUser();
   }, []);
+
+  const initUser = async () => {
+    let storedUser = await SecureStore.getItemAsync("user");
+    let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;
+    if (!userObj) {
+      const newUuid = uuid.v4();
+
+      const res = await apiRequest({
+        url: `/users/create-by-uuid`,
+        method: "POST",
+        data: { uuid: newUuid },
+      });
+
+      if (!res || res.status !== 201) {
+        console.log("No data returned from server");
+        return;
+      }
+
+      const data = await res.data;
+
+      userObj = data.user;
+      await SecureStore.setItemAsync("token", data.accessToken);
+      await SecureStore.setItemAsync("user", JSON.stringify(data.user));
+    }
+
+    setUser(userObj);
+  };
+
+  const updateLastActive = async () => {
+    console.log("user?.id", user?.id);
+    if (!user?.id) {
+      console.warn("User id is not defined");
+      return;
+    }
+    try {
+      await apiRequest({
+        url: `/users/update/${user?.id}`,
+        method: "POST",
+        data: { lastActiveAt: new Date().toISOString() },
+      });
+    } catch (error) {
+      console.warn("Failed to update lastActiveAt", error);
+    }
+  };
+
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await SecureStore.getItemAsync("token");
+      console.log("Token from SecureStore:", token);
+    };
+    getToken();
+  }, []);
+
+  useEffect(() => {
+    updateLastActive();
+    console.log("Initializing user...", user);
+  }, [user]);
 
   useEffect(() => {
     const initLanguage = async () => {
@@ -155,6 +189,15 @@ export default function RootLayout() {
 
     setUser(userObj);
   };
+
+  useEffect(() => {
+    const handler = () => {
+      initUser();
+      setIsAuthenticated(false);
+    };
+    UserEvents.on("userDeleted", handler);
+    return () => UserEvents.off("userDeleted", handler);
+  }, []);
 
   if (!loaded) {
     return null;
@@ -179,7 +222,17 @@ export default function RootLayout() {
         <AuthProvider>
           <BiometryProvider>
             <PortalProvider>
-              {showAuthForm ? (
+              {showRegisterOrNot ? (
+                <RegisterOrNot
+                  setContinueWithoutRegistration={
+                    setContinueWithoutRegistration
+                  }
+                  setShowAuthForm={setShowAuthForm}
+                  onChoice={() => {
+                    setShowRegisterOrNot(false);
+                  }}
+                />
+              ) : showAuthForm ? (
                 <AuthForm
                   forPlanSelect={true}
                   onSuccessSignWithGoogle={() => setShowAuthForm(false)}
@@ -189,8 +242,9 @@ export default function RootLayout() {
                 />
               ) : !user?.plan ? (
                 <HandleSubscription
-                  setShowAuthForm={setShowAuthForm}
+                  setShowRegisterOrNot={setShowRegisterOrNot}
                   onSuccess={onSuccessHandleSubscription}
+                  continueWithoutRegistration={continueWithoutRegistration}
                 />
               ) : (
                 <RootLayoutInner />

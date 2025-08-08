@@ -20,6 +20,8 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Portal } from "@gorhom/portal";
 import Background from "@/components/Background";
 import SubscriptionErrors from "@/components/errors/SubscriptionErrors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import WelcomeModal from "@/components/diary/WelcomeModal";
 
 export default function Diary() {
   const { t } = useTranslation();
@@ -258,7 +260,7 @@ export default function Diary() {
           />
         </Portal>
       </>
-      {/*)}*/}
+      <WelcomeModal />
     </Background>
   );
 }

@@ -15,9 +15,9 @@ export default function Emoji({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
 
-  const handleEmoji = (emoji: string) => {
-    setSelectedEmoji(emoji);
-    handleSelectedEmoji(emoji);
+  const handleEmoji = (emoji: { label: string; value: string }) => {
+    setSelectedEmoji(emoji.value);
+    handleSelectedEmoji(emoji.label);
   };
   return (
     <View
@@ -32,7 +32,7 @@ export default function Emoji({
       {MoodEmoji.map((emoji, index) => (
         <TouchableOpacity
           key={emoji.value}
-          onPress={() => handleEmoji(emoji.value)}
+          onPress={() => handleEmoji(emoji)}
           style={{
             backgroundColor:
               selectedEmoji === emoji.value ? colors.primary : undefined,

@@ -271,7 +271,7 @@ export default function WeekView({
                           zIndex: Math.round(hour),
                         }}
                       >
-                        {getEmojiByMood(mood.mood)}
+                        {mood.mood}
                       </Text>
                       <Text
                         style={{

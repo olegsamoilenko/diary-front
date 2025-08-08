@@ -17,21 +17,23 @@ import * as SecureStore from "@/utils/store/secureStore";
 
 type PlansProps = {
   onSuccess?: () => void;
-  setShowAuthForm?: (show: boolean) => void;
+  setShowRegisterOrNot?: (show: boolean) => void;
   setShowPayment?: (show: boolean) => void;
   setPlan: (plan: User["plan"]) => void;
   successPaymentPlan: Plan | null;
   setSuccessPaymentPlan: (plan: Plan | null) => void;
   showStartPlan?: boolean;
+  continueWithoutRegistration: boolean;
 };
 export default function Plans({
   onSuccess,
-  setShowAuthForm,
+  setShowRegisterOrNot,
   setShowPayment,
   setPlan,
   successPaymentPlan,
   setSuccessPaymentPlan,
   showStartPlan = true,
+  continueWithoutRegistration,
 }: PlansProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
@@ -43,14 +45,17 @@ export default function Plans({
   const onSelect = async (plan: (typeof PLANS)[0]) => {
     if (plan.name === "Start") {
       await saveToDatabase(plan);
-    } else if (user && user.isRegistered) {
+    } else if (
+      (user && continueWithoutRegistration) ||
+      (user && user.isRegistered)
+    ) {
       setPlan(plan);
       if (setShowPayment) {
         setShowPayment(true);
       }
-    } else if (user && !user.isRegistered) {
-      if (setShowAuthForm) {
-        setShowAuthForm(true);
+    } else if (user && !user.isRegistered && !continueWithoutRegistration) {
+      if (setShowRegisterOrNot) {
+        setShowRegisterOrNot(true);
       }
     }
   };
@@ -106,6 +111,10 @@ export default function Plans({
     };
     getUser();
   }, [saveToDatabase]);
+
+  useEffect(() => {
+    console.log("Plans component mounted", user);
+  }, [user]);
 
   return (
     <View

@@ -25,15 +25,19 @@ export default function AuthForm({
   onSuccessSignWithGoogle,
   onSuccessEmailCode,
   onSuccessSignIn,
+  activeAuthTab = "register",
   // onSuccessPhoneCode,
 }: {
   forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
   onSuccessEmailCode: () => void;
   onSuccessSignIn: () => void;
+  activeAuthTab?: "login" | "register";
   // onSuccessPhoneCode: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<"login" | "register">("register");
+  const [activeTab, setActiveTab] = useState<"login" | "register">(
+    activeAuthTab,
+  );
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme] ?? Colors.system;
   const styles = getStyles(colors);

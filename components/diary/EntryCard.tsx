@@ -128,7 +128,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                 paddingBottom: 5,
               }}
             >
-              {getEmojiByMood(loadedEntry.mood)}
+              {loadedEntry.mood}
             </ThemedText>
           </View>
           <View

@@ -122,7 +122,7 @@ export default function TitleEntry({
           }}
         >
           {entry && entry.mood ? (
-            <Text style={styles.moodEmoji}>{getEmojiByMood(entry.mood)}</Text>
+            <Text style={styles.moodEmoji}>{entry.mood}</Text>
           ) : (
             <GreySmileEmoji />
           )}

@@ -17,7 +17,7 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { passwordRules } from "@/utils/";
+import { passwordRules, UserEvents } from "@/utils/";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
 
@@ -77,6 +77,7 @@ export default function LoginForm({
         text2: t("toast.youHaveSuccessfullyLoggedIn"),
       });
       onSuccessSignIn();
+      UserEvents.emit("userLoggedIn", user);
     } catch (err: any) {
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;

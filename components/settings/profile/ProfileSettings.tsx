@@ -30,6 +30,8 @@ import ChangeNameModal from "@/components/settings/profile/ChangeNameModal";
 import Toast from "react-native-toast-message";
 import ChangeEmailModal from "@/components/settings/profile/ChangeEmailModal";
 import ChangePasswordModal from "@/components/settings/profile/ChangePasswordModal";
+import DeleteAccountModal from "@/components/settings/profile/DeleteAccountModal";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
@@ -46,6 +48,8 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showChangeEmailModal, setShowChangeEmailModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<"login" | "register">("register");
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
   useEffect(() => {
     getUserLogged();
@@ -61,13 +65,34 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     const token = await SecureStore.getItemAsync("token");
     if (token) {
       setUserLogged(true);
+    } else {
+      setUserLogged(false);
     }
+    console.log("getUserLogged called, userLogged:", token);
   };
 
   useEffect(() => {
     const handler = () => getUser();
     UserEvents.on("userChanged", handler);
     return () => UserEvents.off("userChanged", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => getUser();
+    UserEvents.on("userRegistered", handler);
+    return () => UserEvents.off("userRegistered", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => getUserLogged();
+    UserEvents.on("userRegistered", handler);
+    return () => UserEvents.off("userRegistered", handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => getUserLogged();
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
   }, []);
 
   const onSuccessChangeName = () => {
@@ -97,6 +122,16 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     setShowChangePasswordModal(false);
   };
 
+  const handleRegister = async () => {
+    setActiveTab("register");
+    setShowAuthForm(true);
+  };
+
+  const handleLogin = async () => {
+    setActiveTab("login");
+    setShowAuthForm(true);
+  };
+
   const handleChangeNameModal = async () => {
     setShowChangeNameModal(true);
   };
@@ -109,26 +144,67 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     setShowChangePasswordModal(true);
   };
 
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync("token");
+    await getUserLogged();
+    if (user?.oauthProviderId) {
+      try {
+        await GoogleSignin.signOut();
+      } catch (error) {
+        console.error("Error signing out from Google:", error);
+      }
+    }
+    Toast.show({
+      type: "success",
+      text1: t("toast.successfullyLoggedOut"),
+    });
+  };
+
   return (
     <SideSheet ref={ref}>
       <Background background={colors.backgroundImage} paddingTop={10}>
         {showAuthForm ? (
           <AuthForm
-            onSuccessSignWithGoogle={() => setShowAuthForm(false)}
+            onSuccessSignWithGoogle={() => {
+              setShowAuthForm(false);
+              getUserLogged();
+              getUser();
+            }}
             onSuccessSignIn={() => setShowAuthForm(false)}
             onSuccessEmailCode={() => setShowAuthForm(false)}
+            activeAuthTab={activeTab}
           />
         ) : (
           <View style={styles.container}>
             <BackArrow ref={ref} />
-            <ThemedText
-              type={"subtitleXL"}
+            <View
               style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
                 marginBottom: 20,
               }}
             >
-              {t("settings.profile.title")}
-            </ThemedText>
+              <ThemedText type={"subtitleXL"}>
+                {t("settings.profile.title")}
+              </ThemedText>
+              <ThemedText
+                style={{
+                  color:
+                    userLogged && user?.isRegistered
+                      ? "green"
+                      : userLogged && !user?.isRegistered
+                        ? "red"
+                        : "orange",
+                }}
+              >
+                {userLogged && user?.isRegistered
+                  ? t("settings.profile.loggedIn")
+                  : userLogged && !user?.isRegistered
+                    ? t("settings.profile.notRegister")
+                    : t("settings.profile.loggedOut")}
+              </ThemedText>
+            </View>
             <ProfileCard
               key={"name"}
               title={t("settings.profile.name")}
@@ -140,17 +216,21 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               setShowChangeNameModal={setShowChangeNameModal}
               onSuccessChangeName={onSuccessChangeName}
             />
-            <ProfileCard
-              key={"email"}
-              title={t("settings.profile.email")}
-              val={user?.email}
-              handleAction={handleChangeEmailModal}
-            ></ProfileCard>
-            <ChangeEmailModal
-              showChangeEmailModal={showChangeEmailModal}
-              setShowChangeEmailModal={setShowChangeEmailModal}
-              onSuccessChangeEmail={onSuccessChangeEmail}
-            />
+            {user?.email && (
+              <>
+                <ProfileCard
+                  key={"email"}
+                  title={t("settings.profile.email")}
+                  val={user?.email}
+                  handleAction={handleChangeEmailModal}
+                ></ProfileCard>
+                <ChangeEmailModal
+                  showChangeEmailModal={showChangeEmailModal}
+                  setShowChangeEmailModal={setShowChangeEmailModal}
+                  onSuccessChangeEmail={onSuccessChangeEmail}
+                />
+              </>
+            )}
 
             <ProfileCard
               key={"identifier"}
@@ -159,10 +239,16 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               isActionButton={false}
             ></ProfileCard>
 
-            {!user?.oauthProviderId && (
+            {!user?.oauthProviderId && user?.isRegistered && (
               <>
                 <TouchableOpacity
-                  style={styles.btn}
+                  style={[
+                    styles.btn,
+                    {
+                      backgroundColor: colors.primary,
+                      marginBottom: 20,
+                    },
+                  ]}
                   onPress={handleChangePasswordModal}
                 >
                   <ThemedText
@@ -182,11 +268,42 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               </>
             )}
 
+            {user?.isRegistered && userLogged && (
+              <View>
+                <TouchableOpacity
+                  style={[
+                    styles.btn,
+                    {
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      marginBottom: 20,
+                    },
+                  ]}
+                  onPress={handleLogout}
+                >
+                  <ThemedText
+                    style={{
+                      color: colors.text,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t("auth.logout")}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            )}
+
             {!user?.isRegistered && (
               <View>
                 <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => setShowAuthForm(true)}
+                  style={[
+                    styles.btn,
+                    {
+                      backgroundColor: colors.primary,
+                      marginBottom: 20,
+                    },
+                  ]}
+                  onPress={handleRegister}
                 >
                   <ThemedText
                     style={{
@@ -202,8 +319,14 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
             {user?.isRegistered && !userLogged && (
               <View>
                 <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => setShowAuthForm(true)}
+                  style={[
+                    styles.btn,
+                    {
+                      backgroundColor: colors.primary,
+                      marginBottom: 20,
+                    },
+                  ]}
+                  onPress={handleLogin}
                 >
                   <ThemedText
                     style={{
@@ -214,6 +337,35 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                     {t("auth.login")}
                   </ThemedText>
                 </TouchableOpacity>
+              </View>
+            )}
+            {user?.isRegistered && (
+              <View>
+                <TouchableOpacity
+                  style={[
+                    styles.btn,
+                    {
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      marginBottom: 20,
+                    },
+                  ]}
+                  onPress={() => setShowDeleteAccountModal(true)}
+                >
+                  <ThemedText
+                    style={{
+                      color: colors.text,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t("auth.deleteAccount")}
+                  </ThemedText>
+                </TouchableOpacity>
+                <DeleteAccountModal
+                  showDeleteAccountModal={showDeleteAccountModal}
+                  setShowDeleteAccountModal={setShowDeleteAccountModal}
+                  userId={Number(user?.id)}
+                />
               </View>
             )}
           </View>
@@ -240,9 +392,8 @@ const getStyles = (colors: ColorTheme) =>
       gap: 10,
     },
     btn: {
-      paddingHorizontal: 18,
-      paddingVertical: 10,
-      backgroundColor: colors.primary,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
       borderRadius: 12,
       textAlign: "center",
     },

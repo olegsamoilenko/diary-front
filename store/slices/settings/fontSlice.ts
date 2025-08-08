@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   font: {
-    title: "Inter",
-    name: "Inter",
+    title: "Nunito",
+    name: "Nunito",
   },
 };
 

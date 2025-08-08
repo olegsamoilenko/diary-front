@@ -6,4 +6,5 @@ export enum ErrorMessages {
   EMAIL_ALREADY_VERIFIED = "emailAlreadyVerified",
   INVALID_PASSWORD = "invalidPassword",
   INVALID_CODE = "invalidCode",
+  INVALID_HASH = "invalidHash",
 }
