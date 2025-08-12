@@ -3,7 +3,7 @@ const Base = {
   light: {
     background: "#",
     backgroundImage: {
-      id: 0,
+      id: 201,
       value: "#0",
       type: "color | image",
       url: undefined,
@@ -18,9 +18,9 @@ const Base = {
     link: "#0000ff",
     border: "#",
     error: "#B9130F",
-    notification: "",
+    notification: "#ff5252",
     // calendar
-    calendarBackground: "#",
+    calendarBackground: "#transparent",
     calendarEnableDayBorder: "#",
     calendarDisableDayBorder: "#",
     calendarDayLabels: "#",
@@ -32,14 +32,15 @@ const Base = {
     // input
     inputBackground: "#",
     inputBorder: "#",
+    inputPlaceholder: "#",
     // Icon
     icon: "#",
     // diary
     card: "#",
-    diaryNotesBackground: "#",
-    aiCommentBackground: "#",
-    questionBackground: "#",
-    answerBackground: "#",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#00000020",
+    questionBackground: "transparent",
+    answerBackground: "#00000020",
     // settings
     blockBackground: "#",
     // barStyle
@@ -52,13 +53,160 @@ const Base = {
 
 export const Colors: Record<string, ColorTheme> = {
   light: {
-    // General
-    background: "#8e8680",
+    background: "#FCFCFC",
     backgroundImage: {
       id: 201,
-      value: "#8e8680",
+      value: "#FCFCFC",
       type: "image",
-      url: require("@/assets/images//background/light.jpg"),
+      url: require("@/assets/images/background/breathe.jpg"),
+    },
+    backgroundAdditional: "#b7c5c8",
+    primary: "#526D73",
+    disabledPrimary: "#aec2c6",
+    secondary: "#",
+    text: "#2c3b3e",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#cee0e3",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#526D73",
+    calendarDisableDayBorder: "#acbabd",
+    calendarDayLabels: "#5c7277",
+    calendarDayDisabled: "#aec2c6",
+    // tabs
+    tabBackground: "#FCFCFC",
+    tabIcon: "#7f8d8f",
+    tabIconSelected: "#526D73",
+    // input
+    inputBackground: "#b7c5c8",
+    inputBorder: "#cee0e3",
+    inputPlaceholder: "#617c81",
+    // Icon
+    icon: "#526D73",
+    // diary
+    card: "#FCFCFC",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#526D7320",
+    questionBackground: "transparent",
+    answerBackground: "#526D7320",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#526D73526D73",
+  },
+  silentPeaks: {
+    background: "#E6E5E3",
+    backgroundImage: {
+      id: 202,
+      value: "#E6E5E3",
+      type: "image",
+      url: require("@/assets/images/background/silentPeaks.jpg"),
+    },
+    backgroundAdditional: "#D1CDC1",
+    primary: "#3D383B",
+    disabledPrimary: "#878184",
+    secondary: "#",
+    text: "#3a3639",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#ccc0c7",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#3D383B",
+    calendarDisableDayBorder: "#888386",
+    calendarDayLabels: "#887f86",
+    calendarDayDisabled: "#878184",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#8e8189",
+    tabIconSelected: "#3D383B",
+    // input
+    inputBackground: "#D1CDC1",
+    inputBorder: "#ccc0c7",
+    inputPlaceholder: "#887f86",
+    // Icon
+    icon: "#3D383B",
+    // diary
+    card: "#E6E5E3",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#3D383B20",
+    questionBackground: "transparent",
+    answerBackground: "#3D383B20",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#3D383B",
+  },
+  goldenHour: {
+    background: "#E6D9D3",
+    backgroundImage: {
+      id: 203,
+      value: "#E6D9D3",
+      type: "image",
+      url: require("@/assets/images/background/goldenHour.jpg"),
+    },
+    backgroundAdditional: "#e6daca",
+    primary: "#836e53",
+    disabledPrimary: "#bfae99",
+    secondary: "#",
+    text: "#322618",
+    textAdditional: "#",
+    textInPrimary: "#FFFFFF",
+    link: "#0000ff",
+    border: "#ccbaa4",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#836e53",
+    calendarDisableDayBorder: "#cabaa5",
+    calendarDayLabels: "#886d4e",
+    calendarDayDisabled: "#bfae99",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#d6bc9a",
+    tabIconSelected: "#836e53",
+    // input
+    inputBackground: "#e6daca",
+    inputBorder: "#ccbaa4",
+    inputPlaceholder: "#886d4e",
+    // Icon
+    icon: "#836e53",
+    // diary
+    card: "#E6D9D3",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#836e5320",
+    questionBackground: "transparent",
+    answerBackground: "#836e5320",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#836e53",
+  },
+  vintagePaper: {
+    // General
+    background: "#E8E8E8",
+    backgroundImage: {
+      id: 204,
+      value: "#E8E8E8",
+      type: "image",
+      url: require("@/assets/images/background/vintagePaper.jpg"),
     },
     backgroundAdditional: "#bab0a9",
     primary: "#604d3f",
@@ -68,7 +216,7 @@ export const Colors: Record<string, ColorTheme> = {
     textAdditional: "#8e7868",
     textInPrimary: "#FFFFFF",
     link: "#0000ff",
-    border: "#604d3f",
+    border: "#c6beb7",
     error: "#B9130F",
     notification: "#ff5252",
     // calendar
@@ -83,39 +231,579 @@ export const Colors: Record<string, ColorTheme> = {
     tabIcon: "#687076",
     tabIconSelected: "#604d3f",
     // input
-    inputBackground: "#ffffff",
+    inputBackground: "#bab0a9",
     inputBorder: "#a59285",
+    inputPlaceholder: "#888",
     // Icon
     icon: "#604d3f",
     // diary
-    card: "#b5aea8",
+    card: "#E8E8E8",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#00000033",
+    aiCommentBackground: "#604d3f20",
     questionBackground: "transparent",
-    answerBackground: "#00000033",
+    answerBackground: "#604d3f20",
     //  settings
     blockBackground: "#b5aea8",
     // barStyle
-    barStyle: "light",
+    barStyle: "dark",
     // rich
-    toolbarBackground: "#8e8680",
+    toolbarBackground: "#F8F8F8",
     toolbarIcon: "#604d3f",
   },
-  neonIce: {
-    // General
-    background: "#FFFFFF",
+  zenMind: {
+    background: "#EDECE4",
     backgroundImage: {
-      id: 201,
-      value: "#FFFFFF",
+      id: 205,
+      value: "#EDECE4",
       type: "image",
-      url: require("@/assets/images//background/neonIce.jpeg"),
+      url: require("@/assets/images/background/zenMind.jpg"),
     },
-    backgroundAdditional: "#6ebbbd",
+    backgroundAdditional: "#afb0b1",
+    primary: "#43484B",
+    disabledPrimary: "#99a1a6",
+    secondary: "#",
+    text: "#2b2e30",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#b6bfc5",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#43484B",
+    calendarDisableDayBorder: "#9ea5a8",
+    calendarDayLabels: "#888f93",
+    calendarDayDisabled: "#99a1a6",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#8e9598",
+    tabIconSelected: "#43484B",
+    // input
+    inputBackground: "#afb0b1",
+    inputBorder: "#b6bfc5",
+    inputPlaceholder: "#696e71",
+    // Icon
+    icon: "#43484B",
+    // diary
+    card: "#EDECE4",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#43484B20",
+    questionBackground: "transparent",
+    answerBackground: "#43484B20",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#43484B",
+  },
+  mindset: {
+    background: "#F3E7D9",
+    backgroundImage: {
+      id: 206,
+      value: "#F3E7D9",
+      type: "image",
+      url: require("@/assets/images/background/mindset.jpg"),
+    },
+    backgroundAdditional: "#ddc5b4",
+    primary: "#C6A186",
+    disabledPrimary: "#d1c0b3",
+    secondary: "#",
+    text: "#4c3422",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#e1d0c3",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#C6A186",
+    calendarDisableDayBorder: "#ddcbbe",
+    calendarDayLabels: "#a1816c",
+    calendarDayDisabled: "#d1c0b3",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#5e4d41",
+    tabIconSelected: "#C6A186",
+    // input
+    inputBackground: "#ddc5b4",
+    inputBorder: "#e1d0c3",
+    inputPlaceholder: "#a1816c",
+    // Icon
+    icon: "#C6A186",
+    // diary
+    card: "#F3E7D9",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#C6A18620",
+    questionBackground: "transparent",
+    answerBackground: "#C6A18620",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#C6A186",
+  },
+  balance: {
+    background: "#DDD9D6",
+    backgroundImage: {
+      id: 207,
+      value: "#DDD9D6",
+      type: "image",
+      url: require("@/assets/images/background/balance.jpg"),
+    },
+    backgroundAdditional: "#9c897b",
+    primary: "#3D2B1D",
+    disabledPrimary: "#9a6d4b",
+    secondary: "#",
+    text: "#1e150e",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#cdb9a9",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#3D2B1D",
+    calendarDisableDayBorder: "#876f5d",
+    calendarDayLabels: "#91847b",
+    calendarDayDisabled: "#9a6d4b",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#3D2B1D",
+    tabIconSelected: "#8c7766",
+    // input
+    inputBackground: "#9c897b",
+    inputBorder: "#cdb9a9",
+    inputPlaceholder: "#5e534b",
+    // Icon
+    icon: "#3D2B1D",
+    // diary
+    card: "#DDD9D6",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#",
+    questionBackground: "#",
+    answerBackground: "#",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#3D2B1D",
+  },
+  leafScape: {
+    background: "#E6E5E1",
+    backgroundImage: {
+      id: 208,
+      value: "#E6E5E1",
+      type: "image",
+      url: require("@/assets/images/background/leafScape.jpg"),
+    },
+    backgroundAdditional: "#869f96",
+    primary: "#213F34",
+    disabledPrimary: "#6fa591",
+    secondary: "#",
+    text: "#0c1713",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#b8d3c9",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#213F34",
+    calendarDisableDayBorder: "#579a81",
+    calendarDayLabels: "#668c7e",
+    calendarDayDisabled: "#6fa591",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#54a185",
+    tabIconSelected: "#213F34",
+    // input
+    inputBackground: "#869f96",
+    inputBorder: "#b8d3c9",
+    inputPlaceholder: "#496359",
+    // Icon
+    icon: "#213F34",
+    // diary
+    card: "#E6E5E1",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#213F3420",
+    questionBackground: "transparent",
+    answerBackground: "#213F3420",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#213F34",
+  },
+  pastelCollage: {
+    background: "#F7F6F2",
+    backgroundImage: {
+      id: 209,
+      value: "#F7F6F2",
+      type: "image",
+      url: require("@/assets/images/background/pastelCollage.jpg"),
+    },
+    backgroundAdditional: "#CEDAD1",
+    primary: "#929c94",
+    disabledPrimary: "#cbd8cd",
+    secondary: "#",
+    text: "#303331",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#d6e4d9",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#929c94",
+    calendarDisableDayBorder: "#ccd8cf",
+    calendarDayLabels: "#a4afa7",
+    calendarDayDisabled: "#cbd8cd",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#5a605b",
+    tabIconSelected: "#929c94",
+    // input
+    inputBackground: "#CEDAD1",
+    inputBorder: "#d6e4d9",
+    inputPlaceholder: "#a4afa7",
+    // Icon
+    icon: "#929c94",
+    // diary
+    card: "#F7F6F2",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#929c9420",
+    questionBackground: "transparent",
+    answerBackground: "#929c9420",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#929c94",
+  },
+  seaWhisper: {
+    background: "#d8cdc4",
+    backgroundImage: {
+      id: 210,
+      value: "#d8cdc4",
+      type: "image",
+      url: require("@/assets/images/background/seaWhisper.jpg"),
+    },
+    backgroundAdditional: "#a5a4a4",
+    primary: "#474144",
+    disabledPrimary: "#9f9399",
+    secondary: "#",
+    text: "#232122",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#d1c7cc",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#474144",
+    calendarDisableDayBorder: "#a69da2",
+    calendarDayLabels: "#7a7377",
+    calendarDayDisabled: "#9f9399",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#9a9196",
+    tabIconSelected: "#474144",
+    // input
+    inputBackground: "#a5a4a4",
+    inputBorder: "#d1c7cc",
+    inputPlaceholder: "#7a7377",
+    // Icon
+    icon: "#474144",
+    // diary
+    card: "#d8cdc4",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#47414420",
+    questionBackground: "transparent",
+    answerBackground: "#47414420",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#474144",
+  },
+  whiteLotus: {
+    background: "#FEFEFE",
+    backgroundImage: {
+      id: 211,
+      value: "#FEFEFE",
+      type: "image",
+      url: require("@/assets/images/background/whiteLotus.jpg"),
+    },
+    backgroundAdditional: "#939892",
+    primary: "#414C4E",
+    disabledPrimary: "#8c9c9f",
+    secondary: "#",
+    text: "#222829",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#bed9dd",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#414C4E",
+    calendarDisableDayBorder: "#8b9c9f",
+    calendarDayLabels: "#96a8aa",
+    calendarDayDisabled: "#8c9c9f",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#899395",
+    tabIconSelected: "#414C4E",
+    // input
+    inputBackground: "#939892",
+    inputBorder: "#bed9dd",
+    inputPlaceholder: "#646f70",
+    // Icon
+    icon: "#414C4E",
+    // diary
+    card: "#FEFEFE",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#414C4E20",
+    questionBackground: "transparent",
+    answerBackground: "#414C4E20",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#414C4E",
+  },
+  slowDown: {
+    background: "#ede3d4",
+    backgroundImage: {
+      id: 212,
+      value: "#ede3d4",
+      type: "image",
+      url: require("@/assets/images/background/slowDown.jpg"),
+    },
+    backgroundAdditional: "#8b96a1",
+    primary: "#2D5C80",
+    disabledPrimary: "#869fb1",
+    secondary: "#",
+    text: "#10202c",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#b7c6d1",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#2D5C80",
+    calendarDisableDayBorder: "#708493",
+    calendarDayLabels: "#92a0a6",
+    calendarDayDisabled: "#869fb1",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#59788f",
+    tabIconSelected: "#2D5C80",
+    // input
+    inputBackground: "#8b96a1",
+    inputBorder: "#b7c6d1",
+    inputPlaceholder: "#596970",
+    // Icon
+    icon: "#2D5C80",
+    // diary
+    card: "#ede3d4",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#2D5C8020",
+    questionBackground: "transparent",
+    answerBackground: "#2D5C8020",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#2D5C80",
+  },
+  fallLight: {
+    background: "#FBF3DC",
+    backgroundImage: {
+      id: 213,
+      value: "#FBF3DC",
+      type: "image",
+      url: require("@/assets/images/background/fallLight.jpg"),
+    },
+    backgroundAdditional: "#dda37c",
+    primary: "#FF6C05",
+    disabledPrimary: "#f6a369",
+    secondary: "#",
+    text: "#421c02",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#f8dbc7",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#FF6C05",
+    calendarDisableDayBorder: "#f8a76e",
+    calendarDayLabels: "#9a6f52",
+    calendarDayDisabled: "#f6a369",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#6e2f03",
+    tabIconSelected: "#FF6C05",
+    // input
+    inputBackground: "#dda37c",
+    inputBorder: "#f8dbc7",
+    inputPlaceholder: "#9a6f52",
+    // Icon
+    icon: "#FF6C05",
+    // diary
+    card: "#FBF3DC",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#FF6C0520",
+    questionBackground: "transparent",
+    answerBackground: "#FF6C0520",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#FF6C05",
+  },
+  pinkWhisper: {
+    background: "#E5DBDC",
+    backgroundImage: {
+      id: 214,
+      value: "#E5DBDC",
+      type: "image",
+      url: require("@/assets/images/background/pinkWhisper.jpg"),
+    },
+    backgroundAdditional: "#d1c5c4",
+    primary: "#B77E77",
+    disabledPrimary: "#b3a19f",
+    secondary: "#",
+    text: "#402d2a",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#baabaa",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#B77E77",
+    calendarDisableDayBorder: "#bca8a5",
+    calendarDayLabels: "#977670",
+    calendarDayDisabled: "#b3a19f",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#77534f",
+    tabIconSelected: "#B77E77",
+    // input
+    inputBackground: "#d1c5c4",
+    inputBorder: "#baabaa",
+    inputPlaceholder: "#977670",
+    // Icon
+    icon: "#B77E77",
+    // diary
+    card: "#E5DBDC",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#B77E7720",
+    questionBackground: "transparent",
+    answerBackground: "#B77E7720",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#B77E77",
+  },
+  paperRose: {
+    background: "#c0c9d1",
+    backgroundImage: {
+      id: 215,
+      value: "#c0c9d1",
+      type: "image",
+      url: require("@/assets/images/background/paperRose.jpg"),
+    },
+    backgroundAdditional: "#c0c9d1",
+    primary: "#627A91",
+    disabledPrimary: "#aabaca",
+    secondary: "#",
+    text: "#2d3945",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#aabaca",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#627A91",
+    calendarDisableDayBorder: "#a7b7c6",
+    calendarDayLabels: "#4c5e6e",
+    calendarDayDisabled: "#aabaca",
+    // tabs
+    tabBackground: "#ffffff",
+    tabIcon: "#bdc2c6",
+    tabIconSelected: "#627A91",
+    // input
+    inputBackground: "#c0c9d1",
+    inputBorder: "#aabaca",
+    inputPlaceholder: "#8197aa",
+    // Icon
+    icon: "#627A91",
+    // diary
+    card: "#c0c9d1",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#627A9120",
+    questionBackground: "transparent",
+    answerBackground: "#627A9120",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "dark",
+    // rich
+    toolbarBackground: "#ffffff",
+    toolbarIcon: "#627A91",
+  },
+  blueBloom: {
+    // General
+    background: "#ECEBE7",
+    backgroundImage: {
+      id: 216,
+      value: "#ECEBE7",
+      type: "image",
+      url: require("@/assets/images/background/blueBloom.jpg"),
+    },
+    backgroundAdditional: "#aebec8",
 
-    primary: "#14E6ED",
-    disabledPrimary: "#0c7578",
-    secondary: "#0d888c",
-    text: "#063739",
+    primary: "#2A7BA7",
+    disabledPrimary: "#7c9daf",
+    secondary: "#2A7BA7",
+    text: "#0a3f5a",
     textAdditional: "#687076",
     textInPrimary: "#FFFFFF",
     link: "#0000ff",
@@ -124,149 +812,48 @@ export const Colors: Record<string, ColorTheme> = {
     notification: "#ff5252",
     // calendar
     calendarBackground: "transparent",
-    calendarEnableDayBorder: "#5a5a5a",
-    calendarDisableDayBorder: "#a6a6a6",
+    calendarEnableDayBorder: "#2A7BA7",
+    calendarDisableDayBorder: "#aeccdc",
     calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
+    calendarDayDisabled: "#7c9daf",
 
     // tabs
     tabBackground: "#FFFFFF",
     tabIcon: "#687076",
-    tabIconSelected: "#14E6ED",
+    tabIconSelected: "#2A7BA7",
     // input
-    inputBackground: "#ffffff",
-    inputBorder: "#95d4d6",
+    inputBackground: "#aebec8",
+    inputBorder: "#E0E0E0",
+    inputPlaceholder: "#888",
     // Icon
-    icon: "#14E6ED",
+    icon: "#2A7BA7",
     // diary
-    card: "#dcfbfb",
+    card: "#ECEBE7",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ffffff33",
+    aiCommentBackground: "#2A7BA720",
     questionBackground: "transparent",
-    answerBackground: "#ffffff33",
+    answerBackground: "#2A7BA720",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
     barStyle: "dark",
     // rich
     toolbarBackground: "#FFFFFF",
-    toolbarIcon: "#344360",
+    toolbarIcon: "#2A7BA7",
   },
-  avocado: {
+  softWaves: {
     // General
-    background: "#FFFFFF",
+    background: "#E0E4E7",
     backgroundImage: {
-      id: 201,
-      value: "#FFFFFF",
+      id: 217,
+      value: "#E0E4E7",
       type: "image",
-      url: require("@/assets/images//background/avocado.jpeg"),
-    },
-    backgroundAdditional: "#badd9f",
-
-    primary: "#839179",
-    disabledPrimary: "#51594c",
-    secondary: "#586151",
-    text: "#30352c",
-    textAdditional: "#6f7768",
-    textInPrimary: "#FFFFFF",
-    link: "#0000ff",
-    border: "#E0E0E0",
-    error: "#B9130F",
-    notification: "#ff5252",
-    // calendar
-    calendarBackground: "transparent",
-    calendarEnableDayBorder: "#5a5a5a",
-    calendarDisableDayBorder: "#a6a6a6",
-    calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
-
-    // tabs
-    tabBackground: "#FFFFFF",
-    tabIcon: "#687076",
-    tabIconSelected: "#839179",
-    // input
-    inputBackground: "#ffffff",
-    inputBorder: "#7e837a",
-    // Icon
-    icon: "#839179",
-    // diary
-    card: "#e7f8db",
-    diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ffffff33",
-    questionBackground: "transparent",
-    answerBackground: "#ffffff33",
-    //  settings
-    blockBackground: "#FFFFFF",
-    // barStyle
-    barStyle: "dark",
-    // rich
-    toolbarBackground: "#FFFFFF",
-    toolbarIcon: "#344360",
-  },
-  heart: {
-    // General
-    background: "#FFFFFF",
-    backgroundImage: {
-      id: 201,
-      value: "#FFFFFF",
-      type: "image",
-      url: require("@/assets/images//background/heart.jpg"),
-    },
-    backgroundAdditional: "#d86668",
-
-    primary: "#DD0103",
-    disabledPrimary: "#7e0405",
-    secondary: "#0d888c",
-    text: "#220101",
-    textAdditional: "#687076",
-    textInPrimary: "#FFFFFF",
-    link: "#0000ff",
-    border: "#E0E0E0",
-    error: "#B9130F",
-    notification: "#ff5252",
-    // calendar
-    calendarBackground: "transparent",
-    calendarEnableDayBorder: "#5a5a5a",
-    calendarDisableDayBorder: "#a6a6a6",
-    calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
-
-    // tabs
-    tabBackground: "#FFFFFF",
-    tabIcon: "#687076",
-    tabIconSelected: "#DD0103",
-    // input
-    inputBackground: "#ffffff",
-    inputBorder: "#a64647",
-    // Icon
-    icon: "#DD0103",
-    // diary
-    card: "#ecb8b8",
-    diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ffffff33",
-    questionBackground: "transparent",
-    answerBackground: "#ffffff33",
-    //  settings
-    blockBackground: "#FFFFFF",
-    // barStyle
-    barStyle: "dark",
-    // rich
-    toolbarBackground: "#FFFFFF",
-    toolbarIcon: "#344360",
-  },
-  space: {
-    // General
-    background: "#FFFFFF",
-    backgroundImage: {
-      id: 201,
-      value: "#FFFFFF",
-      type: "image",
-      url: require("@/assets/images//background/space.jpg"),
+      url: require("@/assets/images/background/softWaves.jpg"),
     },
     backgroundAdditional: "#babfc8",
 
     primary: "#344360",
-    disabledPrimary: "#272f3e",
+    disabledPrimary: "#73819a",
     secondary: "#4a5365",
     text: "#2E3A59",
     textAdditional: "#687076",
@@ -279,24 +866,25 @@ export const Colors: Record<string, ColorTheme> = {
     calendarBackground: "transparent",
     calendarEnableDayBorder: "#f4f4f4",
     calendarDisableDayBorder: "#bfbdbd",
-    calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
+    calendarDayLabels: "#848998",
+    calendarDayDisabled: "#73819a",
 
     // tabs
     tabBackground: "#FFFFFF",
     tabIcon: "#687076",
     tabIconSelected: "#344360",
     // input
-    inputBackground: "#ffffff",
-    inputBorder: "#6d788e",
+    inputBackground: "#babfc8",
+    inputBorder: "#E0E0E0",
+    inputPlaceholder: "#848998",
     // Icon
     icon: "#344360",
     // diary
-    card: "#c3d0dc",
+    card: "#E0E4E7",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#ffffff33",
+    aiCommentBackground: "#34436020",
     questionBackground: "transparent",
-    answerBackground: "#ffffff33",
+    answerBackground: "#34436020",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
@@ -305,18 +893,17 @@ export const Colors: Record<string, ColorTheme> = {
     toolbarBackground: "#FFFFFF",
     toolbarIcon: "#344360",
   },
-
   calmMind: {
     background: "#F6F7F9",
     backgroundImage: {
-      id: 202,
+      id: 218,
       value: "#F6F7F9",
       type: "image",
-      url: require("@/assets/images//background/calmMind.jpg"),
+      url: require("@/assets/images/background/calmMind.jpg"),
     },
-    backgroundAdditional: "#cdd3df",
-    primary: "#5BA9A6",
-    disabledPrimary: "#4a7170",
+    backgroundAdditional: "#CADBE3",
+    primary: "#4A6B74",
+    disabledPrimary: "#89a6ae",
     secondary: "#FFC97A",
     text: "#23272F",
     textAdditional: "#8899AA",
@@ -327,25 +914,26 @@ export const Colors: Record<string, ColorTheme> = {
     notification: "#ff5252",
     // calendar
     calendarBackground: "transparent",
-    calendarEnableDayBorder: "#5BA9A6",
-    calendarDisableDayBorder: "#E5E7EB",
-    calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
+    calendarEnableDayBorder: "#4A6B74",
+    calendarDisableDayBorder: "#99b0b6",
+    calendarDayLabels: "#7b8497",
+    calendarDayDisabled: "#89a6ae",
     // tabs
     tabBackground: "#F6F7F9",
     tabIcon: "#85a6a5",
-    tabIconSelected: "#5BA9A6",
+    tabIconSelected: "#4A6B74",
     // input
-    inputBackground: "#F0F2F6",
-    inputBorder: "#94bdbb",
+    inputBackground: "#CADBE3",
+    inputBorder: "#E5E7EB",
+    inputPlaceholder: "#7b8497",
     // Icon
-    icon: "#5BA9A6",
+    icon: "#4A6B74",
     // diary
-    card: "#BED0DA",
+    card: "#dee1e3",
     diaryNotesBackground: "#FFFBEA",
-    aiCommentBackground: "#ffffff33",
+    aiCommentBackground: "#4A6B7420",
     questionBackground: "transparent",
-    answerBackground: "#ffffff33",
+    answerBackground: "#4A6B7420",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
@@ -354,20 +942,19 @@ export const Colors: Record<string, ColorTheme> = {
     toolbarBackground: "#F6F7F9",
     toolbarIcon: "#5BA9A6",
   },
-
   orange: {
     background: "#FFF9F4",
     backgroundImage: {
-      id: 203,
+      id: 219,
       value: "#FFF9F4",
       type: "image",
-      url: require("@/assets/images//background/orange.jpg"),
+      url: require("@/assets/images/background/orange.jpg"),
     },
-    backgroundAdditional: "#dcd0c5",
-    primary: "#FF8200",
-    disabledPrimary: "#984f02",
+    backgroundAdditional: "#bd795a",
+    primary: "#A54E32",
+    disabledPrimary: "#bc7d69",
     secondary: "#FFB354",
-    text: "#2E2E2E",
+    text: "#351910",
     textAdditional: "#A86800",
     textInPrimary: "#FFF",
     link: "#FF8200",
@@ -376,141 +963,40 @@ export const Colors: Record<string, ColorTheme> = {
     notification: "#ff5252",
     // calendar
     calendarBackground: "transparent",
-    calendarEnableDayBorder: "#FF8200",
-    calendarDisableDayBorder: "#FFD09A",
-    calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
+    calendarEnableDayBorder: "#A54E32",
+    calendarDisableDayBorder: "#d6b0a3",
+    calendarDayLabels: "#b19991",
+    calendarDayDisabled: "#bc7d69",
     // tabs
     tabBackground: "#FFF9F4",
-    tabIcon: "#FFB354",
-    tabIconSelected: "#FF8200",
+    tabIcon: "#472217",
+    tabIconSelected: "#A54E32",
     // input
-    inputBackground: "#FFF4E3",
-    inputBorder: "#a5805a",
+    inputBackground: "#dc9d81",
+    inputBorder: "#FFD09A",
+    inputPlaceholder: "#957c73",
     // Icon
-    icon: "#FF8200",
+    icon: "#A54E32",
     // diary
     card: "#FFF1DB",
     diaryNotesBackground: "#FFE9D1",
-    aiCommentBackground: "#ffffff33",
+    aiCommentBackground: "#A54E3220",
     questionBackground: "transparent",
-    answerBackground: "#ffffff33",
+    answerBackground: "#A54E3220",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle
     barStyle: "dark",
     // rich
     toolbarBackground: "#FFE4C7",
-    toolbarIcon: "#FF8200",
+    toolbarIcon: "#A54E32",
   },
-
-  sandDune: {
-    // General
-    background: "#8e8680",
-    backgroundImage: {
-      id: 205,
-      value: "#8e8680",
-      type: "image",
-      url: require("@/assets/images//background/sandDune.jpg"),
-    },
-    backgroundAdditional: "#bab0a9",
-    primary: "#604d3f",
-    disabledPrimary: "#453b34",
-    secondary: "#4a5365",
-    text: "#344360",
-    textAdditional: "#687076",
-    textInPrimary: "#FFFFFF",
-    link: "#0000ff",
-    border: "#604d3f",
-    error: "#B9130F",
-    notification: "#ff5252",
-    // calendar
-    calendarBackground: "transparent",
-    calendarEnableDayBorder: "#f4f4f4",
-    calendarDisableDayBorder: "#bfbdbd",
-    calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
-
-    // tabs
-    tabBackground: "#FFFFFF",
-    tabIcon: "#687076",
-    tabIconSelected: "#604d3f",
-    // input
-    inputBackground: "#ffffff",
-    inputBorder: "#a59589",
-    // Icon
-    icon: "#604d3f",
-    // diary
-    card: "#b5aea8",
-    diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#00000033",
-    questionBackground: "transparent",
-    answerBackground: "#00000033",
-    //  settings
-    blockBackground: "#b5aea8",
-    // barStyle
-    barStyle: "light",
-    // rich
-    toolbarBackground: "#8e8680",
-    toolbarIcon: "#604d3f",
-  },
-
-  yellowBokeh: {
-    // General
-    background: "#222020",
-    backgroundImage: {
-      id: 206,
-      value: "#222020",
-      type: "image",
-      url: require("@/assets/images/background/yellowBokeh.jpg"),
-    },
-    backgroundAdditional: "#534f4f",
-    primary: "#a59f37",
-    disabledPrimary: "#6a6732",
-    secondary: "#4a5365",
-    text: "#b6bcca",
-    textAdditional: "#687076",
-    textInPrimary: "#FFFFFF",
-    link: "#0000ff",
-    border: "#E0E0E0",
-    error: "#B9130F",
-    notification: "#ff5252",
-    // calendar
-    calendarBackground: "transparent",
-    calendarEnableDayBorder: "#f4f4f4",
-    calendarDisableDayBorder: "#989696",
-    calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
-    // tabs
-    tabBackground: "#222020",
-    tabIcon: "#687076",
-    tabIconSelected: "#a59f37",
-    // input
-    inputBackground: "#ffffff",
-    inputBorder: "#716f4a",
-    // Icon
-    icon: "#a59f37",
-    // diary
-    card: "#494545",
-    diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#00000033",
-    questionBackground: "transparent",
-    answerBackground: "#00000033",
-    //  settings
-    blockBackground: "#222020",
-    // barStyle
-    barStyle: "light",
-    // rich
-    toolbarBackground: "#222020",
-    toolbarIcon: "#a59f37",
-  },
-
   ball: {
     // General
-    background: "#222020",
+    background: "#494949",
     backgroundImage: {
-      id: 206,
-      value: "#222020",
+      id: 220,
+      value: "#494949",
       type: "image",
       url: require("@/assets/images/background/ball.jpeg"),
     },
@@ -522,30 +1008,31 @@ export const Colors: Record<string, ColorTheme> = {
     textAdditional: "#687076",
     textInPrimary: "#FFFFFF",
     link: "#0000ff",
-    border: "#E0E0E0",
+    border: "#575656",
     error: "#B9130F",
     notification: "#ff5252",
     // calendar
     calendarBackground: "transparent",
-    calendarEnableDayBorder: "#f4f4f4",
-    calendarDisableDayBorder: "#989696",
+    calendarEnableDayBorder: "#b6bcca",
+    calendarDisableDayBorder: "#636568",
     calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
+    calendarDayDisabled: "#3e3e3e",
     // tabs
     tabBackground: "#222020",
     tabIcon: "#687076",
     tabIconSelected: "#121212",
     // input
-    inputBackground: "#ffffff",
+    inputBackground: "#534f4f",
     inputBorder: "#615858",
+    inputPlaceholder: "#818080",
     // Icon
     icon: "#202020",
     // diary
-    card: "#494545",
+    card: "#494949",
     diaryNotesBackground: "#EFE7DA",
-    aiCommentBackground: "#00000033",
+    aiCommentBackground: "#20202020",
     questionBackground: "transparent",
-    answerBackground: "#00000033",
+    answerBackground: "#20202020",
     //  settings
     blockBackground: "#222020",
     // barStyle
@@ -554,14 +1041,357 @@ export const Colors: Record<string, ColorTheme> = {
     toolbarBackground: "#222020",
     toolbarIcon: "#7e7d6f",
   },
-
+  compass: {
+    background: "#403837",
+    backgroundImage: {
+      id: 221,
+      value: "#403837",
+      type: "image",
+      url: require("@/assets/images/background/compass.jpg"),
+    },
+    backgroundAdditional: "#4c4341",
+    primary: "#382A27",
+    disabledPrimary: "#493c37",
+    secondary: "#",
+    text: "#e4ccc7",
+    textAdditional: "#",
+    textInPrimary: "#e4ccc7",
+    link: "#0000ff",
+    border: "#3a3533",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#382A27",
+    calendarDisableDayBorder: "#493c37",
+    calendarDayLabels: "#af9692",
+    calendarDayDisabled: "#493c37",
+    // tabs
+    tabBackground: "#403837",
+    tabIcon: "#382A27",
+    tabIconSelected: "#291c19",
+    // input
+    inputBackground: "#4c4341",
+    inputBorder: "#3a3533",
+    inputPlaceholder: "#af9692",
+    // Icon
+    icon: "#382A27",
+    // diary
+    card: "#403837",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#382A2720",
+    questionBackground: "transparent",
+    answerBackground: "#382A2720",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#4a403e",
+    toolbarIcon: "#382A27",
+  },
+  oceanDepths: {
+    background: "#19232D",
+    backgroundImage: {
+      id: 222,
+      value: "#19232D",
+      type: "image",
+      url: require("@/assets/images/background/oceanDepths.jpg"),
+    },
+    backgroundAdditional: "#15222e",
+    primary: "#18314a",
+    disabledPrimary: "#0c1925",
+    secondary: "#",
+    text: "#abbfd5",
+    textAdditional: "#",
+    textInPrimary: "#abbfd5",
+    link: "#0000ff",
+    border: "#15222e",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#transparent",
+    calendarEnableDayBorder: "#18314a",
+    calendarDisableDayBorder: "#2f445a",
+    calendarDayLabels: "#798795",
+    calendarDayDisabled: "#0c1925",
+    // tabs
+    tabBackground: "#19232D",
+    tabIcon: "#252f3a",
+    tabIconSelected: "#18314a",
+    // input
+    inputBackground: "#15222e",
+    inputBorder: "#15222e",
+    inputPlaceholder: "#798795",
+    // Icon
+    icon: "#18314a",
+    // diary
+    card: "#19232D",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#18314a20",
+    questionBackground: "transparent",
+    answerBackground: "#18314a20",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#19232D",
+    toolbarIcon: "#2b5580",
+  },
+  neonFocus: {
+    background: "#111515",
+    backgroundImage: {
+      id: 223,
+      value: "#111515",
+      type: "image",
+      url: require("@/assets/images/background/neonFocus.jpg"),
+    },
+    backgroundAdditional: "#131B20",
+    primary: "#62B959",
+    disabledPrimary: "#2a4e27",
+    secondary: "#",
+    text: "#c2eabe",
+    textAdditional: "#",
+    textInPrimary: "#c2eabe",
+    link: "#0000ff",
+    border: "#162915",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#",
+    calendarEnableDayBorder: "#62B959",
+    calendarDisableDayBorder: "#3f653b",
+    calendarDayLabels: "#6c8f68",
+    calendarDayDisabled: "#2a4e27",
+    // tabs
+    tabBackground: "#111515",
+    tabIcon: "#2c5128",
+    tabIconSelected: "#62B959",
+    // input
+    inputBackground: "#131B20",
+    inputBorder: "#162915",
+    inputPlaceholder: "#6c8f68",
+    // Icon
+    icon: "#62B959",
+    // diary
+    card: "#111515",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#62B95920",
+    questionBackground: "transparent",
+    answerBackground: "#62B95920",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#111515",
+    toolbarIcon: "#62B959",
+  },
+  cipheredNight: {
+    background: "#1A2C2E",
+    backgroundImage: {
+      id: 224,
+      value: "#1A2C2E",
+      type: "image",
+      url: require("@/assets/images/background/cipheredNight.jpg"),
+    },
+    backgroundAdditional: "#223735",
+    primary: "#466a67",
+    disabledPrimary: "#79a8a4",
+    secondary: "#",
+    text: "#9abdba",
+    textAdditional: "#",
+    textInPrimary: "#9abdba",
+    link: "#0000ff",
+    border: "#223534",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#466a67",
+    calendarDisableDayBorder: "#223332",
+    calendarDayLabels: "#415956",
+    calendarDayDisabled: "#2a423f",
+    // tabs
+    tabBackground: "#0F181A",
+    tabIcon: "#283c3b",
+    tabIconSelected: "#466a67",
+    // input
+    inputBackground: "#223735",
+    inputBorder: "#223534",
+    inputPlaceholder: "#3d605b",
+    // Icon
+    icon: "#466a67",
+    // diary
+    card: "#1A2C2E",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#466a6720",
+    questionBackground: "transparent",
+    answerBackground: "#466a6720",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#0F181A",
+    toolbarIcon: "#466a67",
+  },
+  goodLuck: {
+    background: "#424041",
+    backgroundImage: {
+      id: 225,
+      value: "#424041",
+      type: "image",
+      url: require("@/assets/images/background/goodLuck.jpg"),
+    },
+    backgroundAdditional: "#2f3639",
+    primary: "#54676E",
+    disabledPrimary: "#95a8af",
+    secondary: "#",
+    text: "#ffffff",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#384242",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "transparent",
+    calendarEnableDayBorder: "#54676E",
+    calendarDisableDayBorder: "#4d5051",
+    calendarDayLabels: "#a1a1a1",
+    calendarDayDisabled: "#95a8af",
+    // tabs
+    tabBackground: "#000000",
+    tabIcon: "#252d30",
+    tabIconSelected: "#54676E",
+    // input
+    inputBackground: "#2f3639",
+    inputBorder: "#384242",
+    inputPlaceholder: "#989797",
+    // Icon
+    icon: "#",
+    // diary
+    card: "#424041",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#54676E20",
+    questionBackground: "transparent",
+    answerBackground: "#54676E20",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#424041",
+    toolbarIcon: "#54676E",
+  },
+  dreamAchieve: {
+    background: "#1E1E1E",
+    backgroundImage: {
+      id: 226,
+      value: "#1E1E1E",
+      type: "image",
+      url: require("@/assets/images/background/dreamAchieve.jpg"),
+    },
+    backgroundAdditional: "#1E1E1E",
+    primary: "#0d5132",
+    disabledPrimary: "#072e1c",
+    secondary: "#",
+    text: "#d9efe5",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#202523",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#transparent",
+    calendarEnableDayBorder: "#0d5132",
+    calendarDisableDayBorder: "#14271e",
+    calendarDayLabels: "#737a77",
+    calendarDayDisabled: "#072e1c",
+    // tabs
+    tabBackground: "#1E1E1E",
+    tabIcon: "#072c1b",
+    tabIconSelected: "#0d5132",
+    // input
+    inputBackground: "#333333",
+    inputBorder: "#202523",
+    inputPlaceholder: "#737a77",
+    // Icon
+    icon: "#0d5132",
+    // diary
+    card: "#1E1E1E",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#0d513220",
+    questionBackground: "transparent",
+    answerBackground: "#0d513220",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#1E1E1E",
+    toolbarIcon: "#0d5132",
+  },
+  timeToLive: {
+    background: "#1b1b1b",
+    backgroundImage: {
+      id: 227,
+      value: "#1b1b1b",
+      type: "image",
+      url: require("@/assets/images/background/timeToLive.jpg"),
+    },
+    backgroundAdditional: "#1b1b1b",
+    primary: "#5B010B",
+    disabledPrimary: "#330106",
+    secondary: "#",
+    text: "#ffffff",
+    textAdditional: "#",
+    textInPrimary: "#ffffff",
+    link: "#0000ff",
+    border: "#202020",
+    error: "#B9130F",
+    notification: "#ff5252",
+    // calendar
+    calendarBackground: "#transparent",
+    calendarEnableDayBorder: "#5B010B",
+    calendarDisableDayBorder: "#3c161a",
+    calendarDayLabels: "#7c7a7a",
+    calendarDayDisabled: "#330106",
+    // tabs
+    tabBackground: "#1b1b1b",
+    tabIcon: "#3c0108",
+    tabIconSelected: "#5B010B",
+    // input
+    inputBackground: "#4a4a4a",
+    inputBorder: "#202020",
+    inputPlaceholder: "#7c7a7a",
+    // Icon
+    icon: "#5B010B",
+    // diary
+    card: "#1b1b1b",
+    diaryNotesBackground: "#transparent",
+    aiCommentBackground: "#5B010B20",
+    questionBackground: "transparent",
+    answerBackground: "#5B010B20",
+    // settings
+    blockBackground: "#",
+    // barStyle
+    barStyle: "light",
+    // rich
+    toolbarBackground: "#1b1b1b",
+    toolbarIcon: "#5B010B",
+  },
   dark: {
     // General
     background: "#151718",
     backgroundImage: {
-      id: 204,
-      value: "#151718",
-      type: "color",
+      id: 228,
+      value: "#1b1a1a",
+      type: "image",
+      url: require("@/assets/images/background/dark.jpg"),
     },
     backgroundAdditional: "#282c2e",
     primary: "#344360",
@@ -579,7 +1409,7 @@ export const Colors: Record<string, ColorTheme> = {
     calendarEnableDayBorder: "#5b6165",
     calendarDisableDayBorder: "#1e2022",
     calendarDayLabels: "#888",
-    calendarDayDisabled: "#",
+    calendarDayDisabled: "#2d3340",
     // tabs
     tabBackground: "#151718",
     tabIcon: "#9BA1A6",
@@ -587,14 +1417,15 @@ export const Colors: Record<string, ColorTheme> = {
     // input
     inputBackground: "#000000",
     inputBorder: "#73809a",
+    inputPlaceholder: "#878686",
     // Icon
     icon: "#344360",
     // diary
     card: "#151718",
-    diaryNotesBackground: "#4b5255",
-    aiCommentBackground: "#00000033",
+    diaryNotesBackground: "#",
+    aiCommentBackground: "#34436020",
     questionBackground: "transparent",
-    answerBackground: "#00000033",
+    answerBackground: "#34436020",
     //  settings
     blockBackground: "#FFFFFF",
     // barStyle

@@ -51,7 +51,9 @@
     "logout": "Logout",
     "deleteAccount": "Delete Account",
     "continueWithoutRegistration": "Continue without registration",
-    "registerOrNotDescription": "If you continue without registering, your records will be lost if you uninstall the application or transfer it to another device."
+    "registerOrNotDescription": "If you continue without registering, your records will be lost if you uninstall the application or transfer it to another device.",
+    "wantToDeleteAccount": "Are you sure you want to delete your account?",
+    "loseAllRecords": "You will lose all your records. This action cannot be undone.",
   },
   "diary": {
     "title": "Diary",
@@ -72,7 +74,8 @@
         "photo": "Photo",
         "tag": "Tag"
       }
-    }
+    },
+    "askAnything": "Ask anything",
   },
   "chat": {
     "title": "Chat"
@@ -85,17 +88,36 @@
       "titlePlural": "Themes",
       "themes": {
         "light": "Light",
-        "system": "System",
+        "breathe": "Breathe",
+        "silentPeaks": "Silent Peaks",
+        "slowDown": "Slow Down",
+        "goldenHour": "Golden Hour",
+        "blueBloom": "Blue bloom",
+        "vintagePaper": "Vintage Paper",
+        "zenMind": "Zen Mind",
+        "mindset": "Mindset",
+        "balance": "Balance",
+        "leafScape": "Leaf Scape",
+        "pastelCollage": "Pastel Collage",
+        "seaWhisper": "Sea Whisper",
+        "whiteLotus": "White Lotus",
+        "fallLight": "Fall Light",
+        "pinkWhisper": "Pink Whisper",
+        "paperRose": "Paper Rose",
+        "softWaves": "Soft Waves",
         "neonIce": "Neon Ice",
-        "avocado": "Avocado",
-        "heart": "Three Hearts",
         "space": "Space",
         "calmMind": "Calm Mind",
         "orange": "Orange",
         "dark": "Dark",
-        "sandDune": "Sand Dune",
-        "ball": "Ball",
-        "yellowBokeh": "Yellow Bokeh"
+        "compass": "Compass",
+        "oceanDepths": "Ocean Depths",
+        "neonFocus": "Neon Focus",
+        "goodLuck": "Good Luck",
+        "cipheredNight": "Ciphered Night",
+        "dreamAchieve": "Dream.Achieve",
+        "timeToLive": "Time To Live",
+        "ball": "Ball"
       }
     },
     "font": {
@@ -207,6 +229,7 @@
     "userAlreadyExists": "An account with this email already exists",
     "undefined": "An unexpected error occurred",
     "invalidHash": "Invalid hash",
+    "noDataReturnedFromServer": "No data returned from the server",
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",
@@ -243,5 +266,9 @@
       "list5": "- foresee how your life will change if you continue in the same direction"
     },
     "doNotShowAnymore": "Do not show anymore",
+  },
+  "notFond": {
+    "title": "This screen does not exist.",
+    "description": "Go to home screen!"
   }
 }

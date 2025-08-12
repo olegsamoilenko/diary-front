@@ -28,6 +28,7 @@ export type ColorTheme = {
   // input
   inputBackground: string;
   inputBorder: string;
+  inputPlaceholder: string;
   // Icon
   icon: string;
   // diary

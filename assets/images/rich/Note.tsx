@@ -5,7 +5,7 @@ import { Colors } from "@/constants/Colors";
 
 export default function Note({ color }: { color: string }) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   return (
     <MaterialCommunityIcons
       name="notebook-outline"

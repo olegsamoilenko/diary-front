@@ -22,7 +22,7 @@ import RotatingIcon from "@/components/ui/RotatingIcon";
 type EntryCardProps = { entry: Entry; deleteEntry: (id: number) => void };
 export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
   const format = useSelector((state: RootState) => state.timeFormat.key);
   const [key, setKey] = useState<number>(0);
@@ -78,7 +78,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
   };
 
   const [contentHeight, setContentHeight] = useState<number>(30);
-  const onLayout = (e) => {
+  const onLayout = (e: any) => {
     const height = e.nativeEvent.layout.height;
     if (height > 0) setContentHeight(height);
   };
@@ -86,7 +86,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
   return (
     <EntryCardBackground
       background={
-        loadedEntry.settings?.background ?? {
+        loadedEntry.settings!.background ?? {
           type: "color",
           value: colors.card,
         }
@@ -264,8 +264,8 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               <HtmlViewer
                 htmlContent={
                   expanded[Number(loadedEntry.id)]
-                    ? loadedEntry.content
-                    : loadedEntry.previewContent
+                    ? loadedEntry.content!
+                    : loadedEntry.previewContent!
                 }
               />
               {/*<ViewReachEditor*/}
@@ -281,7 +281,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               style={{
                 position: "absolute",
                 zIndex: 0,
-                top: 0,
+                top: -10,
                 right: 0,
                 marginTop: 10,
                 marginBottom: 10,

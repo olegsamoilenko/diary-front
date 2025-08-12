@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const { t } = useTranslation();
   const font = useSelector((state: RootState) => state.font.font);
   const insets = useSafeAreaInsets();
@@ -29,10 +29,12 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
+        sceneStyle: { backgroundColor: "transparent" },
         tabBarStyle: {
           backgroundColor: colors.tabBackground,
           height: 60 + insets.bottom,
           paddingBottom: insets.bottom,
+          // borderTopWidth: 0,
           ...Platform.select({
             ios: { position: "absolute" },
             default: {},

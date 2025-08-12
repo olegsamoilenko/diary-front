@@ -22,7 +22,7 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const dispatch = useAppDispatch();
   const aiModel = useAppSelector((state) => state.settings.aiModel);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
   return (

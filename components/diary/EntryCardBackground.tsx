@@ -1,72 +1,100 @@
 import React, { useEffect, useState } from "react";
 import {
   Image,
-  ImageBackground,
-  ScrollView,
   View,
   LayoutChangeEvent,
+  Dimensions,
+  StyleSheet,
 } from "react-native";
+import { ENTRY_BG } from "@/constants/EntrySettings";
+import { BackgroundSettings } from "@/types";
 
-export default function EntryCardBackground({ children, background }) {
-  const [imageHeight, setImageHeight] = useState<number | null>(null);
+type EntryCardBackgroundProps = {
+  children: React.ReactNode;
+  background: BackgroundSettings;
+};
+
+export default function EntryCardBackground({
+  children,
+  background,
+}: EntryCardBackgroundProps) {
   const [contentHeight, setContentHeight] = useState<number>(0);
+  const screenWidth = Dimensions.get("window").width;
+  const [ratio, setRatio] = useState<number>(1);
 
   useEffect(() => {
-    if (background.type === "image" && background.url) {
-      if (typeof background.url === "number") {
-        // local require
-        const source = Image.resolveAssetSource(background.url);
-        setImageHeight(source.height);
-      } else if (background.url.uri) {
-        // remote
+    if (
+      background.type === "image" &&
+      background.key &&
+      ENTRY_BG[background.key]
+    ) {
+      if (typeof ENTRY_BG[background.key] === "number") {
+        const source = Image.resolveAssetSource(ENTRY_BG[background.key]);
+        setRatio(source.height / source.width);
+      } else if (ENTRY_BG[background.key].uri) {
         Image.getSize(
-          background.url.uri,
-          (w, h) => setImageHeight(h),
+          ENTRY_BG[background.key].uri,
+          (w, h) => {
+            setRatio(h / w);
+          },
           () => {},
         );
       }
     }
   }, [background]);
 
-  // 2. Якщо картинка, обгортаємо
-  if (background.type === "image" && background.url && imageHeight) {
+  const repeatCount = Math.ceil(contentHeight / ((screenWidth - 20) * ratio));
+
+  if (
+    background.type === "image" &&
+    background.key &&
+    ENTRY_BG[background.key]
+  ) {
     return (
-      <ImageBackground
-        source={background.url}
+      <View
         style={{
+          position: "relative",
           width: "100%",
-          minHeight: 100,
+          borderRadius: 8,
           overflow: "hidden",
           marginBottom: 20,
-          borderRadius: 8,
         }}
-        resizeMode="cover"
       >
+        <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+          {Array.from({ length: repeatCount }).map((_, i) => (
+            <Image
+              key={i}
+              source={ENTRY_BG[background.key!]}
+              style={{
+                width: "100%",
+                height: 800,
+              }}
+              resizeMode="cover"
+            />
+          ))}
+        </View>
+
         <View
+          onLayout={(e: LayoutChangeEvent) =>
+            setContentHeight(e.nativeEvent.layout.height)
+          }
           style={{
-            width: "100%",
-            flex: 1,
+            padding: 12,
           }}
         >
-          <View
-            onLayout={(e: LayoutChangeEvent) =>
-              setContentHeight(e.nativeEvent.layout.height)
-            }
-          >
-            {children}
-          </View>
+          {children}
         </View>
-      </ImageBackground>
+      </View>
     );
   }
 
   return (
     <View
       style={{
-        // flex: 1,
         backgroundColor: String(background.value) || "#fff",
-        marginBottom: 20,
         borderRadius: 8,
+        padding: 12,
+        marginBottom: 20,
       }}
     >
       {children}

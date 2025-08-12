@@ -11,6 +11,8 @@ import {
   ScrollView,
   Keyboard,
 } from "react-native";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
 type ModalPortalProps = {
   visible: boolean;
@@ -28,6 +30,8 @@ export default function ModalPortal({
   const { height: SCREEN_HEIGHT } = Dimensions.get("window");
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -77,6 +81,7 @@ export default function ModalPortal({
                     keyboardHeight === 0 && !maxHeight
                       ? contentHeight + 48
                       : computedMaxHeight,
+                  backgroundColor: colors.background,
                 },
               ]}
             >

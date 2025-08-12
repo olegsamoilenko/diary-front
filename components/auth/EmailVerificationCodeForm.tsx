@@ -28,7 +28,7 @@ export default function EmailVerificationCodeForm({
 }: EmailVerificationCodeFormProps) {
   const [code, setCode] = useState("");
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -108,10 +108,8 @@ export default function EmailVerificationCodeForm({
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      Toast.show({
-        type: "error",
-        text1: t(`errors.${errorKey}`),
-      });
+      setError(t(`errors.${errorKey}`));
+      setCode("");
     } finally {
       setResendLoading(false);
     }
@@ -129,6 +127,7 @@ export default function EmailVerificationCodeForm({
         maxLength={6}
         style={[styles.input, { letterSpacing: 5 }]}
         placeholder="******"
+        placeholderTextColor={colors.inputPlaceholder}
       />
       {error && (
         <ThemedText

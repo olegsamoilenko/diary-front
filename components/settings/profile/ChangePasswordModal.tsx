@@ -33,7 +33,7 @@ export default function ChangePasswordModal({
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +59,6 @@ export default function ChangePasswordModal({
   ) => {
     setLoading(true);
     setError(null);
-    console.log("handleChangeName called with values:", values);
     try {
       const res = await axios.post(`${apiUrl}/users/change`, {
         email: values.email,
@@ -126,6 +125,7 @@ export default function ChangePasswordModal({
                 onBlur={handleBlur("email")}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.email && errors.email && (
                 <ThemedText
@@ -148,6 +148,7 @@ export default function ChangePasswordModal({
                 onBlur={handleBlur("password")}
                 secureTextEntry
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.password && errors.password && (
                 <ThemedText
@@ -172,6 +173,7 @@ export default function ChangePasswordModal({
                 onBlur={handleBlur("newPassword")}
                 secureTextEntry
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.newPassword && errors.newPassword && (
                 <ThemedText

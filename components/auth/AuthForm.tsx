@@ -39,7 +39,7 @@ export default function AuthForm({
     activeAuthTab,
   );
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [showEmailVerificationCodeForm, setShowEmailVerificationCodeForm] =
     useState(false);
@@ -110,6 +110,7 @@ export default function AuthForm({
                   onPress={() => setActiveTab("login")}
                 >
                   <ThemedText
+                    type="subtitleLG"
                     style={[
                       styles.tabText,
                       activeTab === "login" && styles.activeTabText,
@@ -126,6 +127,7 @@ export default function AuthForm({
                   onPress={() => setActiveTab("register")}
                 >
                   <ThemedText
+                    type="subtitleLG"
                     style={[
                       styles.tabText,
                       activeTab === "register" && styles.activeTabText,

@@ -25,7 +25,7 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
   const handleFont = async (font: { title: string; name: string }) => {
@@ -36,8 +36,8 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const saveFontToStorage = async (font: { title: string; name: string }) => {
     try {
       await AsyncStorage.setItem("font", JSON.stringify(font));
-    } catch (e) {
-      console.log("Помилка при збереженні шрифту", e);
+    } catch (err: any) {
+      console.log("Error saving a font", err?.response?.data);
     }
   };
 

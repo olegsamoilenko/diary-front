@@ -8,21 +8,21 @@ import { useTranslation } from "react-i18next";
 
 export default function Welcome() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [name, setName] = useState("");
-  const { t } = useTranslation();
   const { t } = useTranslation();
   return (
     <View>
       <NemoryLogo />
       <View>
         <TextInput
-          placeholder="Ім'я"
+          placeholder={t("settings.profile.name")}
           style={styles.input}
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
+          placeholderTextColor={colors.inputPlaceholder}
         />
       </View>
     </View>

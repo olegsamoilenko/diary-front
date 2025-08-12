@@ -43,7 +43,7 @@ export default function RegisterForm({
   const lang = useState<string | null>(i18n.language)[0];
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [error, setError] = useState<string | null>(null);
 
@@ -209,6 +209,7 @@ export default function RegisterForm({
                 onBlur={handleBlur("email")}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.email && errors.email && (
                 <ThemedText
@@ -231,6 +232,7 @@ export default function RegisterForm({
                 onBlur={handleBlur("password")}
                 secureTextEntry
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.password && errors.password && (
                 <ThemedText
@@ -255,6 +257,7 @@ export default function RegisterForm({
                 onBlur={handleBlur("confirmPassword")}
                 secureTextEntry
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.confirmPassword && errors.confirmPassword && (
                 <ThemedText
@@ -372,6 +375,7 @@ export default function RegisterForm({
       {/*        placeholder="38XXXXXXXXXX"*/}
       {/*        onChangeText={handleChange("phone")}*/}
       {/*        onBlur={handleBlur("phone")}*/}
+      {/*placeholderTextColor={colors.inputPlaceholder}*/}
       {/*      />*/}
       {/*      <ThemedText*/}
       {/*        type="small"*/}

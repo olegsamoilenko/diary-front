@@ -14,7 +14,6 @@ GoogleSignin.configure({
 });
 
 export default function IndexScreen() {
-  console.log("IndexScreen rendered");
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (state) => {
       if (state === "active") {

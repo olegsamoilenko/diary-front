@@ -35,6 +35,7 @@ import Toast from "react-native-toast-message";
 import { BiometryProvider } from "@/context/BiometryContext";
 import { apiUrl } from "@/constants/env";
 import RegisterOrNot from "@/components/auth/RegisterOrNot";
+import { useTranslation } from "react-i18next";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -86,6 +87,7 @@ export default function RootLayout() {
   const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
   const [continueWithoutRegistration, setContinueWithoutRegistration] =
     useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     // const clearUserFromSecureStore = async () => {
@@ -127,7 +129,7 @@ export default function RootLayout() {
       });
 
       if (!res || res.status !== 201) {
-        console.log("No data returned from server");
+        console.log(t("errors.noDataReturnedFromServer"));
         return;
       }
 
@@ -142,7 +144,6 @@ export default function RootLayout() {
   };
 
   const updateLastActive = async () => {
-    console.log("user?.id", user?.id);
     if (!user?.id) {
       console.warn("User id is not defined");
       return;
@@ -159,16 +160,7 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
-    const getToken = async () => {
-      const token = await SecureStore.getItemAsync("token");
-      console.log("Token from SecureStore:", token);
-    };
-    getToken();
-  }, []);
-
-  useEffect(() => {
     updateLastActive();
-    console.log("Initializing user...", user);
   }, [user]);
 
   useEffect(() => {
@@ -288,7 +280,7 @@ function RootLayoutInner() {
   return (
     <ThemeProvider value={navTheme}>
       <Stack screenOptions={{ headerShown: false }}></Stack>
-      <StatusBar translucent />
+      <StatusBar translucent style={colors.barStyle} />
     </ThemeProvider>
   );
 }

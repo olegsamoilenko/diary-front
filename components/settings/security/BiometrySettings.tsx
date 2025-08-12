@@ -12,7 +12,7 @@ import { useBiometry } from "@/context/BiometryContext";
 
 const BiometrySettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const { biometryEnabled, setBiometry } = useBiometry();
@@ -45,8 +45,8 @@ const BiometrySettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               value={biometryEnabled}
               onValueChange={setBiometry}
               trackColor={{
-                false: colors.background,
-                true: colors.background,
+                false: "gray",
+                true: colors.backgroundAdditional,
               }}
               thumbColor={biometryEnabled ? colors.primary : "#acacac"}
               ios_backgroundColor="#3e3e3e"

@@ -39,7 +39,7 @@ const SideSheet = forwardRef<SideSheetRef, SideSheetProps>(
     ).current;
     const insets = useSafeAreaInsets();
     const colorScheme = useColorScheme();
-    const colors = Colors[colorScheme] ?? Colors.system;
+    const colors = Colors[colorScheme];
 
     const openSideScreen = () => {
       translateX.setValue(Dimensions.get("window").width);

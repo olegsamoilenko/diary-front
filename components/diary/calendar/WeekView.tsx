@@ -66,7 +66,7 @@ export default function WeekView({
   loadingDays,
 }: WeekViewProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const localeArr = Localization.getLocales();
   const locale = localeArr!.find((loc) => {
     return loc.languageCode === (i18n.language || "uk");
@@ -216,8 +216,10 @@ export default function WeekView({
                     ? colors.calendarEnableDayBorder
                     : itemMonth !== month && !isSelected
                       ? colors.calendarDisableDayBorder
-                      : colors.primary,
-                borderWidth: 1,
+                      : loadingDays
+                        ? colors.calendarDayDisabled
+                        : colors.primary,
+                borderWidth: 2,
                 width: CLOCK_RADIUS * 2,
                 height: CLOCK_RADIUS * 2,
                 borderRadius: CLOCK_RADIUS,
@@ -253,7 +255,7 @@ export default function WeekView({
                     key={idx}
                     style={{
                       position: "absolute",
-                      left: x - EMOJI_SIZE / 2,
+                      left: x - EMOJI_SIZE / 1.5,
                       top: y - EMOJI_SIZE / 1.5,
                       borderRadius: EMOJI_SIZE / 2,
                       alignItems: "center",

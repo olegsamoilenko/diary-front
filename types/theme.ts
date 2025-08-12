@@ -1,15 +1,29 @@
 export type Theme =
   | "light"
-  | "neonIce"
-  | "avocado"
-  | "heart"
-  | "space"
+  | "silentPeaks"
+  | "goldenHour"
+  | "vintagePaper"
+  | "zenMind"
+  | "mindset"
+  | "fallLight"
+  | "seaWhisper"
+  | "whiteLotus"
+  | "balance"
+  | "slowDown"
+  | "pinkWhisper"
+  | "blueBloom"
+  | "softWaves"
   | "calmMind"
   | "orange"
   | "dark"
-  | "sandDune"
-  | "ball"
-  | "yellowBokeh";
+  | "goodLuck"
+  | "oceanDepths"
+  | "dreamAchieve"
+  | "compass"
+  | "neonFocus"
+  | "cipheredNight"
+  | "timeToLive"
+  | "ball";
 export type ThemeContextType = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -18,14 +32,28 @@ export type ThemeContextType = {
 
 export type LogoTheme = {
   light?: any;
-  neonIce?: any;
-  avocado?: any;
-  heart?: any;
-  space?: any;
-  calmMind: any;
+  silentPeaks?: any;
+  goldenHour?: any;
+  vintagePaper?: any;
+  zenMind?: any;
+  fallLight?: any;
+  mindset?: any;
+  seaWhisper?: any;
+  whiteLotus?: any;
+  balance?: any;
+  slowDown?: any;
+  pinkWhisper?: any;
+  blueBloom?: any;
+  softWaves?: any;
+  calmMind?: any;
   orange?: any;
   dark?: any;
-  sandDune?: any;
+  goodLuck?: any;
+  oceanDepths?: any;
+  dreamAchieve?: any;
+  compass?: any;
+  neonFocus?: any;
+  cipheredNight?: any;
+  timeToLive?: any;
   ball?: any;
-  yellowBokeh?: any;
 };

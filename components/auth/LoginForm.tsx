@@ -36,7 +36,7 @@ export default function LoginForm({
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,7 +88,11 @@ export default function LoginForm({
   };
 
   return (
-    <View>
+    <View
+      style={{
+        marginBottom: 40,
+      }}
+    >
       <GoogleSignInButton
         onSuccessSignWithGoogle={onSuccessSignWithGoogle}
         forPlanSelect={forPlanSelect}
@@ -170,6 +174,7 @@ export default function LoginForm({
                 onBlur={handleBlur("email")}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.email && errors.email && (
                 <ThemedText
@@ -192,6 +197,7 @@ export default function LoginForm({
                 onBlur={handleBlur("password")}
                 secureTextEntry
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.password && errors.password && (
                 <ThemedText

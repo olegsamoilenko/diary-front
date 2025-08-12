@@ -13,7 +13,7 @@ type PaymentProps = {
 
 export default function Payment({ onSuccessPayment, plan }: PaymentProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const { t } = useTranslation();
   return (
     <View

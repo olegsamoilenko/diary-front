@@ -18,7 +18,7 @@ export default function RegisterOrNot({
   onChoice,
 }: RegisterOrNotProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const { t } = useTranslation();
 
   const handleRegistration = () => {

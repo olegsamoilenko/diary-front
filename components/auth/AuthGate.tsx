@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
-  Text,
   TextInput,
-  Button,
-  Alert,
   StyleSheet,
   TouchableOpacity,
   Platform,
@@ -42,7 +39,7 @@ export default function AuthGate({
   const [biometryEnabled, setBiometryEnabled] = useState(false);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [errorPin, setErrorPin] = useState("");
   const [user, setUser] = useState<User | null>(null);
@@ -244,7 +241,7 @@ export default function AuthGate({
                   isSubmitting,
                 }) => (
                   <View style={styles.center}>
-                    <ThemedText style={styles.label}>
+                    <ThemedText type="subtitleLG" style={styles.label}>
                       {t("auth.name")}
                     </ThemedText>
                     <TextInput
@@ -253,6 +250,7 @@ export default function AuthGate({
                       onBlur={handleBlur("name")}
                       style={[styles.input, { minWidth: "100%" }]}
                       placeholder={t("auth.name")}
+                      placeholderTextColor={colors.inputPlaceholder}
                     />
                     {touched.name && errors.name && (
                       <ThemedText
@@ -352,6 +350,7 @@ export default function AuthGate({
                     maxLength={6}
                     style={[styles.input, { letterSpacing: 5 }]}
                     placeholder="******"
+                    placeholderTextColor={colors.inputPlaceholder}
                   />
                   {touched.pin && errors.pin && (
                     <ThemedText
@@ -377,6 +376,7 @@ export default function AuthGate({
                     maxLength={6}
                     style={[styles.input, { letterSpacing: 5 }]}
                     placeholder="******"
+                    placeholderTextColor={colors.inputPlaceholder}
                   />
                   {touched.confirmPin && errors.confirmPin && (
                     <ThemedText
@@ -548,6 +548,7 @@ export default function AuthGate({
               maxLength={6}
               style={[styles.input, { letterSpacing: 5 }]}
               placeholder="******"
+              placeholderTextColor={colors.inputPlaceholder}
             />
             {errorPin && (
               <ThemedText
@@ -626,5 +627,7 @@ const getStyles = (colors: ColorTheme) =>
       width: 180,
       textAlign: "center",
       backgroundColor: colors.inputBackground,
+      borderColor: colors.border,
+      borderWidth: 1,
     },
   });

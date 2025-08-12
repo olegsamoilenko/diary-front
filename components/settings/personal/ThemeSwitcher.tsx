@@ -21,23 +21,71 @@ import { apiRequest } from "@/utils";
 const themes = [
   {
     name: "light",
-    img: require("@/assets/images/theme/light.jpg"),
+    img: require("@/assets/images/theme/breathe.jpg"),
   },
   {
-    name: "neonIce",
-    img: require("@/assets/images/theme/neonIce.jpg"),
+    name: "silentPeaks",
+    img: require("@/assets/images/theme/silentPeaks.jpg"),
   },
   {
-    name: "avocado",
-    img: require("@/assets/images/theme/avocado.jpg"),
+    name: "goldenHour",
+    img: require("@/assets/images/theme/goldenHour.jpg"),
   },
   {
-    name: "heart",
-    img: require("@/assets/images/theme/heart.jpg"),
+    name: "vintagePaper",
+    img: require("@/assets/images/theme/vintagePaper.jpg"),
   },
   {
-    name: "space",
-    img: require("@/assets/images/theme/space.jpg"),
+    name: "zenMind",
+    img: require("@/assets/images/theme/zenMind.jpg"),
+  },
+  {
+    name: "mindset",
+    img: require("@/assets/images/theme/mindset.jpg"),
+  },
+  {
+    name: "balance",
+    img: require("@/assets/images/theme/balance.jpg"),
+  },
+  {
+    name: "leafScape",
+    img: require("@/assets/images/theme/leafScape.jpg"),
+  },
+  {
+    name: "pastelCollage",
+    img: require("@/assets/images/theme/pastelCollage.jpg"),
+  },
+  {
+    name: "seaWhisper",
+    img: require("@/assets/images/theme/seaWhisper.jpg"),
+  },
+  {
+    name: "whiteLotus",
+    img: require("@/assets/images/theme/whiteLotus.jpg"),
+  },
+  {
+    name: "slowDown",
+    img: require("@/assets/images/theme/slowDown.jpg"),
+  },
+  {
+    name: "fallLight",
+    img: require("@/assets/images/theme/fallLight.jpg"),
+  },
+  {
+    name: "pinkWhisper",
+    img: require("@/assets/images/theme/pinkWhisper.jpg"),
+  },
+  {
+    name: "paperRose",
+    img: require("@/assets/images/theme/paperRose.jpg"),
+  },
+  {
+    name: "blueBloom",
+    img: require("@/assets/images/theme/blueBloom.jpg"),
+  },
+  {
+    name: "softWaves",
+    img: require("@/assets/images/theme/softWaves.jpg"),
   },
   {
     name: "calmMind",
@@ -48,16 +96,36 @@ const themes = [
     img: require("@/assets/images/theme/orange.jpg"),
   },
   {
-    name: "sandDune",
-    img: require("@/assets/images/theme/sandDune.jpg"),
-  },
-  {
-    name: "yellowBokeh",
-    img: require("@/assets/images/theme/yellowBokeh.jpg"),
-  },
-  {
     name: "ball",
     img: require("@/assets/images/theme/ball.jpg"),
+  },
+  {
+    name: "compass",
+    img: require("@/assets/images/theme/compass.jpg"),
+  },
+  {
+    name: "oceanDepths",
+    img: require("@/assets/images/theme/oceanDepths.jpg"),
+  },
+  {
+    name: "neonFocus",
+    img: require("@/assets/images/theme/neonFocus.jpg"),
+  },
+  {
+    name: "cipheredNight",
+    img: require("@/assets/images/theme/cipheredNight.jpg"),
+  },
+  {
+    name: "goodLuck",
+    img: require("@/assets/images/theme/goodLuck.jpg"),
+  },
+  {
+    name: "dreamAchieve",
+    img: require("@/assets/images/theme/dreamAchieve.jpg"),
+  },
+  {
+    name: "timeToLive",
+    img: require("@/assets/images/theme/timeToLive.jpg"),
   },
   {
     name: "dark",
@@ -69,7 +137,7 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { theme, setTheme } = useThemeCustom();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [user, setUser] = useState<User | null>(null);
 
@@ -91,7 +159,6 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   }, [theme]);
 
   const updateTheme = async () => {
-    console.log("user?.id", user?.id);
     if (!user?.id) {
       console.warn("User id is not defined");
       return;

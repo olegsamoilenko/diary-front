@@ -26,7 +26,7 @@ export default function PhoneVerificationCodeForm({
 }: PhoneVerificationCodeFormProps) {
   const [code, setCode] = useState("");
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
@@ -82,6 +82,7 @@ export default function PhoneVerificationCodeForm({
         maxLength={6}
         style={[styles.input, { letterSpacing: 5 }]}
         placeholder="******"
+        placeholderTextColor={colors.inputPlaceholder}
       />
       {error && (
         <ThemedText

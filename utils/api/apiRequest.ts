@@ -29,7 +29,6 @@ export async function apiRequest<T = any>({
 }: ApiRequestOptions): Promise<AxiosResponse<T>> {
   try {
     let token = await SecureStore.getItemAsync("token");
-    console.log("apiRequest: token", token);
 
     if (isTokenExpired(token)) {
       const userRaw = await SecureStore.getItemAsync("user");
@@ -44,7 +43,6 @@ export async function apiRequest<T = any>({
           });
           token = res.data.accessToken as string;
           await SecureStore.setItemAsync("token", token);
-          console.log("apiRequest: new token", token);
         } catch (err: any) {
           if (axios.isAxiosError(err)) {
             if (err.response && err.response.data) {
@@ -156,9 +154,6 @@ function isTokenExpired(token: string | null): boolean {
     if (!exp) return false;
 
     const now = Math.floor(Date.now() / 1000);
-
-    console.log("Token expiration time:", exp);
-    console.log("Current time:", now);
 
     return now >= exp;
   } catch (e) {

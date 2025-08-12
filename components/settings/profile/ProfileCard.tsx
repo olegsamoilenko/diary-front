@@ -20,7 +20,7 @@ export default function ProfileCard({
 }: ProfileCardProps) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
   return (

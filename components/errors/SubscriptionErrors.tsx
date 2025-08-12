@@ -5,11 +5,12 @@ import { View } from "react-native";
 import Background from "@/components/Background";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { Plan } from "@/types";
 import { ThemedText } from "@/components/ThemedText";
 import { useTranslation } from "react-i18next";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
+import RegisterOrNot from "@/components/auth/RegisterOrNot";
 
 const SubscriptionErrors = forwardRef<
   SideSheetRef,
@@ -20,13 +21,16 @@ const SubscriptionErrors = forwardRef<
   }
 >((props, ref) => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const [showPayment, setShowPayment] = React.useState(false);
   const [showAuthForm, setShowAuthForm] = React.useState(false);
   const [plan, setPlan] = React.useState<Plan | null>(null);
   const [successPaymentPlan, setSuccessPaymentPlan] =
     React.useState<Plan | null>(null);
   const { t } = useTranslation();
+  const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
+  const [continueWithoutRegistration, setContinueWithoutRegistration] =
+    useState(false);
 
   const onSuccess = async () => {
     props.onSuccessRenewPlan();
@@ -40,7 +44,15 @@ const SubscriptionErrors = forwardRef<
   return (
     <SideSheet ref={ref}>
       <Background background={colors.backgroundImage}>
-        {showPayment ? (
+        {showRegisterOrNot ? (
+          <RegisterOrNot
+            setShowAuthForm={setShowAuthForm}
+            setContinueWithoutRegistration={setContinueWithoutRegistration}
+            onChoice={() => {
+              setShowRegisterOrNot(false);
+            }}
+          />
+        ) : showPayment ? (
           <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
         ) : showAuthForm ? (
           <AuthForm
@@ -51,6 +63,7 @@ const SubscriptionErrors = forwardRef<
             onSuccessEmailCode={() => {
               setShowAuthForm(false);
             }}
+            onSuccessSignIn={() => setShowAuthForm(false)}
           />
         ) : (
           <View
@@ -70,12 +83,13 @@ const SubscriptionErrors = forwardRef<
             </ThemedText>
             <Plans
               showStartPlan={false}
-              setShowAuthForm={setShowAuthForm}
               setShowPayment={setShowPayment}
               onSuccess={onSuccess}
               setPlan={setPlan}
               successPaymentPlan={successPaymentPlan}
               setSuccessPaymentPlan={setSuccessPaymentPlan}
+              setShowRegisterOrNot={setShowRegisterOrNot}
+              continueWithoutRegistration={continueWithoutRegistration}
             />
           </View>
         )}

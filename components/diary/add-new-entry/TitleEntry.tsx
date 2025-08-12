@@ -40,6 +40,8 @@ type TitleEntryProps = {
   disabledTitleReachEditor?: boolean;
   titleReachEditorKey: number;
   titleEmoji: string;
+  setShowTip: (show: boolean) => void;
+  showTip?: boolean;
 };
 export default function TitleEntry({
   onChangeEntry,
@@ -58,12 +60,14 @@ export default function TitleEntry({
   disabledTitleReachEditor,
   titleReachEditorKey,
   titleEmoji,
+  setShowTip,
+  showTip,
 }: TitleEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const { t } = useTranslation();
-  const [showTip, setShowTip] = useState(false);
+
   const [visibleEmojiModal, setVisibleEmojiModal] = useState(false);
 
   useEffect(() => {

@@ -57,12 +57,15 @@ export default function RichToolbar({
   handlePhotoAction,
 }: RichToolbarProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   return (
     <View
       style={{
         width: "100%",
+        elevation: 10,
+        borderTopWidth: 1,
+        borderColor: colors.border,
       }}
     >
       <ScrollView

@@ -25,7 +25,7 @@ export default function ChangePasswordForm({
 }) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -132,6 +132,7 @@ export default function ChangePasswordForm({
                 maxLength={6}
                 style={[styles.input, { letterSpacing: 5 }]}
                 placeholder="******"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.code && errors.code && (
                 <ThemedText
@@ -154,6 +155,7 @@ export default function ChangePasswordForm({
                 onBlur={handleBlur("password")}
                 secureTextEntry
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.password && errors.password && (
                 <ThemedText
@@ -178,6 +180,7 @@ export default function ChangePasswordForm({
                 onBlur={handleBlur("confirmPassword")}
                 secureTextEntry
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.confirmPassword && errors.confirmPassword && (
                 <ThemedText

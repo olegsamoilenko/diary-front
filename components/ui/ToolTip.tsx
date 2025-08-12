@@ -34,7 +34,7 @@ export default function ToolTip({
   onClose?: () => void;
 }) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const [lines, setLines] = useState(0);
   const styles = getStyles(
     colors,
@@ -107,6 +107,8 @@ const getStyles = (
       bottom: bottom,
       backgroundColor: colors.background,
       borderRadius: 8,
+      borderColor: colors.border,
+      borderWidth: 1,
       padding: 10,
       zIndex: 99,
       maxWidth: maxWidth,
@@ -115,7 +117,7 @@ const getStyles = (
       shadowOpacity: 0.18,
       shadowRadius: 10,
       shadowOffset: { width: 0, height: 2 },
-      elevation: 5,
+      elevation: 10,
     },
     arrow: {
       position: "absolute",

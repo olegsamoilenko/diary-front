@@ -36,7 +36,7 @@ export default function Plans({
   continueWithoutRegistration,
 }: PlansProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
@@ -111,10 +111,6 @@ export default function Plans({
     };
     getUser();
   }, [saveToDatabase]);
-
-  useEffect(() => {
-    console.log("Plans component mounted", user);
-  }, [user]);
 
   return (
     <View

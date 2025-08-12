@@ -26,7 +26,7 @@ export default function ContentEntry({
   isEntrySaved,
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const scrollViewRef = useRef(null);
   const [idx, setIdx] = useState<number>(0);
 

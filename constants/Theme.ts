@@ -6,24 +6,69 @@ export const NavigationThemes = {
     colors: Colors["light"],
     fonts: {},
   },
-  neonIce: {
+  silentPeaks: {
     dark: false,
-    colors: Colors["neonIce"],
+    colors: Colors["silentPeaks"],
     fonts: {},
   },
-  avocado: {
+  goldenHour: {
     dark: false,
-    colors: Colors["avocado"],
+    colors: Colors["goldenHour"],
     fonts: {},
   },
-  heart: {
+  vintagePaper: {
     dark: false,
-    colors: Colors["heart"],
+    colors: Colors["vintagePaper"],
     fonts: {},
   },
-  space: {
+  zenMind: {
     dark: false,
-    colors: Colors["space"],
+    colors: Colors["zenMind"],
+    fonts: {},
+  },
+  mindset: {
+    dark: false,
+    colors: Colors["mindset"],
+    fonts: {},
+  },
+  seaWhisper: {
+    dark: false,
+    colors: Colors["seaWhisper"],
+    fonts: {},
+  },
+  fallLight: {
+    dark: false,
+    colors: Colors["fallLight"],
+    fonts: {},
+  },
+  whiteLotus: {
+    dark: false,
+    colors: Colors["whiteLotus"],
+    fonts: {},
+  },
+  balance: {
+    dark: false,
+    colors: Colors["balance"],
+    fonts: {},
+  },
+  slowDown: {
+    dark: false,
+    colors: Colors["slowDown"],
+    fonts: {},
+  },
+  pinkWhisper: {
+    dark: false,
+    colors: Colors["mindset"],
+    fonts: {},
+  },
+  blueBloom: {
+    dark: false,
+    colors: Colors["blueBloom"],
+    fonts: {},
+  },
+  softWaves: {
+    dark: false,
+    colors: Colors["softWaves"],
     fonts: {},
   },
   calmMind: {
@@ -41,19 +86,44 @@ export const NavigationThemes = {
     colors: Colors["ball"],
     fonts: {},
   },
+  goodLuck: {
+    dark: true,
+    colors: Colors["goodLuck"],
+    fonts: {},
+  },
+  oceanDepths: {
+    dark: true,
+    colors: Colors["oceanDepths"],
+    fonts: {},
+  },
+  dreamAchieve: {
+    dark: true,
+    colors: Colors["dreamAchieve"],
+    fonts: {},
+  },
+  cipheredNight: {
+    dark: true,
+    colors: Colors["cipheredNight"],
+    fonts: {},
+  },
+  neonFocus: {
+    dark: true,
+    colors: Colors["neonFocus"],
+    fonts: {},
+  },
+  compass: {
+    dark: true,
+    colors: Colors["compass"],
+    fonts: {},
+  },
+  timeToLive: {
+    dark: true,
+    colors: Colors["timeToLive"],
+    fonts: {},
+  },
   dark: {
     dark: true,
     colors: Colors["dark"],
-    fonts: {},
-  },
-  sandDune: {
-    dark: false,
-    colors: Colors["sandDune"],
-    fonts: {},
-  },
-  yellowBokeh: {
-    dark: false,
-    colors: Colors["yellowBokeh"],
     fonts: {},
   },
 };

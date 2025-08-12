@@ -35,7 +35,7 @@ export default function MonthView({
 }: MonthViewProps) {
   const lang = i18n.language || "uk";
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const localeArr = Localization.getLocales();
   const locale =
     localeArr!.find((loc) => loc.languageCode === lang)?.languageTag ?? "en-US";
@@ -143,7 +143,7 @@ export default function MonthView({
                 position: "relative",
                 width: "80%",
                 height: 37,
-                borderWidth: 1,
+                borderWidth: 2,
                 borderColor:
                   state === "disabled"
                     ? colors.calendarDisableDayBorder
@@ -177,7 +177,7 @@ export default function MonthView({
                     key={idx}
                     style={{
                       position: "absolute",
-                      left: x - EMOJI_SIZE / 2,
+                      left: x - EMOJI_SIZE / 1.5,
                       top: y - EMOJI_SIZE / 1.5,
                       borderRadius: EMOJI_SIZE / 2,
                       alignItems: "center",

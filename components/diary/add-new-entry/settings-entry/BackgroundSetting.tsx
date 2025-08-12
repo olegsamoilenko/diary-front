@@ -11,6 +11,7 @@ import type { BackgroundSettings, ColorTheme } from "@/types";
 import {
   AddEntryBackgroundColors,
   AddEntryBackgroundImage,
+  ENTRY_BG,
 } from "@/constants/EntrySettings";
 
 type OnChangeBackgroundArg = { background: BackgroundSettings };
@@ -24,7 +25,7 @@ export default function BackgroundSetting({
   onChangeBackground,
 }: BackgroundSettingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
   const handleBackground = (background: BackgroundSettings) => {
@@ -129,7 +130,7 @@ export default function BackgroundSetting({
                 ]}
               >
                 <Image
-                  source={image.url}
+                  source={ENTRY_BG[image.key!]}
                   style={{ width: "100%", height: "100%" }}
                 />
               </View>

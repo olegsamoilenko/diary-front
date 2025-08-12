@@ -64,7 +64,7 @@ export default function TitleReachEditor({
   const richTitle = useRef(null);
   const [editorHeight, setEditorHeight] = useState(40);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const { t } = useTranslation();
 
   const handleEditorMessage = (event: any) => {

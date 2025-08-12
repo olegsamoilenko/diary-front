@@ -26,7 +26,7 @@ export default function ForgotPasswordForm({
   const { t } = useTranslation();
   const lang = useState<string | null>(i18n.language)[0];
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,6 +122,7 @@ export default function ForgotPasswordForm({
                 onBlur={handleBlur("email")}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.email && errors.email && (
                 <ThemedText

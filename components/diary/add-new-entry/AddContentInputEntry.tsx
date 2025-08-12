@@ -62,7 +62,7 @@ export default function AddContentInputEntry({
   addEmoji,
 }: InputEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const [showImageSetting, setShowImageSetting] = useState(false);
   const [showPhotoSetting, setShowPhotoSetting] = useState(false);
   const [selectedColor, setSelectedColor] = useState(colors.text);

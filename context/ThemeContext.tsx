@@ -4,9 +4,9 @@ import { useColorScheme } from "react-native";
 import type { Theme, ThemeContextType } from "@/types";
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "system",
+  theme: "light",
   setTheme: () => {},
-  colorScheme: "system",
+  colorScheme: "light",
 });
 
 export const ThemeProviderCustom = ({
@@ -14,12 +14,13 @@ export const ThemeProviderCustom = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const systemScheme = useColorScheme() ?? "system";
-  const [theme, setTheme] = useState<Theme>("system");
+  const systemScheme = useColorScheme() ?? "dark";
+  const [theme, setTheme] = useState<Theme>("light");
   const [colorScheme, setColorScheme] = useState<Theme>(systemScheme);
 
   useEffect(() => {
     const handleStartTheme = async () => {
+      // await AsyncStorage.removeItem("APP_THEME");
       const storedTheme = await AsyncStorage.getItem("APP_THEME");
       if (storedTheme) {
         setTheme(storedTheme as Theme);
@@ -32,11 +33,7 @@ export const ThemeProviderCustom = ({
   }, []);
 
   useEffect(() => {
-    if (theme === "system") {
-      setColorScheme(systemScheme);
-    } else {
-      setColorScheme(theme);
-    }
+    setColorScheme(theme);
     AsyncStorage.setItem("APP_THEME", theme).catch(() => {});
   }, [theme, systemScheme]);
 

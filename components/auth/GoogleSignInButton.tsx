@@ -18,7 +18,7 @@ export default function GoogleSignInButton({
   onSuccessSignWithGoogle: () => void;
 }) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const googleLogo = require("@/assets/images/logo/google_logo.webp");
   const { t } = useTranslation();
 
@@ -69,8 +69,8 @@ export default function GoogleSignInButton({
       if (idToken) {
         await processUserData(idToken, user);
       }
-    } catch (error) {
-      console.log("Error", error);
+    } catch (err: any) {
+      console.log("Error", err?.response?.data);
     }
   };
 

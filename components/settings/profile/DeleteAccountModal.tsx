@@ -21,10 +21,9 @@ export default function DeleteAccountModal({
 }: DeleteAccountModalProps) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
 
   const handleDeleteAccount = async () => {
-    console.log("DeleteAccountModal: handleDeleteAccount called", userId);
     try {
       await apiRequest({
         url: `/users/${userId}`,
@@ -52,10 +51,10 @@ export default function DeleteAccountModal({
     >
       <View style={{ padding: 20 }}>
         <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>
-          Are you sure you want to delete your account?
+          {t("auth.wantToDeleteAccount")}
         </ThemedText>
         <ThemedText style={{ marginTop: 10 }}>
-          You will lose all your records. This action cannot be undone.
+          {t("auth.loseAllRecords")}
         </ThemedText>
         <View
           style={{
@@ -75,7 +74,9 @@ export default function DeleteAccountModal({
               borderColor: colors.border,
             }}
           >
-            <ThemedText style={{ color: colors.text }}>Cancel</ThemedText>
+            <ThemedText style={{ color: colors.text }}>
+              {t("common.cancel")}
+            </ThemedText>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleDeleteAccount}
@@ -86,7 +87,9 @@ export default function DeleteAccountModal({
               borderRadius: 12,
             }}
           >
-            <ThemedText style={{ color: "white" }}>Delete</ThemedText>
+            <ThemedText style={{ color: "white" }}>
+              {t("common.delete")}
+            </ThemedText>
           </TouchableOpacity>
         </View>
       </View>

@@ -13,6 +13,15 @@ export default ({ config }: { config: any }) => ({
     scheme: "nemory",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
+    splash: {
+      image: "./assets/images/icon_light.png",
+      backgroundColor: "#FFFFFF",
+      resizeMode: "contain",
+      dark: {
+        image: "./assets/images/icon_dark.png",
+        backgroundColor: "#000000",
+      },
+    },
     plugins: [
       "expo-router",
       "expo-localization",
@@ -23,15 +32,15 @@ export default ({ config }: { config: any }) => ({
             "com.googleusercontent.apps.com.googleusercontent.apps.328496914085-v457ftd508li5e4g35n1rj9s0b5douvu",
         },
       ],
-      [
-        "expo-splash-screen",
-        {
-          image: "./assets/images/icon.png",
-          imageWidth: 200,
-          resizeMode: "contain",
-          backgroundColor: "#ffffff",
-        },
-      ],
+      // [
+      //   "expo-splash-screen",
+      // {
+      //   image: "./assets/images/icon.png",
+      //   imageWidth: 200,
+      //   resizeMode: "contain",
+      //   backgroundColor: "#ffffff",
+      // },
+      // ],
       "expo-secure-store",
     ],
     experiments: {

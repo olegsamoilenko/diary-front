@@ -53,7 +53,7 @@ const AddNewEntry = forwardRef<
 >((props, ref) => {
   const aiModel = useAppSelector((state) => state.settings.aiModel);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const lang = i18n.language || "uk";
@@ -81,6 +81,7 @@ const AddNewEntry = forwardRef<
   const [isFocusTextRichEditor, setIsFocusTextRichEditor] = useState(false);
   const font = useSelector((state: RootState) => state.font.font);
   const [contentLoading, setContentLoading] = useState(false);
+  const [showTip, setShowTip] = useState(false);
 
   const [entry, setEntry] = useState<Entry>({
     id: 0,
@@ -102,6 +103,7 @@ const AddNewEntry = forwardRef<
       type: "color",
       value: colors.card,
       url: undefined,
+      key: "",
     },
   });
 
@@ -150,6 +152,7 @@ const AddNewEntry = forwardRef<
         type: "color",
         value: colors.card,
         url: undefined,
+        key: "",
       },
     });
   }, [isAddNewEntryOpen]);
@@ -244,6 +247,11 @@ const AddNewEntry = forwardRef<
   }, []);
 
   const handleSave = async () => {
+    if (!entry.mood) {
+      setShowTip(true);
+      return;
+    }
+
     setLoading(true);
     setIsFocusTitleRichEditor(false);
     setIsFocusTextRichEditor(false);
@@ -294,7 +302,7 @@ const AddNewEntry = forwardRef<
         newEntry!.mood,
       );
     } catch (err) {
-      console.log("Error saving entry.ts:", err);
+      console.log("Error saving entry.ts:", err?.response?.data);
       setLoading(false);
       setContentLoading(false);
     }
@@ -530,6 +538,8 @@ const AddNewEntry = forwardRef<
               sizeAction={sizeAction}
               selectedFont={selectedFont}
               titleEmoji={titleEmoji}
+              setShowTip={setShowTip}
+              showTip={showTip}
             />
 
             {contentLoading ? (
@@ -646,9 +656,9 @@ const AddNewEntry = forwardRef<
                   multiline
                   onChangeText={setDialogQuestion}
                   value={dialogQuestion}
-                  placeholder="Enter text"
+                  placeholder={t("diary.askAnything")}
                   scrollEnabled={true}
-                  placeholderTextColor={colors.textAdditional}
+                  placeholderTextColor={colors.inputPlaceholder}
                   style={{
                     maxHeight: ROW_HEIGHT * 10,
                     color: colors.text,

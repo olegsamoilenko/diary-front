@@ -15,4 +15,5 @@ export type BackgroundSettings = {
   type: "color" | "image";
   value?: string;
   url?: ImageSourcePropType | undefined;
+  key?: string;
 };

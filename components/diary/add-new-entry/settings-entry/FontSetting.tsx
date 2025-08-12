@@ -14,7 +14,7 @@ export default function SizeSetting({
   selectedFont,
 }: SizeSettingProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
 
   return (
     <View

@@ -27,7 +27,7 @@ export default function HandleSubscription({
   continueWithoutRegistration,
 }: SelectPlanProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const [showPayment, setShowPayment] = React.useState(false);

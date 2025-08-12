@@ -31,7 +31,7 @@ export function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const font = useSelector((state: RootState) => state.font.font);
   const styles = getStyles(colors, font);
 

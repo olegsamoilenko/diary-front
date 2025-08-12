@@ -43,7 +43,7 @@ export default function Settings() {
   const profileRef = useRef<SideSheetRef>(null);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
 
   const modelSwitcherRef = useRef<SideSheetRef>(null);
   const aiModel = useAppSelector((state) => state.settings.aiModel);

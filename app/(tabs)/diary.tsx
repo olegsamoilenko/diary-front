@@ -26,7 +26,7 @@ import WelcomeModal from "@/components/diary/WelcomeModal";
 export default function Diary() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const addNewEntryRef = useRef<SideSheetRef>(null);
   const subscriptionErrorsRef = useRef<SideSheetRef>(null);
   const [selectedDay, setSelectedDay] = useState<

@@ -21,7 +21,7 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [lang, setLang] = useState<string | null>(i18n.language);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
   const languages = Object.keys(i18n.options.resources ?? { en: {} }).map(

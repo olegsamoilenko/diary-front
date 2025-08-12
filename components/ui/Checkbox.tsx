@@ -18,7 +18,7 @@ export default function Checkbox({
   onChange,
 }: CustomCheckboxProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   return (
     <TouchableOpacity
@@ -66,6 +66,6 @@ const getStyles = (colors: ColorTheme) =>
     label: {
       marginLeft: 8,
       fontSize: 16,
-      color: "#222",
+      color: colors.text,
     },
   });

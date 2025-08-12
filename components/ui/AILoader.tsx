@@ -18,7 +18,7 @@ export const AILoader = ({
   dotFontSize = 16,
 }: AILoaderProps) => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const [step, setStep] = useState(0);
   const interval = useRef<NodeJS.Timeout | null>(null);
 

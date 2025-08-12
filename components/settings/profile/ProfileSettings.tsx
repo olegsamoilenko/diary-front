@@ -35,7 +35,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme] ?? Colors.system;
+  const colors = Colors[colorScheme];
   const styles = getStyles(colors);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
@@ -68,7 +68,6 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     } else {
       setUserLogged(false);
     }
-    console.log("getUserLogged called, userLogged:", token);
   };
 
   useEffect(() => {
@@ -277,6 +276,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                       borderWidth: 1,
                       borderColor: colors.border,
                       marginBottom: 20,
+                      backgroundColor: colors.background,
                     },
                   ]}
                   onPress={handleLogout}
@@ -348,6 +348,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                       borderWidth: 1,
                       borderColor: colors.border,
                       marginBottom: 20,
+                      backgroundColor: colors.background,
                     },
                   ]}
                   onPress={() => setShowDeleteAccountModal(true)}
