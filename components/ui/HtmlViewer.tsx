@@ -15,6 +15,27 @@ export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
     }),
   };
 
+  const getSize = (size: string | undefined): number => {
+    switch (size) {
+      case "1":
+        return 10;
+      case "2":
+        return 12;
+      case "3":
+        return 16;
+      case "4":
+        return 18;
+      case "5":
+        return 22;
+      case "6":
+        return 28;
+      case "7":
+        return 32;
+      default:
+        return 16;
+    }
+  };
+
   const renderers = {
     font: ({ tnode, TDefaultRenderer, ...props }) => {
       if (!tnode || !tnode.domNode || !tnode.domNode.attribs) {
@@ -33,10 +54,10 @@ export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
       }
 
       if (size) {
-        const sizeNum = parseInt(size);
-        // Наприклад, формула (можна налаштувати)
-        style.fontSize = 10 + sizeNum * 3;
+        style.fontSize = getSize(size);
       }
+
+      style.lineHeight = getSize(size) + 4;
 
       return TDefaultRenderer({ ...props, style: [props.style, style], tnode });
     },

@@ -36,6 +36,7 @@ import { BiometryProvider } from "@/context/BiometryContext";
 import { apiUrl } from "@/constants/env";
 import RegisterOrNot from "@/components/auth/RegisterOrNot";
 import { useTranslation } from "react-i18next";
+import CustomToast from "@/components/ui/CustomToast";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -201,7 +202,7 @@ export default function RootLayout() {
         <ThemeProviderCustom>
           <ThemeProvider value={navTheme}>
             <AuthGate onAuthenticated={() => setIsAuthenticated(true)} />
-            <Toast />
+            <CustomToast />
           </ThemeProvider>
         </ThemeProviderCustom>
       </Provider>
@@ -245,7 +246,7 @@ export default function RootLayout() {
           </BiometryProvider>
         </AuthProvider>
       </ThemeProviderCustom>
-      <Toast />
+      <CustomToast />
     </Provider>
   );
 }

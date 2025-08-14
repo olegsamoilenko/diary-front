@@ -123,7 +123,7 @@ export async function apiRequest<T = any>({
 
       Toast.show({
         type: "error",
-        text1: `Error ${status}`,
+        text1: `${err.response.data.error}`,
         text2: errorMessage,
       });
 

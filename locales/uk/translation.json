@@ -145,7 +145,9 @@
       "title": "Модель",
       "titlePlural": "Моделі",
       "gpt-4o": "GPT-4o",
-      "gpt-4-turbo": "GPT-4 Turbo"
+      "gpt-4-turbo": "GPT-4 Turbo",
+      "gpt-4.1": "GPT-4.1",
+      "gpt-5": "GPT-5"
     },
     "subscription": "Налаштування підписки",
     "plans": {

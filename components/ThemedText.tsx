@@ -83,27 +83,27 @@ const getStyles = (
     titleXL: {
       fontSize: 24,
       fontFamily: getFont(font.name, "bold"),
-      lineHeight: 32,
+      lineHeight: 38,
     },
     titleLG: {
       fontSize: 22,
       fontFamily: getFont(font.name, "bold"),
-      lineHeight: 28,
+      lineHeight: 26,
     },
     subtitleXL: {
       fontSize: 20,
       fontFamily: getFont(font.name, "bold"),
-      lineHeight: 26,
+      lineHeight: 24,
     },
     subtitleLG: {
       fontSize: 18,
       fontFamily: getFont(font.name, "bold"),
-      lineHeight: 24,
+      lineHeight: 22,
     },
     extraSmall: {
       fontSize: 12,
       fontFamily: getFont(font.name, "regular"),
-      lineHeight: 16,
+      lineHeight: 15,
     },
     small: {
       fontSize: 14,
@@ -113,17 +113,16 @@ const getStyles = (
     default: {
       fontSize: 16,
       fontFamily: getFont(font.name, "regular"),
-      lineHeight: 24,
+      lineHeight: 20,
     },
     bold: {
       fontSize: 16,
       fontFamily: getFont(font.name, "bold"),
-      lineHeight: 24,
+      lineHeight: 20,
     },
     extraSmallLink: {
       fontFamily: getFont(font.name, "regular"),
       lineHeight: 16,
-
       fontSize: 12,
     },
     smallLink: {
@@ -133,7 +132,7 @@ const getStyles = (
     },
     link: {
       fontFamily: getFont(font.name, "regular"),
-      lineHeight: 30,
+      lineHeight: 20,
       fontSize: 16,
     },
   });

@@ -98,8 +98,9 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
           backgroundColor: "transparent",
           borderRadius: 8,
           marginBottom: 8,
-          padding: 8,
+          padding: 2,
           position: "relative",
+          zIndex: 0,
         }}
       >
         <View
@@ -108,28 +109,28 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
             alignItems: "flex-start",
             justifyContent: "space-between",
             backgroundColor: "transparent",
+            marginBottom: 10,
           }}
         >
           <View
             style={{
-              alignItems: "flex-start",
-              justifyContent: "flex-start",
+              alignItems: "flex-end",
+              justifyContent: "flex-end",
               // flex: 1,
               backgroundColor: "transparent",
               marginBottom: 0,
-              marginTop: 5,
+              marginTop: 0,
               paddingBottom: 0,
             }}
           >
-            <ThemedText
+            <Text
               style={{
                 fontSize: 24,
                 marginRight: 8,
-                paddingBottom: 5,
               }}
             >
               {loadedEntry.mood}
-            </ThemedText>
+            </Text>
           </View>
           <View
             style={{
@@ -243,11 +244,11 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
 
         <ExpandableSection
           expanded={expanded[Number(loadedEntry.id)]}
-          collapsedHeight={115}
-          expandedHeight={180}
+          collapsedHeight={100}
+          expandedHeight={150}
           style={{
             borderRadius: 8,
-            marginBottom: 12,
+            marginBottom: 2,
             padding: 0,
           }}
         >
@@ -255,7 +256,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
             key={loadedEntry.id}
             onPress={() => toggleExpand(Number(loadedEntry.id))}
             style={{
-              marginBottom: 20,
+              marginBottom: 15,
               position: "relative",
               zIndex: 10,
             }}
@@ -299,7 +300,8 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               style={{
                 backgroundColor: colors.aiCommentBackground,
                 borderRadius: 10,
-                paddingLeft: 4,
+                paddingHorizontal: 5,
+                paddingBottom: 5,
                 width: "80%",
                 marginBottom: 18,
               }}
@@ -352,7 +354,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                     borderRadius: 10,
                     width: "80%",
                     alignSelf: "flex-end",
-                    padding: 8,
+                    padding: 0,
                     marginBottom: 18,
                   }}
                 >
@@ -370,13 +372,13 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                   style={{
                     backgroundColor: colors.answerBackground,
                     borderRadius: 10,
-                    paddingLeft: 4,
+                    paddingHorizontal: 10,
+                    paddingBottom: 10,
                     width: "80%",
                   }}
                 >
                   <View
                     style={{
-                      paddingLeft: 5,
                       paddingTop: 10,
                     }}
                   >

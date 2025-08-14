@@ -58,6 +58,7 @@ export default function EntryCardBackground({
           borderRadius: 8,
           overflow: "hidden",
           marginBottom: 20,
+          elevation: 3,
         }}
       >
         <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
@@ -93,8 +94,9 @@ export default function EntryCardBackground({
       style={{
         backgroundColor: String(background.value) || "#fff",
         borderRadius: 8,
-        padding: 12,
+        paddingHorizontal: 8,
         marginBottom: 20,
+        elevation: 3,
       }}
     >
       {children}

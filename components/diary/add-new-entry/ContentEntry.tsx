@@ -9,6 +9,7 @@ import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 // import { useTypewriter } from "@/hooks/useTypewriter";
 import TypewriterText from "@/components/diary/add-new-entry/TypewriterText";
+import HtmlViewer from "@/components/ui/HtmlViewer";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -54,13 +55,13 @@ export default function ContentEntry({
           style={{
             flex: 1,
             padding: 10,
-            marginHorizontal: 15,
             backgroundColor: "transparent",
             borderRadius: 8,
             marginBottom: 10,
           }}
         >
           <ViewReachEditor content={entry.content} />
+          {/*<HtmlViewer htmlContent={entry.content} />*/}
         </View>
         {entry && entry.aiComment && (
           <>

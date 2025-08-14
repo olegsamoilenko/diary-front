@@ -17,7 +17,13 @@ export default function ViewReachEditor({ content }: { content: string }) {
     <RichEditor
       disabled={true}
       initialContentHTML={content}
+      style={{
+        flex: 1,
+        padding: 0,
+        margin: 0,
+      }}
       editorStyle={{
+        cssText: "body { line-height: 1.2 !important; }",
         backgroundColor: "transparent",
         initialCSSText: `
           ${MarckScriptFontStylesheet}

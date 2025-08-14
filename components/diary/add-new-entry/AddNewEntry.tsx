@@ -301,7 +301,7 @@ const AddNewEntry = forwardRef<
         aiModel,
         newEntry!.mood,
       );
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error saving entry.ts:", err?.response?.data);
       setLoading(false);
       setContentLoading(false);
