@@ -10,11 +10,19 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Pressable,
+  ScrollView,
 } from "react-native";
 import { AiComment, ColorTheme, Entry, PlanStatus, StatusCode } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { apiRequest, getFont, getTodayDateStr } from "@/utils";
+import {
+  apiRequest,
+  getFont,
+  getTodayDateStr,
+  getToken,
+  aiStreamEmitter,
+  addToAiChunkBuffer,
+} from "@/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -32,6 +40,7 @@ import { FONTS } from "@/assets/fonts/entry";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import * as SecureStore from "@/utils/store/secureStore";
+import { io } from "socket.io-client";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -40,6 +49,13 @@ type ActiveActions = {
   isInsertUnorderedList?: boolean;
   isInsertOrderedList?: boolean;
 };
+
+const socket = io(process.env.EXPO_PUBLIC_API_URL, {
+  auth: async (cb) => {
+    const token = await getToken();
+    cb({ token });
+  },
+});
 
 const AddNewEntry = forwardRef<
   SideSheetRef,
@@ -121,6 +137,7 @@ const AddNewEntry = forwardRef<
   );
   const [isFocusTitleRichEditor, setIsFocusTitleRichEditor] = useState(false);
   const [dialogQuestion, setDialogQuestion] = useState("");
+  const [chunk, setChunk] = useState<string>("");
 
   useEffect(() => {
     setColorAction(colors.text);
@@ -246,6 +263,11 @@ const AddNewEntry = forwardRef<
     };
   }, []);
 
+  const aiLoadingRef = useRef(aiLoading);
+
+  useEffect(() => {
+    aiLoadingRef.current = aiLoading;
+  }, [aiLoading]);
   const handleSave = async () => {
     if (!entry.mood) {
       setShowTip(true);
@@ -286,21 +308,38 @@ const AddNewEntry = forwardRef<
 
       setIsEntrySaved(true);
 
-      // if (ref && typeof ref !== "function" && ref?.current) {
-      //   ref.current.close();
-      // }
-
-      // if (props.onSuccess && entry) props.onSuccess(entry);
-
       setContentLoading(false);
+      setAiLoading(true);
 
-      await generateAiContent(
-        Number(newEntry!.id),
-        newEntry!.content,
-        newEntry!.embedding,
+      socket.emit("stream_ai_comment", {
+        entryId: Number(newEntry!.id),
+        content: newEntry!.content,
         aiModel,
-        newEntry!.mood,
-      );
+        mood: newEntry!.mood,
+      });
+
+      socket.on("ai_stream_chunk", ({ text }) => {
+        addToAiChunkBuffer(text);
+        aiStreamEmitter.emit("chunk", text);
+        if (aiLoadingRef.current) {
+          aiLoadingRef.current = false;
+
+          setTimeout(() => {
+            setAiLoading(false);
+          }, 0);
+        }
+      });
+
+      socket.on("ai_stream_done", ({ aiComment }) => {
+        setEntry((prev) => ({ ...prev, aiComment }));
+      });
+
+      // await generateAiContent(
+      //   Number(newEntry!.id),
+      //   newEntry!.content,
+      //   aiModel,
+      //   newEntry!.mood,
+      // );
     } catch (err: any) {
       console.log("Error saving entry.ts:", err?.response?.data);
       setLoading(false);
@@ -311,7 +350,6 @@ const AddNewEntry = forwardRef<
   const generateAiContent = async (
     entryId: number,
     content: string,
-    embedding: number[],
     aiModel: string,
     mood: string,
   ) => {
@@ -325,7 +363,6 @@ const AddNewEntry = forwardRef<
           entryId,
           data: {
             content,
-            embedding,
             aiModel,
             mood,
           },

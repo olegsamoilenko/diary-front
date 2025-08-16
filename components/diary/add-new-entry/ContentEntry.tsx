@@ -9,6 +9,7 @@ import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 // import { useTypewriter } from "@/hooks/useTypewriter";
 import TypewriterText from "@/components/diary/add-new-entry/TypewriterText";
+import StreamingText from "@/components/diary/add-new-entry/StreamingText";
 import HtmlViewer from "@/components/ui/HtmlViewer";
 
 type ContentEntryProps = {
@@ -17,6 +18,7 @@ type ContentEntryProps = {
   aiDialogLoading: boolean;
   isKeyboardOpen: boolean;
   isEntrySaved?: boolean;
+  onChange?: (text: string) => void;
 };
 
 export default function ContentEntry({
@@ -25,6 +27,7 @@ export default function ContentEntry({
   aiDialogLoading,
   isKeyboardOpen,
   isEntrySaved,
+  onChange,
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -97,14 +100,24 @@ export default function ContentEntry({
                   >
                     <NemoryIcon width={50} height={60} />
                   </View>
+                  {/*<ThemedText>{entry.aiComment.content}</ThemedText>*/}
 
-                  <TypewriterText
-                    text={entry.aiComment.content}
+                  {/*<TypewriterText*/}
+                  {/*  text={entry.aiComment.content}*/}
+                  {/*  speed={30}*/}
+                  {/*  style={{ color: colors.text, padding: 10 }}*/}
+                  {/*  onChange={() => {*/}
+                  {/*    setTimeout(() => {*/}
+                  {/*      // @ts-ignore*/}
+                  {/*      scrollViewRef.current?.scrollToEnd({ animated: true });*/}
+                  {/*    }, 20);*/}
+                  {/*  }}*/}
+                  {/*/>*/}
+                  <StreamingText
                     speed={30}
                     style={{ color: colors.text, padding: 10 }}
                     onChange={() => {
                       setTimeout(() => {
-                        // @ts-ignore
                         scrollViewRef.current?.scrollToEnd({ animated: true });
                       }, 20);
                     }}
@@ -162,15 +175,8 @@ export default function ContentEntry({
                       key={dialog.id || dialog.question}
                       text={dialog.answer ?? ""}
                       speed={30}
-                      style={{ color: colors.text, padding: 10 }}
-                      onChange={() => {
-                        setTimeout(() => {
-                          // @ts-ignore
-                          scrollViewRef.current?.scrollToEnd({
-                            animated: true,
-                          });
-                        }, 20);
-                      }}
+                      style={{ color: colors.text, padding: 5 }}
+                      onChange={onChange}
                     />
                   </View>
                 </View>
