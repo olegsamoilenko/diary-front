@@ -1,11 +1,17 @@
-const aiChunkBuffer: string[] = [];
+let aiChunkBuffers: Record<string, string[]> = {};
 
-export function addToAiChunkBuffer(chunk: string) {
-  aiChunkBuffer.push(chunk);
+export function addToAiChunkBuffer(id: string, chunk: string) {
+  if (!aiChunkBuffers[id]) aiChunkBuffers[id] = [];
+  aiChunkBuffers[id].push(chunk);
 }
 
-export function consumeAiChunkBuffer(): string[] {
-  const chunks = [...aiChunkBuffer];
-  aiChunkBuffer.length = 0;
+export function consumeAiChunkBuffer(id: string): string[] {
+  const chunks = [...(aiChunkBuffers[id] ?? [])];
+  aiChunkBuffers[id] = [];
   return chunks;
+}
+
+export function resetAiChunkBuffer(id: string) {
+  delete aiChunkBuffers[id];
+  console.log(`AI chunk buffer for ID ${id} has been reset.`, aiChunkBuffers);
 }

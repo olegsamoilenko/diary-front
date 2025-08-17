@@ -1,5 +1,6 @@
 export type Dialog = {
-  id?: string;
+  id?: number | string;
+  uuid?: string;
   question: string;
   answer?: string;
   entryId?: string;

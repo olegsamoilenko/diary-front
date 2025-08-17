@@ -22,6 +22,7 @@ import {
   getToken,
   aiStreamEmitter,
   addToAiChunkBuffer,
+  resetAiChunkBuffer,
 } from "@/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
@@ -41,6 +42,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import * as SecureStore from "@/utils/store/secureStore";
 import { io } from "socket.io-client";
+import { Dialog } from "@/types/dialog";
+import uuid from "react-native-uuid";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -300,7 +303,7 @@ const AddNewEntry = forwardRef<
         return;
       }
 
-      const newEntry: Entry = res.data;
+      const newEntry: Entry = await res.data;
 
       setEntry((prev) => ({ ...prev, ...newEntry }));
 
@@ -314,13 +317,16 @@ const AddNewEntry = forwardRef<
       socket.emit("stream_ai_comment", {
         entryId: Number(newEntry!.id),
         content: newEntry!.content,
-        aiModel,
+        aiModel: aiModel,
         mood: newEntry!.mood,
       });
 
-      socket.on("ai_stream_chunk", ({ text }) => {
-        addToAiChunkBuffer(text);
-        aiStreamEmitter.emit("chunk", text);
+      socket.off("ai_stream_comment_chunk");
+      socket.off("ai_stream_comment_done");
+
+      socket.on("ai_stream_comment_chunk", ({ text }) => {
+        addToAiChunkBuffer(`comment-${newEntry.id}`, text);
+        aiStreamEmitter.emit(`comment-${newEntry.id}`, text);
         if (aiLoadingRef.current) {
           aiLoadingRef.current = false;
 
@@ -330,70 +336,14 @@ const AddNewEntry = forwardRef<
         }
       });
 
-      socket.on("ai_stream_done", ({ aiComment }) => {
-        setEntry((prev) => ({ ...prev, aiComment }));
+      socket.on("ai_stream_comment_done", ({ aiComment }) => {
+        resetAiChunkBuffer(`comment-${newEntry.id}`);
+        setEntry((prev) => ({ ...prev, aiComment: aiComment }));
       });
-
-      // await generateAiContent(
-      //   Number(newEntry!.id),
-      //   newEntry!.content,
-      //   aiModel,
-      //   newEntry!.mood,
-      // );
     } catch (err: any) {
       console.log("Error saving entry.ts:", err?.response?.data);
       setLoading(false);
       setContentLoading(false);
-    }
-  };
-
-  const generateAiContent = async (
-    entryId: number,
-    content: string,
-    aiModel: string,
-    mood: string,
-  ) => {
-    setAiLoading(true);
-
-    try {
-      const response = await apiRequest({
-        url: "/ai/generate-comment",
-        method: "POST",
-        data: {
-          entryId,
-          data: {
-            content,
-            aiModel,
-            mood,
-          },
-        },
-      });
-
-      if (!response || response.status !== 201) {
-        console.log("No data returned from server");
-        setAiLoading(false);
-        return;
-      }
-
-      const aiComment: AiComment = response.data;
-
-      setEntry((prev) => ({ ...prev, aiComment: aiComment }));
-
-      setAiLoading(false);
-    } catch (err: any) {
-      setAiLoading(false);
-      if (err.response && err.response.data) {
-        console.log("response.data", err.response.data);
-        if (
-          err.response.data.statusCode === StatusCode.PLAN_HAS_EXPIRED ||
-          err.response.data.statusCode === StatusCode.TRIAL_PLAN_HAS_EXPIRED
-        ) {
-          props.onPlanExpiredErrorOccurred();
-          await changeUserPlanStatus(PlanStatus.EXPIRED);
-        }
-      } else if (err.message) {
-        console.log("error.message", err.message);
-      }
     }
   };
 
@@ -404,53 +354,114 @@ const AddNewEntry = forwardRef<
   const ROW_HEIGHT = 20;
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
-  const handleDialog = async () => {
+  const aiDialogLoadingRef = useRef(aiDialogLoading);
+
+  useEffect(() => {
+    aiDialogLoadingRef.current = aiDialogLoading;
+  }, [aiDialogLoading]);
+  const handleDialog = async (dialog: Dialog) => {
     setAiDialogLoading(true);
-    try {
-      const response = await apiRequest({
-        url: "/diary-entries/dialog",
-        method: "POST",
-        data: {
-          entryId: entry.id,
-          question: dialogQuestion,
-        },
-      });
 
-      if (!response || response.status !== 201) {
-        console.log("No data returned from server");
-        setAiDialogLoading(false);
-        return;
+    socket.emit("stream_ai_dialog", {
+      entryId: Number(entry!.id),
+      uuid: dialog.uuid,
+      content: dialogQuestion,
+      aiModel,
+      mood: entry!.mood,
+    });
+
+    socket.off("ai_stream_dialog_chunk");
+    socket.off("ai_stream_dialog_done");
+
+    socket.on("ai_stream_dialog_chunk", ({ text }) => {
+      addToAiChunkBuffer(`dialog-${dialog.uuid}`, text);
+      aiStreamEmitter.emit(`dialog-${dialog.uuid}`, text);
+      if (aiDialogLoadingRef.current) {
+        aiDialogLoadingRef.current = false;
+
+        console.log("test", dialog);
+
+        setEntry((prev) => ({
+          ...prev,
+          dialogs: prev.dialogs.map((d) => {
+            if (d.uuid === dialog.uuid) {
+              return { ...d, loading: false };
+            }
+            return d;
+          }),
+        }));
+
+        console.log("test", entry);
+
+        setTimeout(() => {
+          setAiDialogLoading(false);
+        }, 0);
       }
+    });
 
+    socket.on("ai_stream_dialog_done", ({ respDialog }) => {
+      resetAiChunkBuffer(`dialog-${dialog.uuid}`);
       setEntry((prev) => ({
         ...prev,
-        dialogs: prev.dialogs.map((dialog) => {
-          if (dialog.question === dialogQuestion) {
-            const { question, ...restData } = response.data;
+        dialogs: prev.dialogs.map((d) => {
+          console.log("dialog", d);
+          if (d.uuid === dialog.uuid) {
+            const { question, ...restData } = respDialog;
             return {
-              ...dialog,
+              ...d,
               ...restData,
             };
           }
-          return dialog;
+          return d;
         }),
       }));
-      setAiDialogLoading(false);
-    } catch (err: any) {
-      setAiDialogLoading(false);
-      if (err.response && err.response.data) {
-        console.log("response.data", err.response.data);
-        if (
-          err.response.data.statusCode === StatusCode.PLAN_HAS_EXPIRED ||
-          err.response.data.statusCode === StatusCode.TRIAL_PLAN_HAS_EXPIRED
-        ) {
-          props.onPlanExpiredErrorOccurred();
-          await changeUserPlanStatus(PlanStatus.EXPIRED);
-        }
-      } else if (err.message) {
-        console.log("error.message", err.message);
-      }
-    }
+    });
+
+    // try {
+    //   const response = await apiRequest({
+    //     url: "/diary-entries/dialog",
+    //     method: "POST",
+    //     data: {
+    //       entryId: entry.id,
+    //       question: dialogQuestion,
+    //     },
+    //   });
+    //
+    //   if (!response || response.status !== 201) {
+    //     console.log("No data returned from server");
+    //     setAiDialogLoading(false);
+    //     return;
+    //   }
+    //
+    //   setEntry((prev) => ({
+    //     ...prev,
+    //     dialogs: prev.dialogs.map((dialog) => {
+    //       if (dialog.question === dialogQuestion) {
+    //         const { question, ...restData } = response.data;
+    //         return {
+    //           ...dialog,
+    //           ...restData,
+    //         };
+    //       }
+    //       return dialog;
+    //     }),
+    //   }));
+    //   setAiDialogLoading(false);
+    // } catch (err: any) {
+    //   setAiDialogLoading(false);
+    //   if (err.response && err.response.data) {
+    //     console.log("response.data", err.response.data);
+    //     if (
+    //       err.response.data.statusCode === StatusCode.PLAN_HAS_EXPIRED ||
+    //       err.response.data.statusCode === StatusCode.TRIAL_PLAN_HAS_EXPIRED
+    //     ) {
+    //       props.onPlanExpiredErrorOccurred();
+    //       await changeUserPlanStatus(PlanStatus.EXPIRED);
+    //     }
+    //   } else if (err.message) {
+    //     console.log("error.message", err.message);
+    //   }
+    // }
   };
 
   const changeUserPlanStatus = async (status: PlanStatus) => {
@@ -471,19 +482,23 @@ const AddNewEntry = forwardRef<
   }
 
   const handleSend = async () => {
+    const newUuid = uuid.v4();
+    const dialog = {
+      uuid: newUuid,
+      question: dialogQuestion,
+      answer: "",
+      loading: true,
+    };
     setEntry((prev) => ({
       ...prev,
       dialogs:
         prev.dialogs && prev.dialogs.length
-          ? [
-              ...prev.dialogs,
-              { question: dialogQuestion, answer: "", loading: true },
-            ]
-          : [{ question: dialogQuestion, answer: "", loading: true }],
+          ? [...prev.dialogs, dialog]
+          : [dialog],
     }));
     Keyboard.dismiss();
     setDialogQuestion("");
-    await handleDialog();
+    await handleDialog(dialog);
   };
 
   const anySettingOpen =

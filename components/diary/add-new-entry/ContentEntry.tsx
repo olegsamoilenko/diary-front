@@ -100,24 +100,14 @@ export default function ContentEntry({
                   >
                     <NemoryIcon width={50} height={60} />
                   </View>
-                  {/*<ThemedText>{entry.aiComment.content}</ThemedText>*/}
-
-                  {/*<TypewriterText*/}
-                  {/*  text={entry.aiComment.content}*/}
-                  {/*  speed={30}*/}
-                  {/*  style={{ color: colors.text, padding: 10 }}*/}
-                  {/*  onChange={() => {*/}
-                  {/*    setTimeout(() => {*/}
-                  {/*      // @ts-ignore*/}
-                  {/*      scrollViewRef.current?.scrollToEnd({ animated: true });*/}
-                  {/*    }, 20);*/}
-                  {/*  }}*/}
-                  {/*/>*/}
                   <StreamingText
+                    key={entry.id}
+                    id={`comment-${entry.id}`}
                     speed={30}
                     style={{ color: colors.text, padding: 10 }}
                     onChange={() => {
                       setTimeout(() => {
+                        // @ts-ignore
                         scrollViewRef.current?.scrollToEnd({ animated: true });
                       }, 20);
                     }}
@@ -170,13 +160,19 @@ export default function ContentEntry({
                     ) : (
                       <NemoryIcon width={50} height={60} />
                     )}
-
-                    <TypewriterText
-                      key={dialog.id || dialog.question}
-                      text={dialog.answer ?? ""}
+                    <StreamingText
+                      key={dialog.uuid}
+                      id={`dialog-${dialog.uuid}`}
                       speed={30}
-                      style={{ color: colors.text, padding: 5 }}
-                      onChange={onChange}
+                      style={{ color: colors.text, padding: 10 }}
+                      onChange={() => {
+                        setTimeout(() => {
+                          // @ts-ignore
+                          scrollViewRef.current?.scrollToEnd({
+                            animated: true,
+                          });
+                        }, 20);
+                      }}
                     />
                   </View>
                 </View>
@@ -184,22 +180,6 @@ export default function ContentEntry({
             })}
           </>
         )}
-        {/*<View>*/}
-        {/*  {aiDialogLoading && (*/}
-        {/*    <View*/}
-        {/*      style={{*/}
-        {/*        width: "75%",*/}
-        {/*        alignItems: "flex-start",*/}
-        {/*        backgroundColor: colors.aiCommentBackground,*/}
-        {/*        padding: 10,*/}
-        {/*        marginLeft: 10,*/}
-        {/*        borderRadius: 8,*/}
-        {/*      }}*/}
-        {/*    >*/}
-        {/*      <AILoader width={50} height={60} dotFontSize={24} />*/}
-        {/*    </View>*/}
-        {/*  )}*/}
-        {/*</View>*/}
       </View>
     </ScrollView>
   );

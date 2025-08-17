@@ -17,6 +17,7 @@ import aiStreamEmitter from "./events/eventEmitter";
 import {
   addToAiChunkBuffer,
   consumeAiChunkBuffer,
+  resetAiChunkBuffer,
 } from "./events/aiChunkBuffer";
 
 export {
@@ -38,4 +39,5 @@ export {
   aiStreamEmitter,
   addToAiChunkBuffer,
   consumeAiChunkBuffer,
+  resetAiChunkBuffer,
 };
