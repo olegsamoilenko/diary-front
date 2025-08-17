@@ -1,6 +1,4 @@
 import React from "react";
-import { View } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
 import Toast, {
   SuccessToast,
   ErrorToast,
@@ -20,7 +18,9 @@ export default function CustomToast() {
     success: (props: any) => (
       <SuccessToast
         {...props}
-        style={{ padding: 10, borderLeftColor: "green", height: 70 }}
+        style={{ padding: 10, borderLeftColor: "green", height: "auto" }}
+        text1NumberOfLines={0}
+        text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
           fontFamily: getFont(font.name, "bold"),
@@ -36,8 +36,13 @@ export default function CustomToast() {
     error: (props: any) => (
       <ErrorToast
         {...props}
-        contentContainerStyle={{}}
-        style={{ padding: 10, borderLeftColor: "red", height: 70 }}
+        style={{
+          padding: 10,
+          borderLeftColor: "red",
+          height: "auto",
+        }}
+        text1NumberOfLines={0}
+        text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
           fontFamily: getFont(font.name, "bold"),
@@ -53,7 +58,9 @@ export default function CustomToast() {
     info: (props: any) => (
       <InfoToast
         {...props}
-        style={{ padding: 10, borderLeftColor: "yellow", height: 70 }}
+        style={{ padding: 10, borderLeftColor: "yellow", height: "auto" }}
+        text1NumberOfLines={0}
+        text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
           fontFamily: getFont(font.name, "bold"),
@@ -67,5 +74,5 @@ export default function CustomToast() {
       />
     ),
   };
-  return <Toast config={toastConfig} visibilityTime={5000} topOffset={60} />;
+  return <Toast config={toastConfig} visibilityTime={10000} topOffset={60} />;
 }

@@ -44,6 +44,7 @@ import * as SecureStore from "@/utils/store/secureStore";
 import { io } from "socket.io-client";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
+import Toast from "react-native-toast-message";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -267,6 +268,7 @@ const AddNewEntry = forwardRef<
   }, []);
 
   const aiLoadingRef = useRef(aiLoading);
+  const [strimCommentError, setStrimCommentError] = useState<boolean>(false);
 
   useEffect(() => {
     aiLoadingRef.current = aiLoading;
@@ -307,12 +309,15 @@ const AddNewEntry = forwardRef<
 
       setEntry((prev) => ({ ...prev, ...newEntry }));
 
+      console.log("newEntry", newEntry);
+
       setLoading(false);
 
       setIsEntrySaved(true);
 
       setContentLoading(false);
       setAiLoading(true);
+      setStrimCommentError(false);
 
       socket.emit("stream_ai_comment", {
         entryId: Number(newEntry!.id),
@@ -336,7 +341,55 @@ const AddNewEntry = forwardRef<
         }
       });
 
+      socket.on("unauthorized_error", (error) => {
+        console.log("Unauthorized error:", error);
+        Toast.show({
+          type: "error",
+          text1: t(`errors.${error.statusMessage}`),
+          text2: t(`errors.${error.message}`),
+        });
+        setAiLoading(false);
+        setStrimCommentError(true);
+      });
+
+      socket.on("ai_stream_comment_error", (error) => {
+        console.log("ai stream comment error:", error);
+        Toast.show({
+          type: "error",
+          text1: t(`errors.${error.statusMessage}`),
+          text2: t(`errors.${error.message}`),
+        });
+        setAiLoading(false);
+        setStrimCommentError(true);
+      });
+
+      socket.on("user_error", (error) => {
+        console.log("user error:", error);
+        Toast.show({
+          type: "error",
+          text1: t(`errors.${error.statusMessage}`),
+          text2: t(`errors.${error.message}`),
+        });
+        setAiLoading(false);
+        setStrimCommentError(true);
+      });
+
+      socket.on("plan_error", (error) => {
+        console.log("plan error:", error);
+        Toast.show({
+          type: "error",
+          text1: t(`errors.${error.statusMessage}`),
+          text2: t(`errors.${error.message}`),
+        });
+        if (error.planStatus) {
+          changeUserPlanStatus(error.planStatus as PlanStatus);
+        }
+        setAiLoading(false);
+        setStrimCommentError(true);
+      });
+
       socket.on("ai_stream_comment_done", ({ aiComment }) => {
+        console.log("aiComment", aiComment);
         resetAiChunkBuffer(`comment-${newEntry.id}`);
         setEntry((prev) => ({ ...prev, aiComment: aiComment }));
       });
@@ -361,6 +414,7 @@ const AddNewEntry = forwardRef<
   }, [aiDialogLoading]);
   const handleDialog = async (dialog: Dialog) => {
     setAiDialogLoading(true);
+    setStrimCommentError(false);
 
     socket.emit("stream_ai_dialog", {
       entryId: Number(entry!.id),
@@ -397,6 +451,53 @@ const AddNewEntry = forwardRef<
           setAiDialogLoading(false);
         }, 0);
       }
+    });
+
+    socket.on("unauthorized_error", (error) => {
+      console.log("Unauthorized error:", error);
+      Toast.show({
+        type: "error",
+        text1: t(`errors.${error.statusMessage}`),
+        text2: t(`errors.${error.message}`),
+      });
+      setAiDialogLoading(false);
+      setStrimCommentError(true);
+    });
+
+    socket.on("ai_stream_dialog_error", (error) => {
+      console.log("ai stream dialog error:", error);
+      Toast.show({
+        type: "error",
+        text1: t(`errors.${error.statusMessage}`),
+        text2: t(`errors.${error.message}`),
+      });
+      setAiDialogLoading(false);
+      setStrimCommentError(true);
+    });
+
+    socket.on("user_error", (error) => {
+      console.log("user error:", error);
+      Toast.show({
+        type: "error",
+        text1: t(`errors.${error.statusMessage}`),
+        text2: t(`errors.${error.message}`),
+      });
+      setAiDialogLoading(false);
+      setStrimCommentError(true);
+    });
+
+    socket.on("plan_error", (error) => {
+      console.log("plan error:", error);
+      Toast.show({
+        type: "error",
+        text1: t(`errors.${error.statusMessage}`),
+        text2: t(`errors.${error.message}`),
+      });
+      if (error.planStatus) {
+        changeUserPlanStatus(error.planStatus as PlanStatus);
+      }
+      setAiDialogLoading(false);
+      setStrimCommentError(true);
     });
 
     socket.on("ai_stream_dialog_done", ({ respDialog }) => {
@@ -611,6 +712,7 @@ const AddNewEntry = forwardRef<
                 aiDialogLoading={aiDialogLoading}
                 isKeyboardOpen={isKeyboardOpen}
                 isEntrySaved={isEntrySaved}
+                strimCommentError={strimCommentError}
               />
             ) : (
               <>

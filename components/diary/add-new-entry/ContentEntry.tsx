@@ -19,6 +19,7 @@ type ContentEntryProps = {
   isKeyboardOpen: boolean;
   isEntrySaved?: boolean;
   onChange?: (text: string) => void;
+  strimCommentError: boolean;
 };
 
 export default function ContentEntry({
@@ -28,6 +29,7 @@ export default function ContentEntry({
   isKeyboardOpen,
   isEntrySaved,
   onChange,
+  strimCommentError,
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -66,7 +68,7 @@ export default function ContentEntry({
           <ViewReachEditor content={entry.content} />
           {/*<HtmlViewer htmlContent={entry.content} />*/}
         </View>
-        {entry && entry.aiComment && (
+        {entry && entry.aiComment && !strimCommentError && (
           <>
             <View
               style={{

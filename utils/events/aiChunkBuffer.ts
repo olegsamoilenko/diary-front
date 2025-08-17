@@ -13,5 +13,4 @@ export function consumeAiChunkBuffer(id: string): string[] {
 
 export function resetAiChunkBuffer(id: string) {
   delete aiChunkBuffers[id];
-  console.log(`AI chunk buffer for ID ${id} has been reset.`, aiChunkBuffers);
 }
