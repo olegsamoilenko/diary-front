@@ -1,6 +1,7 @@
 import type { ColorTheme } from "./colorTheme";
 import type { Entry } from "./entry";
 import type { AiComment } from "./ai";
+import { AiModel } from "./ai";
 import type { Plan } from "./plan";
 import type { User } from "./user";
 import type { Payment } from "./payment";
@@ -31,4 +32,4 @@ export type {
   ErrorsType,
 };
 
-export { ErrorMessages, StatusCode, PlanStatus };
+export { ErrorMessages, StatusCode, PlanStatus, AiModel };

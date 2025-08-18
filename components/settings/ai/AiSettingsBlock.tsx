@@ -18,6 +18,7 @@ export default function AiSettingsBlock({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const aiModel = useAppSelector((state) => state.settings.aiModel);
+  console.log("AI Model in AiSettingsBlock:", aiModel);
   return (
     <View
       style={{

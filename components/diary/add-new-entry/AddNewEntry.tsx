@@ -518,52 +518,6 @@ const AddNewEntry = forwardRef<
         }),
       }));
     });
-
-    // try {
-    //   const response = await apiRequest({
-    //     url: "/diary-entries/dialog",
-    //     method: "POST",
-    //     data: {
-    //       entryId: entry.id,
-    //       question: dialogQuestion,
-    //     },
-    //   });
-    //
-    //   if (!response || response.status !== 201) {
-    //     console.log("No data returned from server");
-    //     setAiDialogLoading(false);
-    //     return;
-    //   }
-    //
-    //   setEntry((prev) => ({
-    //     ...prev,
-    //     dialogs: prev.dialogs.map((dialog) => {
-    //       if (dialog.question === dialogQuestion) {
-    //         const { question, ...restData } = response.data;
-    //         return {
-    //           ...dialog,
-    //           ...restData,
-    //         };
-    //       }
-    //       return dialog;
-    //     }),
-    //   }));
-    //   setAiDialogLoading(false);
-    // } catch (err: any) {
-    //   setAiDialogLoading(false);
-    //   if (err.response && err.response.data) {
-    //     console.log("response.data", err.response.data);
-    //     if (
-    //       err.response.data.statusCode === StatusCode.PLAN_HAS_EXPIRED ||
-    //       err.response.data.statusCode === StatusCode.TRIAL_PLAN_HAS_EXPIRED
-    //     ) {
-    //       props.onPlanExpiredErrorOccurred();
-    //       await changeUserPlanStatus(PlanStatus.EXPIRED);
-    //     }
-    //   } else if (err.message) {
-    //     console.log("error.message", err.message);
-    //   }
-    // }
   };
 
   const changeUserPlanStatus = async (status: PlanStatus) => {

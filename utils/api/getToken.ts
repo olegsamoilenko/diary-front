@@ -5,7 +5,9 @@ import Toast from "react-native-toast-message";
 
 export const getToken = async (): Promise<string | null> => {
   let token = await SecureStore.getItemAsync("token");
+  console.log("токен из SecureStore: 1", token);
   if (isTokenExpired(token)) {
+    console.log("isTokenExpired");
     const userRaw = await SecureStore.getItemAsync("user");
     const user = userRaw ? JSON.parse(userRaw) : {};
     const uuid = user.uuid;
@@ -55,6 +57,7 @@ export const getToken = async (): Promise<string | null> => {
       }
     }
   }
+  console.log("токен из SecureStore: 2", token);
   return token;
 };
 

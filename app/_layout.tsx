@@ -21,7 +21,7 @@ import { LocaleConfig } from "react-native-calendars";
 import { store } from "@/store";
 import { Provider, useDispatch } from "react-redux";
 import HandleSubscription from "@/components/auth/HandleSubscription";
-import { User } from "@/types";
+import { AiModel, User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
 import { PortalProvider } from "@gorhom/portal";
 import { setFont } from "@/store/slices/settings/fontSlice";
@@ -37,6 +37,7 @@ import { apiUrl } from "@/constants/env";
 import RegisterOrNot from "@/components/auth/RegisterOrNot";
 import { useTranslation } from "react-i18next";
 import CustomToast from "@/components/ui/CustomToast";
+import { setAiModel } from "@/store/slices/settings/settingsSlice";
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -267,6 +268,16 @@ function RootLayoutInner() {
       }
     };
     loadFont();
+
+    const loadAiModel = async () => {
+      const savedAiModel: AiModel | null = (await AsyncStorage.getItem(
+        "ai_model",
+      )) as AiModel;
+      if (savedAiModel) {
+        dispatch(setAiModel(JSON.parse(savedAiModel)));
+      }
+    };
+    loadAiModel();
 
     const loadTimeFormat = async () => {
       const timeFormat = await SecureStore.getItemAsync("timeFormat");

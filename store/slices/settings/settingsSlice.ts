@@ -1,18 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AiModel } from "@/types";
 
 export interface SettingsState {
-  aiModel: string;
+  aiModel: AiModel;
 }
 
 const initialState: SettingsState = {
-  aiModel: "gpt-4o",
+  aiModel: AiModel.GPT_5,
 };
 
 export const settingsSlice = createSlice({
   name: "settings",
   initialState,
   reducers: {
-    setAiModel: (state, action: PayloadAction<string>) => {
+    setAiModel: (state, action: PayloadAction<AiModel>) => {
       state.aiModel = action.payload;
     },
   },

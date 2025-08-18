@@ -1,12 +1,6 @@
 import React, { forwardRef } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AI_MODELS } from "@/constants/AIModels";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
@@ -16,6 +10,8 @@ import { setAiModel } from "@/store/slices/settings/settingsSlice";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import Background from "@/components/Background";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AiModel } from "@/types";
 
 const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
@@ -24,6 +20,20 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
+
+  const handleAiModel = async (aiModel: AiModel) => {
+    console.log("Selected AI Model:", aiModel);
+    await saveAiModelToStorage(aiModel);
+    dispatch(setAiModel(aiModel));
+  };
+
+  const saveAiModelToStorage = async (aiModel: AiModel) => {
+    try {
+      await AsyncStorage.setItem("ai_model", JSON.stringify(aiModel));
+    } catch (err: any) {
+      console.log("Error saving a ai model", err?.response?.data);
+    }
+  };
 
   return (
     <SideSheet ref={ref}>
@@ -36,9 +46,9 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           <ScrollView style={{ marginBottom: 0 }}>
             {AI_MODELS.map((model) => (
               <TouchableOpacity
-                key={model.value}
+                key={model.key}
                 style={styles.row}
-                onPress={() => dispatch(setAiModel(model.key))}
+                onPress={() => handleAiModel(model.key)}
               >
                 <View
                   style={[
