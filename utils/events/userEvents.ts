@@ -1,2 +1,2 @@
-import mitt from "mitt";
-export const UserEvents = mitt();
+import EventEmitter from "eventemitter3";
+export const UserEvents = new EventEmitter();

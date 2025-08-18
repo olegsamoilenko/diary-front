@@ -45,6 +45,7 @@ import { io } from "socket.io-client";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
 import Toast from "react-native-toast-message";
+import { BASE_URL } from "@/constants/env";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -53,8 +54,8 @@ type ActiveActions = {
   isInsertUnorderedList?: boolean;
   isInsertOrderedList?: boolean;
 };
-
-const socket = io(process.env.EXPO_PUBLIC_API_URL, {
+const socket = io(process.env.EXPO_PUBLIC_URL, {
+  transports: ["websocket"],
   auth: async (cb) => {
     const token = await getToken();
     cb({ token });

@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 console.log("CONFIG ENV API_URL:", process.env.EXPO_PUBLIC_API_URL);
+console.log("CONFIG ENV BASE_URL:", process.env.EXPO_PUBLIC_URL);
 export default ({ config }: { config: any }) => ({
   expo: {
     ...config,
@@ -70,6 +71,7 @@ export default ({ config }: { config: any }) => ({
     extra: {
       ...config.extra,
       API_URL: "https://nemoryai.com/api",
+      URL: "https://nemoryai.com",
       // API_URL: "http://192.168.0.102:3001",
       GOOGLE_CLIENT_WEB_ID:
         "203981333495-fjift3o1qr4q35tv5hscsuutbouspfir.apps.googleusercontent.com",
