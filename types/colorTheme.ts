@@ -1,4 +1,5 @@
 import { BackgroundSettings } from "@/types";
+import { StatusBarStyle } from "expo-status-bar";
 
 export type ColorTheme = {
   // General
@@ -40,7 +41,7 @@ export type ColorTheme = {
   //  settings
   blockBackground: string;
   // barStyle
-  barStyle: string;
+  barStyle: StatusBarStyle | undefined;
   // rich
   toolbarBackground: string;
   toolbarIcon: string;

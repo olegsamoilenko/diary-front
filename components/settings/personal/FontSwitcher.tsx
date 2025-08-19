@@ -17,27 +17,38 @@ import { useSelector, useDispatch } from "react-redux";
 import { setFont } from "@/store/slices/settings/fontSlice";
 import type { RootState } from "@/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getFont } from "@/utils";
+import { apiRequest, getFont } from "@/utils";
 import Background from "@/components/Background";
+import * as SecureStore from "expo-secure-store";
+import type { User } from "@/types";
+import { Font } from "@/types";
 
 const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
-  const font = useSelector((state: RootState) => state.font.font);
+  const font = useSelector((state: RootState) => state.font);
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
-  const handleFont = async (font: { title: string; name: string }) => {
-    await saveFontToStorage(font);
+  const handleFont = async (font: Font) => {
     dispatch(setFont(font));
-  };
-
-  const saveFontToStorage = async (font: { title: string; name: string }) => {
     try {
-      await AsyncStorage.setItem("font", JSON.stringify(font));
-    } catch (err: any) {
-      console.log("Error saving a font", err?.response?.data);
+      await apiRequest({
+        url: `/users/update-settings`,
+        method: "POST",
+        data: { font },
+      });
+
+      const stored = await SecureStore.getItemAsync("user");
+      const user: User | null = stored ? JSON.parse(stored) : null;
+
+      if (user?.settings) {
+        user.settings.font = font;
+        await SecureStore.setItemAsync("user", JSON.stringify(user));
+      }
+    } catch (error) {
+      console.warn("Failed to update lang", error);
     }
   };
 
@@ -66,7 +77,10 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
             >
               {Fonts.map((f) => {
                 return (
-                  <TouchableOpacity key={f.name} onPress={() => handleFont(f)}>
+                  <TouchableOpacity
+                    key={f.name}
+                    onPress={() => handleFont(f.name)}
+                  >
                     <View style={styles.fontContainer}>
                       <Text
                         style={{
@@ -89,7 +103,7 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                         borderRadius: 10,
                         borderWidth: 3,
                         borderColor:
-                          f.name === font.name ? colors.primary : "transparent",
+                          f.name === font ? colors.primary : "transparent",
                       }}
                     />
                   </TouchableOpacity>

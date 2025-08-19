@@ -22,7 +22,6 @@ export default function StreamingText({
 
   useEffect(() => {
     const bufferedChunks = consumeAiChunkBuffer(id.toString());
-    console.log(`Buffered chunks for ID ${id.toString()}:`, bufferedChunks);
     bufferedChunks.forEach((chunk) => {
       bufferRef.current.push(...chunk.split(""));
     });

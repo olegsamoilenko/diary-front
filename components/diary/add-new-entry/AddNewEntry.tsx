@@ -72,7 +72,7 @@ const AddNewEntry = forwardRef<
     onPlanExpiredErrorOccurred: () => void;
   }
 >((props, ref) => {
-  const aiModel = useAppSelector((state) => state.settings.aiModel);
+  const aiModel = useAppSelector((state) => state.aiModel);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [loading, setLoading] = useState(false);
@@ -100,7 +100,7 @@ const AddNewEntry = forwardRef<
   const [textReachEditorKey, setTextReachEditorKey] = useState(0);
   const [titleReachEditorKey, setTitleReachEditorKey] = useState(0);
   const [isFocusTextRichEditor, setIsFocusTextRichEditor] = useState(false);
-  const font = useSelector((state: RootState) => state.font.font);
+  const font = useSelector((state: RootState) => state.font);
   const [contentLoading, setContentLoading] = useState(false);
   const [showTip, setShowTip] = useState(false);
 
@@ -310,8 +310,6 @@ const AddNewEntry = forwardRef<
 
       setEntry((prev) => ({ ...prev, ...newEntry }));
 
-      console.log("newEntry", newEntry);
-
       setLoading(false);
 
       setIsEntrySaved(true);
@@ -390,7 +388,6 @@ const AddNewEntry = forwardRef<
       });
 
       socket.on("ai_stream_comment_done", ({ aiComment }) => {
-        console.log("aiComment", aiComment);
         resetAiChunkBuffer(`comment-${newEntry.id}`);
         setEntry((prev) => ({ ...prev, aiComment: aiComment }));
       });
@@ -434,8 +431,6 @@ const AddNewEntry = forwardRef<
       if (aiDialogLoadingRef.current) {
         aiDialogLoadingRef.current = false;
 
-        console.log("test", dialog);
-
         setEntry((prev) => ({
           ...prev,
           dialogs: prev.dialogs.map((d) => {
@@ -445,8 +440,6 @@ const AddNewEntry = forwardRef<
             return d;
           }),
         }));
-
-        console.log("test", entry);
 
         setTimeout(() => {
           setAiDialogLoading(false);
@@ -506,7 +499,6 @@ const AddNewEntry = forwardRef<
       setEntry((prev) => ({
         ...prev,
         dialogs: prev.dialogs.map((d) => {
-          console.log("dialog", d);
           if (d.uuid === dialog.uuid) {
             const { question, ...restData } = respDialog;
             return {
@@ -771,7 +763,7 @@ const AddNewEntry = forwardRef<
                   style={{
                     maxHeight: ROW_HEIGHT * 10,
                     color: colors.text,
-                    fontFamily: getFont(font.name, "regular"),
+                    fontFamily: getFont(font, "regular"),
                   }}
                 />
                 <View

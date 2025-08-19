@@ -18,7 +18,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
-  const font = useSelector((state: RootState) => state.font.font);
+  const font = useSelector((state: RootState) => state.font);
   const insets = useSafeAreaInsets();
 
   return (
@@ -49,7 +49,7 @@ export default function TabLayout() {
             return (
               <Text
                 style={{
-                  fontFamily: getFont(font.name, "regular"),
+                  fontFamily: getFont(font, "regular"),
                   color,
                   fontSize: 13,
                 }}
@@ -74,7 +74,7 @@ export default function TabLayout() {
       {/*      return (*/}
       {/*        <Text*/}
       {/*          style={{*/}
-      {/*            fontFamily: getFont(font.name, "regular"),*/}
+      {/*            fontFamily: getFont(font, "regular"),*/}
       {/*            color,*/}
       {/*            fontSize: 13,*/}
       {/*          }}*/}
@@ -99,7 +99,7 @@ export default function TabLayout() {
             return (
               <Text
                 style={{
-                  fontFamily: getFont(font.name, "regular"),
+                  fontFamily: getFont(font, "regular"),
                   color,
                   fontSize: 13,
                 }}

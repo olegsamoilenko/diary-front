@@ -1,50 +1,52 @@
+import { Font } from "@/types";
+
 export const Fonts = [
   {
     title: "Roboto",
-    name: "Roboto",
+    name: Font.ROBOTO,
   },
   {
     title: "Open Sans",
-    name: "OpenSans",
+    name: Font.OPEN_SANS,
   },
   {
     title: "Montserrat",
-    name: "Montserrat",
+    name: Font.MONSERRAT,
   },
   {
     title: "Lato",
-    name: "Lato",
+    name: Font.LATO,
   },
   {
     title: "Nunito",
-    name: "Nunito",
+    name: Font.NUNITO,
   },
   {
     title: "Source Code Pro",
-    name: "SourceCodePro",
+    name: Font.SOURCE_CODE_PRO,
   },
   {
     title: "Fira Sans",
-    name: "FiraSans",
+    name: Font.FIRA_SANS,
   },
   {
     title: "Tinos",
-    name: "Tinos",
+    name: Font.TINOS,
   },
   {
     title: "Ubuntu",
-    name: "Ubuntu",
+    name: Font.UBUNTU,
   },
   {
     title: "Exo 2",
-    name: "Exo2",
+    name: Font.EXO2,
   },
   {
     title: "Oswald",
-    name: "Oswald",
+    name: Font.OSWALD,
   },
   {
     title: "Rubik",
-    name: "Rubik",
+    name: Font.RUBIK,
   },
 ];

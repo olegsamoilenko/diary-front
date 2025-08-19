@@ -13,6 +13,7 @@ import { ErrorMessages } from "./messages";
 import type { ErrorsType } from "./errors";
 import { StatusCode } from "./statusCode";
 import { PlanStatus } from "./plan";
+import { Font, Lang, TimeFormat, ETheme } from "./userSettings";
 
 export type {
   ColorTheme,
@@ -32,4 +33,13 @@ export type {
   ErrorsType,
 };
 
-export { ErrorMessages, StatusCode, PlanStatus, AiModel };
+export {
+  ErrorMessages,
+  StatusCode,
+  PlanStatus,
+  AiModel,
+  Font,
+  Lang,
+  TimeFormat,
+  ETheme,
+};

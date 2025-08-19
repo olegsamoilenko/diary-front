@@ -6,32 +6,41 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { setAiModel } from "@/store/slices/settings/settingsSlice";
+import { setAiModel } from "@/store/slices/settings/aiModelSlice";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import Background from "@/components/Background";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AiModel } from "@/types";
+import { AiModel, type User } from "@/types";
+import { apiRequest } from "@/utils";
+import * as SecureStore from "expo-secure-store";
 
 const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const aiModel = useAppSelector((state) => state.settings.aiModel);
+  const aiModel = useAppSelector((state) => state.aiModel);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
   const handleAiModel = async (aiModel: AiModel) => {
-    console.log("Selected AI Model:", aiModel);
-    await saveAiModelToStorage(aiModel);
     dispatch(setAiModel(aiModel));
-  };
 
-  const saveAiModelToStorage = async (aiModel: AiModel) => {
     try {
-      await AsyncStorage.setItem("ai_model", JSON.stringify(aiModel));
-    } catch (err: any) {
-      console.log("Error saving a ai model", err?.response?.data);
+      await apiRequest({
+        url: `/users/update-settings`,
+        method: "POST",
+        data: { aiModel },
+      });
+
+      const stored = await SecureStore.getItemAsync("user");
+      const user: User | null = stored ? JSON.parse(stored) : null;
+
+      if (user?.settings) {
+        user.settings.aiModel = aiModel;
+        await SecureStore.setItemAsync("user", JSON.stringify(user));
+      }
+    } catch (error) {
+      console.warn("Failed to update lang", error);
     }
   };
 
@@ -46,14 +55,14 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           <ScrollView style={{ marginBottom: 0 }}>
             {AI_MODELS.map((model) => (
               <TouchableOpacity
-                key={model.key}
+                key={model}
                 style={styles.row}
-                onPress={() => handleAiModel(model.key)}
+                onPress={() => handleAiModel(model)}
               >
                 <View
                   style={[
                     styles.radio,
-                    aiModel === model.key && {
+                    aiModel === model && {
                       borderColor: colors.primary,
                     },
                     {
@@ -61,7 +70,7 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                     },
                   ]}
                 >
-                  {aiModel === model.key && (
+                  {aiModel === model && (
                     <View
                       style={[
                         styles.radioDot,
@@ -71,7 +80,7 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                   )}
                 </View>
                 <ThemedText style={[styles.label, { color: colors.text }]}>
-                  {t(`settings.model.${model.key}`)}
+                  {t(`settings.model.${model}`)}
                 </ThemedText>
               </TouchableOpacity>
             ))}

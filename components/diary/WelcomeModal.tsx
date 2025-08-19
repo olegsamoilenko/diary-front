@@ -1,6 +1,6 @@
 import ModalPortal from "@/components/ui/Modal";
 import { ThemedText } from "@/components/ThemedText";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Checkbox from "@/components/ui/Checkbox";
 import { useTranslation } from "react-i18next";
@@ -21,6 +21,7 @@ export default function WelcomeModal({}) {
     const getData = async () => {
       // await AsyncStorage.removeItem("show_welcome");
       const value = await AsyncStorage.getItem("show_welcome");
+      console.log("show_welcome value:", value);
       if (value === null) {
         setShowWelcome(true);
       } else {
@@ -30,16 +31,13 @@ export default function WelcomeModal({}) {
     getData();
   }, []);
 
-  useEffect(() => {
-    const storeData = async () => {
-      try {
-        await AsyncStorage.setItem("show_welcome", JSON.stringify(!checked));
-      } catch (e) {
-        console.error("Failed to save the data to the storage", e);
-      }
-    };
-    storeData();
-  }, [checked]);
+  const onToggle = useCallback((value: boolean) => {
+    setChecked(value);
+    console.log("onToggle called with checked:", value);
+    AsyncStorage.setItem("show_welcome", JSON.stringify(!value)).catch(
+      console.error,
+    );
+  }, []);
   return (
     <ModalPortal visible={showWelcome} onClose={() => setShowWelcome(false)}>
       <View
@@ -71,7 +69,7 @@ export default function WelcomeModal({}) {
       >
         <Checkbox
           checked={checked}
-          onChange={setChecked}
+          onChange={onToggle}
           label={t("welcome.doNotShowAnymore")}
         />
       </View>

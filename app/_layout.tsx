@@ -1,43 +1,55 @@
+import React, { useEffect, useMemo, useState, lazy, Suspense } from "react";
 import "../i18n";
 import "@/constants/CalendarLocale";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { ThemeProvider as NavThemeProvider } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
-
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { Provider, useDispatch } from "react-redux";
+import { store } from "@/store";
 import { ThemeProviderCustom, useThemeCustom } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
-import { useEffect, useState } from "react";
-import { apiRequest, UserEvents } from "@/utils";
-import uuid from "react-native-uuid";
-import i18n from "i18next";
-import { LocaleConfig } from "react-native-calendars";
-import { store } from "@/store";
-import { Provider, useDispatch } from "react-redux";
-import HandleSubscription from "@/components/auth/HandleSubscription";
-import { AiModel, User } from "@/types";
-import * as SecureStore from "@/utils/store/secureStore";
+import { BiometryProvider } from "@/context/BiometryContext";
 import { PortalProvider } from "@gorhom/portal";
-import { setFont } from "@/store/slices/settings/fontSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
-import AuthGate from "@/components/auth/AuthGate";
+import CustomToast from "@/components/ui/CustomToast";
+
 import { Colors } from "@/constants/Colors";
 import { NavigationThemes } from "@/constants/Theme";
-import AuthForm from "@/components/auth/AuthForm";
-import Toast from "react-native-toast-message";
-import { BiometryProvider } from "@/context/BiometryContext";
-import { apiUrl } from "@/constants/env";
-import RegisterOrNot from "@/components/auth/RegisterOrNot";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+
+import * as SecureStore from "@/utils/store/secureStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import i18n from "i18next";
+import { LocaleConfig } from "react-native-calendars";
+import uuid from "react-native-uuid";
+import { apiRequest, UserEvents } from "@/utils";
+import type { User } from "@/types";
+import { AiModel } from "@/types";
+
+import { resetFont } from "@/store/slices/settings/fontSlice";
+import { resetTimeFormat } from "@/store/slices/settings/timeFormatSlice";
+import { resetAiModel } from "@/store/slices/settings/aiModelSlice";
 import { useTranslation } from "react-i18next";
-import CustomToast from "@/components/ui/CustomToast";
-import { setAiModel } from "@/store/slices/settings/settingsSlice";
+import { useHydrateSettings } from "@/hooks/useHydrateSettings";
+import { unstable_batchedUpdates, AppState } from "react-native";
+
+// Ліниві імпорти важких екранів
+const AuthGate = lazy(() => import("@/components/auth/AuthGate"));
+const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
+const HandleSubscription = lazy(
+  () => import("@/components/auth/HandleSubscription"),
+);
+const RegisterOrNot = lazy(() => import("@/components/auth/RegisterOrNot"));
+
+function NavigationThemeWrapper({ children }: { children: React.ReactNode }) {
+  const { theme } = useThemeCustom();
+  const navTheme = useMemo(
+    () => NavigationThemes[theme] || NavigationThemes.light,
+    [theme],
+  );
+  return <NavThemeProvider value={navTheme}>{children}</NavThemeProvider>;
+}
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -81,219 +93,218 @@ export default function RootLayout() {
     "Yeseva One": require("@/assets/fonts/entry/YesevaOne-Regular.ttf"),
   });
 
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { theme } = useThemeCustom();
-  const navTheme = NavigationThemes[theme] || NavigationThemes.light;
-  const [showAuthForm, setShowAuthForm] = useState(false);
-  const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
-  const [continueWithoutRegistration, setContinueWithoutRegistration] =
-    useState(false);
-  const { t } = useTranslation();
-
   useEffect(() => {
-    // const clearUserFromSecureStore = async () => {
-    //   await SecureStore.deleteItemAsync("token");
-    //   await SecureStore.deleteItemAsync("user");
-    //   await SecureStore.deleteItemAsync("user_pin");
-    //   await SecureStore.deleteItemAsync("biometry_enabled");
-    //   return;
-    // };
-    // clearUserFromSecureStore();
-
-    // const clearFontFromStore = async () => {
-    //   await AsyncStorage.removeItem("font");
-    // };
-    // clearFontFromStore();
-
-    // const clearThemeFromStore = async () => {
-    //   const storedTheme = await AsyncStorage.getItem("APP_THEME");
-    //   console.log("Clearing theme from store:", storedTheme);
-    //   await AsyncStorage.removeItem("APP_THEME");
-    //   const afterClearTheme = await AsyncStorage.getItem("APP_THEME");
-    //   console.log("After clearing theme from store:", afterClearTheme);
-    // };
-    // clearThemeFromStore();
-
-    initUser();
-  }, []);
-
-  const initUser = async () => {
-    let storedUser = await SecureStore.getItemAsync("user");
-    let userObj: User | null = storedUser ? JSON.parse(storedUser) : null;
-    console.log("Initializing user:", userObj);
-    if (!userObj) {
-      const newUuid = uuid.v4();
-
-      const res = await apiRequest({
-        url: `/users/create-by-uuid`,
-        method: "POST",
-        data: { uuid: newUuid },
-      });
-
-      if (!res || res.status !== 201) {
-        console.log(t("errors.noDataReturnedFromServer"));
-        return;
+    let cancelled = false;
+    (async () => {
+      if (!cancelled) {
+        const stored = await SecureStore.getItemAsync("user");
+        let u: User | null = stored ? JSON.parse(stored) : null;
+        if (!u) {
+          u = await createAnonymousUser();
+        }
       }
-
-      const data = await res.data;
-
-      userObj = data.user;
-      await SecureStore.setItemAsync("token", data.accessToken);
-      await SecureStore.setItemAsync("user", JSON.stringify(data.user));
-    }
-
-    setUser(userObj);
-  };
-
-  const updateLastActive = async () => {
-    if (!user?.id) {
-      console.warn("User id is not defined");
-      return;
-    }
-    try {
-      await apiRequest({
-        url: `/users/update/${user?.id}`,
-        method: "POST",
-        data: { lastActiveAt: new Date().toISOString() },
-      });
-    } catch (error) {
-      console.warn("Failed to update lastActiveAt", error);
-    }
-  };
-
-  useEffect(() => {
-    updateLastActive();
-  }, [user]);
-
-  useEffect(() => {
-    const initLanguage = async () => {
-      const lang = await SecureStore.getItemAsync("lang");
-      if (lang) {
-        i18n.changeLanguage(lang);
-        LocaleConfig.defaultLocale = lang;
-      }
+    })();
+    return () => {
+      cancelled = true;
     };
-
-    initLanguage();
   }, []);
 
-  const onSuccessHandleSubscription = async () => {
-    const storedUser = await SecureStore.getItemAsync("user");
-    const userObj = JSON.parse(storedUser!);
-
-    setUser(userObj);
-  };
-
-  useEffect(() => {
-    const handler = () => {
-      initUser();
-      setIsAuthenticated(false);
-    };
-    UserEvents.on("userDeleted", handler);
-    return () => UserEvents.off("userDeleted", handler);
-  }, []);
-
-  if (!loaded) {
-    return null;
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <Provider store={store}>
-        <ThemeProviderCustom>
-          <ThemeProvider value={navTheme}>
-            <AuthGate onAuthenticated={() => setIsAuthenticated(true)} />
-            <CustomToast />
-          </ThemeProvider>
-        </ThemeProviderCustom>
-      </Provider>
-    );
-  }
+  if (!loaded) return null;
 
   return (
     <Provider store={store}>
       <ThemeProviderCustom>
-        <AuthProvider>
-          <BiometryProvider>
-            <PortalProvider>
-              {showRegisterOrNot ? (
-                <RegisterOrNot
-                  setContinueWithoutRegistration={
-                    setContinueWithoutRegistration
-                  }
-                  setShowAuthForm={setShowAuthForm}
-                  onChoice={() => {
-                    setShowRegisterOrNot(false);
-                  }}
-                />
-              ) : showAuthForm ? (
-                <AuthForm
-                  forPlanSelect={true}
-                  onSuccessSignWithGoogle={() => setShowAuthForm(false)}
-                  onSuccessEmailCode={() => setShowAuthForm(false)}
-                  // onSuccessPhoneCode={() => setShowAuthForm(false)}
-                  onSuccessSignIn={() => setShowAuthForm(false)}
-                />
-              ) : !user?.plan ? (
-                <HandleSubscription
-                  setShowRegisterOrNot={setShowRegisterOrNot}
-                  onSuccess={onSuccessHandleSubscription}
-                  continueWithoutRegistration={continueWithoutRegistration}
-                />
-              ) : (
-                <RootLayoutInner />
-              )}
-            </PortalProvider>
-          </BiometryProvider>
-        </AuthProvider>
+        <NavigationThemeWrapper>
+          <AuthProvider>
+            <BiometryProvider>
+              <PortalProvider>
+                <Suspense fallback={null}>
+                  <AppContent />
+                </Suspense>
+              </PortalProvider>
+            </BiometryProvider>
+          </AuthProvider>
+        </NavigationThemeWrapper>
       </ThemeProviderCustom>
       <CustomToast />
     </Provider>
   );
 }
 
-function RootLayoutInner() {
+async function createAnonymousUser(): Promise<User | null> {
+  try {
+    const newUuid = uuid.v4();
+    const res = await apiRequest({
+      url: `/users/create-by-uuid`,
+      method: "POST",
+      data: { uuid: newUuid },
+    });
+    if (res?.status === 201) {
+      const data = await res.data;
+      await SecureStore.setItemAsync("token", data.accessToken);
+      await SecureStore.setItemAsync("user", JSON.stringify(data.user));
+      return data.user as User;
+    }
+  } catch (e) {
+    console.warn("Failed to create anonymous user", e);
+  }
+  return null;
+}
+
+function AppContent() {
   const colorScheme = useColorScheme();
-  const { theme } = useThemeCustom();
-  const navTheme = NavigationThemes[theme] || NavigationThemes.light;
   const colors = Colors[colorScheme ?? "light"];
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const loadFont = async () => {
-      const savedFont = await AsyncStorage.getItem("font");
-      if (savedFont) {
-        dispatch(setFont(JSON.parse(savedFont)));
-      }
-    };
-    loadFont();
+    let cancelled = false;
+    (async () => {
+      try {
+        const stored = await SecureStore.getItemAsync("user");
+        const u: User | null = stored ? JSON.parse(stored) : null;
 
-    const loadAiModel = async () => {
-      const savedAiModel: AiModel | null = (await AsyncStorage.getItem(
-        "ai_model",
-      )) as AiModel;
-      if (savedAiModel) {
-        dispatch(setAiModel(JSON.parse(savedAiModel)));
-      }
-    };
-    loadAiModel();
+        if (cancelled) return;
 
-    const loadTimeFormat = async () => {
-      const timeFormat = await SecureStore.getItemAsync("timeFormat");
-      if (timeFormat) {
-        dispatch(setTimeFormat(JSON.parse(timeFormat)));
-      }
-    };
+        setUser(u);
 
-    loadTimeFormat();
+        const lang = u?.settings?.lang;
+        if (lang) {
+          await i18n.changeLanguage(lang);
+          LocaleConfig.defaultLocale = lang;
+        }
+        console.log("Init complete, user:", u);
+      } catch (e) {
+        console.warn("Failed to init user/lang", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
+  useHydrateSettings(user);
+
+  useUpdateLastActive(user);
+
+  useEffect(() => {
+    let cancelled = false;
+    const onUserDeleted = async () => {
+      const fresh = await createAnonymousUser();
+      console.log("User deleted, created new anonymous user:", fresh);
+
+      if (cancelled) return;
+      unstable_batchedUpdates(() => {
+        console.log("Resetting settings after user deletion");
+        dispatch(resetFont());
+        dispatch(resetAiModel());
+        dispatch(resetTimeFormat());
+        console.log("User deleted, reset settings and user state");
+      });
+      setUser(fresh);
+      setIsAuthenticated(false);
+    };
+
+    UserEvents.on("userDeleted", onUserDeleted);
+    return () => {
+      cancelled = true;
+      UserEvents.off("userDeleted", onUserDeleted);
+    };
+  }, []);
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <AuthGate onAuthenticated={() => setIsAuthenticated(true)} />
+        <StatusBar translucent style={colors.barStyle} />
+      </>
+    );
+  }
+
   return (
-    <ThemeProvider value={navTheme}>
-      <Stack screenOptions={{ headerShown: false }}></Stack>
+    <>
+      <MainAfterAuth user={user} setUser={setUser} />
       <StatusBar translucent style={colors.barStyle} />
-    </ThemeProvider>
+    </>
   );
+}
+
+function MainAfterAuth({
+  user,
+  setUser,
+}: {
+  user: User | null;
+  setUser: (u: User | null) => void;
+}) {
+  const [showAuthForm, setShowAuthForm] = useState(false);
+  const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
+  const [continueWithoutRegistration, setContinueWithoutRegistration] =
+    useState(false);
+
+  const onSuccessHandleSubscription = async () => {
+    const storedUser = await SecureStore.getItemAsync("user");
+    setUser(storedUser ? JSON.parse(storedUser) : null);
+  };
+
+  if (showRegisterOrNot) {
+    return (
+      <RegisterOrNot
+        setContinueWithoutRegistration={setContinueWithoutRegistration}
+        setShowAuthForm={setShowAuthForm}
+        onChoice={() => setShowRegisterOrNot(false)}
+      />
+    );
+  }
+
+  if (showAuthForm) {
+    return (
+      <AuthForm
+        forPlanSelect
+        onSuccessSignWithGoogle={() => setShowAuthForm(false)}
+        onSuccessEmailCode={() => setShowAuthForm(false)}
+        onSuccessSignIn={() => setShowAuthForm(false)}
+      />
+    );
+  }
+
+  if (!user?.plan) {
+    return (
+      <HandleSubscription
+        setShowRegisterOrNot={setShowRegisterOrNot}
+        onSuccess={onSuccessHandleSubscription}
+        continueWithoutRegistration={continueWithoutRegistration}
+      />
+    );
+  }
+
+  return <Stack screenOptions={{ headerShown: false }} />;
+}
+function useUpdateLastActive(user: User | null) {
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let last = 0;
+    const send = async () => {
+      const now = Date.now();
+      if (now - last < 15_000) return; // тротл 15с
+      last = now;
+      try {
+        await apiRequest({
+          url: `/users/update/${user.id}`,
+          method: "POST",
+          data: { lastActiveAt: new Date().toISOString() },
+        });
+      } catch {}
+    };
+
+    const sub = AppState.addEventListener("change", (s) => {
+      if (s === "active") send();
+    });
+    send();
+
+    return () => sub.remove();
+  }, [user?.id]);
 }

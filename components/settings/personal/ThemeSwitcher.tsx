@@ -150,24 +150,13 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
     setUser(storedUser ? JSON.parse(storedUser) : null);
   };
 
-  const handleTheme = (themeName: string) => {
+  const handleTheme = async (themeName: string) => {
     setTheme(themeName as Theme);
-  };
-
-  useEffect(() => {
-    updateTheme();
-  }, [theme]);
-
-  const updateTheme = async () => {
-    if (!user?.id) {
-      console.warn("User id is not defined");
-      return;
-    }
     try {
       await apiRequest({
-        url: `/users/update/${user?.id}`,
+        url: `/users/update-settings`,
         method: "POST",
-        data: { theme },
+        data: { theme: themeName },
       });
     } catch (error) {
       console.warn("Failed to update theme", error);
@@ -189,10 +178,10 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           </ThemedText>
           <ScrollView style={{ marginBottom: 0 }}>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
-              {themes.map((theme) => {
+              {themes.map((thm) => {
                 return (
                   <View
-                    key={theme.name}
+                    key={thm.name}
                     style={{
                       width: "45%",
                     }}
@@ -202,11 +191,20 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                         marginBottom: 5,
                       }}
                     >
-                      {t(`settings.theme.themes.${theme.name}`)}
+                      {t(`settings.theme.themes.${thm.name}`)}
                     </ThemedText>
-                    <TouchableOpacity onPress={() => handleTheme(theme.name)}>
+                    <TouchableOpacity
+                      onPress={() => handleTheme(thm.name)}
+                      style={{
+                        borderWidth: 4,
+                        borderColor:
+                          thm.name === theme ? colors.primary : "transparent",
+                        borderRadius: 8,
+                        overflow: "hidden",
+                      }}
+                    >
                       <Image
-                        source={theme.img}
+                        source={thm.img}
                         style={{
                           width: "100%",
                           height: 315,

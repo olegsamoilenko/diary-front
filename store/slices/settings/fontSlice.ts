@@ -1,21 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Font } from "@/types";
 
-const initialState = {
-  font: {
-    title: "Nunito",
-    name: "Nunito",
-  },
-};
+const initialState = Font.NUNITO;
 
 const fontSlice = createSlice({
   name: "font",
   initialState,
   reducers: {
-    setFont: (state, action) => {
-      state.font = action.payload;
-    },
+    setFont: (_state, action: PayloadAction<Font>) => action.payload,
+    resetFont: () => initialState,
   },
 });
 
-export const { setFont } = fontSlice.actions;
+export const { setFont, resetFont } = fontSlice.actions;
 export default fontSlice.reducer;

@@ -14,10 +14,9 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { PLANS } from "@/constants/Plans";
-import { ColorTheme, Plan } from "@/types";
+import type { ColorTheme, Plan, User } from "@/types";
 import Background from "@/components/Background";
 import * as SecureStore from "@/utils/store/secureStore";
-import type { User } from "@/types";
 import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
 import AuthForm from "@/components/auth/AuthForm";
@@ -46,6 +45,10 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     };
     getUser();
   }, []);
+
+  useEffect(() => {
+    console.log("PlansSettings mounted", user);
+  }, [user]);
 
   const onSuccessPayment = () => {
     setSuccessPaymentPlan(plan);
@@ -124,27 +127,29 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                   setShowRegisterOrNot={setShowRegisterOrNot}
                   continueWithoutRegistration={continueWithoutRegistration}
                 />
-                <TouchableOpacity onPress={onUnsubscribe}>
-                  <View
-                    style={[
-                      styles.button,
-                      {
-                        borderWidth: 1,
-                        borderColor: colors.border,
-                        borderRadius: 12,
-                      },
-                    ]}
-                  >
-                    <ThemedText
-                      type="subtitleLG"
-                      style={{
-                        color: colors.text,
-                      }}
+                {user && user!.plan && (
+                  <TouchableOpacity onPress={onUnsubscribe}>
+                    <View
+                      style={[
+                        styles.button,
+                        {
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          borderRadius: 12,
+                        },
+                      ]}
                     >
-                      {t("settings.plans.unsubscribe")}
-                    </ThemedText>
-                  </View>
-                </TouchableOpacity>
+                      <ThemedText
+                        type="subtitleLG"
+                        style={{
+                          color: colors.text,
+                        }}
+                      >
+                        {t("settings.plans.unsubscribe")}
+                      </ThemedText>
+                    </View>
+                  </TouchableOpacity>
+                )}
               </View>
             </ScrollView>
           </View>

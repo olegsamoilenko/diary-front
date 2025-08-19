@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -9,6 +9,7 @@ import * as SecureStore from "expo-secure-store";
 import { User } from "@/types";
 import { useTranslation } from "react-i18next";
 import { apiUrl } from "@/constants/env";
+import { Image } from "expo-image";
 
 export default function GoogleSignInButton({
   forPlanSelect,
@@ -92,6 +93,8 @@ export default function GoogleSignInButton({
       <View>
         <Image
           source={googleLogo}
+          contentFit="cover"
+          cachePolicy="memory-disk"
           style={{
             backgroundColor: "transparent",
             width: 24,

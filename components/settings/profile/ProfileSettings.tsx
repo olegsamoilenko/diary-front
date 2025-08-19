@@ -169,8 +169,16 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               getUserLogged();
               getUser();
             }}
-            onSuccessSignIn={() => setShowAuthForm(false)}
-            onSuccessEmailCode={() => setShowAuthForm(false)}
+            onSuccessSignIn={() => {
+              setShowAuthForm(false);
+              getUserLogged();
+              getUser();
+            }}
+            onSuccessEmailCode={() => {
+              setShowAuthForm(false);
+              getUserLogged();
+              getUser();
+            }}
             activeAuthTab={activeTab}
           />
         ) : (

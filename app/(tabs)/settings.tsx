@@ -46,7 +46,7 @@ export default function Settings() {
   const colors = Colors[colorScheme];
 
   const modelSwitcherRef = useRef<SideSheetRef>(null);
-  const aiModel = useAppSelector((state) => state.settings.aiModel);
+  const aiModel = useAppSelector((state) => state.aiModel);
 
   return (
     <Background background={colors.backgroundImage} paddingTop={40}>

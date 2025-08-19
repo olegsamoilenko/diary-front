@@ -51,6 +51,7 @@ export async function apiRequest<T = any>({
     return await axios<T>(requestConfig);
   } catch (err) {
     if (axios.isAxiosError(err)) {
+      console.log(111);
       if (!err.response) {
         console.error("Network or Axios error:", err.message, err.code);
         Toast.show({
@@ -73,7 +74,9 @@ export async function apiRequest<T = any>({
 
       Toast.show({
         type: "error",
-        text1: `${err.response.data.error}`,
+        text1: err.response.data.statusMessage
+          ? `${err.response.data.statusMessage}`
+          : "Unknown Error",
         text2: errorMessage,
       });
 

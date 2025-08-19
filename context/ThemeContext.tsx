@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useColorScheme } from "react-native";
-import type { Theme, ThemeContextType } from "@/types";
+import type { Theme, ThemeContextType, User } from "@/types";
+import * as SecureStore from "@/utils/store/secureStore";
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: "light",
@@ -14,27 +14,41 @@ export const ThemeProviderCustom = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const systemScheme = useColorScheme() ?? "dark";
+  const systemScheme = useColorScheme() ?? "light";
   const [theme, setTheme] = useState<Theme>("light");
   const [colorScheme, setColorScheme] = useState<Theme>(systemScheme);
 
   useEffect(() => {
-    const handleStartTheme = async () => {
-      // await AsyncStorage.removeItem("APP_THEME");
-      const storedTheme = await AsyncStorage.getItem("APP_THEME");
-      if (storedTheme) {
-        setTheme(storedTheme as Theme);
-      } else {
-        setTheme(systemScheme);
-      }
-    };
+    let cancelled = false;
 
-    handleStartTheme();
+    (async () => {
+      try {
+        const stored = await SecureStore.getItemAsync("user");
+        const user: User | null = stored ? JSON.parse(stored) : null;
+
+        if (cancelled) return;
+
+        const theme = (user?.settings?.theme as Theme) ?? systemScheme;
+        setTheme(theme);
+      } catch (e) {
+        if (!cancelled) setTheme(systemScheme);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     setColorScheme(theme);
-    AsyncStorage.setItem("APP_THEME", theme).catch(() => {});
+    (async () => {
+      const stored = await SecureStore.getItemAsync("user");
+      const user = stored ? JSON.parse(stored) : null;
+      if (!user) return;
+      user.settings.theme = theme;
+      await SecureStore.setItemAsync("user", JSON.stringify(user));
+    })();
   }, [theme, systemScheme]);
 
   return (

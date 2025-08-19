@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   ScrollView,
@@ -10,17 +10,19 @@ import {
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import * as SecureStore from "@/utils/store/secureStore";
 import { ThemedText } from "@/components/ThemedText";
 import { useDispatch, useSelector } from "react-redux";
-import { saveTimeFormat } from "@/store/thunks/timeFormatThunks";
 import type { AppDispatch, RootState } from "@/store";
 import BackArrow from "@/components/ui/BackArrow";
 import Background from "@/components/Background";
+import { TimeFormat, type User } from "@/types";
+import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
+import { apiRequest } from "@/utils";
+import * as SecureStore from "expo-secure-store";
 
-const timeFormatOptions = [
-  { key: 12, value: "12h" },
-  { key: 24, value: "24h" },
+const timeFormatOptions: TimeFormat[] = [
+  TimeFormat["12_H"],
+  TimeFormat["24_H"],
 ];
 
 const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
@@ -31,9 +33,25 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const dispatch = useDispatch<AppDispatch>();
   const format = useSelector((state: RootState) => state.timeFormat);
 
-  async function handleFormat(format: { key: 12 | 24; value: "12h" | "24h" }) {
-    dispatch(saveTimeFormat(format));
-    await SecureStore.setItemAsync("timeFormat", JSON.stringify(format));
+  async function handleFormat(format: TimeFormat) {
+    dispatch(setTimeFormat(format));
+    try {
+      await apiRequest({
+        url: `/users/update-settings`,
+        method: "POST",
+        data: { timeFormat: format },
+      });
+
+      const stored = await SecureStore.getItemAsync("user");
+      const user: User | null = stored ? JSON.parse(stored) : null;
+
+      if (user?.settings) {
+        user.settings.timeFormat = format;
+        await SecureStore.setItemAsync("user", JSON.stringify(user));
+      }
+    } catch (error) {
+      console.warn("Failed to update lang", error);
+    }
   }
 
   return (
@@ -47,19 +65,19 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           <ScrollView style={{ marginBottom: 0 }}>
             {timeFormatOptions.map((f) => (
               <TouchableOpacity
-                key={f.key}
+                key={f}
                 style={styles.row}
-                onPress={() => handleFormat(f as any)}
+                onPress={() => handleFormat(f)}
               >
                 <View
                   style={[
                     styles.radio,
-                    Number(format.key) === Number(f.key) && {
+                    format === f && {
                       borderColor: colors.primary,
                     },
                   ]}
                 >
-                  {Number(format.key) === Number(f.key) && (
+                  {format === f && (
                     <View
                       style={[
                         styles.radioDot,
@@ -69,7 +87,7 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                   )}
                 </View>
                 <Text style={[styles.label, { color: colors.text }]}>
-                  {t(`settings.timeFormat.${f.key}`)}
+                  {t(`settings.timeFormat.${f}`)}
                 </Text>
               </TouchableOpacity>
             ))}

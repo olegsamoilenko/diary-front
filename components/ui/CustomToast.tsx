@@ -11,7 +11,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 
 export default function CustomToast() {
-  const font = useSelector((state: RootState) => state.font.font);
+  const font = useSelector((state: RootState) => state.font);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const toastConfig = {
@@ -23,12 +23,12 @@ export default function CustomToast() {
         text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
-          fontFamily: getFont(font.name, "bold"),
+          fontFamily: getFont(font, "bold"),
           color: colors.text,
         }}
         text2Style={{
           fontSize: 14,
-          fontFamily: getFont(font.name, "regular"),
+          fontFamily: getFont(font, "regular"),
           color: colors.text,
         }}
       />
@@ -45,12 +45,12 @@ export default function CustomToast() {
         text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
-          fontFamily: getFont(font.name, "bold"),
+          fontFamily: getFont(font, "bold"),
           color: colors.text,
         }}
         text2Style={{
           fontSize: 14,
-          fontFamily: getFont(font.name, "regular"),
+          fontFamily: getFont(font, "regular"),
           color: colors.text,
         }}
       />
@@ -63,12 +63,12 @@ export default function CustomToast() {
         text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
-          fontFamily: getFont(font.name, "bold"),
+          fontFamily: getFont(font, "bold"),
           color: colors.text,
         }}
         text2Style={{
           fontSize: 14,
-          fontFamily: getFont(font.name, "regular"),
+          fontFamily: getFont(font, "regular"),
           color: colors.text,
         }}
       />

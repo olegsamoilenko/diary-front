@@ -127,9 +127,8 @@
     "timeFormat": {
       "title": "Time Format",
       "titlePlural": "Time Formats",
-      "12": "12-hour format",
-      "24": "24-hour format",
-      "h": "- hours"
+      "12h": "12 hour",
+      "24h": "24 hour"
     },
     "activeHours": {
       "title": "Active Hours"

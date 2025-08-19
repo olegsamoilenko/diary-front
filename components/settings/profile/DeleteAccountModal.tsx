@@ -8,6 +8,7 @@ import { Colors } from "@/constants/Colors";
 import { apiRequest, UserEvents } from "@/utils";
 import * as SecureStore from "@/utils/store/secureStore";
 import Toast from "react-native-toast-message";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type DeleteAccountModalProps = {
   showDeleteAccountModal: boolean;
@@ -29,11 +30,13 @@ export default function DeleteAccountModal({
         url: `/users/${userId}`,
         method: "DELETE",
       });
-      await SecureStore.deleteItemAsync("token");
-      await SecureStore.deleteItemAsync("user");
-      await SecureStore.deleteItemAsync("user_pin");
-      await SecureStore.deleteItemAsync("user_pin");
-      await SecureStore.deleteItemAsync("biometry_enabled");
+      await Promise.allSettled([
+        SecureStore.deleteItemAsync("token"),
+        SecureStore.deleteItemAsync("user"),
+        SecureStore.deleteItemAsync("user_pin"),
+        SecureStore.deleteItemAsync("biometry_enabled"),
+        AsyncStorage.removeItem("show_welcome"),
+      ]);
       UserEvents.emit("userDeleted");
       setShowDeleteAccountModal(false);
     } catch (error) {

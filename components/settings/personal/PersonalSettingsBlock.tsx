@@ -10,6 +10,7 @@ import { Colors } from "@/constants/Colors";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { RefObject } from "react";
+import { Fonts } from "@/constants/Fonts";
 
 export default function PersonalSettingsBlock({
   themeSwitcherRef,
@@ -26,8 +27,8 @@ export default function PersonalSettingsBlock({
   const colorScheme = useColorScheme();
   const { theme } = useThemeCustom();
   const colors = Colors[colorScheme];
-  const format = useSelector((state: RootState) => state.timeFormat.value);
-  const font = useSelector((state: RootState) => state.font.font);
+  const format = useSelector((state: RootState) => state.timeFormat);
+  const font = useSelector((state: RootState) => state.font);
 
   return (
     <View
@@ -103,7 +104,9 @@ export default function PersonalSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>{font.title ?? "Default"}</ThemedText>
+            <ThemedText>
+              {Fonts.find((f) => f.name === font).title ?? "Default"}
+            </ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}
@@ -134,9 +137,7 @@ export default function PersonalSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>
-              {format} {t("settings.timeFormat.h")}{" "}
-            </ThemedText>
+            <ThemedText>{t(`settings.timeFormat.${format}`)}</ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}

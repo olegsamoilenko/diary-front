@@ -2,6 +2,7 @@ import type { Plan } from "@/types/plan";
 import type { Entry } from "@/types/entry";
 import type { TokenUsageHistory, UserTokenUsage } from "@/types/token";
 import type { Payment } from "@/types/payment";
+import type { UserSettings } from "@/types/userSettings";
 
 export type User = {
   id: string;
@@ -16,6 +17,7 @@ export type User = {
   passwordChangeToken?: string | null;
   emailVerified: boolean;
   emailVerificationToken?: string | null;
+  settings: UserSettings;
   diaryEntries: Entry[];
   plan: Plan;
   tokenUsageHistory: TokenUsageHistory[];

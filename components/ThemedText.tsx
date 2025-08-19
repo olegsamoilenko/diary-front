@@ -1,5 +1,5 @@
 import { StyleSheet, Text, type TextProps } from "react-native";
-import { ColorTheme } from "@/types";
+import { ColorTheme, Font } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useSelector } from "react-redux";
@@ -32,7 +32,7 @@ export function ThemedText({
 }: ThemedTextProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const font = useSelector((state: RootState) => state.font.font);
+  const font = useSelector((state: RootState) => state.font);
   const styles = getStyles(colors, font);
 
   return (
@@ -63,75 +63,72 @@ export function ThemedText({
   );
 }
 
-const getStyles = (
-  colors: ColorTheme,
-  font: { title: string; name: string },
-) => {
+const getStyles = (colors: ColorTheme, font: Font) => {
   return StyleSheet.create({
     logo: {
       fontSize: 40,
-      fontFamily: getFont(font.name, "bold"),
+      fontFamily: getFont(font, "bold"),
       lineHeight: 60,
       letterSpacing: 2,
     },
     slogan: {
       fontSize: 20,
-      fontFamily: getFont(font.name, "bold"),
+      fontFamily: getFont(font, "bold"),
       lineHeight: 24,
       letterSpacing: 3,
     },
     titleXL: {
       fontSize: 24,
-      fontFamily: getFont(font.name, "bold"),
+      fontFamily: getFont(font, "bold"),
       lineHeight: 38,
     },
     titleLG: {
       fontSize: 22,
-      fontFamily: getFont(font.name, "bold"),
+      fontFamily: getFont(font, "bold"),
       lineHeight: 26,
     },
     subtitleXL: {
       fontSize: 20,
-      fontFamily: getFont(font.name, "bold"),
+      fontFamily: getFont(font, "bold"),
       lineHeight: 24,
     },
     subtitleLG: {
       fontSize: 18,
-      fontFamily: getFont(font.name, "bold"),
+      fontFamily: getFont(font, "bold"),
       lineHeight: 22,
     },
     extraSmall: {
       fontSize: 12,
-      fontFamily: getFont(font.name, "regular"),
+      fontFamily: getFont(font, "regular"),
       lineHeight: 15,
     },
     small: {
       fontSize: 14,
-      fontFamily: getFont(font.name, "regular"),
+      fontFamily: getFont(font, "regular"),
       lineHeight: 18,
     },
     default: {
       fontSize: 16,
-      fontFamily: getFont(font.name, "regular"),
+      fontFamily: getFont(font, "regular"),
       lineHeight: 20,
     },
     bold: {
       fontSize: 16,
-      fontFamily: getFont(font.name, "bold"),
+      fontFamily: getFont(font, "bold"),
       lineHeight: 20,
     },
     extraSmallLink: {
-      fontFamily: getFont(font.name, "regular"),
+      fontFamily: getFont(font, "regular"),
       lineHeight: 16,
       fontSize: 12,
     },
     smallLink: {
-      fontFamily: getFont(font.name, "regular"),
+      fontFamily: getFont(font, "regular"),
       lineHeight: 18,
       fontSize: 14,
     },
     link: {
-      fontFamily: getFont(font.name, "regular"),
+      fontFamily: getFont(font, "regular"),
       lineHeight: 20,
       fontSize: 16,
     },

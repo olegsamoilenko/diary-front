@@ -33,6 +33,18 @@ export default ({ config }: { config: any }) => ({
             "com.googleusercontent.apps.com.googleusercontent.apps.328496914085-v457ftd508li5e4g35n1rj9s0b5douvu",
         },
       ],
+      [
+        "expo-build-properties",
+        {
+          android: {
+            enableProguardInReleaseBuilds: true,
+            enableShrinkResourcesInReleaseBuilds: true,
+            enablePngCrunchInReleaseBuilds: false,
+            extraProguardRules:
+              "-keep class com.swmansion.reanimated.** { *; }\n-dontwarn com.facebook.react.**",
+          },
+        },
+      ],
       // [
       //   "expo-splash-screen",
       // {
@@ -62,6 +74,7 @@ export default ({ config }: { config: any }) => ({
         backgroundColor: "#ffffff",
       },
       edgeToEdgeEnabled: true,
+      enableProguardInReleaseBuilds: true,
     },
     web: {
       bundler: "metro",

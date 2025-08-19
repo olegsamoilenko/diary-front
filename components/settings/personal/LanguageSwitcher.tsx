@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useState } from "react";
+import React, { forwardRef, useCallback, useState, useMemo } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   ScrollView,
@@ -16,33 +16,55 @@ import { LocaleConfig } from "react-native-calendars";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import Background from "@/components/Background";
+import type { User } from "@/types";
+import { Lang } from "@/types";
+import { apiRequest } from "@/utils";
 
 const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
-  const [lang, setLang] = useState<string | null>(i18n.language);
+  const [lang, setLang] = useState<Lang>(i18n.language as Lang);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
 
-  const languages = Object.keys(i18n.options.resources ?? { en: {} }).map(
-    (lang) => ({
-      key: lang,
-      value: lang,
-    }),
-  );
+  const languages = useMemo(() => {
+    const resources = (i18n.options?.resources ?? { en: {} }) as Record<
+      string,
+      unknown
+    >;
+    return Object.keys(resources).map((code) => ({
+      key: code,
+      value: code as Lang,
+    }));
+  }, []);
 
-  const setValue = useCallback(
-    async (valOrFn: string | ((prev: string | null) => string | null)) => {
-      const value = typeof valOrFn === "function" ? valOrFn(lang) : valOrFn;
-      if (value) {
-        i18n.changeLanguage(value);
-        setLang(value);
-        LocaleConfig.defaultLocale = value;
-        await SecureStore.setItemAsync("lang", value);
+  const handleSelect = useCallback(async (value: Lang) => {
+    try {
+      await i18n.changeLanguage(value);
+      LocaleConfig.defaultLocale = value;
+      setLang(value);
+
+      try {
+        await apiRequest({
+          url: `/users/update-settings`,
+          method: "POST",
+          data: { lang: value },
+        });
+
+        const stored = await SecureStore.getItemAsync("user");
+        const user: User | null = stored ? JSON.parse(stored) : null;
+
+        if (user?.settings) {
+          user.settings.lang = value;
+          await SecureStore.setItemAsync("user", JSON.stringify(user));
+        }
+      } catch (error) {
+        console.warn("Failed to update lang", error);
       }
-    },
-    [lang],
-  );
+    } catch (e) {
+      console.warn("Failed to change language", e);
+    }
+  }, []);
 
   return (
     <SideSheet ref={ref}>
@@ -57,7 +79,7 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
               <TouchableOpacity
                 key={option.value}
                 style={styles.row}
-                onPress={() => setValue(option.value as any)}
+                onPress={() => handleSelect(option.value)}
               >
                 <View
                   style={[

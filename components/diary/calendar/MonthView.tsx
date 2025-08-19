@@ -41,7 +41,7 @@ export default function MonthView({
     localeArr!.find((loc) => loc.languageCode === lang)?.languageTag ?? "en-US";
   const firstDayOfWeek = FIRST_DAY_BY_LOCALE[locale] ?? 1;
   const key = `${i18n.language || "uk"}-${colorScheme}`;
-  const font = useSelector((state: RootState) => state.font.font);
+  const font = useSelector((state: RootState) => state.font);
 
   const weekdayLabels = getWeekdayLabels(lang, firstDayOfWeek);
   return (
@@ -84,7 +84,7 @@ export default function MonthView({
           calendarBackground: colors.calendarBackground,
           arrowColor: colors.primary,
           monthTextColor: colors.text,
-          textDayHeaderFontFamily: getFont(font.name, "regular"),
+          textDayHeaderFontFamily: getFont(font, "regular"),
         }}
         onMonthChange={(obj) => {
           setMonth(obj.month);
