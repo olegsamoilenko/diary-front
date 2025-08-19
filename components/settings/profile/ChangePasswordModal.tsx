@@ -19,6 +19,7 @@ import { passwordRules, UserEvents } from "@/utils";
 import axios from "axios";
 import { apiUrl } from "@/constants/env";
 import * as SecureStore from "expo-secure-store";
+import i18n from "i18next";
 
 type ChangePasswordModalProps = {
   showChangePasswordModal: boolean;
@@ -60,10 +61,11 @@ export default function ChangePasswordModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/users/change`, {
+      const res = await axios.post(`${apiUrl}/users/change-user-auth-data`, {
         email: values.email,
         password: values.password,
         newPassword: values.newPassword,
+        lang: i18n.language,
       });
 
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));

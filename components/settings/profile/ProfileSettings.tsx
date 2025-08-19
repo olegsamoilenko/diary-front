@@ -221,6 +221,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                   key={"email"}
                   title={t("settings.profile.email")}
                   val={user?.email}
+                  isActionButton={!user?.oauthProviderId}
                   handleAction={handleChangeEmailModal}
                 ></ProfileCard>
                 <ChangeEmailModal

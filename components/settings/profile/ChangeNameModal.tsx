@@ -39,17 +39,11 @@ export default function ChangeNameModal({
   const [error, setError] = useState<string | null>(null);
 
   const changeNameSchema = Yup.object().shape({
-    email: Yup.string()
-      .email(t("auth.enterValidEmailAddress"))
-      .required(t("auth.emailIsRequired")),
-    password: Yup.string()
-      .matches(passwordRules, t("auth.thePasswordMustContain"))
-      .required(t("auth.passwordRequired")),
     newName: Yup.string().required(t("settings.profile.nameIsRequired")),
   });
 
   const handleChangeName = async (
-    values: { email: string; password: string; newName: string },
+    values: { newName: string },
     {
       setSubmitting,
       resetForm,
@@ -57,10 +51,14 @@ export default function ChangeNameModal({
   ) => {
     setLoading(true);
     setError(null);
+    const userRaw = await SecureStore.getItemAsync("user");
+    const user = userRaw ? JSON.parse(userRaw) : {};
+    const uuid = user.uuid;
+    const hash = user.hash;
     try {
       const res = await axios.post(`${apiUrl}/users/change`, {
-        email: values.email,
-        password: values.password,
+        uuid,
+        hash,
         newName: values.newName,
       });
 
@@ -95,7 +93,7 @@ export default function ChangeNameModal({
         {t("settings.profile.changeName")}
       </ThemedText>
       <Formik
-        initialValues={{ email: "", password: "", newName: "" }}
+        initialValues={{ newName: "" }}
         validationSchema={changeNameSchema}
         onSubmit={handleChangeName}
       >
@@ -114,52 +112,6 @@ export default function ChangeNameModal({
                 marginBottom: 20,
               }}
             >
-              <ThemedText style={styles.label}>{t("auth.email")}</ThemedText>
-              <TextInput
-                placeholder={t("auth.email")}
-                style={styles.input}
-                value={values.email}
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor={colors.inputPlaceholder}
-              />
-              {touched.email && errors.email && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
-                  {errors.email}
-                </ThemedText>
-              )}
-              <ThemedText style={styles.label}>{t("auth.password")}</ThemedText>
-              <TextInput
-                placeholder={t("auth.password")}
-                style={styles.input}
-                value={values.password}
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                secureTextEntry
-                autoCapitalize="none"
-                placeholderTextColor={colors.inputPlaceholder}
-              />
-              {touched.password && errors.password && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
-                  {errors.password}
-                </ThemedText>
-              )}
               <ThemedText style={styles.label}>
                 {t("settings.profile.newName")}
               </ThemedText>

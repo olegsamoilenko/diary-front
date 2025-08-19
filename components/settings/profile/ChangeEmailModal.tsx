@@ -19,6 +19,8 @@ import { passwordRules, UserEvents } from "@/utils";
 import axios from "axios";
 import { apiUrl } from "@/constants/env";
 import * as SecureStore from "expo-secure-store";
+import Toast from "react-native-toast-message";
+import i18n from "i18next";
 
 type ChangeEmailModalProps = {
   showChangeEmailModal: boolean;
@@ -37,6 +39,9 @@ export default function ChangeEmailModal({
   const styles = getStyles(colors);
 
   const [error, setError] = useState<string | null>(null);
+  const [showChangeEmailForm, setShowChangeEmailForm] = useState(true);
+  const [code, setCode] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
 
   const changeEmailSchema = Yup.object().shape({
     email: Yup.string()
@@ -60,17 +65,18 @@ export default function ChangeEmailModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/users/change`, {
+      const res = await axios.post(`${apiUrl}/users/change-user-auth-data`, {
         email: values.email,
         password: values.password,
         newEmail: values.newEmail,
+        lang: i18n.language,
       });
 
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));
 
       UserEvents.emit("userChanged");
 
-      onSuccessChangeEmail();
+      setShowChangeEmailForm(false);
     } catch (err: any) {
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
@@ -83,6 +89,90 @@ export default function ChangeEmailModal({
     }
   };
 
+  const resendCode = async () => {
+    setError(null);
+    const rowUser = await SecureStore.getItemAsync("user");
+    const user = rowUser ? JSON.parse(rowUser) : null;
+    setCode("");
+    setResendLoading(true);
+    try {
+      const res = await axios.post(`${apiUrl}/auth/resend-code`, {
+        email: user?.email,
+        lang: i18n.language,
+        type: "newEmail",
+      });
+
+      if (res && res.status !== 201) {
+        Toast.show({
+          type: "error",
+          text1: t("toast.failedToResendCode"),
+          text2: t("toast.failedToResendCode"),
+        });
+        throw new Error("Failed to resend code");
+      }
+
+      Toast.show({
+        type: "success",
+        text1: t("toast.codeResent"),
+        text2: t("toast.weHaveSentYouCodeByEmail"),
+      });
+    } catch (err: any) {
+      console.log(err?.response?.data);
+      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
+      const errorKey = ErrorMessages[code];
+      setError(t(`errors.${errorKey}`));
+      setCode("");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (code.length !== 6) {
+      setError(t("auth.codeMustBe6Digits"));
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.post(`${apiUrl}/auth/new-email-confirm`, {
+        code,
+      });
+
+      if (res && res.status !== 201) {
+        Toast.show({
+          type: "error",
+          text1: t("toast.failedToConfirmEmail"),
+          text2: t("toast.failedToConfirmEmail"),
+        });
+        throw new Error("Failed to confirm email");
+      }
+
+      setCode("");
+
+      await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
+      await SecureStore.setItemAsync("token", res.data.accessToken);
+
+      Toast.show({
+        type: "success",
+        text1: t("toast.emailConfirmed"),
+        text2: t("toast.youHaveSuccessfullyVerifiedYourEmail"),
+      });
+
+      UserEvents.emit("userChanged");
+
+      onSuccessChangeEmail();
+    } catch (err: any) {
+      console.log(err?.response?.data);
+      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
+      const errorKey = ErrorMessages[code];
+      setError(t(`errors.${errorKey}`));
+      setCode("");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ModalPortal
       visible={showChangeEmailModal}
@@ -92,141 +182,221 @@ export default function ChangeEmailModal({
         type="subtitleXL"
         style={{
           marginBottom: 20,
+          textAlign: "center",
         }}
       >
         {t("settings.profile.changeEmail")}
       </ThemedText>
-      <Formik
-        initialValues={{ email: "", password: "", newEmail: "" }}
-        validationSchema={changeEmailSchema}
-        onSubmit={handleChangeEmail}
-      >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-          isSubmitting,
-        }) => (
-          <>
-            <View
-              style={{
-                marginBottom: 20,
-              }}
-            >
-              <ThemedText style={styles.label}>{t("auth.email")}</ThemedText>
-              <TextInput
-                placeholder={t("auth.email")}
-                style={styles.input}
-                value={values.email}
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor={colors.inputPlaceholder}
-              />
-              {touched.email && errors.email && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
-                  {errors.email}
-                </ThemedText>
-              )}
-              <ThemedText style={styles.label}>{t("auth.password")}</ThemedText>
-              <TextInput
-                placeholder={t("auth.password")}
-                style={styles.input}
-                value={values.password}
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                secureTextEntry
-                autoCapitalize="none"
-                placeholderTextColor={colors.inputPlaceholder}
-              />
-              {touched.password && errors.password && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
-                  {errors.password}
-                </ThemedText>
-              )}
-              <ThemedText style={styles.label}>
-                {t("settings.profile.newEmail")}
-              </ThemedText>
-              <TextInput
-                placeholder={t("settings.profile.newEmail")}
-                style={styles.input}
-                value={values.newEmail}
-                onChangeText={handleChange("newEmail")}
-                onBlur={handleBlur("newEmail")}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor={colors.inputPlaceholder}
-              />
-              {touched.newEmail && errors.newEmail && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
-                  {errors.newEmail}
-                </ThemedText>
-              )}
-            </View>
-            {error && (
-              <ThemedText
-                type={"small"}
+      {showChangeEmailForm ? (
+        <Formik
+          initialValues={{ email: "", password: "", newEmail: "" }}
+          validationSchema={changeEmailSchema}
+          onSubmit={handleChangeEmail}
+        >
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            isSubmitting,
+          }) => (
+            <>
+              <View
                 style={{
-                  color: colors.error,
-                  marginTop: -10,
                   marginBottom: 20,
                 }}
               >
-                {error}
-              </ThemedText>
-            )}
-            <TouchableOpacity
-              style={styles.btn}
-              onPress={() => handleSubmit()}
-              disabled={isSubmitting}
-            >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
+                <ThemedText style={styles.label}>{t("auth.email")}</ThemedText>
+                <TextInput
+                  placeholder={t("auth.email")}
+                  style={styles.input}
+                  value={values.email}
+                  onChangeText={handleChange("email")}
+                  onBlur={handleBlur("email")}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor={colors.inputPlaceholder}
+                />
+                {touched.email && errors.email && (
+                  <ThemedText
+                    type={"small"}
+                    style={{
+                      color: colors.error,
+                      marginTop: -10,
+                      marginBottom: 20,
+                    }}
+                  >
+                    {errors.email}
+                  </ThemedText>
+                )}
+                <ThemedText style={styles.label}>
+                  {t("auth.password")}
+                </ThemedText>
+                <TextInput
+                  placeholder={t("auth.password")}
+                  style={styles.input}
+                  value={values.password}
+                  onChangeText={handleChange("password")}
+                  onBlur={handleBlur("password")}
+                  secureTextEntry
+                  autoCapitalize="none"
+                  placeholderTextColor={colors.inputPlaceholder}
+                />
+                {touched.password && errors.password && (
+                  <ThemedText
+                    type={"small"}
+                    style={{
+                      color: colors.error,
+                      marginTop: -10,
+                      marginBottom: 20,
+                    }}
+                  >
+                    {errors.password}
+                  </ThemedText>
+                )}
+                <ThemedText style={styles.label}>
+                  {t("settings.profile.newEmail")}
+                </ThemedText>
+                <TextInput
+                  placeholder={t("settings.profile.newEmail")}
+                  style={styles.input}
+                  value={values.newEmail}
+                  onChangeText={handleChange("newEmail")}
+                  onBlur={handleBlur("newEmail")}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor={colors.inputPlaceholder}
+                />
+                {touched.newEmail && errors.newEmail && (
+                  <ThemedText
+                    type={"small"}
+                    style={{
+                      color: colors.error,
+                      marginTop: -10,
+                      marginBottom: 20,
+                    }}
+                  >
+                    {errors.newEmail}
+                  </ThemedText>
+                )}
+              </View>
+              {error && (
                 <ThemedText
+                  type={"small"}
                   style={{
-                    color: colors.textInPrimary,
-                    textAlign: "center",
+                    color: colors.error,
+                    marginTop: -10,
+                    marginBottom: 20,
                   }}
                 >
-                  {t("common.save")}
+                  {error}
                 </ThemedText>
               )}
-            </TouchableOpacity>
-          </>
-        )}
-      </Formik>
+              <TouchableOpacity
+                style={styles.btn}
+                onPress={() => handleSubmit()}
+                disabled={isSubmitting}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <ThemedText
+                    style={{
+                      color: colors.textInPrimary,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t("common.save")}
+                  </ThemedText>
+                )}
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
+      ) : (
+        <View style={styles.center}>
+          <ThemedText style={styles.label}>
+            {t("auth.weHaveSentYouCodeByEmail")}
+          </ThemedText>
+          <TextInput
+            value={code}
+            onChangeText={setCode}
+            keyboardType="number-pad"
+            maxLength={6}
+            style={[styles.input, { letterSpacing: 5, width: 180 }]}
+            placeholder="******"
+            placeholderTextColor={colors.inputPlaceholder}
+          />
+          {error && (
+            <ThemedText
+              type={"small"}
+              style={{
+                color: colors.error,
+                marginTop: -10,
+                marginBottom: 20,
+              }}
+            >
+              {error}
+            </ThemedText>
+          )}
+
+          <TouchableOpacity
+            style={{
+              paddingHorizontal: 18,
+              paddingVertical: 10,
+              borderRadius: 12,
+              marginBottom: 16,
+            }}
+            onPress={resendCode}
+            disabled={resendLoading}
+          >
+            {resendLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <ThemedText
+                type="subtitleLG"
+                style={{
+                  color: colors.text,
+                  textAlign: "center",
+                }}
+              >
+                {t("auth.resendCode")}
+              </ThemedText>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => handleSubmit()}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <ThemedText
+                style={{
+                  color: colors.textInPrimary,
+                  textAlign: "center",
+                }}
+              >
+                {t("auth.confirm")}
+              </ThemedText>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
     </ModalPortal>
   );
 }
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
+    center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
     input: {
       backgroundColor: colors.inputBackground,
       borderWidth: 1,
@@ -235,11 +405,10 @@ const getStyles = (colors: ColorTheme) =>
       borderRadius: 8,
       marginBottom: 12,
       fontSize: 16,
-      minWidth: "100%",
     },
     label: {
       marginBottom: 16,
-      textAlign: "left",
+      textAlign: "center",
     },
     btn: {
       paddingHorizontal: 18,
