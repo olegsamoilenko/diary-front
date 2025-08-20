@@ -22,6 +22,9 @@ import { ThemedText } from "@/components/ThemedText";
 import NemoryLogo from "@/components/ui/logo/NemoryLogo";
 import { apiRequest } from "@/utils";
 import Toast from "react-native-toast-message";
+import i18n from "i18next";
+import { LocaleConfig } from "react-native-calendars";
+import { useBiometry } from "@/context/BiometryContext";
 
 const PIN_KEY = "user_pin";
 const BIOMETRY_KEY = "biometry_enabled";
@@ -39,12 +42,13 @@ export default function AuthGate({
   const [biometryEnabled, setBiometryEnabled] = useState(false);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme ?? "light"];
   const styles = getStyles(colors);
   const [errorPin, setErrorPin] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [nameLoading, setNameLoading] = useState(false);
   const [pinLoading, setPinLoading] = useState(false);
+  const { setBiometry } = useBiometry();
 
   const PinSchema = Yup.object().shape({
     pin: Yup.string()
@@ -62,135 +66,168 @@ export default function AuthGate({
   });
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const userString = await SecureStore.getItemAsync("user");
-      const userObj: User | null = userString ? JSON.parse(userString) : null;
-      setUser(userObj);
-    };
+    let cancelled = false;
+    (async () => {
+      try {
+        const [userStr, pinStr, bioFlag] = await Promise.all([
+          SecureStore.getItemAsync("user"),
+          SecureStore.getItemAsync(PIN_KEY),
+          SecureStore.getItemAsync(BIOMETRY_KEY),
+        ]);
+        if (cancelled) return;
 
-    fetchUser();
+        const u: User | null = userStr ? JSON.parse(userStr) : null;
+        setUser(u);
+        const bio = bioFlag === "true";
+        setBiometryEnabled(bio);
+        setSavedPin(pinStr ?? "");
+
+        const lang = u?.settings?.lang;
+        if (lang) {
+          await i18n.changeLanguage(lang);
+          LocaleConfig.defaultLocale = lang;
+        }
+
+        if (!u?.name) setStep("name");
+        else if (!pinStr) setStep("setup");
+        else if (bio) setStep("biometry");
+        else setStep("pin");
+      } catch (e) {
+        console.warn("AuthGate init failed", e);
+        setStep("name");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  useEffect(() => {
-    if (user?.name) {
-      init();
-    } else {
-      setStep("name");
-    }
-  }, [user]);
+  const handleSetName = useCallback(
+    async (
+      values: { name: string },
+      {
+        setSubmitting,
+        resetForm,
+      }: { setSubmitting: (b: boolean) => void; resetForm: () => void },
+    ) => {
+      setNameLoading(true);
+      try {
+        const userString = await SecureStore.getItemAsync("user");
+        const u: User | null = userString ? JSON.parse(userString) : null;
+        if (!u?.id) throw new Error("User not found");
 
-  const handleSetName = async (
-    values: {
-      name: string;
-    },
-    {
-      setSubmitting,
-      resetForm,
-    }: { setSubmitting: (submitting: boolean) => void; resetForm: () => void },
-  ) => {
-    setNameLoading(true);
-    const userString = await SecureStore.getItemAsync("user");
-    const user: User = userString ? JSON.parse(userString) : null;
-    try {
-      const res = await apiRequest({
-        url: `/users/update/${user.id}`,
-        method: "POST",
-        data: {
-          name: values.name,
-        },
-      });
-      if (!res || res.status !== 201) {
-        console.log("No data returned from server");
-        return;
+        const res = await apiRequest({
+          url: `/users/update`,
+          method: "POST",
+          data: { name: values.name },
+        });
+
+        if (!res || (res.status !== 200 && res.status !== 201)) {
+          console.log("No data returned from server");
+          return;
+        }
+
+        const updated = res.data?.user ?? res.data;
+        await SecureStore.setItemAsync("user", JSON.stringify(updated));
+        setUser(updated);
+
+        Toast.show({
+          type: "success",
+          text1: t("toast.successfullySaved"),
+          text2: t("toast.youHaveSuccessfullySavedYourName"),
+        });
+
+        const [pinStr, bioFlag] = await Promise.all([
+          SecureStore.getItemAsync(PIN_KEY),
+          SecureStore.getItemAsync(BIOMETRY_KEY),
+        ]);
+        setSavedPin(pinStr ?? "");
+        const bio = bioFlag === "true";
+        setBiometryEnabled(bio);
+        setStep(!pinStr ? "setup" : bio ? "biometry" : "pin");
+      } catch (err: any) {
+        console.log(err?.response?.data ?? err);
+      } finally {
+        setNameLoading(false);
+        setSubmitting(false);
+        resetForm();
       }
+    },
+    [t],
+  );
 
-      Toast.show({
-        type: "success",
-        text1: t("toast.successfullySaved"),
-        text2: t("toast.youHaveSuccessfullySavedYourName"),
-      });
-
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data));
-      setSubmitting(false);
-      resetForm();
-      setNameLoading(false);
-      init();
-    } catch (err: any) {
-      setNameLoading(false);
-      console.log(err?.response?.data);
-    }
-  };
-
-  const init = async () => {
-    const storedPin = await SecureStore.getItemAsync(PIN_KEY);
-    const bioFlag = await SecureStore.getItemAsync(BIOMETRY_KEY);
-    if (!storedPin) setStep("setup");
-    else if (bioFlag === "true") setStep("biometry");
-    else setStep("pin");
-    setSavedPin(storedPin || "");
-    setBiometryEnabled(bioFlag === "true");
-  };
-
-  const handleSetPin = async (
-    values: { pin: string },
-    {
-      setSubmitting,
-      resetForm,
-    }: { setSubmitting: (submitting: boolean) => void; resetForm: () => void },
-  ) => {
-    setPinLoading(true);
-    await SecureStore.setItemAsync(PIN_KEY, values.pin);
-    setSavedPin(pin);
-    setSubmitting(false);
-    resetForm();
-    setPinLoading(false);
-    setStep("biometry-ask");
-  };
+  const handleSetPin = useCallback(
+    async (
+      values: { pin: string },
+      {
+        setSubmitting,
+        resetForm,
+      }: { setSubmitting: (b: boolean) => void; resetForm: () => void },
+    ) => {
+      setPinLoading(true);
+      try {
+        await SecureStore.setItemAsync(PIN_KEY, values.pin);
+        setSavedPin(values.pin);
+        setStep("biometry-ask");
+      } finally {
+        setSubmitting(false);
+        resetForm();
+        setPinLoading(false);
+      }
+    },
+    [],
+  );
 
   const handleBiometryChoice = useCallback(async (enable: boolean) => {
     await SecureStore.setItemAsync(BIOMETRY_KEY, enable ? "true" : "false");
+    await setBiometry(enable);
     setBiometryEnabled(enable);
     setStep(enable ? "biometry" : "pin");
   }, []);
 
   useEffect(() => {
-    if (step === "biometry") {
-      (async () => {
+    if (step !== "biometry") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const hasHw = await LocalAuthentication.hasHardwareAsync();
+        const enrolled = hasHw && (await LocalAuthentication.isEnrolledAsync());
+        if (!hasHw || !enrolled) {
+          setStep("pin");
+          return;
+        }
         const res = await LocalAuthentication.authenticateAsync({
           promptMessage: t("auth.useBiometricsToLogIn"),
           fallbackLabel: t("auth.enterPin"),
+          disableDeviceFallback: false,
         });
-        if (res.success) {
-          onAuthenticated();
-        } else {
-          setStep("pin");
+        if (!cancelled) {
+          if (res.success) onAuthenticated();
+          else setStep("pin");
         }
-      })();
-    }
-  }, [step, onAuthenticated]);
+      } catch {
+        if (!cancelled) setStep("pin");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [step, t, onAuthenticated]);
 
   const handleCheckPin = useCallback(async () => {
     const storedPin = await SecureStore.getItemAsync(PIN_KEY);
-
-    if (pin === storedPin) {
+    if (pin && storedPin && pin === storedPin) {
       onAuthenticated();
     } else {
       setErrorPin(t("auth.pinIsIncorrect"));
       setPin("");
     }
-  }, [pin, savedPin, onAuthenticated]);
+  }, [pin, t, onAuthenticated]);
 
-  if (step === "loading")
+  if (step === "loading") {
     return (
       <Background background={colors.backgroundImage}>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 50,
-            marginBottom: 20,
-          }}
-        >
+        <View style={styles.logoWrap}>
           <NemoryLogo width={120} height={150} />
         </View>
         <View style={styles.center}>
@@ -198,31 +235,18 @@ export default function AuthGate({
         </View>
       </Background>
     );
+  }
 
-  if (step === "name")
+  if (step === "name") {
     return (
       <Background background={colors.backgroundImage}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+          keyboardVerticalOffset={0}
         >
-          <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              padding: 20,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 50,
-                marginBottom: 20,
-              }}
-            >
+          <ScrollView contentContainerStyle={styles.scrollCenter}>
+            <View style={styles.logoWrap}>
               <NemoryLogo width={120} height={150} />
             </View>
             <View style={styles.center}>
@@ -253,36 +277,23 @@ export default function AuthGate({
                       placeholderTextColor={colors.inputPlaceholder}
                     />
                     {touched.name && errors.name && (
-                      <ThemedText
-                        type={"small"}
-                        style={{
-                          color: colors.error,
-                          marginTop: -10,
-                          marginBottom: 20,
-                        }}
-                      >
+                      <ThemedText type="small" style={styles.errorText}>
                         {errors.name}
                       </ThemedText>
                     )}
                     <View>
                       <TouchableOpacity
-                        style={{
-                          paddingHorizontal: 18,
-                          paddingVertical: 10,
-                          backgroundColor: colors.primary,
-                          borderRadius: 12,
-                        }}
+                        style={[
+                          styles.btn,
+                          { backgroundColor: colors.primary },
+                        ]}
                         onPress={() => handleSubmit()}
                         disabled={isSubmitting}
                       >
                         {nameLoading ? (
                           <ActivityIndicator color="#fff" />
                         ) : (
-                          <ThemedText
-                            style={{
-                              color: colors.textInPrimary,
-                            }}
-                          >
+                          <ThemedText style={{ color: colors.textInPrimary }}>
                             {t("common.save")}
                           </ThemedText>
                         )}
@@ -296,31 +307,18 @@ export default function AuthGate({
         </KeyboardAvoidingView>
       </Background>
     );
+  }
 
-  if (step === "setup")
+  if (step === "setup") {
     return (
       <Background background={colors.backgroundImage}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+          keyboardVerticalOffset={0}
         >
-          <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              padding: 20,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                marginTop: 50,
-                marginBottom: 20,
-              }}
-            >
+          <ScrollView contentContainerStyle={styles.scrollCenter}>
+            <View style={styles.logoWrap}>
               <NemoryLogo width={120} height={150} />
             </View>
             <Formik
@@ -353,14 +351,7 @@ export default function AuthGate({
                     placeholderTextColor={colors.inputPlaceholder}
                   />
                   {touched.pin && errors.pin && (
-                    <ThemedText
-                      type={"small"}
-                      style={{
-                        color: colors.error,
-                        marginTop: -10,
-                        marginBottom: 20,
-                      }}
-                    >
+                    <ThemedText type="small" style={styles.errorText}>
                       {errors.pin}
                     </ThemedText>
                   )}
@@ -379,35 +370,20 @@ export default function AuthGate({
                     placeholderTextColor={colors.inputPlaceholder}
                   />
                   {touched.confirmPin && errors.confirmPin && (
-                    <ThemedText
-                      style={{
-                        color: colors.error,
-                        marginTop: -10,
-                        marginBottom: 20,
-                      }}
-                    >
+                    <ThemedText style={styles.errorText}>
                       {errors.confirmPin}
                     </ThemedText>
                   )}
                   <View>
                     <TouchableOpacity
-                      style={{
-                        paddingHorizontal: 18,
-                        paddingVertical: 10,
-                        backgroundColor: colors.primary,
-                        borderRadius: 12,
-                      }}
+                      style={[styles.btn, { backgroundColor: colors.primary }]}
                       onPress={() => handleSubmit()}
                       disabled={isSubmitting}
                     >
                       {pinLoading ? (
                         <ActivityIndicator color="#fff" />
                       ) : (
-                        <ThemedText
-                          style={{
-                            color: colors.textInPrimary,
-                          }}
-                        >
+                        <ThemedText style={{ color: colors.textInPrimary }}>
                           {t("common.save")}
                         </ThemedText>
                       )}
@@ -420,70 +396,35 @@ export default function AuthGate({
         </KeyboardAvoidingView>
       </Background>
     );
+  }
 
-  if (step === "biometry-ask")
+  if (step === "biometry-ask") {
     return (
       <Background background={colors.backgroundImage}>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 50,
-            marginBottom: 20,
-          }}
-        >
+        <View style={styles.logoWrap}>
           <NemoryLogo width={120} height={150} />
         </View>
         <View style={styles.center}>
-          <ThemedText
-            type={"titleLG"}
-            style={{
-              textAlign: "center",
-            }}
-          >
+          <ThemedText type="titleLG" style={{ textAlign: "center" }}>
             {t("auth.enableFingerprint")}
           </ThemedText>
-          <ThemedText
-            type={"small"}
-            style={{
-              textAlign: "center",
-            }}
-          >
+          <ThemedText type="small" style={{ textAlign: "center" }}>
             {t("auth.youCanChangeThis")}
           </ThemedText>
-          <View style={{ flexDirection: "row", gap: 10, marginTop: 16 }}>
+          <View style={styles.row}>
             <TouchableOpacity
-              style={{
-                paddingHorizontal: 18,
-                paddingVertical: 10,
-                borderWidth: 1,
-                borderColor: colors.primary,
-                borderRadius: 12,
-              }}
+              style={[styles.btnOutline, { borderColor: colors.primary }]}
               onPress={() => handleBiometryChoice(false)}
             >
-              <ThemedText
-                style={{
-                  color: colors.text,
-                }}
-              >
+              <ThemedText style={{ color: colors.text }}>
                 {t("common.no")}
               </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{
-                paddingHorizontal: 18,
-                paddingVertical: 10,
-                backgroundColor: colors.primary,
-                borderRadius: 12,
-              }}
+              style={[styles.btn, { backgroundColor: colors.primary }]}
               onPress={() => handleBiometryChoice(true)}
             >
-              <ThemedText
-                style={{
-                  color: colors.textInPrimary,
-                }}
-              >
+              <ThemedText style={{ color: colors.textInPrimary }}>
                 {t("common.yes")}
               </ThemedText>
             </TouchableOpacity>
@@ -491,18 +432,12 @@ export default function AuthGate({
         </View>
       </Background>
     );
+  }
 
-  if (step === "biometry")
+  if (step === "biometry") {
     return (
       <Background background={colors.backgroundImage}>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            marginTop: 50,
-            marginBottom: 20,
-          }}
-        >
+        <View style={styles.logoWrap}>
           <NemoryLogo width={120} height={150} />
         </View>
         <View style={styles.center}>
@@ -512,30 +447,17 @@ export default function AuthGate({
         </View>
       </Background>
     );
+  }
 
   return (
     <Background background={colors.backgroundImage}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        keyboardVerticalOffset={0}
       >
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            padding: 20,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: 50,
-              marginBottom: 20,
-            }}
-          >
+        <ScrollView contentContainerStyle={styles.scrollCenter}>
+          <View style={styles.logoWrap}>
             <NemoryLogo width={120} height={150} />
           </View>
           <View style={styles.center}>
@@ -550,50 +472,26 @@ export default function AuthGate({
               placeholder="******"
               placeholderTextColor={colors.inputPlaceholder}
             />
-            {errorPin && (
-              <ThemedText
-                style={{
-                  color: colors.error,
-                  marginTop: -10,
-                  marginBottom: 20,
-                }}
-              >
-                {errorPin}
-              </ThemedText>
+            {!!errorPin && (
+              <ThemedText style={styles.errorText}>{errorPin}</ThemedText>
             )}
             <TouchableOpacity
-              style={{
-                paddingHorizontal: 18,
-                paddingVertical: 10,
-                backgroundColor: colors.primary,
-                borderRadius: 12,
-                marginBottom: 10,
-              }}
+              style={[
+                styles.btn,
+                { backgroundColor: colors.primary, marginBottom: 10 },
+              ]}
               onPress={handleCheckPin}
             >
-              <ThemedText
-                style={{
-                  color: colors.textInPrimary,
-                }}
-              >
+              <ThemedText style={{ color: colors.textInPrimary }}>
                 {t("auth.signIn")}
               </ThemedText>
             </TouchableOpacity>
             {biometryEnabled && (
               <TouchableOpacity
-                style={{
-                  paddingHorizontal: 18,
-                  paddingVertical: 10,
-                  backgroundColor: colors.primary,
-                  borderRadius: 12,
-                }}
+                style={[styles.btn, { backgroundColor: colors.primary }]}
                 onPress={() => setStep("biometry")}
               >
-                <ThemedText
-                  style={{
-                    color: colors.textInPrimary,
-                  }}
-                >
+                <ThemedText style={{ color: colors.textInPrimary }}>
                   {t("auth.tryBiometricsAgain")}
                 </ThemedText>
               </TouchableOpacity>
@@ -607,6 +505,12 @@ export default function AuthGate({
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
+    scrollCenter: {
+      flexGrow: 1,
+      padding: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
     center: {
       flex: 1,
       alignItems: "center",
@@ -629,5 +533,32 @@ const getStyles = (colors: ColorTheme) =>
       backgroundColor: colors.inputBackground,
       borderColor: colors.border,
       borderWidth: 1,
+    },
+    errorText: {
+      color: colors.error,
+      marginTop: -10,
+      marginBottom: 20,
+    },
+    btn: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 12,
+    },
+    btnOutline: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+    },
+    logoWrap: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 50,
+      marginBottom: 20,
+    },
+    row: {
+      flexDirection: "row",
+      gap: 10,
+      marginTop: 16,
     },
   });

@@ -32,6 +32,7 @@ import ChangeEmailModal from "@/components/settings/profile/ChangeEmailModal";
 import ChangePasswordModal from "@/components/settings/profile/ChangePasswordModal";
 import DeleteAccountModal from "@/components/settings/profile/DeleteAccountModal";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { apiRequest } from "@/utils";
 
 const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
@@ -52,53 +53,43 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
   useEffect(() => {
-    getUserLogged();
     getUser();
   }, []);
 
   const getUser = async () => {
-    const storedUser = await SecureStore.getItemAsync("user");
-    setUser(storedUser ? JSON.parse(storedUser) : null);
+    const [storedUser, token] = await Promise.all([
+      SecureStore.getItemAsync("user"),
+      SecureStore.getItemAsync("token"),
+    ]);
+
+    const parsed: User | null = storedUser ? JSON.parse(storedUser) : null;
+    setUser(parsed);
+
+    const logged = !!token && !!parsed?.isLogged;
+    setUserLogged(logged);
   };
 
-  const getUserLogged = async () => {
-    const token = await SecureStore.getItemAsync("token");
-    if (token) {
-      setUserLogged(true);
-    } else {
-      setUserLogged(false);
-    }
+  useEffect(() => {
+    const refresh = () => {
+      void getUser();
+    };
+    UserEvents.on("userChanged", refresh);
+    UserEvents.on("userRegistered", refresh);
+    return () => {
+      UserEvents.off("userChanged", refresh);
+      UserEvents.off("userRegistered", refresh);
+    };
+  }, []);
+
+  const updateUser = async (u: User) => {
+    setUser(u);
+    setUserLogged(!!u.isLogged);
   };
 
   useEffect(() => {
-    const handler = () => getUser();
-    UserEvents.on("userChanged", handler);
-    return () => UserEvents.off("userChanged", handler);
-  }, []);
-
-  useEffect(() => {
-    const handler = () => getUser();
-    UserEvents.on("userRegistered", handler);
-    return () => UserEvents.off("userRegistered", handler);
-  }, []);
-
-  useEffect(() => {
-    const handler = () => getUserLogged();
-    UserEvents.on("userRegistered", handler);
-    return () => UserEvents.off("userRegistered", handler);
-  }, []);
-
-  useEffect(() => {
-    const handler = () => getUserLogged();
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
-
-  const updateUser = (user: User) => {
-    if (user) {
-      setUser(user);
-    }
-  };
+    console.log("user", user);
+    console.log("loggedIn", userLogged);
+  }, [user]);
 
   useEffect(() => {
     const handler = (user: User) => updateUser(user);
@@ -155,22 +146,6 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     setShowChangePasswordModal(true);
   };
 
-  const handleLogout = async () => {
-    await SecureStore.deleteItemAsync("token");
-    await getUserLogged();
-    if (user?.oauthProviderId) {
-      try {
-        await GoogleSignin.signOut();
-      } catch (error) {
-        console.error("Error signing out from Google:", error);
-      }
-    }
-    Toast.show({
-      type: "success",
-      text1: t("toast.successfullyLoggedOut"),
-    });
-  };
-
   return (
     <SideSheet ref={ref}>
       <Background background={colors.backgroundImage} paddingTop={10}>
@@ -178,17 +153,14 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
           <AuthForm
             onSuccessSignWithGoogle={() => {
               setShowAuthForm(false);
-              getUserLogged();
               getUser();
             }}
             onSuccessSignIn={() => {
               setShowAuthForm(false);
-              getUserLogged();
               getUser();
             }}
             onSuccessEmailCode={() => {
               setShowAuthForm(false);
-              getUserLogged();
               getUser();
             }}
             activeAuthTab={activeTab}
@@ -212,16 +184,18 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                   color:
                     userLogged && user?.isRegistered
                       ? "green"
-                      : userLogged && !user?.isRegistered
+                      : !userLogged && !user?.isRegistered
                         ? "red"
                         : "orange",
                 }}
               >
                 {userLogged && user?.isRegistered
                   ? t("settings.profile.loggedIn")
-                  : userLogged && !user?.isRegistered
+                  : !userLogged && !user?.isRegistered
                     ? t("settings.profile.notRegister")
-                    : t("settings.profile.loggedOut")}
+                    : !userLogged && user?.isRegistered
+                      ? t("settings.profile.notLoggedIn")
+                      : t("settings.profile.loggedOut")}
               </ThemedText>
             </View>
             <ProfileCard
@@ -288,32 +262,6 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               </>
             )}
 
-            {user?.isRegistered && userLogged && (
-              <View>
-                <TouchableOpacity
-                  style={[
-                    styles.btn,
-                    {
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                      marginBottom: 20,
-                      backgroundColor: colors.background,
-                    },
-                  ]}
-                  onPress={handleLogout}
-                >
-                  <ThemedText
-                    style={{
-                      color: colors.text,
-                      textAlign: "center",
-                    }}
-                  >
-                    {t("auth.logout")}
-                  </ThemedText>
-                </TouchableOpacity>
-              </View>
-            )}
-
             {!user?.isRegistered && (
               <View>
                 <TouchableOpacity
@@ -337,7 +285,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                 </TouchableOpacity>
               </View>
             )}
-            {user?.isRegistered && !userLogged && (
+            {!userLogged && (
               <View>
                 <TouchableOpacity
                   style={[

@@ -51,7 +51,6 @@ export async function apiRequest<T = any>({
     return await axios<T>(requestConfig);
   } catch (err) {
     if (axios.isAxiosError(err)) {
-      console.log(111);
       if (!err.response) {
         console.error("Network or Axios error:", err.message, err.code);
         Toast.show({

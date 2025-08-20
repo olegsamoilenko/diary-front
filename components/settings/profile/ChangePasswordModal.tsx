@@ -15,7 +15,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme, ErrorMessages } from "@/types";
 import * as Yup from "yup";
-import { passwordRules } from "@/utils";
+import { apiRequest, passwordRules } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
 import axios from "axios";
 import { apiUrl } from "@/constants/env";
@@ -62,11 +62,15 @@ export default function ChangePasswordModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/users/change-user-auth-data`, {
-        email: values.email,
-        password: values.password,
-        newPassword: values.newPassword,
-        lang: i18n.language,
+      const res = await apiRequest({
+        url: `/users/change-user-auth-data`,
+        method: "POST",
+        data: {
+          email: values.email,
+          password: values.password,
+          newPassword: values.newPassword,
+          lang: i18n.language,
+        },
       });
 
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));

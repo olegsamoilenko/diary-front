@@ -130,25 +130,13 @@ export default function EmailVerificationCodeForm({
         placeholderTextColor={colors.inputPlaceholder}
       />
       {error && (
-        <ThemedText
-          type={"small"}
-          style={{
-            color: colors.error,
-            marginTop: -10,
-            marginBottom: 20,
-          }}
-        >
+        <ThemedText type={"small"} style={styles.error}>
           {error}
         </ThemedText>
       )}
 
       <TouchableOpacity
-        style={{
-          paddingHorizontal: 18,
-          paddingVertical: 10,
-          borderRadius: 12,
-          marginBottom: 16,
-        }}
+        style={styles.resendCodeBtn}
         onPress={resendCode}
         disabled={resendLoading}
       >
@@ -157,10 +145,12 @@ export default function EmailVerificationCodeForm({
         ) : (
           <ThemedText
             type="subtitleLG"
-            style={{
-              color: colors.text,
-              textAlign: "center",
-            }}
+            style={[
+              styles.text,
+              {
+                color: colors.text,
+              },
+            ]}
           >
             {t("auth.resendCode")}
           </ThemedText>
@@ -175,10 +165,12 @@ export default function EmailVerificationCodeForm({
           <ActivityIndicator color="#fff" />
         ) : (
           <ThemedText
-            style={{
-              color: colors.textInPrimary,
-              textAlign: "center",
-            }}
+            style={[
+              styles.text,
+              {
+                color: colors.textInPrimary,
+              },
+            ]}
           >
             {t("auth.confirm")}
           </ThemedText>
@@ -202,6 +194,11 @@ const getStyles = (colors: ColorTheme) =>
       textAlign: "center",
       fontWeight: "500",
     },
+    error: {
+      color: colors.error,
+      marginTop: -10,
+      marginBottom: 20,
+    },
     input: {
       borderRadius: 12,
       padding: 12,
@@ -216,6 +213,15 @@ const getStyles = (colors: ColorTheme) =>
       paddingVertical: 10,
       backgroundColor: colors.primary,
       borderRadius: 12,
+      textAlign: "center",
+    },
+    resendCodeBtn: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 12,
+      marginBottom: 16,
+    },
+    text: {
       textAlign: "center",
     },
   });

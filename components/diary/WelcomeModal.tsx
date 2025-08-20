@@ -21,7 +21,6 @@ export default function WelcomeModal({}) {
     const getData = async () => {
       // await AsyncStorage.removeItem("show_welcome");
       const value = await AsyncStorage.getItem("show_welcome");
-      console.log("show_welcome value:", value);
       if (value === null) {
         setShowWelcome(true);
       } else {
@@ -33,7 +32,6 @@ export default function WelcomeModal({}) {
 
   const onToggle = useCallback((value: boolean) => {
     setChecked(value);
-    console.log("onToggle called with checked:", value);
     AsyncStorage.setItem("show_welcome", JSON.stringify(!value)).catch(
       console.error,
     );

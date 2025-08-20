@@ -19,6 +19,7 @@ import { UserEvents } from "@/utils/events/userEvents";
 import axios from "axios";
 import { apiUrl } from "@/constants/env";
 import * as SecureStore from "expo-secure-store";
+import { apiRequest } from "@/utils";
 
 type ChangeNameModalProps = {
   showChangeNameModal: boolean;
@@ -56,10 +57,14 @@ export default function ChangeNameModal({
     const uuid = user.uuid;
     const hash = user.hash;
     try {
-      const res = await axios.post(`${apiUrl}/users/change`, {
-        uuid,
-        hash,
-        newName: values.newName,
+      const res = await apiRequest({
+        url: `/users/change`,
+        method: "POST",
+        data: {
+          uuid,
+          hash,
+          newName: values.newName,
+        },
       });
 
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));

@@ -15,7 +15,6 @@ import RegisterForm from "./RegisterForm";
 import React, { useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { useTranslation } from "react-i18next";
-import PhoneVerificationCodeForm from "./PhoneVerificationCodeForm";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 import ChangePasswordForm from "@/components/auth/ChangePasswordForm";
 import EmailVerificationCodeForm from "@/components/auth/EmailVerificationCodeForm";
@@ -26,14 +25,12 @@ export default function AuthForm({
   onSuccessEmailCode,
   onSuccessSignIn,
   activeAuthTab = "register",
-  // onSuccessPhoneCode,
 }: {
   forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
   onSuccessEmailCode: () => void;
   onSuccessSignIn: () => void;
   activeAuthTab?: "login" | "register";
-  // onSuccessPhoneCode: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"login" | "register">(
     activeAuthTab,
@@ -44,7 +41,6 @@ export default function AuthForm({
   const [showEmailVerificationCodeForm, setShowEmailVerificationCodeForm] =
     useState(false);
   const { t } = useTranslation();
-  // const [showPhoneVerificationCodeForm, setShowPhoneVerificationCodeForm] = useState(false);
   const [showForgotPasswordForm, setShowForgotPasswordForm] = useState(false);
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
 
@@ -65,22 +61,8 @@ export default function AuthForm({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            padding: 20,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: 50,
-              marginBottom: 20,
-            }}
-          >
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          <View style={styles.logo}>
             <NemoryLogo />
           </View>
           {showEmailVerificationCodeForm ? (
@@ -93,12 +75,6 @@ export default function AuthForm({
           ) : showChangePasswordForm ? (
             <ChangePasswordForm onSuccess={onSuccessChangePassword} />
           ) : (
-            //   showPhoneVerificationCodeForm ? (
-            //   <PhoneVerificationCodeForm
-            //     onSuccessPhoneVerificationCodeCode={onSuccessPhoneVerificationCodeCode}
-            //     forPlanSelect={forPlanSelect}
-            //   />
-            // ) :
             <View style={styles.container}>
               {/* Tabs */}
               <View style={styles.tabsContainer}>
@@ -154,7 +130,6 @@ export default function AuthForm({
                     setShowEmailVerificationCodeForm={
                       setShowEmailVerificationCodeForm
                     }
-                    // setShowPhoneVerificationCodeForm={setShowPhoneVerificationCodeForm}
                   />
                 )}
               </View>
@@ -172,6 +147,18 @@ const getStyles = (colors: any) =>
       flex: 1,
       paddingTop: 10,
       backgroundColor: "transparent",
+    },
+    scrollView: {
+      flexGrow: 1,
+      padding: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    logo: {
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 50,
+      marginBottom: 20,
     },
     tabsContainer: {
       flexDirection: "row",

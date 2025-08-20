@@ -2,14 +2,9 @@ import React, { useState } from "react";
 import {
   View,
   TextInput,
-  Text,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Image,
-  Platform,
-  KeyboardAvoidingView,
-  ScrollView,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -30,14 +25,12 @@ interface RegisterFormProps {
   forPlanSelect: boolean;
   onSuccessSignWithGoogle: () => void;
   setShowEmailVerificationCodeForm: (show: boolean) => void;
-  // setShowPhoneVerificationCodeForm: (show: boolean) => void;
 }
 
 export default function RegisterForm({
   forPlanSelect,
   onSuccessSignWithGoogle,
   setShowEmailVerificationCodeForm,
-  // setShowPhoneVerificationCodeForm,
 }: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
   const lang = useState<string | null>(i18n.language)[0];
@@ -58,14 +51,6 @@ export default function RegisterForm({
       .required(t("auth.confirmYourPassword"))
       .oneOf([Yup.ref("password")], t("auth.passwordsDoNotMatch")),
   });
-
-  // const phoneRegExp = /^\d{10,15}$/;
-  //
-  // const phoneSchema = Yup.object({
-  //   phone: Yup.string()
-  //     // .matches(phoneRegExp)
-  //     .required("Phone number is required"),
-  // });
 
   const handleRegister = async (
     values: { email: string; password: string },
@@ -104,64 +89,29 @@ export default function RegisterForm({
     }
   };
 
-  // const handleSendCode = async (values, { setSubmitting, resetForm }) => {
-  //   const userString = await SecureStore.getItemAsync("user");
-  //   const user: User = userString ? JSON.parse(userString) : null;
-  //   try {
-  //     await axios.post(`${apiUrl}/auth/sign-in-with-phone/${user.id}`, {
-  //       phone: values.phone,
-  //     });
-  //     setLoading(false);
-  //     setShowPhoneVerificationCodeForm(true);
-  //     resetForm();
-  //     setSubmitting(false);
-  //   } catch (err: any) {
-  //     console.log("Registration error:", err);
-  //     setLoading(false);
-  //   }
-  // };
-
   return (
-    <View
-      style={{
-        paddingBottom: 30,
-      }}
-    >
+    <View style={styles.container}>
       <GoogleSignInButton
         onSuccessSignWithGoogle={onSuccessSignWithGoogle}
         forPlanSelect={forPlanSelect}
       />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <View style={styles.separator}>
         <View
-          style={{
-            flex: 1,
-            height: 1,
-            backgroundColor: colors.border,
-            marginRight: 8,
-          }}
+          style={[
+            styles.separatorLine,
+            {
+              marginRight: 8,
+            },
+          ]}
         ></View>
-        <ThemedText
-          style={{
-            textAlign: "center",
-            marginVertical: 16,
-            color: colors.text,
-          }}
-        >
-          {t("common.or")}
-        </ThemedText>
+        <ThemedText style={styles.or}>{t("common.or")}</ThemedText>
         <View
-          style={{
-            flex: 1,
-            height: 1,
-            backgroundColor: colors.border,
-            marginLeft: 8,
-          }}
+          style={[
+            styles.separatorLine,
+            {
+              marginLeft: 8,
+            },
+          ]}
         ></View>
       </View>
 
@@ -212,14 +162,7 @@ export default function RegisterForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.email && errors.email && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.email}
                 </ThemedText>
               )}
@@ -235,14 +178,7 @@ export default function RegisterForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.password && errors.password && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.password}
                 </ThemedText>
               )}
@@ -260,27 +196,13 @@ export default function RegisterForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.confirmPassword && errors.confirmPassword && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.confirmPassword}
                 </ThemedText>
               )}
             </View>
             {error && (
-              <ThemedText
-                type={"small"}
-                style={{
-                  color: colors.error,
-                  marginTop: -10,
-                  marginBottom: 20,
-                }}
-              >
+              <ThemedText type={"small"} style={styles.error}>
                 {error}
               </ThemedText>
             )}
@@ -293,10 +215,12 @@ export default function RegisterForm({
                 <ActivityIndicator color="#fff" />
               ) : (
                 <ThemedText
-                  style={{
-                    color: colors.textInPrimary,
-                    textAlign: "center",
-                  }}
+                  style={[
+                    styles.text,
+                    {
+                      color: colors.textInPrimary,
+                    },
+                  ]}
                 >
                   {t("auth.register")}
                 </ThemedText>
@@ -305,115 +229,35 @@ export default function RegisterForm({
           </>
         )}
       </Formik>
-
-      {/*<View*/}
-      {/*  style={{*/}
-      {/*    flexDirection: "row",*/}
-      {/*    alignItems: "center",*/}
-      {/*    justifyContent: "center",*/}
-      {/*  }}*/}
-      {/*>*/}
-      {/*  <View*/}
-      {/*    style={{*/}
-      {/*      flex: 1,*/}
-      {/*      height: 1,*/}
-      {/*      backgroundColor: colors.border,*/}
-      {/*      marginRight: 8,*/}
-      {/*    }}*/}
-      {/*  ></View>*/}
-      {/*  <ThemedText*/}
-      {/*    style={{*/}
-      {/*      textAlign: "center",*/}
-      {/*      marginVertical: 16,*/}
-      {/*      color: colors.text,*/}
-      {/*    }}*/}
-      {/*  >*/}
-      {/*    {t("common.or")}*/}
-      {/*  </ThemedText>*/}
-      {/*  <View*/}
-      {/*    style={{*/}
-      {/*      flex: 1,*/}
-      {/*      height: 1,*/}
-      {/*      backgroundColor: colors.border,*/}
-      {/*      marginLeft: 8,*/}
-      {/*    }}*/}
-      {/*  ></View>*/}
-      {/*</View>*/}
-
-      {/*<Formik*/}
-      {/*  initialValues={{ phone: "" }}*/}
-      {/*  validationSchema={phoneSchema}*/}
-      {/*  onSubmit={handleSendCode}*/}
-      {/*>*/}
-      {/*  {({*/}
-      {/*    handleChange,*/}
-      {/*    handleBlur,*/}
-      {/*    handleSubmit,*/}
-      {/*    values,*/}
-      {/*    errors,*/}
-      {/*    touched,*/}
-      {/*    isSubmitting,*/}
-      {/*  }) => (*/}
-      {/*    <>*/}
-      {/*      <View*/}
-      {/*        style={{*/}
-      {/*          marginBottom: 20,*/}
-      {/*        }}*/}
-      {/*      >*/}
-      {/*        <ThemedText*/}
-      {/*          type="subtitleXL"*/}
-      {/*          style={{*/}
-      {/*            textAlign: "center",*/}
-      {/*          }}*/}
-      {/*        >*/}
-      {/*          {t("auth.signInWithPhone")}*/}
-      {/*        </ThemedText>*/}
-      {/*      </View>*/}
-      {/*      <TextInput*/}
-      {/*        value={values.phone}*/}
-      {/*        style={[styles.input]}*/}
-      {/*        placeholder="38XXXXXXXXXX"*/}
-      {/*        onChangeText={handleChange("phone")}*/}
-      {/*        onBlur={handleBlur("phone")}*/}
-      {/*placeholderTextColor={colors.inputPlaceholder}*/}
-      {/*      />*/}
-      {/*      <ThemedText*/}
-      {/*        type="small"*/}
-      {/*        style={{*/}
-      {/*          marginBottom: 20,*/}
-      {/*          color:*/}
-      {/*            touched.phone && errors.phone ? colors.error : colors.text,*/}
-      {/*        }}*/}
-      {/*      >*/}
-      {/*        {t("auth.phoneMustBeInFormat")}*/}
-      {/*      </ThemedText>*/}
-      {/*      <TouchableOpacity*/}
-      {/*        style={styles.btn}*/}
-      {/*        onPress={() => handleSubmit()}*/}
-      {/*        disabled={isSubmitting}*/}
-      {/*      >*/}
-      {/*        {loading ? (*/}
-      {/*          <ActivityIndicator color="#fff" />*/}
-      {/*        ) : (*/}
-      {/*          <ThemedText*/}
-      {/*            style={{*/}
-      {/*              color: colors.textInPrimary,*/}
-      {/*              textAlign: "center",*/}
-      {/*            }}*/}
-      {/*          >*/}
-      {/*            {t("auth.sendCode")}*/}
-      {/*          </ThemedText>*/}
-      {/*        )}*/}
-      {/*      </TouchableOpacity>*/}
-      {/*    </>*/}
-      {/*  )}*/}
-      {/*</Formik>*/}
     </View>
   );
 }
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
+    container: {
+      marginBottom: 30,
+    },
+    separator: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    separatorLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    or: {
+      textAlign: "center",
+      marginVertical: 16,
+      color: colors.text,
+    },
+    error: {
+      color: colors.error,
+      marginTop: -10,
+      marginBottom: 20,
+    },
     label: {
       marginBottom: 16,
       textAlign: "left",
@@ -431,6 +275,9 @@ const getStyles = (colors: ColorTheme) =>
       paddingVertical: 10,
       backgroundColor: colors.primary,
       borderRadius: 12,
+      textAlign: "center",
+    },
+    text: {
       textAlign: "center",
     },
   });

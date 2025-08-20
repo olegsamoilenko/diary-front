@@ -179,6 +179,7 @@
       "changePassword": "Change Password",
       "newPassword": "New Password",
       "loggedIn": "Logged in",
+      "notLoggedIn": "Not logged in",
       "loggedOut": "Logged out",
       "notRegister": "Not registered",
     }

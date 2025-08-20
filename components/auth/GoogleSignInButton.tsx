@@ -45,7 +45,7 @@ export default function GoogleSignInButton({
     const userString = await SecureStore.getItemAsync("user");
     const userObj: User | null = userString ? JSON.parse(userString) : null;
     try {
-      const res = await axios.post(`${apiUrl}/auth/sign-in-with-google}`, {
+      const res = await axios.post(`${apiUrl}/auth/sign-in-with-google`, {
         userId: userObj?.id,
         uuid: userObj?.uuid,
         idToken,
@@ -60,9 +60,9 @@ export default function GoogleSignInButton({
 
       onSuccessSignWithGoogle();
       UserEvents.emit("userLoggedIn", res.data.user);
-      console.log("Google sign-in response:", res.data.user);
     } catch (err: any) {
       console.error("Error during Google sign-in: 2", err);
+      console.error("Error during Google sign-in: 2", err.response);
     }
   };
 

@@ -15,7 +15,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme, ErrorMessages } from "@/types";
 import * as Yup from "yup";
-import { passwordRules } from "@/utils";
+import { apiRequest, passwordRules } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
 import axios from "axios";
 import { apiUrl } from "@/constants/env";
@@ -66,11 +66,15 @@ export default function ChangeEmailModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/users/change-user-auth-data`, {
-        email: values.email,
-        password: values.password,
-        newEmail: values.newEmail,
-        lang: i18n.language,
+      const res = await apiRequest({
+        url: `/users/change-user-auth-data`,
+        method: "POST",
+        data: {
+          email: values.email,
+          password: values.password,
+          newEmail: values.newEmail,
+          lang: i18n.language,
+        },
       });
 
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));
@@ -97,10 +101,14 @@ export default function ChangeEmailModal({
     setCode("");
     setResendLoading(true);
     try {
-      const res = await axios.post(`${apiUrl}/auth/resend-code`, {
-        email: user?.email,
-        lang: i18n.language,
-        type: "newEmail",
+      const res = await apiRequest({
+        url: `/auth/resend-code`,
+        method: "POST",
+        data: {
+          email: user?.email,
+          lang: i18n.language,
+          type: "newEmail",
+        },
       });
 
       if (res && res.status !== 201) {
@@ -136,8 +144,10 @@ export default function ChangeEmailModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/new-email-confirm`, {
-        code,
+      const res = await apiRequest({
+        url: `/auth/new-email-confirm`,
+        method: "POST",
+        data: { code },
       });
 
       if (res && res.status !== 201) {
@@ -326,7 +336,10 @@ export default function ChangeEmailModal({
             onChangeText={setCode}
             keyboardType="number-pad"
             maxLength={6}
-            style={[styles.input, { letterSpacing: 5, width: 180 }]}
+            style={[
+              styles.input,
+              { letterSpacing: 5, width: 180, textAlign: "center" },
+            ]}
             placeholder="******"
             placeholderTextColor={colors.inputPlaceholder}
           />

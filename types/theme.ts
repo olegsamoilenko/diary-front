@@ -28,6 +28,7 @@ export type ThemeContextType = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   colorScheme: Theme;
+  resetToSystem: () => void;
 };
 
 export type LogoTheme = {

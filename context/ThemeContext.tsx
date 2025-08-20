@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useColorScheme } from "react-native";
 import type { Theme, ThemeContextType, User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
@@ -7,6 +13,7 @@ const ThemeContext = createContext<ThemeContextType>({
   theme: "light",
   setTheme: () => {},
   colorScheme: "light",
+  resetToSystem: () => {},
 });
 
 export const ThemeProviderCustom = ({
@@ -40,6 +47,10 @@ export const ThemeProviderCustom = ({
     };
   }, []);
 
+  const resetToSystem = useCallback(() => {
+    setTheme(systemScheme as Theme);
+  }, [systemScheme]);
+
   useEffect(() => {
     setColorScheme(theme);
     (async () => {
@@ -52,7 +63,9 @@ export const ThemeProviderCustom = ({
   }, [theme, systemScheme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, colorScheme }}>
+    <ThemeContext.Provider
+      value={{ theme, setTheme, colorScheme, resetToSystem }}
+    >
       {children}
     </ThemeContext.Provider>
   );

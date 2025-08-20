@@ -79,7 +79,6 @@ export default function LoginForm({
       });
       onSuccessSignIn();
       UserEvents.emit("userLoggedIn", user);
-      console.log("Login response:", user);
     } catch (err: any) {
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
@@ -90,46 +89,28 @@ export default function LoginForm({
   };
 
   return (
-    <View
-      style={{
-        marginBottom: 40,
-      }}
-    >
+    <View style={styles.container}>
       <GoogleSignInButton
         onSuccessSignWithGoogle={onSuccessSignWithGoogle}
         forPlanSelect={forPlanSelect}
       />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <View style={styles.separator}>
         <View
-          style={{
-            flex: 1,
-            height: 1,
-            backgroundColor: colors.border,
-            marginRight: 8,
-          }}
+          style={[
+            styles.separatorLine,
+            {
+              marginRight: 8,
+            },
+          ]}
         ></View>
-        <ThemedText
-          style={{
-            textAlign: "center",
-            marginVertical: 16,
-            color: colors.text,
-          }}
-        >
-          {t("common.or")}
-        </ThemedText>
+        <ThemedText style={styles.or}>{t("common.or")}</ThemedText>
         <View
-          style={{
-            flex: 1,
-            height: 1,
-            backgroundColor: colors.border,
-            marginLeft: 8,
-          }}
+          style={[
+            styles.separatorLine,
+            {
+              marginLeft: 8,
+            },
+          ]}
         ></View>
       </View>
       <View
@@ -179,14 +160,7 @@ export default function LoginForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.email && errors.email && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.email}
                 </ThemedText>
               )}
@@ -202,47 +176,30 @@ export default function LoginForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.password && errors.password && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.password}
                 </ThemedText>
               )}
             </View>
             {error && (
-              <ThemedText
-                type={"small"}
-                style={{
-                  color: colors.error,
-                  marginTop: -10,
-                  marginBottom: 20,
-                }}
-              >
+              <ThemedText type={"small"} style={styles.error}>
                 {error}
               </ThemedText>
             )}
             <TouchableOpacity
-              style={{
-                paddingHorizontal: 18,
-                paddingVertical: 10,
-                borderRadius: 12,
-                marginBottom: 16,
-              }}
+              style={styles.forgotYourPasswordBtn}
               onPress={() => {
                 setShowForgotPasswordForm(true);
               }}
             >
               <ThemedText
                 type="subtitleLG"
-                style={{
-                  color: colors.text,
-                  textAlign: "center",
-                }}
+                style={[
+                  styles.text,
+                  {
+                    color: colors.text,
+                  },
+                ]}
               >
                 {t("auth.forgotYourPassword")}
               </ThemedText>
@@ -256,10 +213,12 @@ export default function LoginForm({
                 <ActivityIndicator color="#fff" />
               ) : (
                 <ThemedText
-                  style={{
-                    color: colors.textInPrimary,
-                    textAlign: "center",
-                  }}
+                  style={[
+                    styles.text,
+                    {
+                      color: colors.textInPrimary,
+                    },
+                  ]}
                 >
                   {t("auth.login")}
                 </ThemedText>
@@ -274,6 +233,29 @@ export default function LoginForm({
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
+    container: {
+      marginBottom: 40,
+    },
+    separator: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    separatorLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    or: {
+      textAlign: "center",
+      marginVertical: 16,
+      color: colors.text,
+    },
+    error: {
+      color: colors.error,
+      marginTop: -10,
+      marginBottom: 20,
+    },
     input: {
       backgroundColor: colors.inputBackground,
       padding: 14,
@@ -291,6 +273,15 @@ const getStyles = (colors: ColorTheme) =>
       paddingVertical: 10,
       backgroundColor: colors.primary,
       borderRadius: 12,
+      textAlign: "center",
+    },
+    forgotYourPasswordBtn: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 12,
+      marginBottom: 16,
+    },
+    text: {
       textAlign: "center",
     },
   });

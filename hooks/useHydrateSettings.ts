@@ -7,16 +7,7 @@ import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 import { setAiModel } from "@/store/slices/settings/aiModelSlice";
 import type { AiModel, User } from "@/types";
 
-function safeParse<T>(v: string | null, fallback: T): T {
-  if (v == null) return fallback;
-  try {
-    return JSON.parse(v) as T;
-  } catch {
-    return (v as unknown as T) ?? fallback;
-  }
-}
-
-export function useHydrateSettings(user: User) {
+export function useHydrateSettings(user: User | null) {
   const dispatch = useDispatch();
 
   useEffect(() => {

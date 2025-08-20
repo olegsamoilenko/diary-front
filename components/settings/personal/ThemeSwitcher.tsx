@@ -157,7 +157,6 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   };
 
   const updateTheme = (user: User) => {
-    console.log("Updating theme from user settings:", user);
     if (user?.settings?.theme) {
       setTheme(user?.settings?.theme as Theme);
     }

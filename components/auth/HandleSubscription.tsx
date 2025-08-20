@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Modal,
-  Pressable,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { ColorTheme, Plan } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";

@@ -10,6 +10,7 @@ import { UserEvents } from "@/utils/events/userEvents";
 import * as SecureStore from "@/utils/store/secureStore";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useBiometry } from "@/context/BiometryContext";
 
 type DeleteAccountModalProps = {
   showDeleteAccountModal: boolean;
@@ -24,6 +25,7 @@ export default function DeleteAccountModal({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const { setBiometry } = useBiometry();
 
   const handleDeleteAccount = async () => {
     try {
@@ -38,6 +40,7 @@ export default function DeleteAccountModal({
         SecureStore.deleteItemAsync("biometry_enabled"),
         AsyncStorage.removeItem("show_welcome"),
       ]);
+      await setBiometry(false);
       UserEvents.emit("userDeleted");
       setShowDeleteAccountModal(false);
     } catch (error) {

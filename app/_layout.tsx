@@ -19,21 +19,20 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 
 import * as SecureStore from "@/utils/store/secureStore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
 import uuid from "react-native-uuid";
 import { apiRequest } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
 import type { User } from "@/types";
-import { AiModel } from "@/types";
+import { Lang } from "@/types";
 
 import { resetFont } from "@/store/slices/settings/fontSlice";
 import { resetTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 import { resetAiModel } from "@/store/slices/settings/aiModelSlice";
-import { useTranslation } from "react-i18next";
 import { useHydrateSettings } from "@/hooks/useHydrateSettings";
 import { unstable_batchedUpdates, AppState } from "react-native";
+import * as Localization from "expo-localization";
 
 // Ліниві імпорти важких екранів
 const AuthGate = lazy(() => import("@/components/auth/AuthGate"));
@@ -156,6 +155,7 @@ async function createAnonymousUser(): Promise<User | null> {
 function AppContent() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const { resetToSystem } = useThemeCustom();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -196,18 +196,22 @@ function AppContent() {
     let cancelled = false;
     const onUserDeleted = async () => {
       const fresh = await createAnonymousUser();
-      console.log("User deleted, created new anonymous user:", fresh);
 
       if (cancelled) return;
+      setUser(fresh);
       unstable_batchedUpdates(() => {
-        console.log("Resetting settings after user deletion");
         dispatch(resetFont());
         dispatch(resetAiModel());
         dispatch(resetTimeFormat());
-        console.log("User deleted, reset settings and user state");
       });
-      setUser(fresh);
+      resetToSystem();
       setIsAuthenticated(false);
+
+      const locales = Localization.getLocales();
+      const deviceLanguage: string = locales[0]?.languageCode ?? Lang.EN;
+
+      await i18n.changeLanguage(deviceLanguage);
+      LocaleConfig.defaultLocale = deviceLanguage;
     };
 
     UserEvents.on("userDeleted", onUserDeleted);
@@ -295,7 +299,7 @@ function useUpdateLastActive(user: User | null) {
       last = now;
       try {
         await apiRequest({
-          url: `/users/update/${user.id}`,
+          url: `/users/update`,
           method: "POST",
           data: { lastActiveAt: new Date().toISOString() },
         });

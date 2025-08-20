@@ -13,6 +13,7 @@ export type User = {
   oauthProviderId?: string | null;
   name?: string | null;
   isRegistered: boolean;
+  isLogged: boolean;
   passwordResetToken?: string | null;
   passwordChangeToken?: string | null;
   emailVerified: boolean;

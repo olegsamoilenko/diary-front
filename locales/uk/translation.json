@@ -179,6 +179,7 @@
       "changePassword": "Змінити пароль",
       "newPassword": "Новий пароль",
       "loggedIn": "Увійшли",
+      "notLoggedIn": "Не увійшли",
       "loggedOut": "Вийшли",
       "notRegister": "Не зареєстрований",
     }
