@@ -12,7 +12,8 @@ import { useTranslation } from "react-i18next";
 import { ColorTheme, Plan, PlanStatus, User } from "@/types";
 import { PLANS } from "@/constants/Plans";
 import { ThemedText } from "@/components/ThemedText";
-import { apiRequest, getStatusColor, UserEvents } from "@/utils";
+import { apiRequest, getStatusColor } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 import * as SecureStore from "@/utils/store/secureStore";
 
 type PlansProps = {

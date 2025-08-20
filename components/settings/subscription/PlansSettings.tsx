@@ -21,7 +21,9 @@ import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
 import AuthForm from "@/components/auth/AuthForm";
 import { apiRequest } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 import RegisterOrNot from "@/components/auth/RegisterOrNot";
+import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
@@ -45,10 +47,6 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
     };
     getUser();
   }, []);
-
-  useEffect(() => {
-    console.log("PlansSettings mounted", user);
-  }, [user]);
 
   const onSuccessPayment = () => {
     setSuccessPaymentPlan(plan);
@@ -80,6 +78,19 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
       }
     }
   };
+
+  const updatePlan = (user: User) => {
+    if (user?.plan) {
+      setUser(user);
+      // setPlan(user.plan);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updatePlan(user);
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
+  }, []);
   return (
     <SideSheet ref={ref}>
       <Background background={colors.backgroundImage} paddingTop={10}>

@@ -9,7 +9,7 @@ import {
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Fonts } from "@/constants/Fonts";
@@ -18,6 +18,7 @@ import { setFont } from "@/store/slices/settings/fontSlice";
 import type { RootState } from "@/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { apiRequest, getFont } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 import Background from "@/components/Background";
 import * as SecureStore from "expo-secure-store";
 import type { User } from "@/types";
@@ -32,13 +33,13 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const styles = getStyles(colors);
 
   const handleFont = async (font: Font) => {
-    dispatch(setFont(font));
     try {
       await apiRequest({
         url: `/users/update-settings`,
         method: "POST",
         data: { font },
       });
+      dispatch(setFont(font));
 
       const stored = await SecureStore.getItemAsync("user");
       const user: User | null = stored ? JSON.parse(stored) : null;
@@ -51,6 +52,18 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
       console.warn("Failed to update lang", error);
     }
   };
+
+  const updateFont = (user: User) => {
+    if (user?.settings?.font) {
+      dispatch(setFont(user.settings.font));
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updateFont(user);
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
+  }, []);
 
   return (
     <SideSheet ref={ref}>

@@ -11,7 +11,6 @@ import { getFont } from "./common/getFont";
 import { uploadImageToServer } from "./files/uploadImageToServer";
 import { passwordRules } from "./auth/passwordRules";
 import { getStatusColor } from "./colors/getStatusColor";
-import { UserEvents } from "./events/userEvents";
 import { getToken } from "./api/getToken";
 import aiStreamEmitter from "./events/eventEmitter";
 import {
@@ -34,7 +33,6 @@ export {
   uploadImageToServer,
   passwordRules,
   getStatusColor,
-  UserEvents,
   getToken,
   aiStreamEmitter,
   addToAiChunkBuffer,

@@ -10,6 +10,7 @@ import { User } from "@/types";
 import { useTranslation } from "react-i18next";
 import { apiUrl } from "@/constants/env";
 import { Image } from "expo-image";
+import { UserEvents } from "@/utils/events/userEvents";
 
 export default function GoogleSignInButton({
   forPlanSelect,
@@ -40,14 +41,15 @@ export default function GoogleSignInButton({
     return userInfo;
   };
 
-  const processUserData = async (idToken: string, user: any) => {
+  const processUserData = async (idToken: string) => {
     const userString = await SecureStore.getItemAsync("user");
     const userObj: User | null = userString ? JSON.parse(userString) : null;
     try {
-      const res = await axios.post(
-        `${apiUrl}/auth/sign-in-with-google/${userObj?.id}`,
-        { idToken },
-      );
+      const res = await axios.post(`${apiUrl}/auth/sign-in-with-google}`, {
+        userId: userObj?.id,
+        uuid: userObj?.uuid,
+        idToken,
+      });
 
       if (res && res.status !== 201) {
         throw new Error("Failed to sign in with Google");
@@ -57,8 +59,10 @@ export default function GoogleSignInButton({
       await SecureStore.setItemAsync("token", res.data.accessToken);
 
       onSuccessSignWithGoogle();
+      UserEvents.emit("userLoggedIn", res.data.user);
+      console.log("Google sign-in response:", res.data.user);
     } catch (err: any) {
-      console.error("Error during Google sign-in:", err?.response?.data);
+      console.error("Error during Google sign-in: 2", err);
     }
   };
 
@@ -66,9 +70,9 @@ export default function GoogleSignInButton({
     try {
       const response = await GoogleLogin();
 
-      const { idToken, user } = response.data ?? {};
+      const { idToken } = response.data ?? {};
       if (idToken) {
-        await processUserData(idToken, user);
+        await processUserData(idToken);
       }
     } catch (err: any) {
       console.log("Error", err?.response?.data);

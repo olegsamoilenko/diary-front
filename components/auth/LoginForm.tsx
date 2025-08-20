@@ -17,9 +17,10 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { passwordRules, UserEvents } from "@/utils/";
+import { passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
+import { UserEvents } from "@/utils/events/userEvents";
 
 type LoginFormProps = {
   forPlanSelect?: boolean;
@@ -78,6 +79,7 @@ export default function LoginForm({
       });
       onSuccessSignIn();
       UserEvents.emit("userLoggedIn", user);
+      console.log("Login response:", user);
     } catch (err: any) {
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;

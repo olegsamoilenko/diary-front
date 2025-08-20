@@ -16,7 +16,7 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
-import { UserEvents } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 
 type EmailVerificationCodeFormProps = {
   forPlanSelect: boolean;

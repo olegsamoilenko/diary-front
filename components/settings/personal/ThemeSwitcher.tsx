@@ -17,6 +17,9 @@ import BackArrow from "@/components/ui/BackArrow";
 import Background from "@/components/Background";
 import * as SecureStore from "@/utils/store/secureStore";
 import { apiRequest } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
+import i18n from "i18next";
+import { LocaleConfig } from "react-native-calendars";
 
 const themes = [
   {
@@ -139,29 +142,32 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = getStyles(colors);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  const getUser = async () => {
-    const storedUser = await SecureStore.getItemAsync("user");
-    setUser(storedUser ? JSON.parse(storedUser) : null);
-  };
 
   const handleTheme = async (themeName: string) => {
-    setTheme(themeName as Theme);
     try {
       await apiRequest({
         url: `/users/update-settings`,
         method: "POST",
         data: { theme: themeName },
       });
+      setTheme(themeName as Theme);
     } catch (error) {
       console.warn("Failed to update theme", error);
     }
   };
+
+  const updateTheme = (user: User) => {
+    console.log("Updating theme from user settings:", user);
+    if (user?.settings?.theme) {
+      setTheme(user?.settings?.theme as Theme);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updateTheme(user);
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
+  }, []);
 
   return (
     <SideSheet ref={ref}>

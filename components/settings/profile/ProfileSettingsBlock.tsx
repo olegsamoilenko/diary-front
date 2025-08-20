@@ -8,7 +8,7 @@ import { SideSheetRef } from "@/components/SideSheet";
 import { useTranslation } from "react-i18next";
 import type { User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
-import { UserEvents } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 
 export default function ProfileSettingsBlock({
   profileRef,

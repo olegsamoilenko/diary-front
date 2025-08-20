@@ -23,7 +23,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
 import uuid from "react-native-uuid";
-import { apiRequest, UserEvents } from "@/utils";
+import { apiRequest } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 import type { User } from "@/types";
 import { AiModel } from "@/types";
 
@@ -96,6 +97,7 @@ export default function RootLayout() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // await SecureStore.deleteItemAsync("user");
       if (!cancelled) {
         const stored = await SecureStore.getItemAsync("user");
         let u: User | null = stored ? JSON.parse(stored) : null;
@@ -289,7 +291,7 @@ function useUpdateLastActive(user: User | null) {
     let last = 0;
     const send = async () => {
       const now = Date.now();
-      if (now - last < 15_000) return; // тротл 15с
+      if (now - last < 15_000) return;
       last = now;
       try {
         await apiRequest({
@@ -300,11 +302,11 @@ function useUpdateLastActive(user: User | null) {
       } catch {}
     };
 
-    const sub = AppState.addEventListener("change", (s) => {
-      if (s === "active") send();
-    });
+    // const sub = AppState.addEventListener("change", (s) => {
+    //   if (s === "active") send();
+    // });
     send();
 
-    return () => sub.remove();
+    // return () => sub.remove();
   }, [user?.id]);
 }

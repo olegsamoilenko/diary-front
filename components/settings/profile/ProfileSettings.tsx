@@ -22,7 +22,7 @@ import type { User } from "@/types";
 import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
 import AuthForm from "@/components/auth/AuthForm";
-import { apiRequest, UserEvents } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 import ProfileCard from "./ProfileCard";
 import ModalPortal from "@/components/ui/Modal";
 import Emoji from "@/components/diary/Emoji";
@@ -90,6 +90,18 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   useEffect(() => {
     const handler = () => getUserLogged();
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
+  }, []);
+
+  const updateUser = (user: User) => {
+    if (user) {
+      setUser(user);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updateUser(user);
     UserEvents.on("userLoggedIn", handler);
     return () => UserEvents.off("userLoggedIn", handler);
   }, []);

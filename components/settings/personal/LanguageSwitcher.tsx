@@ -1,12 +1,12 @@
-import React, { forwardRef, useCallback, useState, useMemo } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useState,
+  useMemo,
+  useEffect,
+} from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Colors } from "@/constants/Colors";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
@@ -19,6 +19,7 @@ import Background from "@/components/Background";
 import type { User } from "@/types";
 import { Lang } from "@/types";
 import { apiRequest } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 
 const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [lang, setLang] = useState<Lang>(i18n.language as Lang);
@@ -40,30 +41,39 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   const handleSelect = useCallback(async (value: Lang) => {
     try {
+      await apiRequest({
+        url: `/users/update-settings`,
+        method: "POST",
+        data: { lang: value },
+      });
       await i18n.changeLanguage(value);
       LocaleConfig.defaultLocale = value;
       setLang(value);
 
-      try {
-        await apiRequest({
-          url: `/users/update-settings`,
-          method: "POST",
-          data: { lang: value },
-        });
+      const stored = await SecureStore.getItemAsync("user");
+      const user: User | null = stored ? JSON.parse(stored) : null;
 
-        const stored = await SecureStore.getItemAsync("user");
-        const user: User | null = stored ? JSON.parse(stored) : null;
-
-        if (user?.settings) {
-          user.settings.lang = value;
-          await SecureStore.setItemAsync("user", JSON.stringify(user));
-        }
-      } catch (error) {
-        console.warn("Failed to update lang", error);
+      if (user?.settings) {
+        user.settings.lang = value;
+        await SecureStore.setItemAsync("user", JSON.stringify(user));
       }
-    } catch (e) {
-      console.warn("Failed to change language", e);
+    } catch (error) {
+      console.warn("Failed to update lang", error);
     }
+  }, []);
+
+  const updateLang = async (user: User) => {
+    if (user?.settings?.lang) {
+      await i18n.changeLanguage(user?.settings?.lang);
+      LocaleConfig.defaultLocale = user?.settings?.lang;
+      setLang(user?.settings?.lang);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updateLang(user);
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
   }, []);
 
   return (

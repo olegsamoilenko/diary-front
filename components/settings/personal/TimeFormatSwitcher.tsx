@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   ScrollView,
@@ -15,9 +15,10 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store";
 import BackArrow from "@/components/ui/BackArrow";
 import Background from "@/components/Background";
-import { TimeFormat, type User } from "@/types";
+import { Theme, TimeFormat, type User } from "@/types";
 import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 import { apiRequest } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 import * as SecureStore from "expo-secure-store";
 
 const timeFormatOptions: TimeFormat[] = [
@@ -34,7 +35,6 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const format = useSelector((state: RootState) => state.timeFormat);
 
   async function handleFormat(format: TimeFormat) {
-    dispatch(setTimeFormat(format));
     try {
       await apiRequest({
         url: `/users/update-settings`,
@@ -42,6 +42,7 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         data: { timeFormat: format },
       });
 
+      dispatch(setTimeFormat(format));
       const stored = await SecureStore.getItemAsync("user");
       const user: User | null = stored ? JSON.parse(stored) : null;
 
@@ -53,6 +54,18 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
       console.warn("Failed to update lang", error);
     }
   }
+
+  const updateTimeFormat = (user: User) => {
+    if (user?.settings?.timeFormat) {
+      dispatch(setTimeFormat(user?.settings?.timeFormat));
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updateTimeFormat(user);
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
+  }, []);
 
   return (
     <SideSheet ref={ref}>

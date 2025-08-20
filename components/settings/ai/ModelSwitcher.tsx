@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AI_MODELS } from "@/constants/AIModels";
@@ -12,6 +12,7 @@ import { ThemedText } from "@/components/ThemedText";
 import Background from "@/components/Background";
 import { AiModel, type User } from "@/types";
 import { apiRequest } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 import * as SecureStore from "expo-secure-store";
 
 const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
@@ -23,14 +24,13 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const styles = getStyles(colors);
 
   const handleAiModel = async (aiModel: AiModel) => {
-    dispatch(setAiModel(aiModel));
-
     try {
       await apiRequest({
         url: `/users/update-settings`,
         method: "POST",
         data: { aiModel },
       });
+      dispatch(setAiModel(aiModel));
 
       const stored = await SecureStore.getItemAsync("user");
       const user: User | null = stored ? JSON.parse(stored) : null;
@@ -43,6 +43,18 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
       console.warn("Failed to update lang", error);
     }
   };
+
+  const updateAiModel = (user: User) => {
+    if (user?.settings?.aiModel) {
+      dispatch(setAiModel(user.settings.aiModel));
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updateAiModel(user);
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
+  }, []);
 
   return (
     <SideSheet ref={ref}>

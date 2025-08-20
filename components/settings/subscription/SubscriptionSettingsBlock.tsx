@@ -8,7 +8,7 @@ import { SideSheetRef } from "@/components/SideSheet";
 import { useTranslation } from "react-i18next";
 import type { User } from "@/types";
 import * as SecureStore from "@/utils/store/secureStore";
-import { UserEvents } from "@/utils";
+import { UserEvents } from "@/utils/events/userEvents";
 
 export default function SubscriptionSettingsBlock({
   plansRef,
@@ -33,6 +33,18 @@ export default function SubscriptionSettingsBlock({
     const handler = () => getUser();
     UserEvents.on("userChanged", handler);
     return () => UserEvents.off("userChanged", handler);
+  }, []);
+
+  const updatePlan = (user: User) => {
+    if (user?.plan) {
+      setUser(user);
+    }
+  };
+
+  useEffect(() => {
+    const handler = (user: User) => updatePlan(user);
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
   }, []);
 
   return (
