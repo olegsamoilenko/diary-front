@@ -35,15 +35,20 @@ export default function GoogleSignInButton({
   });
 
   const GoogleLogin = async () => {
-    await GoogleSignin.hasPlayServices();
+    console.log("Starting Google sign-in process");
+    const play = await GoogleSignin.hasPlayServices();
+
+    console.log("Play services are available", play);
 
     const userInfo = await GoogleSignin.signIn();
+    console.log("userInfo", userInfo);
     return userInfo;
   };
 
   const processUserData = async (idToken: string) => {
     const userString = await SecureStore.getItemAsync("user");
     const userObj: User | null = userString ? JSON.parse(userString) : null;
+    console.log("userObj", userObj);
     try {
       const res = await axios.post(`${apiUrl}/auth/sign-in-with-google`, {
         userId: userObj?.id,
@@ -69,6 +74,9 @@ export default function GoogleSignInButton({
   const googleSignIn = async () => {
     try {
       const response = await GoogleLogin();
+
+      console.log("response", response);
+      console.log("response.data", response.data);
 
       const { idToken } = response.data ?? {};
       if (idToken) {
