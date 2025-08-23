@@ -36,13 +36,21 @@ export default function GoogleSignInButton({
 
   const GoogleLogin = async () => {
     console.log("Starting Google sign-in process");
-    const play = await GoogleSignin.hasPlayServices();
+    try {
+      const play = await GoogleSignin.hasPlayServices();
 
-    console.log("Play services are available", play);
+      console.log("Play services are available", play);
 
-    const userInfo = await GoogleSignin.signIn();
-    console.log("userInfo", userInfo);
-    return userInfo;
+      const userInfo = await GoogleSignin.signIn();
+      console.log("userInfo", userInfo);
+      return userInfo;
+    } catch (err: any) {
+      console.error("Error GoogleLogin1:", err);
+      console.error("Error GoogleLogin2:", err.response);
+      console.error("Error GoogleLogin3:", err.response.data);
+      console.error("Error GoogleLogin4:", err.message);
+      throw err;
+    }
   };
 
   const processUserData = async (idToken: string) => {
@@ -57,6 +65,7 @@ export default function GoogleSignInButton({
       });
 
       if (res && res.status !== 201) {
+        console.log("Unexpected response status:", res);
         throw new Error("Failed to sign in with Google");
       }
 
@@ -66,7 +75,7 @@ export default function GoogleSignInButton({
       onSuccessSignWithGoogle();
       UserEvents.emit("userLoggedIn", res.data.user);
     } catch (err: any) {
-      console.error("Error during Google sign-in: 2", err);
+      console.error("Error during Google sign-in: 1", err);
       console.error("Error during Google sign-in: 2", err.response);
     }
   };
@@ -83,7 +92,9 @@ export default function GoogleSignInButton({
         await processUserData(idToken);
       }
     } catch (err: any) {
-      console.log("Error", err?.response?.data);
+      console.log("Error googleSignIn0", err);
+      console.log("Error googleSignIn1", err?.response);
+      console.log("Error googleSignIn2", err?.response?.data);
     }
   };
 
