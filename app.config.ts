@@ -37,8 +37,8 @@ export default ({ config }: { config: any }) => ({
         "expo-build-properties",
         {
           android: {
-            enableProguardInReleaseBuilds: true,
-            enableShrinkResourcesInReleaseBuilds: true,
+            enableProguardInReleaseBuilds: false,
+            enableShrinkResourcesInReleaseBuilds: false,
             enablePngCrunchInReleaseBuilds: false,
             extraProguardRules:
               "-keep class com.swmansion.reanimated.** { *; }\n-dontwarn com.facebook.react.**",
@@ -74,7 +74,7 @@ export default ({ config }: { config: any }) => ({
         backgroundColor: "#ffffff",
       },
       edgeToEdgeEnabled: true,
-      enableProguardInReleaseBuilds: true,
+      enableProguardInReleaseBuilds: false,
     },
     web: {
       bundler: "metro",
