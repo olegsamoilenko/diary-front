@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ColorTheme, ErrorMessages } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -27,7 +27,7 @@ export default function PhoneVerificationCodeForm({
   const [code, setCode] = useState("");
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);

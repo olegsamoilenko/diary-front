@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
   View,
   TextInput,
@@ -43,7 +43,7 @@ export default function AuthGate({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [errorPin, setErrorPin] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [nameLoading, setNameLoading] = useState(false);

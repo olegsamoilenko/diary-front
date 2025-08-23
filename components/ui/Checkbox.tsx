@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ColorTheme } from "@/types";
@@ -19,7 +19,7 @@ export default function Checkbox({
 }: CustomCheckboxProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   return (
     <TouchableOpacity
       style={styles.container}

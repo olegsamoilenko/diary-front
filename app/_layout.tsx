@@ -34,7 +34,6 @@ import { useHydrateSettings } from "@/hooks/useHydrateSettings";
 import { unstable_batchedUpdates, AppState } from "react-native";
 import * as Localization from "expo-localization";
 
-// Ліниві імпорти важких екранів
 const AuthGate = lazy(() => import("@/components/auth/AuthGate"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
 const HandleSubscription = lazy(

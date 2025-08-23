@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -20,7 +20,7 @@ export default function AuthScreen() {
   const [activeTab, setActiveTab] = useState<Tab>("login");
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
 
   return (
     <KeyboardAvoidingView

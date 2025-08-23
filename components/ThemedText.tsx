@@ -5,6 +5,7 @@ import { Colors } from "@/constants/Colors";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import { getFont } from "@/utils";
+import { useMemo } from "react";
 
 export type ThemedTextProps = TextProps & {
   type?:
@@ -33,7 +34,7 @@ export function ThemedText({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const font = useSelector((state: RootState) => state.font);
-  const styles = getStyles(colors, font);
+  const styles = useMemo(() => getStyles(colors, font), [colors, font]);
 
   return (
     <Text

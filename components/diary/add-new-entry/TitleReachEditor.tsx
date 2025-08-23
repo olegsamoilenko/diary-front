@@ -189,7 +189,7 @@ export default function TitleReachEditor({
       placeholder={t("diary.addEntryTitle")}
       editorStyle={{
         backgroundColor: "transparent",
-        placeholderColor: colors.text,
+        placeholderColor: colors.inputPlaceholder,
         color: "#6c6b6b",
         initialCSSText: `
             ${MarckScriptFontStylesheet}google

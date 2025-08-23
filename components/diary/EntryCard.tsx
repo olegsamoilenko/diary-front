@@ -1,135 +1,148 @@
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
-import { getEmojiByMood } from "@/constants/Mood";
-import { ThemedText } from "@/components/ThemedText";
-import type { Entry } from "@/types";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Colors } from "@/constants/Colors";
-import React, { useEffect, useRef, useState } from "react";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import i18n from "i18next";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
-import ViewReachEditor from "@/components/diary/ViewReachEditor";
+
+import { ThemedText } from "@/components/ThemedText";
 import EntryCardBackground from "@/components/diary/EntryCardBackground";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 import ModalPortal from "@/components/ui/Modal";
-import { useTranslation } from "react-i18next";
 import { ExpandableSection } from "@/components/ExpandableSection";
 import HtmlViewer from "@/components/ui/HtmlViewer";
-import { apiRequest } from "@/utils";
 import RotatingIcon from "@/components/ui/RotatingIcon";
 
-type EntryCardProps = { entry: Entry; deleteEntry: (id: number) => void };
-export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
-  const format = useSelector((state: RootState) => state.timeFormat.key);
-  const [key, setKey] = useState<number>(0);
-  const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
-  const { t } = useTranslation();
-  const [loadedEntry, setLoadedEntry] = useState<Entry>(entry);
+import { ColorTheme, Entry, Dialog } from "@/types";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import type { RootState } from "@/store";
+import { apiRequest } from "@/utils";
 
-  const toggleExpand = async (id: number) => {
-    const isNowExpanded = expanded[id];
-    if (!isNowExpanded) {
-      await loadEntryById(id).then(() => {
-        setExpanded((prev) => ({
-          ...prev,
-          [id]: !prev[id],
-        }));
+type EntryCardProps = {
+  entry: Entry;
+  deleteEntry: (id: number) => void;
+  setActiveMoods: React.Dispatch<React.SetStateAction<{ id: number }[]>>;
+};
+export default React.memo(function EntryCard({
+  entry,
+  deleteEntry,
+  setActiveMoods,
+}: EntryCardProps) {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme ?? "light"];
+  const styles = useMemo(() => getStyles(colors), [colors]);
+
+  const { t } = useTranslation();
+  const timeFormat = useSelector((state: RootState) => state.timeFormat);
+
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [showAiComment, setShowAiComment] = useState(false);
+
+  useEffect(() => {
+    if (isExpanded) {
+      setActiveMoods((prev) => {
+        return [...prev, { id: entry.id }];
       });
     } else {
-      setExpanded((prev) => ({
-        ...prev,
-        [id]: !prev[id],
-      }));
-      setLoadedEntry(entry);
+      setActiveMoods((prev) => prev.filter((mood) => mood.id !== entry.id));
     }
+  }, [isExpanded]);
 
-    setKey((prevKey) => prevKey + 1);
-  };
+  const [details, setDetails] = useState<{
+    content?: string | null;
+    aiComment?: { content?: string | null } | null;
+    dialogs?: Dialog[] | null;
+  }>({
+    content: entry.content ?? entry.previewContent ?? null,
+    aiComment: entry.aiComment ?? null,
+    dialogs: entry.dialogs ?? null,
+  });
 
-  const loadEntryById = async (id: number) => {
+  const loadedOnceRef = useRef(
+    Boolean(entry.content || entry.dialogs || entry.aiComment),
+  );
+
+  const formattedTime = useMemo(() => {
     try {
-      const response = await apiRequest({
-        url: `/diary-entries/get-by-id/${id}`,
-        method: "GET",
-      });
-
-      setLoadedEntry((prev) => {
-        return {
-          ...prev,
-          content: response.data.content,
-          aiComment: response.data.aiComment,
-          dialogs: response.data.dialogs,
-        };
-      });
-    } catch (error) {
-      console.error("Error fetching diary entries:", error);
-    } finally {
-      // setLoading(false);
+      return new Date(entry.createdAt)
+        .toLocaleTimeString(i18n.language!, {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: timeFormat === "12h",
+        })
+        .toUpperCase();
+    } catch {
+      return "";
     }
-  };
+  }, [entry.createdAt, timeFormat]);
+
+  const background = useMemo(
+    () =>
+      entry.settings?.background ?? {
+        type: "color" as "color" | "image",
+        value: colors.card,
+      },
+    [entry.settings?.background, colors.card],
+  );
+
+  const handleToggle = useCallback(async () => {
+    if (!isExpanded && !loadedOnceRef.current && !loadingDetails) {
+      setLoadingDetails(true);
+      try {
+        const res = await apiRequest({
+          url: `/diary-entries/get-by-id/${entry.id}`,
+          method: "GET",
+        });
+        setDetails((prev) => ({
+          ...prev,
+          content: res.data?.content ?? prev.content ?? null,
+          aiComment: res.data?.aiComment ?? prev.aiComment ?? null,
+          dialogs: res.data?.dialogs ?? prev.dialogs ?? null,
+        }));
+        loadedOnceRef.current = true;
+      } catch (e) {
+        console.error("Error fetching diary entry:", e);
+      } finally {
+        setLoadingDetails(false);
+        setIsExpanded(true);
+      }
+      return;
+    }
+    setIsExpanded((v) => !v);
+  }, [entry.id, isExpanded, loadingDetails]);
 
   const handleDeleteEntry = async (id: number) => {
     setVisibleDeleteModal(false);
     deleteEntry(id);
   };
 
-  const [contentHeight, setContentHeight] = useState<number>(30);
-  const onLayout = (e: any) => {
-    const height = e.nativeEvent.layout.height;
-    if (height > 0) setContentHeight(height);
-  };
-
   return (
-    <EntryCardBackground
-      background={
-        loadedEntry.settings!.background ?? {
-          type: "color",
-          value: colors.card,
-        }
-      }
-    >
-      <View
-        key={loadedEntry.id}
-        style={{
-          backgroundColor: "transparent",
-          borderRadius: 8,
-          marginBottom: 8,
-          padding: 2,
-          position: "relative",
-          zIndex: 0,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            backgroundColor: "transparent",
-            marginBottom: 10,
-          }}
-        >
-          <View
-            style={{
-              alignItems: "flex-end",
-              justifyContent: "flex-end",
-              // flex: 1,
-              backgroundColor: "transparent",
-              marginBottom: 0,
-              marginTop: 0,
-              paddingBottom: 0,
-            }}
-          >
+    <EntryCardBackground background={background}>
+      <View style={styles.container}>
+        <View style={styles.titleContainer}>
+          <View style={styles.moodContainer}>
             <Text
               style={{
                 fontSize: 24,
                 marginRight: 8,
               }}
             >
-              {loadedEntry.mood}
+              {entry.mood}
             </Text>
           </View>
           <View
@@ -138,45 +151,20 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               marginBottom: 8,
             }}
           >
-            <HtmlViewer htmlContent={loadedEntry.title} />
-            {/*<ViewReachEditor content={loadedEntry.title} />*/}
+            <HtmlViewer htmlContent={entry.title} />
           </View>
-          <View
-            style={{
-              justifyContent: "flex-start",
-              flexDirection: "row",
-              alignItems: "flex-start",
-              marginTop: 10,
-            }}
-          >
-            <ThemedText
-              type="small"
-              style={{
-                marginLeft: 8,
-                paddingBottom: 5,
-                color: colors.textAdditional,
-              }}
-            >
-              {new Date(loadedEntry.createdAt)
-                .toLocaleTimeString(i18n.language!, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: Number(format) === 12,
-                })
-                .toUpperCase()}
+          <View style={styles.timeContainer}>
+            <ThemedText type="small" style={styles.time}>
+              {formattedTime}
             </ThemedText>
           </View>
           <TouchableOpacity
-            style={{
-              justifyContent: "flex-start",
-              flexDirection: "row",
-              alignItems: "flex-start",
-              marginTop: 5,
-              marginLeft: 7,
-            }}
+            style={styles.deleteButton}
             onPress={() => {
               setVisibleDeleteModal(true);
             }}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.delete") as string}
           >
             <MaterialIcons
               name="delete-outline"
@@ -192,24 +180,9 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               <ThemedText>
                 {t("diary.entry.deleteEntryConfirmation")}
               </ThemedText>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "flex-end",
-                  alignItems: "center",
-                  gap: 10,
-                  marginTop: 10,
-                }}
-              >
+              <View style={styles.modalInner}>
                 <TouchableOpacity
-                  style={{
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
-                    borderRadius: 50,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    backgroundColor: "transparent",
-                  }}
+                  style={styles.modalCancelButton}
                   onPress={() => setVisibleDeleteModal(false)}
                 >
                   <ThemedText
@@ -221,12 +194,7 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                   </ThemedText>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={{
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
-                    borderRadius: 50,
-                    backgroundColor: colors.primary,
-                  }}
+                  style={styles.modalDeleteButton}
                   onPress={() => handleDeleteEntry(Number(entry.id))}
                 >
                   <ThemedText
@@ -243,69 +211,53 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
         </View>
 
         <ExpandableSection
-          expanded={expanded[Number(loadedEntry.id)]}
+          expanded={isExpanded}
           collapsedHeight={100}
           expandedHeight={150}
-          style={{
-            borderRadius: 8,
-            marginBottom: 2,
-            padding: 0,
-          }}
+          style={styles.expandedSectionContainer}
         >
           <Pressable
-            key={loadedEntry.id}
-            onPress={() => toggleExpand(Number(loadedEntry.id))}
-            style={{
-              marginBottom: 15,
-              position: "relative",
-              zIndex: 10,
-            }}
+            onPress={handleToggle}
+            style={styles.content}
+            accessibilityRole="button"
           >
-            <View onLayout={onLayout}>
-              <HtmlViewer
-                htmlContent={
-                  expanded[Number(loadedEntry.id)]
-                    ? loadedEntry.content!
-                    : loadedEntry.previewContent!
-                }
-              />
-              {/*<ViewReachEditor*/}
-              {/*  key={key}*/}
-              {/*  content={*/}
-              {/*    expanded[Number(loadedEntry.id)]*/}
-              {/*      ? loadedEntry.content*/}
-              {/*      : loadedEntry.previewContent*/}
-              {/*  }*/}
-              {/*/>*/}
-            </View>
-            <View
-              style={{
-                position: "absolute",
-                zIndex: 0,
-                top: -10,
-                right: 0,
-                marginTop: 10,
-                marginBottom: 10,
-              }}
-            >
-              <RotatingIcon
-                expanded={expanded[Number(loadedEntry.id)]}
-                onPress={() => toggleExpand(Number(loadedEntry.id))}
-              />
+            <HtmlViewer
+              htmlContent={
+                isExpanded
+                  ? (details.content ??
+                    entry.content ??
+                    entry.previewContent ??
+                    "")
+                  : (entry.previewContent ?? entry.content ?? "")
+              }
+            />
+            <View style={styles.contentIcon}>
+              <RotatingIcon expanded={isExpanded} onPress={handleToggle} />
             </View>
           </Pressable>
 
-          {expanded[Number(loadedEntry.id)] && loadedEntry.aiComment && (
-            <View
-              style={{
-                backgroundColor: colors.aiCommentBackground,
-                borderRadius: 10,
-                paddingHorizontal: 5,
-                paddingBottom: 5,
-                width: "80%",
-                marginBottom: 18,
-              }}
-            >
+          {isExpanded &&
+            (!!details.aiComment?.content ||
+              (Array.isArray(details.dialogs) &&
+                details.dialogs.length > 0)) && (
+              <TouchableOpacity
+                style={styles.showDialogButton}
+                onPress={() => setShowAiComment((v) => !v)}
+              >
+                <ThemedText
+                  type="small"
+                  style={{
+                    color: colors.textInPrimary,
+                    textAlign: "center",
+                  }}
+                >
+                  Show dialog
+                </ThemedText>
+              </TouchableOpacity>
+            )}
+
+          {isExpanded && showAiComment && !!details.aiComment?.content && (
+            <View style={styles.aiCommentContent}>
               <View
                 style={{
                   paddingLeft: 5,
@@ -314,50 +266,18 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               >
                 <NemoryIcon />
               </View>
-              {/*<ThemedText*/}
-              {/*  style={{*/}
-              {/*    fontWeight: "bold",*/}
-              {/*    color: colors.primary,*/}
-              {/*    marginRight: 5,*/}
-              {/*    position: "absolute",*/}
-              {/*    top: 10,*/}
-              {/*    left: 0,*/}
-              {/*  }}*/}
-              {/*>*/}
-              {/*  <NemoryIcon /> <ThemedText> </ThemedText>*/}
-              {/*</ThemedText>*/}
               <ThemedText style={{ padding: 5 }}>
-                {/*<ThemedText*/}
-                {/*  style={{*/}
-                {/*    paddingLeft: 300,*/}
-                {/*  }}*/}
-                {/*>*/}
-                {/*  {"        "}*/}
-                {/*</ThemedText>*/}
-                {loadedEntry.aiComment?.content}
+                {details.aiComment.content}
               </ThemedText>
             </View>
           )}
-          {expanded[Number(loadedEntry.id)] &&
-            loadedEntry.dialogs &&
-            loadedEntry.dialogs.length > 0 &&
-            loadedEntry.dialogs.map((dialog) => (
-              <View
-                key={dialog.id}
-                style={{
-                  marginBottom: 18,
-                }}
-              >
-                <View
-                  style={{
-                    backgroundColor: colors.questionBackground,
-                    borderRadius: 10,
-                    width: "80%",
-                    alignSelf: "flex-end",
-                    padding: 0,
-                    marginBottom: 18,
-                  }}
-                >
+          {isExpanded &&
+            showAiComment &&
+            Array.isArray(details.dialogs) &&
+            details.dialogs.length > 0 &&
+            details.dialogs.map((dialog) => (
+              <View key={dialog.id} style={{ marginBottom: 18 }}>
+                <View style={styles.question}>
                   <ThemedText
                     style={{
                       marginTop: 6,
@@ -368,20 +288,8 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
                     {dialog.question}
                   </ThemedText>
                 </View>
-                <View
-                  style={{
-                    backgroundColor: colors.answerBackground,
-                    borderRadius: 10,
-                    paddingHorizontal: 10,
-                    paddingBottom: 10,
-                    width: "80%",
-                  }}
-                >
-                  <View
-                    style={{
-                      paddingTop: 10,
-                    }}
-                  >
+                <View style={styles.answer}>
+                  <View style={{ paddingTop: 10 }}>
                     <NemoryIcon />
                   </View>
                   <ThemedText style={{ marginTop: 6 }}>
@@ -391,28 +299,122 @@ export default function EntryCard({ entry, deleteEntry }: EntryCardProps) {
               </View>
             ))}
         </ExpandableSection>
-
-        {/*<Pressable onPress={() => toggleExpand(Number(loadedEntry.id))}>*/}
-        {/*  <View*/}
-        {/*    style={{*/}
-        {/*      justifyContent: "center",*/}
-        {/*      alignItems: "center",*/}
-        {/*      marginTop: 5,*/}
-        {/*    }}*/}
-        {/*  >*/}
-        {/*    <MaterialCommunityIcons*/}
-        {/*      name="chevron-down"*/}
-        {/*      size={5}*/}
-        {/*      style={{*/}
-        {/*        transform: expanded[Number(loadedEntry.id)]*/}
-        {/*          ? [{ rotate: "180deg" }, { scaleX: 5.6 }, { scaleY: 6.9 }]*/}
-        {/*          : [{ scaleX: 5.6 }, { scaleY: 6.9 }],*/}
-        {/*        color: colors.tabIcon,*/}
-        {/*      }}*/}
-        {/*    />*/}
-        {/*  </View>*/}
-        {/*</Pressable>*/}
       </View>
     </EntryCardBackground>
   );
-}
+});
+
+const getStyles = (colors: ColorTheme) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: "transparent",
+      borderRadius: 8,
+      marginBottom: 8,
+      padding: 2,
+      position: "relative",
+      zIndex: 0,
+    },
+    titleContainer: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      backgroundColor: "transparent",
+      marginBottom: 10,
+    },
+    moodContainer: {
+      alignItems: "flex-end",
+      justifyContent: "flex-end",
+      backgroundColor: "transparent",
+      marginBottom: 0,
+      marginTop: 0,
+      paddingBottom: 0,
+    },
+    timeContainer: {
+      justifyContent: "flex-start",
+      flexDirection: "row",
+      alignItems: "flex-start",
+      marginTop: 10,
+    },
+    time: {
+      marginLeft: 8,
+      paddingBottom: 5,
+      color: colors.textAdditional,
+    },
+    deleteButton: {
+      justifyContent: "flex-start",
+      flexDirection: "row",
+      alignItems: "flex-start",
+      marginTop: 5,
+      marginLeft: 7,
+    },
+    modalInner: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      alignItems: "center",
+      gap: 10,
+      marginTop: 10,
+    },
+    modalCancelButton: {
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      borderRadius: 50,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: "transparent",
+    },
+    modalDeleteButton: {
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      borderRadius: 50,
+      backgroundColor: colors.primary,
+    },
+    expandedSectionContainer: {
+      borderRadius: 8,
+      marginBottom: 2,
+      padding: 0,
+    },
+    content: {
+      marginBottom: 15,
+      position: "relative",
+      zIndex: 10,
+    },
+    contentIcon: {
+      position: "absolute",
+      zIndex: 0,
+      top: -10,
+      right: 0,
+      marginTop: 10,
+      marginBottom: 10,
+    },
+    aiCommentContent: {
+      backgroundColor: colors.aiCommentBackground,
+      borderRadius: 10,
+      paddingHorizontal: 5,
+      paddingBottom: 5,
+      width: "80%",
+      marginBottom: 18,
+    },
+    question: {
+      backgroundColor: colors.questionBackground,
+      borderRadius: 10,
+      width: "80%",
+      alignSelf: "flex-end",
+      padding: 0,
+      marginBottom: 18,
+    },
+    answer: {
+      backgroundColor: colors.answerBackground,
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      paddingBottom: 10,
+      width: "80%",
+    },
+    showDialogButton: {
+      backgroundColor: colors.primary,
+      paddingVertical: 5,
+      paddingHorizontal: 20,
+      borderRadius: 50,
+      alignSelf: "center",
+      marginBottom: 20,
+    },
+  });

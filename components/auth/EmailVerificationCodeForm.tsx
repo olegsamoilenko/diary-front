@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import type { ColorTheme } from "@/types";
 import { ErrorMessages } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -29,7 +29,7 @@ export default function EmailVerificationCodeForm({
   const [code, setCode] = useState("");
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const { t } = useTranslation();

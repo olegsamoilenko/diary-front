@@ -1,6 +1,6 @@
 import ModalPortal from "@/components/ui/Modal";
 import { ThemedText } from "@/components/ThemedText";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Checkbox from "@/components/ui/Checkbox";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,7 @@ export default function WelcomeModal({}) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
 
   useEffect(() => {
     const getData = async () => {

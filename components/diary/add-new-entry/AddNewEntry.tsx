@@ -1,4 +1,11 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   StyleSheet,
@@ -10,9 +17,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Pressable,
-  ScrollView,
 } from "react-native";
-import { AiComment, ColorTheme, Entry, PlanStatus, StatusCode } from "@/types";
+import { ColorTheme, Entry, PlanStatus } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import {
@@ -45,7 +51,6 @@ import { io } from "socket.io-client";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
 import Toast from "react-native-toast-message";
-import { BASE_URL } from "@/constants/env";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -62,6 +67,13 @@ const socket = io(process.env.EXPO_PUBLIC_URL, {
   },
 });
 
+type ResetFn = (opts?: {
+  title?: string;
+  color?: string;
+  size?: number;
+  fontName?: string;
+}) => void;
+
 const AddNewEntry = forwardRef<
   SideSheetRef,
   {
@@ -69,12 +81,15 @@ const AddNewEntry = forwardRef<
     handleBack: (back: boolean) => void;
     onClose?: () => void;
     tabBarHeight: number;
-    onPlanExpiredErrorOccurred: () => void;
   }
 >((props, ref) => {
   const aiModel = useAppSelector((state) => state.aiModel);
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme ?? "light"];
+  const styles = useMemo(() => getStyles(colors), [colors]);
+  const font = useSelector((state: RootState) => state.font);
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const lang = i18n.language || "uk";
@@ -100,9 +115,15 @@ const AddNewEntry = forwardRef<
   const [textReachEditorKey, setTextReachEditorKey] = useState(0);
   const [titleReachEditorKey, setTitleReachEditorKey] = useState(0);
   const [isFocusTextRichEditor, setIsFocusTextRichEditor] = useState(false);
-  const font = useSelector((state: RootState) => state.font);
+
   const [contentLoading, setContentLoading] = useState(false);
   const [showTip, setShowTip] = useState(false);
+
+  useEffect(() => {
+    setSizeAction(16);
+    setColorAction(colors.text);
+    setSelectedFont(FONTS[0]);
+  }, [props.isOpen]);
 
   const [entry, setEntry] = useState<Entry>({
     id: 0,
@@ -128,7 +149,6 @@ const AddNewEntry = forwardRef<
     },
   });
 
-  const { t } = useTranslation();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
@@ -142,32 +162,24 @@ const AddNewEntry = forwardRef<
   );
   const [isFocusTitleRichEditor, setIsFocusTitleRichEditor] = useState(false);
   const [dialogQuestion, setDialogQuestion] = useState("");
-  const [chunk, setChunk] = useState<string>("");
 
   useEffect(() => {
     setColorAction(colors.text);
-  }, [colorScheme]);
+  }, [colorScheme, colors.text]);
 
-  useEffect(() => {
-    if (!isAddNewEntryOpen) {
-      setIsEntrySaved(false);
-    }
-
+  const resetForm = useCallback(() => {
+    setIsEntrySaved(false);
     setEntry({
       id: 0,
       title: "",
       content: "",
       mood: "",
-      aiComment: {
-        content: "",
-        aiModel: aiModel,
-      },
+      aiComment: { content: "", aiModel },
       embedding: [],
       dialogs: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-
     setEntrySettings({
       background: {
         id: 0,
@@ -177,77 +189,75 @@ const AddNewEntry = forwardRef<
         key: "",
       },
     });
-  }, [isAddNewEntryOpen]);
+    setEmoji("");
+    setTitleEmoji("");
+    setActiveActions(null);
+    setShowTip(false);
+    setTextReachEditorKey((k) => k + 1);
+    setTitleReachEditorKey((k) => k + 1);
+  }, [aiModel, colors.card]);
 
   useEffect(() => {
-    const onKeyboardShow = Keyboard.addListener("keyboardDidShow", () => {
+    if (!props.isOpen) resetForm();
+  }, [props.isOpen, resetForm]);
+
+  useEffect(() => {
+    const onShow = (e: any) => {
       setIsKeyboardOpen(true);
-    });
-
-    const onKeyboardHide = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHeight(e.endCoordinates?.height ?? 0);
+    };
+    const onHide = () => {
       setIsKeyboardOpen(false);
-    });
+      setKeyboardHeight(0);
+    };
 
+    const showEvt =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvt =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showL = Keyboard.addListener(showEvt, onShow);
+    const hideL = Keyboard.addListener(hideEvt, onHide);
     return () => {
-      onKeyboardShow.remove();
-      onKeyboardHide.remove();
+      showL.remove();
+      hideL.remove();
     };
   }, []);
 
-  const handleBoldAction = () => {
-    setIsBoldAction(!isBoldAction);
-  };
-
-  const handleItalicAction = () => {
-    setIsItalicAction(!isItalicAction);
-  };
-
-  const setColor = (color: string) => {
+  const handleBoldAction = useCallback(() => setIsBoldAction((v) => !v), []);
+  const handleItalicAction = useCallback(
+    () => setIsItalicAction((v) => !v),
+    [],
+  );
+  const setColor = useCallback((color: string) => {
     setSelectedColor(color);
     setColorAction(color);
-  };
-
-  const setSize = (size: number) => {
+  }, []);
+  const setSize = useCallback((size: number) => {
     setSelectedSize(size);
     setSizeAction(size);
-  };
+  }, []);
+  const setFont = useCallback((f: any) => setSelectedFont(f), []);
 
-  const setFont = (font: any) => {
-    setSelectedFont(font);
-  };
-
-  const handleFontAction = () => {
-    setShowTitleFontSetting(true);
-  };
-
-  const handleColorAction = () => {
-    if (isKeyboardOpen) {
-      setShowTitleColorSetting(true);
-    }
-  };
-
-  const handleSizeAction = () => {
-    if (isKeyboardOpen) {
-      setShowTitleSizeSetting(true);
-    }
-  };
-
-  const handleEmojiAction = () => {
-    setShowTitleEmojiSetting(true);
-  };
-
-  const handleFocus = () => {
-    setIsFocusTitleRichEditor(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocusTitleRichEditor(false);
-  };
-
-  const handleTitleEmoji = (emoji: string) => {
-    setTitleEmoji(emoji);
+  const handleFontAction = useCallback(() => setShowTitleFontSetting(true), []);
+  const handleColorAction = useCallback(
+    () => isKeyboardOpen && setShowTitleColorSetting(true),
+    [isKeyboardOpen],
+  );
+  const handleSizeAction = useCallback(
+    () => isKeyboardOpen && setShowTitleSizeSetting(true),
+    [isKeyboardOpen],
+  );
+  const handleEmojiAction = useCallback(
+    () => setShowTitleEmojiSetting(true),
+    [],
+  );
+  const handleFocus = useCallback(() => setIsFocusTitleRichEditor(true), []);
+  const handleBlur = useCallback(() => setIsFocusTitleRichEditor(false), []);
+  const handleTitleEmoji = useCallback((e: string) => {
+    setTitleEmoji(e);
     setShowTitleEmojiSetting(false);
-  };
+  }, []);
 
   useEffect(() => {
     const onShow = (e: any) => setKeyboardHeight(e.endCoordinates.height);
@@ -268,13 +278,51 @@ const AddNewEntry = forwardRef<
     };
   }, []);
 
+  const changeUserPlanStatus = async (status: PlanStatus) => {
+    const rowUser = await SecureStore.getItemAsync("user");
+    if (!rowUser) return;
+    const user = JSON.parse(rowUser);
+
+    user.plan.status = status;
+
+    await SecureStore.setItemAsync("user", JSON.stringify(user));
+  };
+
+  const removeAllStreamListeners = useCallback(() => {
+    socket.off("ai_stream_comment_chunk");
+    socket.off("ai_stream_comment_done");
+    socket.off("ai_stream_dialog_chunk");
+    socket.off("ai_stream_dialog_done");
+    socket.off("unauthorized_error");
+    socket.off("ai_stream_comment_error");
+    socket.off("ai_stream_dialog_error");
+    socket.off("user_error");
+    socket.off("plan_error");
+  }, []);
+  useEffect(() => removeAllStreamListeners, [removeAllStreamListeners]);
+
+  const toastError = useCallback(
+    (error: any) => {
+      Toast.show({
+        type: "error",
+        text1: t(`errors.${error?.statusMessage}`),
+        text2: t(`errors.${error?.message}`),
+      });
+    },
+    [t],
+  );
+
   const aiLoadingRef = useRef(aiLoading);
   const [strimCommentError, setStrimCommentError] = useState<boolean>(false);
+  const [strimDialogError, setStrimDialogError] = useState<{
+    uuid: string;
+  } | null>(null);
 
   useEffect(() => {
     aiLoadingRef.current = aiLoading;
   }, [aiLoading]);
-  const handleSave = async () => {
+
+  const handleSave = useCallback(async () => {
     if (!entry.mood) {
       setShowTip(true);
       return;
@@ -307,16 +355,15 @@ const AddNewEntry = forwardRef<
       }
 
       const newEntry: Entry = await res.data;
-
       setEntry((prev) => ({ ...prev, ...newEntry }));
-
       setLoading(false);
-
       setIsEntrySaved(true);
-
       setContentLoading(false);
+
       setAiLoading(true);
       setStrimCommentError(false);
+
+      removeAllStreamListeners();
 
       socket.emit("stream_ai_comment", {
         entryId: Number(newEntry!.id),
@@ -324,9 +371,6 @@ const AddNewEntry = forwardRef<
         aiModel: aiModel,
         mood: newEntry!.mood,
       });
-
-      socket.off("ai_stream_comment_chunk");
-      socket.off("ai_stream_comment_done");
 
       socket.on("ai_stream_comment_chunk", ({ text }) => {
         addToAiChunkBuffer(`comment-${newEntry.id}`, text);
@@ -340,51 +384,19 @@ const AddNewEntry = forwardRef<
         }
       });
 
-      socket.on("unauthorized_error", (error) => {
-        console.log("Unauthorized error:", error);
-        Toast.show({
-          type: "error",
-          text1: t(`errors.${error.statusMessage}`),
-          text2: t(`errors.${error.message}`),
-        });
+      const onAnyError = (error: any) => {
+        console.log("AI stream error:", error);
+        toastError(error);
         setAiLoading(false);
         setStrimCommentError(true);
-      });
-
-      socket.on("ai_stream_comment_error", (error) => {
-        console.log("ai stream comment error:", error);
-        Toast.show({
-          type: "error",
-          text1: t(`errors.${error.statusMessage}`),
-          text2: t(`errors.${error.message}`),
-        });
-        setAiLoading(false);
-        setStrimCommentError(true);
-      });
-
-      socket.on("user_error", (error) => {
-        console.log("user error:", error);
-        Toast.show({
-          type: "error",
-          text1: t(`errors.${error.statusMessage}`),
-          text2: t(`errors.${error.message}`),
-        });
-        setAiLoading(false);
-        setStrimCommentError(true);
-      });
-
+      };
+      socket.on("unauthorized_error", onAnyError);
+      socket.on("ai_stream_comment_error", onAnyError);
+      socket.on("user_error", onAnyError);
       socket.on("plan_error", (error) => {
-        console.log("plan error:", error);
-        Toast.show({
-          type: "error",
-          text1: t(`errors.${error.statusMessage}`),
-          text2: t(`errors.${error.message}`),
-        });
-        if (error.planStatus) {
+        onAnyError(error);
+        if (error?.planStatus)
           changeUserPlanStatus(error.planStatus as PlanStatus);
-        }
-        setAiLoading(false);
-        setStrimCommentError(true);
       });
 
       socket.on("ai_stream_comment_done", ({ aiComment }) => {
@@ -396,7 +408,17 @@ const AddNewEntry = forwardRef<
       setLoading(false);
       setContentLoading(false);
     }
-  };
+  }, [
+    aiModel,
+    changeUserPlanStatus,
+    entry.content,
+    entry.mood,
+    entry.title,
+    entrySettings,
+    removeAllStreamListeners,
+    toastError,
+    aiLoading,
+  ]);
 
   const onHandleTooltip = (show: boolean) => {
     setTooltipVisible(show);
@@ -410,126 +432,98 @@ const AddNewEntry = forwardRef<
   useEffect(() => {
     aiDialogLoadingRef.current = aiDialogLoading;
   }, [aiDialogLoading]);
-  const handleDialog = async (dialog: Dialog) => {
-    setAiDialogLoading(true);
-    setStrimCommentError(false);
 
-    socket.emit("stream_ai_dialog", {
-      entryId: Number(entry!.id),
-      uuid: dialog.uuid,
-      content: dialogQuestion,
-      aiModel,
-      mood: entry!.mood,
-    });
+  const handleDialog = useCallback(
+    async (dialog: Dialog) => {
+      setAiDialogLoading(true);
+      setStrimDialogError(null);
+      removeAllStreamListeners();
 
-    socket.off("ai_stream_dialog_chunk");
-    socket.off("ai_stream_dialog_done");
+      socket.emit("stream_ai_dialog", {
+        entryId: Number(entry!.id),
+        uuid: dialog.uuid,
+        content: dialogQuestion,
+        aiModel,
+        mood: entry!.mood,
+      });
 
-    socket.on("ai_stream_dialog_chunk", ({ text }) => {
-      addToAiChunkBuffer(`dialog-${dialog.uuid}`, text);
-      aiStreamEmitter.emit(`dialog-${dialog.uuid}`, text);
-      if (aiDialogLoadingRef.current) {
-        aiDialogLoadingRef.current = false;
+      socket.on("ai_stream_dialog_chunk", ({ text }) => {
+        addToAiChunkBuffer(`dialog-${dialog.uuid}`, text);
+        aiStreamEmitter.emit(`dialog-${dialog.uuid}`, text);
+        if (aiDialogLoadingRef.current) {
+          aiDialogLoadingRef.current = false;
 
+          setEntry((prev) => ({
+            ...prev,
+            dialogs: prev.dialogs.map((d) => {
+              if (d.uuid === dialog.uuid) {
+                return { ...d, loading: false };
+              }
+              return d;
+            }),
+          }));
+
+          setTimeout(() => {
+            setAiDialogLoading(false);
+          }, 0);
+        }
+      });
+
+      const onAnyError = (error: any) => {
+        console.log("AI stream dialog error:", error);
+        toastError(error);
+        setAiDialogLoading(false);
+        setStrimDialogError({
+          uuid: dialog.uuid,
+        });
+      };
+      socket.on("unauthorized_error", onAnyError);
+      socket.on("ai_stream_dialog_error", onAnyError);
+      socket.on("user_error", onAnyError);
+      socket.on("plan_error", (error) => {
+        onAnyError(error);
+        if (error?.planStatus)
+          changeUserPlanStatus(error.planStatus as PlanStatus);
+      });
+
+      socket.on("ai_stream_dialog_done", ({ respDialog }) => {
+        resetAiChunkBuffer(`dialog-${dialog.uuid}`);
         setEntry((prev) => ({
           ...prev,
           dialogs: prev.dialogs.map((d) => {
             if (d.uuid === dialog.uuid) {
-              return { ...d, loading: false };
+              const { question, ...restData } = respDialog;
+              return {
+                ...d,
+                ...restData,
+              };
             }
             return d;
           }),
         }));
-
-        setTimeout(() => {
-          setAiDialogLoading(false);
-        }, 0);
-      }
-    });
-
-    socket.on("unauthorized_error", (error) => {
-      console.log("Unauthorized error:", error);
-      Toast.show({
-        type: "error",
-        text1: t(`errors.${error.statusMessage}`),
-        text2: t(`errors.${error.message}`),
       });
-      setAiDialogLoading(false);
-      setStrimCommentError(true);
-    });
-
-    socket.on("ai_stream_dialog_error", (error) => {
-      console.log("ai stream dialog error:", error);
-      Toast.show({
-        type: "error",
-        text1: t(`errors.${error.statusMessage}`),
-        text2: t(`errors.${error.message}`),
-      });
-      setAiDialogLoading(false);
-      setStrimCommentError(true);
-    });
-
-    socket.on("user_error", (error) => {
-      console.log("user error:", error);
-      Toast.show({
-        type: "error",
-        text1: t(`errors.${error.statusMessage}`),
-        text2: t(`errors.${error.message}`),
-      });
-      setAiDialogLoading(false);
-      setStrimCommentError(true);
-    });
-
-    socket.on("plan_error", (error) => {
-      console.log("plan error:", error);
-      Toast.show({
-        type: "error",
-        text1: t(`errors.${error.statusMessage}`),
-        text2: t(`errors.${error.message}`),
-      });
-      if (error.planStatus) {
-        changeUserPlanStatus(error.planStatus as PlanStatus);
-      }
-      setAiDialogLoading(false);
-      setStrimCommentError(true);
-    });
-
-    socket.on("ai_stream_dialog_done", ({ respDialog }) => {
-      resetAiChunkBuffer(`dialog-${dialog.uuid}`);
-      setEntry((prev) => ({
-        ...prev,
-        dialogs: prev.dialogs.map((d) => {
-          if (d.uuid === dialog.uuid) {
-            const { question, ...restData } = respDialog;
-            return {
-              ...d,
-              ...restData,
-            };
-          }
-          return d;
-        }),
-      }));
-    });
-  };
-
-  const changeUserPlanStatus = async (status: PlanStatus) => {
-    const rowUser = await SecureStore.getItemAsync("user");
-    if (!rowUser) return;
-    const user = JSON.parse(rowUser);
-
-    user.plan.status = status;
-
-    await SecureStore.setItemAsync("user", JSON.stringify(user));
-  };
+    },
+    [
+      aiDialogLoading,
+      aiModel,
+      changeUserPlanStatus,
+      dialogQuestion,
+      entry.id,
+      entry.mood,
+      removeAllStreamListeners,
+      toastError,
+    ],
+  );
 
   function handleCloseSheet() {
+    console.log(111);
     setIsFocusTitleRichEditor(false);
     props.handleBack(true);
     setEmoji("");
     setTitleEmoji("");
   }
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     const newUuid = uuid.v4();
     const dialog = {
       uuid: newUuid,
@@ -547,34 +541,49 @@ const AddNewEntry = forwardRef<
     Keyboard.dismiss();
     setDialogQuestion("");
     await handleDialog(dialog);
-  };
+  }, [dialogQuestion, handleDialog]);
 
-  const anySettingOpen =
-    showTitleColorSetting ||
-    showColorSetting ||
-    showTitleSizeSetting ||
-    showSizeSetting ||
-    showTitleFontSetting ||
-    showFontSetting ||
-    showBackgroundSetting ||
-    showEmojiSetting ||
-    showTitleEmojiSetting;
+  const closeAllSettings = useCallback(() => {
+    setShowBackgroundSetting(false);
+    setShowColorSetting(false);
+    setShowSizeSetting(false);
+    setShowFontSetting(false);
+    setShowEmojiSetting(false);
+    setShowTitleColorSetting(false);
+    setShowTitleSizeSetting(false);
+    setShowTitleFontSetting(false);
+    setShowTitleEmojiSetting(false);
+  }, []);
+
+  const anySettingOpen = useMemo(
+    () =>
+      showTitleColorSetting ||
+      showColorSetting ||
+      showTitleSizeSetting ||
+      showSizeSetting ||
+      showTitleFontSetting ||
+      showFontSetting ||
+      showBackgroundSetting ||
+      showEmojiSetting ||
+      showTitleEmojiSetting,
+    [
+      showTitleColorSetting,
+      showColorSetting,
+      showTitleSizeSetting,
+      showSizeSetting,
+      showTitleFontSetting,
+      showFontSetting,
+      showBackgroundSetting,
+      showEmojiSetting,
+      showTitleEmojiSetting,
+    ],
+  );
 
   return (
     <SideSheet ref={ref} onOpenChange={setIsAddNewEntryOpen}>
       <View style={{ flex: 1 }}>
         <Background background={entrySettings.background} />
-        <View
-          style={{
-            flex: 1,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            marginBottom: -50,
-          }}
-        >
+        <View style={styles.containerInner}>
           <BackArrow
             ref={ref}
             style={{
@@ -587,26 +596,18 @@ const AddNewEntry = forwardRef<
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={Platform.OS === "ios" ? 44 : 0}
           >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingLeft: 10,
-                paddingRight: 20,
-              }}
-            >
+            <View style={styles.header}>
               <ThemedText>{todayDate}</ThemedText>
               {!isEntrySaved && (
                 <TouchableOpacity
-                  style={{
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
-                    borderRadius: 50,
-                    backgroundColor: loading
-                      ? colors.disabledPrimary
-                      : colors.primary,
-                  }}
+                  style={[
+                    styles.addEntryButton,
+                    {
+                      backgroundColor: loading
+                        ? colors.disabledPrimary
+                        : colors.primary,
+                    },
+                  ]}
                   onPress={handleSave}
                   disabled={loading}
                 >
@@ -640,16 +641,11 @@ const AddNewEntry = forwardRef<
               titleEmoji={titleEmoji}
               setShowTip={setShowTip}
               showTip={showTip}
+              isOpen={props.isOpen}
             />
 
             {contentLoading ? (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
+              <View style={styles.loaderContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
               </View>
             ) : entry && entry.content && isEntrySaved && !contentLoading ? (
@@ -660,6 +656,7 @@ const AddNewEntry = forwardRef<
                 isKeyboardOpen={isKeyboardOpen}
                 isEntrySaved={isEntrySaved}
                 strimCommentError={strimCommentError}
+                strimDialogError={strimDialogError}
               />
             ) : (
               <>
@@ -740,18 +737,13 @@ const AddNewEntry = forwardRef<
 
             {isEntrySaved && entry.aiComment.content && (
               <View
-                style={{
-                  position: "relative",
-                  bottom: isKeyboardOpen ? 7 : -25,
-                  left: 0,
-                  right: 0,
-                  elevation: 10,
-                  borderRadius: 20,
-                  backgroundColor: colors.backgroundAdditional,
-                  marginTop: isKeyboardOpen ? 0 : -33,
-                  padding: 10,
-                  marginHorizontal: 10,
-                }}
+                style={[
+                  styles.chatContainer,
+                  {
+                    bottom: isKeyboardOpen ? 7 : -25,
+                    marginTop: isKeyboardOpen ? 0 : -33,
+                  },
+                ]}
               >
                 <TextInput
                   multiline
@@ -766,15 +758,7 @@ const AddNewEntry = forwardRef<
                     fontFamily: getFont(font, "regular"),
                   }}
                 />
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    paddingHorizontal: 15,
-                  }}
-                >
+                <View style={styles.sendMessageButton}>
                   <TouchableOpacity onPress={handleSend}>
                     <MaterialCommunityIcons
                       name="send"
@@ -788,28 +772,7 @@ const AddNewEntry = forwardRef<
           </KeyboardAvoidingView>
         </View>
         {anySettingOpen && (
-          <Pressable
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(0,0,0,0.07)",
-              zIndex: 0,
-            }}
-            onPress={() => {
-              setShowBackgroundSetting(false);
-              setShowColorSetting(false);
-              setShowSizeSetting(false);
-              setShowFontSetting(false);
-              setShowEmojiSetting(false);
-              setShowTitleColorSetting(false);
-              setShowTitleSizeSetting(false);
-              setShowTitleFontSetting(false);
-              setShowTitleEmojiSetting(false);
-            }}
-          />
+          <Pressable style={styles.settings} onPress={closeAllSettings} />
         )}
       </View>
     </SideSheet>
@@ -820,4 +783,58 @@ AddNewEntry.displayName = "AddNewEntry";
 
 export default AddNewEntry;
 
-const getStyles = (colors: ColorTheme) => StyleSheet.create({});
+const getStyles = (colors: ColorTheme) =>
+  StyleSheet.create({
+    containerInner: {
+      flex: 1,
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      marginBottom: -50,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingLeft: 10,
+      paddingRight: 20,
+    },
+    addEntryButton: {
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      borderRadius: 50,
+    },
+    loaderContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    chatContainer: {
+      position: "relative",
+      left: 0,
+      right: 0,
+      elevation: 10,
+      borderRadius: 20,
+      backgroundColor: colors.backgroundAdditional,
+      padding: 10,
+      marginHorizontal: 10,
+    },
+    sendMessageButton: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      alignItems: "center",
+      paddingHorizontal: 15,
+    },
+    settings: {
+      position: "absolute",
+      left: 0,
+      top: 0,
+      width: "100%",
+      height: "100%",
+      backgroundColor: "rgba(0,0,0,0.07)",
+      zIndex: 0,
+    },
+  });

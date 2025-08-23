@@ -1,50 +1,31 @@
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useMemo, useState } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import { PLANS } from "@/constants/Plans";
 import { ColorTheme, Plan } from "@/types";
 import Background from "@/components/Background";
 import * as SecureStore from "@/utils/store/secureStore";
 import type { User } from "@/types";
-import Plans from "@/components/subscription/Plans";
-import Payment from "@/components/subscription/Payment";
 import AuthForm from "@/components/auth/AuthForm";
 import { UserEvents } from "@/utils/events/userEvents";
 import ProfileCard from "./ProfileCard";
-import ModalPortal from "@/components/ui/Modal";
-import Emoji from "@/components/diary/Emoji";
 import ChangeNameModal from "@/components/settings/profile/ChangeNameModal";
 import Toast from "react-native-toast-message";
 import ChangeEmailModal from "@/components/settings/profile/ChangeEmailModal";
 import ChangePasswordModal from "@/components/settings/profile/ChangePasswordModal";
 import DeleteAccountModal from "@/components/settings/profile/DeleteAccountModal";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { apiRequest } from "@/utils";
 
 const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [userLogged, setUserLogged] = useState(false);
-  const [showPayment, setShowPayment] = React.useState(false);
-  const [successPaymentPlan, setSuccessPaymentPlan] =
-    React.useState<Plan | null>(null);
-  const [plan, setPlan] = React.useState<Plan | null>(null);
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showChangeEmailModal, setShowChangeEmailModal] = useState(false);

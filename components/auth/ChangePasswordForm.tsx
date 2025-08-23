@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { Formik } from "formik";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -26,7 +26,7 @@ export default function ChangePasswordForm({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,13 +81,7 @@ export default function ChangePasswordForm({
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: 10,
-        backgroundColor: "transparent",
-      }}
-    >
+    <View style={styles.container}>
       <View
         style={{
           marginBottom: 20,
@@ -135,14 +129,7 @@ export default function ChangePasswordForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.code && errors.code && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.code}
                 </ThemedText>
               )}
@@ -158,14 +145,7 @@ export default function ChangePasswordForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.password && errors.password && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.password}
                 </ThemedText>
               )}
@@ -183,27 +163,13 @@ export default function ChangePasswordForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.confirmPassword && errors.confirmPassword && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.confirmPassword}
                 </ThemedText>
               )}
             </View>
             {error && (
-              <ThemedText
-                type={"small"}
-                style={{
-                  color: colors.error,
-                  marginTop: -10,
-                  marginBottom: 20,
-                }}
-              >
+              <ThemedText type={"small"} style={styles.error}>
                 {error}
               </ThemedText>
             )}
@@ -234,6 +200,11 @@ export default function ChangePasswordForm({
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: 10,
+      backgroundColor: "transparent",
+    },
     input: {
       backgroundColor: colors.inputBackground,
       padding: 14,
@@ -252,5 +223,10 @@ const getStyles = (colors: ColorTheme) =>
       backgroundColor: colors.primary,
       borderRadius: 12,
       textAlign: "center",
+    },
+    error: {
+      color: colors.error,
+      marginTop: -10,
+      marginBottom: 20,
     },
   });

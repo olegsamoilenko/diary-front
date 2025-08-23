@@ -57,7 +57,8 @@
   },
   "diary": {
     "title": "Diary",
-    "addEntryTitle": "Title",
+    "addEntryTitle": "Enter title ...",
+    "addEntryText": "What's on your mind?",
     "addEntryContent": "Content...",
     "addEntryButton": "Save",
     "noRecords": "There are no records for this day",

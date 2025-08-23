@@ -26,7 +26,7 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
 
   const languages = useMemo(() => {
     const resources = (i18n.options?.resources ?? { en: {} }) as Record<

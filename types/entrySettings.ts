@@ -11,7 +11,7 @@ export type TextSettings = {
 };
 
 export type BackgroundSettings = {
-  id: number;
+  id?: number;
   type: "color" | "image";
   value?: string;
   url?: ImageSourcePropType | undefined;

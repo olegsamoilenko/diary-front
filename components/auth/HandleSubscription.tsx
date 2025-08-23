@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { ColorTheme, Plan } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -20,18 +20,18 @@ export default function HandleSubscription({
   continueWithoutRegistration,
 }: SelectPlanProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const colors = Colors[colorScheme ?? "light"];
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
   const [showPayment, setShowPayment] = React.useState(false);
   const [plan, setPlan] = React.useState<Plan | null>(null);
   const [successPaymentPlan, setSuccessPaymentPlan] =
     React.useState<Plan | null>(null);
 
-  const onSuccessPayment = () => {
+  const onSuccessPayment = useCallback(() => {
     setSuccessPaymentPlan(plan);
     setShowPayment(false);
-  };
+  }, [plan]);
   return (
     <Background background={colors.backgroundImage}>
       <View style={styles.container}>
@@ -75,25 +75,4 @@ const getStyles = (colors: ColorTheme) =>
       textAlign: "center",
       color: colors.text,
     },
-    card: {
-      minWidth: "100%",
-      backgroundColor: colors.backgroundAdditional,
-      borderRadius: 12,
-      padding: 18,
-      marginBottom: 14,
-    },
-    planName: {
-      fontSize: 18,
-      fontWeight: "600",
-      marginBottom: 4,
-      color: colors.text,
-    },
-    desc: { fontSize: 14, color: colors.textAdditional, marginBottom: 4 },
-    price: {
-      fontSize: 16,
-      fontWeight: "500",
-      color: colors.text,
-      marginBottom: 2,
-    },
-    tokens: { fontSize: 12, color: colors.textAdditional },
   });

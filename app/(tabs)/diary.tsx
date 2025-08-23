@@ -1,10 +1,21 @@
-import { StyleSheet, View, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  InteractionManager,
+} from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import AddButton from "@/components/ui/AddButton";
 import { SideSheetRef } from "@/components/SideSheet";
 import AddNewEntry from "@/components/diary/add-new-entry/AddNewEntry";
@@ -13,146 +24,148 @@ import { Entry, MoodByDate } from "@/types";
 import WeekView from "@/components/diary/calendar/WeekView";
 import MonthView from "@/components/diary/calendar/MonthView";
 import Animated from "react-native-reanimated";
-import * as SecureStore from "@/utils/store/secureStore";
 import { useTranslation } from "react-i18next";
 import EntryCard from "@/components/diary/EntryCard";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Portal } from "@gorhom/portal";
 import Background from "@/components/Background";
-import SubscriptionErrors from "@/components/errors/SubscriptionErrors";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import WelcomeModal from "@/components/diary/WelcomeModal";
+
+function localISODate(d = new Date()) {
+  const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return dt.toISOString().slice(0, 10);
+}
 
 export default function Diary() {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme ?? "light"];
+
   const addNewEntryRef = useRef<SideSheetRef>(null);
-  const subscriptionErrorsRef = useRef<SideSheetRef>(null);
-  const [selectedDay, setSelectedDay] = useState<
-    string | number | Date | undefined
-  >(new Date().toISOString().split("T")[0]);
-  const [weekAnchorDay, setWeekAnchorDay] = useState(
-    new Date().toISOString().split("T")[0],
-  );
+  const scrollRef = useRef<Animated.ScrollView>(null);
+
+  const initialDay = useRef(localISODate()).current;
+  const [selectedDay, setSelectedDay] = useState<string>(initialDay);
+  const [weekAnchorDay, setWeekAnchorDay] = useState<string>(initialDay);
   const [diaryEntries, setDiaryEntries] = useState<Record<string, Entry[]>>({});
-  const [month, setMonth] = useState<number | null>(new Date().getMonth() + 1);
-  const [year, setYear] = useState<number | null>(new Date().getFullYear());
+  const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
+  const [year, setYear] = useState<number>(new Date().getFullYear());
   const [moodsByDate, setMoodsByDate] = useState<Record<string, MoodByDate[]>>(
     {},
   );
   const [showWeek, setShowWeek] = useState(false);
+  const [initialDate, setInitialDate] = useState<string>(initialDay);
 
-  const offsetMinutes = new Date().getTimezoneOffset() * -1;
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const scrollRef = useRef<Animated.ScrollView>(null);
+  const offsetMinutes = useMemo(() => -new Date().getTimezoneOffset(), []);
+  const timeZone = useMemo(
+    () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+    [],
+  );
+
   const [loading, setLoading] = useState(true);
   const [isAddNewEntryOpen, setIsAddNewEntryOpen] = useState(false);
-  const [planExpiredError, setPlanExpiredError] = useState<boolean>(false);
   const [addNewEntryButtonDisabled, setAddNewEntryButtonDisabled] =
-    useState<boolean>(false);
+    useState(false);
+  const [activeMoods, setActiveMoods] = useState<{ id: number }[]>([]);
+
+  useEffect(() => {
+    setActiveMoods([]);
+  }, [selectedDay]);
+
+  useEffect(() => {
+    console.log("activeMoods", activeMoods);
+  }, [activeMoods]);
+
+  const openingRef = useRef(false);
 
   const handleNewEntryOpen = useCallback(() => {
+    if (openingRef.current) return;
+    openingRef.current = true;
     setAddNewEntryButtonDisabled(true);
     setIsAddNewEntryOpen(true);
     addNewEntryRef.current?.open();
     setTimeout(() => {
+      openingRef.current = false;
       setAddNewEntryButtonDisabled(false);
+      setSelectedDay(initialDay);
     }, 1000);
-  }, []);
+  }, [initialDay]);
 
-  const onPlanExpiredErrorOccurred = useCallback(() => {
-    subscriptionErrorsRef.current?.open();
-    setTimeout(() => {
-      addNewEntryRef.current?.close();
-    }, 100);
-  }, []);
+  const reqIdRef = useRef(0);
 
-  const onSuccessRenewPlan = useCallback(() => {
-    setPlanExpiredError(false);
-    subscriptionErrorsRef.current?.close();
-  }, []);
-
-  const fetchDiaryEntries = async (back = false) => {
-    setDiaryEntries({});
-
-    setLoading(true);
-
-    try {
-      const response = await apiRequest({
-        url: "/diary-entries/get-by-date",
-        method: "POST",
-        data: {
-          date: selectedDay,
-          timeZone,
-        },
-      });
-
-      setDiaryEntries((prev) => ({
-        ...prev,
-        [selectedDay?.toString() || "unknown"]: response.data,
-      }));
-
-      setWeekAnchorDay(selectedDay as string);
-      setShowWeek(true);
-    } catch (error) {
-      console.error("Error fetching diary entries:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleBack = useCallback(
-    async (back: boolean) => {
-      const today = new Date().toISOString().split("T")[0];
-      if (back) {
-        if (today === selectedDay) {
-          fetchDiaryEntries();
-        } else {
-          setSelectedDay(new Date().toISOString().split("T")[0]);
+  const fetchDiaryEntriesFor = useCallback(
+    async (day: string) => {
+      const id = ++reqIdRef.current;
+      setLoading(true);
+      try {
+        const response = await apiRequest({
+          url: "/diary-entries/get-by-date",
+          method: "POST",
+          data: { date: day, timeZone },
+        });
+        if (id !== reqIdRef.current) return;
+        setDiaryEntries((prev) => ({
+          ...prev,
+          [day]: response.data,
+        }));
+        setWeekAnchorDay(day);
+        setShowWeek(true);
+      } catch (e) {
+        if (id === reqIdRef.current) {
+          console.error("Error fetching diary entries:", e);
         }
-
-        await fetchMoodsByDate();
-        if (!loading) {
-          setTimeout(() => {
-            scrollRef.current?.scrollToEnd({ animated: true });
-          }, 1000);
-        }
+      } finally {
+        if (id === reqIdRef.current) setLoading(false);
       }
     },
-    [selectedDay],
+    [timeZone],
   );
 
   useEffect(() => {
-    if (selectedDay && timeZone) {
-      fetchDiaryEntries();
-    }
-  }, [selectedDay, timeZone]);
+    fetchDiaryEntriesFor(selectedDay);
+  }, [fetchDiaryEntriesFor, selectedDay]);
 
-  const fetchMoodsByDate = async () => {
-    const user = await SecureStore.getItemAsync("user");
-
-    if (!user) return;
+  const fetchMoodsByDate = useCallback(async () => {
     try {
       const response = await apiRequest({
         url: "/diary-entries/get-moods-by-date",
         method: "POST",
-        data: {
-          month,
-          year,
-          offsetMinutes,
-        },
+        data: { month, year, offsetMinutes },
       });
-
       setMoodsByDate(response.data);
-    } catch (error) {
-      console.error("Error fetching moods by date:", error);
+    } catch (e) {
+      console.error("Error fetching moods by date:", e);
     }
-  };
+  }, [month, year, offsetMinutes]);
 
   useEffect(() => {
     fetchMoodsByDate();
-  }, [month, year, offsetMinutes]);
+  }, [fetchMoodsByDate]);
+
+  const handleBack = useCallback(
+    async (back: boolean) => {
+      if (!back) return;
+
+      setIsAddNewEntryOpen(false);
+
+      const today = initialDay;
+
+      if (selectedDay === today) {
+        await fetchDiaryEntriesFor(today);
+      } else {
+        setSelectedDay(today);
+      }
+
+      await fetchMoodsByDate();
+
+      InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
+          scrollRef.current?.scrollToEnd({ animated: true });
+        }, 50);
+      });
+    },
+    [selectedDay, fetchDiaryEntriesFor, fetchMoodsByDate, initialDay],
+  );
 
   const tabBarHeight = useBottomTabBarHeight();
 
@@ -163,27 +176,23 @@ export default function Diary() {
           url: `/diary-entries/${id}`,
           method: "DELETE",
         });
-
-        if (!response || response.status !== 200) {
+        if (response?.status !== 200) {
           console.log("No data returned from server");
           return;
         }
-
-        setDiaryEntries((prev) => {
-          return {
-            ...prev,
-            [selectedDay]: prev[selectedDay]
-              ? prev[selectedDay].filter((entry: Entry) => entry.id !== id)
-              : [],
-          };
-        });
+        setDiaryEntries((prev) => ({
+          ...prev,
+          [selectedDay]: prev[selectedDay]?.filter((e) => e.id !== id) ?? [],
+        }));
         await fetchMoodsByDate();
-      } catch (error) {
-        console.error("Error deleting entry:", error);
+      } catch (e) {
+        console.error("Error deleting entry:", e);
       }
     },
-    [selectedDay],
+    [selectedDay, fetchMoodsByDate],
   );
+
+  const entriesForDay = diaryEntries[selectedDay] ?? [];
 
   return (
     <Background background={colors.backgroundImage} paddingTop={40}>
@@ -200,6 +209,8 @@ export default function Diary() {
             setMonth={setMonth}
             setYear={setYear}
             setShowWeek={setShowWeek}
+            initialDate={initialDate}
+            activeMoods={activeMoods}
           />
         ) : (
           <WeekView
@@ -212,30 +223,27 @@ export default function Diary() {
             setYear={setYear}
             onBackToMonth={() => setShowWeek(false)}
             loadingDays={loading}
+            setInitialDate={setInitialDate}
+            activeMoods={activeMoods}
           />
         )}
         <ParallaxScrollView scrollRef={scrollRef}>
           <View style={{ flex: 1 }}>
             {loading ? (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
+              <View style={styles.activeIndicatorContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
               </View>
+            ) : entriesForDay.length ? (
+              entriesForDay.map((entry) => (
+                <EntryCard
+                  entry={entry}
+                  key={entry.id}
+                  deleteEntry={deleteEntry}
+                  setActiveMoods={setActiveMoods}
+                />
+              ))
             ) : (
-              (diaryEntries[selectedDay as string] &&
-                diaryEntries[selectedDay as string].length > 0 &&
-                diaryEntries[selectedDay as string].map((entry: Entry) => (
-                  <EntryCard
-                    entry={entry}
-                    key={entry.id}
-                    deleteEntry={deleteEntry}
-                  />
-                ))) || <ThemedText>{t("diary.noRecords")}</ThemedText>
+              <ThemedText>{t("diary.noRecords")}</ThemedText>
             )}
           </View>
         </ParallaxScrollView>
@@ -249,14 +257,6 @@ export default function Diary() {
             isOpen={isAddNewEntryOpen}
             handleBack={(back) => handleBack(back)}
             tabBarHeight={tabBarHeight}
-            onPlanExpiredErrorOccurred={onPlanExpiredErrorOccurred}
-          />
-        </Portal>
-        <Portal>
-          <SubscriptionErrors
-            onSuccessRenewPlan={onSuccessRenewPlan}
-            ref={subscriptionErrorsRef}
-            isOpen={planExpiredError}
           />
         </Portal>
       </>
@@ -265,4 +265,10 @@ export default function Diary() {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  activeIndicatorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

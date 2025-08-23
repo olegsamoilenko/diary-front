@@ -57,8 +57,9 @@
   },
   "diary": {
     "title": "Щоденник",
-    "addEntryTitle": "Заголовок",
+    "addEntryTitle": "Введіть заголовок",
     "addEntryContent": "Текст...",
+    "addEntryText": "Що у вас на думці?",
     "addEntryButton": "Зберегти",
     "noRecords": "Немає записів за цей день",
     "entry": {

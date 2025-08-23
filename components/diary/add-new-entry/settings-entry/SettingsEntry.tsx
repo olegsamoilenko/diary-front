@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import type { ColorTheme, EntrySettings } from "@/types";
@@ -58,7 +58,10 @@ export default function SettingsEntry({
 }: SettingsEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors, keyboardHeight);
+  const styles = useMemo(
+    () => getStyles(colors, keyboardHeight),
+    [colors, keyboardHeight],
+  );
   const { t } = useTranslation();
 
   return (

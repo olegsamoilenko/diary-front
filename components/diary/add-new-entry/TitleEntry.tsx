@@ -1,16 +1,22 @@
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { getEmojiByMood } from "@/constants/Mood";
 import { GreySmileEmoji } from "@/components/ui/GreySmileEmoji";
 import ModalPortal from "@/components/ui/Modal";
 import Emoji from "@/components/diary/Emoji";
 import { Portal } from "@gorhom/portal";
 import ToolTip from "@/components/ui/ToolTip";
-import React, { useEffect, useRef, useState } from "react";
+
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme, Entry } from "@/types";
 import { useTranslation } from "react-i18next";
-import TitleRichEditor from "@/components/diary/add-new-entry/TitleReachEditor";
+import TitleReachEditor from "@/components/diary/add-new-entry/TitleReachEditor";
 
 type TitleEntryProps = {
   onChangeEntry: (entry: (prev: Entry) => Entry) => void;
@@ -42,8 +48,9 @@ type TitleEntryProps = {
   titleEmoji: string;
   setShowTip: (show: boolean) => void;
   showTip?: boolean;
+  isOpen: boolean;
 };
-export default function TitleEntry({
+export default React.memo(function TitleEntry({
   onChangeEntry,
   entry,
   isAddNewEntryOpen,
@@ -62,10 +69,11 @@ export default function TitleEntry({
   titleEmoji,
   setShowTip,
   showTip,
+  isOpen,
 }: TitleEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
 
   const [visibleEmojiModal, setVisibleEmojiModal] = useState(false);
@@ -75,52 +83,37 @@ export default function TitleEntry({
     onHandleTooltip(isAddNewEntryOpen && !entry.mood);
   }, [isAddNewEntryOpen, entry.mood]);
 
-  const setTitle = (title: any) => {
-    onChangeEntry((prev: Entry) => ({ ...prev, title }));
-  };
+  const setTitle = useCallback(
+    (title: string) => {
+      onChangeEntry((prev) => ({ ...prev, title }));
+    },
+    [onChangeEntry],
+  );
 
-  const handleEmoji = () => {
+  const handleEmoji = useCallback(() => {
     setShowTip(false);
     setVisibleEmojiModal(true);
-  };
+  }, [setShowTip]);
 
-  const handleMood = (mood: string) => {
-    onChangeEntry((prev: Entry) => ({ ...prev, mood }));
-    setShowTip(false);
-    setVisibleEmojiModal(false);
-  };
+  const handleMood = useCallback(
+    (mood: string) => {
+      onChangeEntry((prev: Entry) => ({ ...prev, mood }));
+      setShowTip(false);
+      setVisibleEmojiModal(false);
+    },
+    [onChangeEntry, setShowTip],
+  );
 
-  const onCloseTooltip = () => {
+  const onCloseTooltip = useCallback(() => {
     setShowTip(false);
     onHandleTooltip(false);
-  };
+  }, [onHandleTooltip, setShowTip]);
 
   return (
-    <View
-      style={{
-        flex: 0,
-        paddingBottom: 10,
-        flexDirection: "row",
-        gap: 10,
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
-      }}
-    >
-      <View
-        style={{
-          position: "relative",
-        }}
-      >
+    <View style={styles.root}>
+      <View style={styles.left}>
         <TouchableOpacity
-          style={{
-            position: "relative",
-            zIndex: 10,
-            right: 0,
-            top: 0,
-            left: 0,
-            bottom: 0,
-          }}
+          style={styles.moodButton}
           onPress={() => {
             handleEmoji();
           }}
@@ -156,7 +149,7 @@ export default function TitleEntry({
           )}
         </Portal>
       </View>
-      <TitleRichEditor
+      <TitleReachEditor
         titleReachEditorKey={titleReachEditorKey}
         disabledTitleReachEditor={disabledTitleReachEditor}
         title={entry.title}
@@ -171,10 +164,11 @@ export default function TitleEntry({
         handleBlur={handleBlur}
         setActiveActions={setActiveActions}
         titleEmoji={titleEmoji}
+        isOpen={isOpen}
       />
     </View>
   );
-}
+});
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
@@ -189,5 +183,21 @@ const getStyles = (colors: ColorTheme) =>
       marginBottom: 18,
       color: colors.text,
       width: "80%",
+    },
+    root: {
+      flex: 0,
+      paddingBottom: 10,
+      flexDirection: "row",
+      gap: 10,
+      justifyContent: "center",
+      alignItems: "center",
+      position: "relative",
+    },
+    left: {
+      position: "relative",
+    },
+    moodButton: {
+      position: "relative",
+      zIndex: 10,
     },
   });

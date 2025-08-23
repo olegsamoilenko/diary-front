@@ -12,7 +12,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { useTranslation } from "react-i18next";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
@@ -37,7 +37,7 @@ export default function AuthForm({
   );
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [showEmailVerificationCodeForm, setShowEmailVerificationCodeForm] =
     useState(false);
   const { t } = useTranslation();

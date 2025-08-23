@@ -19,6 +19,7 @@ import uuid from "react-native-uuid";
 
 import * as ImagePicker from "expo-image-picker";
 import { uploadImageToServer } from "@/utils";
+import { useTranslation } from "react-i18next";
 
 type TextReachEditorProps = {
   textReachEditorKey: number;
@@ -82,6 +83,7 @@ export default function TextReachEditor({
   const richText = useRef(null);
   const scrollRef = useRef(null);
   const [imageLoading, setImageLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleEditorMessage = (event: any) => {
     try {
@@ -440,9 +442,11 @@ export default function TextReachEditor({
           onFocus={onFocus}
           onBlur={handleBlur}
           editorInitializedCallback={() => {}}
+          placeholder={t("diary.addEntryText")}
           editorStyle={{
             backgroundColor: "transparent",
             color: "#6c6b6b",
+            placeholderColor: colors.inputPlaceholder,
             initialCSSText: `
             ${MarckScriptFontStylesheet}
             ${NeuchaFontStylesheet}

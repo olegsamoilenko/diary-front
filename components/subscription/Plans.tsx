@@ -5,7 +5,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
@@ -20,7 +26,7 @@ type PlansProps = {
   onSuccess?: () => void;
   setShowRegisterOrNot?: (show: boolean) => void;
   setShowPayment?: (show: boolean) => void;
-  setPlan: (plan: User["plan"]) => void;
+  setPlan: (plan: Plan | null) => void;
   successPaymentPlan: Plan | null;
   setSuccessPaymentPlan: (plan: Plan | null) => void;
   showStartPlan?: boolean;
@@ -37,108 +43,108 @@ export default function Plans({
   continueWithoutRegistration,
 }: PlansProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const colors = Colors[colorScheme ?? "light"];
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const onSelect = async (plan: (typeof PLANS)[0]) => {
-    if (plan.name === "Start") {
-      await saveToDatabase(plan);
-    } else if (
-      (user && continueWithoutRegistration) ||
-      (user && user.isRegistered)
-    ) {
-      setPlan(plan);
-      if (setShowPayment) {
-        setShowPayment(true);
-      }
-    } else if (user && !user.isRegistered && !continueWithoutRegistration) {
-      if (setShowRegisterOrNot) {
-        setShowRegisterOrNot(true);
-      }
-    }
-  };
+  const navigatingRef = useRef(false);
 
   useEffect(() => {
-    const handlePlan = async () => {
-      if (successPaymentPlan) {
-        await saveToDatabase(successPaymentPlan);
-        setPlan(successPaymentPlan);
-        setSuccessPaymentPlan(null);
-      }
+    let mounted = true;
+    (async () => {
+      const storedUser = await SecureStore.getItemAsync("user");
+      if (!mounted) return;
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    })();
+    return () => {
+      mounted = false;
     };
+  }, []);
 
-    handlePlan();
+  useEffect(() => {
+    if (!successPaymentPlan) return;
+    (async () => {
+      await saveToDatabase(successPaymentPlan);
+      setPlan(successPaymentPlan);
+      setSuccessPaymentPlan(null);
+    })();
   }, [successPaymentPlan]);
 
   const saveToDatabase = useCallback(
-    async (plan: (typeof PLANS)[0]) => {
+    async (plan: Plan) => {
       setLoading(true);
       try {
-        const { name, ...rest } = plan;
         const res = await apiRequest({
           url: `/plans/subscribe`,
           method: "POST",
-          data: {
-            name,
-          },
+          data: { name: plan.name },
         });
-        const storedUser = await SecureStore.getItemAsync("user");
-        const userObj = JSON.parse(storedUser!);
 
-        userObj.plan = res.data;
-        await SecureStore.setItemAsync("user", JSON.stringify(userObj));
+        const stored = await SecureStore.getItemAsync("user");
+        const userObj: User | null = stored ? JSON.parse(stored) : null;
+        if (userObj) {
+          userObj.plan = res.data;
+          await SecureStore.setItemAsync("user", JSON.stringify(userObj));
+          setUser({ ...userObj });
+        }
 
         UserEvents.emit("userChanged");
-
-        if (onSuccess) {
-          onSuccess();
-        }
-        setLoading(false);
+        onSuccess?.();
       } catch (error) {
-        setLoading(false);
         console.error("Error setting plan:", error);
+      } finally {
+        setLoading(false);
       }
     },
     [onSuccess],
   );
 
-  useEffect(() => {
-    const getUser = async () => {
-      const storedUser = await SecureStore.getItemAsync("user");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
-    };
-    getUser();
-  }, [saveToDatabase]);
+  const onSelect = useCallback(
+    async (plan: Plan) => {
+      if (loading || navigatingRef.current) return;
+      if (plan.name === "Start") {
+        await saveToDatabase(plan);
+        return;
+      }
+
+      const canPay =
+        (user && continueWithoutRegistration) || (user && user.isRegistered);
+
+      if (canPay) {
+        setPlan(plan);
+        if (setShowPayment) {
+          navigatingRef.current = true;
+          setShowPayment(true);
+          setTimeout(() => (navigatingRef.current = false), 250);
+        }
+        return;
+      }
+
+      if (user && !user.isRegistered && !continueWithoutRegistration) {
+        setShowRegisterOrNot?.(true);
+      }
+    },
+    [
+      loading,
+      user,
+      continueWithoutRegistration,
+      setPlan,
+      setShowPayment,
+      setShowRegisterOrNot,
+      saveToDatabase,
+    ],
+  );
 
   return (
-    <View
-      style={{
-        flex: 1,
-        height: "100%",
-      }}
-    >
+    <View style={styles.container}>
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.loaderWrap}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            width: "100%",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "column",
-              width: "100%",
-            }}
-          >
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          <View style={styles.plansContainer}>
             {PLANS.map((plan) => {
               if (
                 plan.name === "Start" &&
@@ -174,22 +180,18 @@ export default function Plans({
                       },
                     ]}
                   >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
+                    <View style={styles.cardInner}>
                       <ThemedText type="subtitleLG">{plan.name}</ThemedText>
                       {user?.plan?.name === plan.name && (
                         <View
-                          style={{
-                            backgroundColor: getStatusColor(user?.plan?.status),
-                            paddingVertical: 4,
-                            paddingHorizontal: 8,
-                            borderRadius: 16,
-                          }}
+                          style={[
+                            styles.status,
+                            {
+                              backgroundColor: getStatusColor(
+                                user?.plan?.status,
+                              ),
+                            },
+                          ]}
                         >
                           <ThemedText
                             style={{
@@ -227,6 +229,23 @@ export default function Plans({
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      height: "100%",
+    },
+    loaderWrap: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    scrollView: {
+      flexGrow: 1,
+      width: "100%",
+    },
+    plansContainer: {
+      flexDirection: "column",
+      width: "100%",
+    },
     card: {
       minWidth: "100%",
       backgroundColor: colors.backgroundAdditional,
@@ -234,6 +253,16 @@ const getStyles = (colors: ColorTheme) =>
       padding: 18,
       marginBottom: 14,
       borderWidth: 4,
+    },
+    cardInner: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    status: {
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      borderRadius: 16,
     },
     desc: { color: colors.textAdditional, marginBottom: 4 },
     price: {

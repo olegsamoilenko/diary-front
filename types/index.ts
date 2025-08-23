@@ -14,6 +14,7 @@ import type { ErrorsType } from "./errors";
 import { StatusCode } from "./statusCode";
 import { PlanStatus } from "./plan";
 import { Font, Lang, TimeFormat, ETheme } from "./userSettings";
+import { Dialog } from "./dialog";
 
 export type {
   ColorTheme,
@@ -31,6 +32,7 @@ export type {
   BackgroundSettings,
   LogoTheme,
   ErrorsType,
+  Dialog,
 };
 
 export {

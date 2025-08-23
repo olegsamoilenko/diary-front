@@ -8,7 +8,7 @@ import {
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Position = "top" | "bottom" | "left" | "right";
 type ArrowPosition = "start" | "center" | "end";
@@ -36,17 +36,32 @@ export default function ToolTip({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [lines, setLines] = useState(0);
-  const styles = getStyles(
-    colors,
-    position,
-    arrowPosition,
-    maxWidth,
-    lines,
-    left,
-    top,
-    right,
-    bottom,
+  const styles = useMemo(
+    () =>
+      getStyles(
+        colors,
+        position,
+        arrowPosition,
+        maxWidth,
+        lines,
+        left,
+        top,
+        right,
+        bottom,
+      ),
+    [
+      colors,
+      position,
+      arrowPosition,
+      maxWidth,
+      lines,
+      left,
+      top,
+      right,
+      bottom,
+    ],
   );
+
   const animation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {

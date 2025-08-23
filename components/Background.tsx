@@ -5,7 +5,7 @@ import type { BackgroundSettings } from "@/types";
 
 type EntryCardBackgroundProps = {
   children: React.ReactNode;
-  background: BackgroundSettings;
+  background?: BackgroundSettings;
   paddingTop?: number;
 };
 export default function Background({
@@ -13,7 +13,8 @@ export default function Background({
   background,
   paddingTop = 0,
 }: EntryCardBackgroundProps) {
-  if (background.type === "image" && background.url) {
+  console.log("Background render", background);
+  if (background?.type === "image" && background.url) {
     return (
       <ImageBackground
         source={background.url}
@@ -42,7 +43,7 @@ export default function Background({
     <View
       style={{
         flex: 1,
-        backgroundColor: String(background.value) || "#fff",
+        backgroundColor: String(background?.value) || "#fff",
         paddingTop: paddingTop,
       }}
     >

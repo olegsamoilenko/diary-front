@@ -13,6 +13,7 @@ import {
   AddEntryBackgroundImage,
   ENTRY_BG,
 } from "@/constants/EntrySettings";
+import { useMemo } from "react";
 
 type OnChangeBackgroundArg = { background: BackgroundSettings };
 
@@ -26,7 +27,7 @@ export default function BackgroundSetting({
 }: BackgroundSettingProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
 
   const handleBackground = (background: BackgroundSettings) => {
     onChangeBackground({ background: background });

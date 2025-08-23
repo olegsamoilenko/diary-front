@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { ColorTheme } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { useMemo } from "react";
 
 export default function AddButton({
   onPress,
@@ -13,7 +14,7 @@ export default function AddButton({
 }) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   return (
     <TouchableOpacity
       style={[

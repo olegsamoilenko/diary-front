@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect, useMemo } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   ScrollView,
@@ -30,7 +30,7 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const dispatch = useDispatch<AppDispatch>();
   const format = useSelector((state: RootState) => state.timeFormat);
 

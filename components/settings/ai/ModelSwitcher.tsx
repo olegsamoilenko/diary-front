@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from "react";
+import React, { forwardRef, useEffect, useMemo } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AI_MODELS } from "@/constants/AIModels";
@@ -21,7 +21,7 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const aiModel = useAppSelector((state) => state.aiModel);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
 
   const handleAiModel = async (aiModel: AiModel) => {
     try {

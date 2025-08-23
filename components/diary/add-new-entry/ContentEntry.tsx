@@ -1,10 +1,10 @@
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { AILoader } from "@/components/ui/AILoader";
 import { ThemedText } from "@/components/ThemedText";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { Entry } from "@/types";
+import { ColorTheme, Entry } from "@/types";
 import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 // import { useTypewriter } from "@/hooks/useTypewriter";
@@ -20,6 +20,7 @@ type ContentEntryProps = {
   isEntrySaved?: boolean;
   onChange?: (text: string) => void;
   strimCommentError: boolean;
+  strimDialogError: { uuid: string } | null;
 };
 
 export default function ContentEntry({
@@ -30,9 +31,11 @@ export default function ContentEntry({
   isEntrySaved,
   onChange,
   strimCommentError,
+  strimDialogError,
 }: ContentEntryProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
+  const colors = Colors[colorScheme ?? "light"];
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const scrollViewRef = useRef(null);
   const [idx, setIdx] = useState<number>(0);
 
@@ -56,41 +59,14 @@ export default function ContentEntry({
           marginBottom: isKeyboardOpen ? 0 : 20,
         }}
       >
-        <View
-          style={{
-            flex: 1,
-            padding: 10,
-            backgroundColor: "transparent",
-            borderRadius: 8,
-            marginBottom: 10,
-          }}
-        >
+        <View style={styles.content}>
           <ViewReachEditor content={entry.content} />
-          {/*<HtmlViewer htmlContent={entry.content} />*/}
         </View>
         {entry && entry.aiComment && !strimCommentError && (
           <>
-            <View
-              style={{
-                flex: 1,
-                padding: 0,
-                marginLeft: 15,
-                width: "75%",
-                alignItems: "flex-start",
-                borderRadius: 8,
-                backgroundColor: colors.aiCommentBackground,
-                marginBottom: 20,
-                position: "relative",
-              }}
-            >
+            <View style={styles.commentContainer}>
               {aiLoading ? (
-                <View
-                  style={{
-                    width: "75%",
-                    alignItems: "flex-start",
-                    padding: 10,
-                  }}
-                >
+                <View style={styles.loaderContainer}>
                   <AILoader width={50} height={60} dotFontSize={24} />
                 </View>
               ) : (
@@ -129,14 +105,7 @@ export default function ContentEntry({
                       alignItems: "flex-end",
                     }}
                   >
-                    <View
-                      style={{
-                        width: "80%",
-                        marginBottom: 20,
-                        padding: 10,
-                        backgroundColor: colors.questionBackground,
-                      }}
-                    >
+                    <View style={styles.questionContainer}>
                       <ThemedText
                         style={{
                           color: colors.text,
@@ -147,36 +116,31 @@ export default function ContentEntry({
                       </ThemedText>
                     </View>
                   </View>
-                  <View
-                    style={{
-                      width: "75%",
-                      alignItems: "flex-start",
-                      backgroundColor: colors.aiCommentBackground,
-                      padding: 10,
-                      marginLeft: 10,
-                      borderRadius: 8,
-                    }}
-                  >
-                    {aiDialogLoading && dialog.loading ? (
-                      <AILoader width={50} height={60} dotFontSize={24} />
-                    ) : (
-                      <NemoryIcon width={50} height={60} />
-                    )}
-                    <StreamingText
-                      key={dialog.uuid}
-                      id={`dialog-${dialog.uuid}`}
-                      speed={30}
-                      style={{ color: colors.text, padding: 10 }}
-                      onChange={() => {
-                        setTimeout(() => {
-                          // @ts-ignore
-                          scrollViewRef.current?.scrollToEnd({
-                            animated: true,
-                          });
-                        }, 20);
-                      }}
-                    />
-                  </View>
+                  {(!strimDialogError ||
+                    (strimDialogError &&
+                      strimDialogError.uuid !== dialog.uuid)) && (
+                    <View style={styles.answerContainer}>
+                      {aiDialogLoading && dialog.loading ? (
+                        <AILoader width={50} height={60} dotFontSize={24} />
+                      ) : (
+                        <NemoryIcon width={50} height={60} />
+                      )}
+                      <StreamingText
+                        key={dialog.uuid}
+                        id={`dialog-${dialog.uuid}`}
+                        speed={30}
+                        style={{ color: colors.text, padding: 10 }}
+                        onChange={() => {
+                          setTimeout(() => {
+                            // @ts-ignore
+                            scrollViewRef.current?.scrollToEnd({
+                              animated: true,
+                            });
+                          }, 20);
+                        }}
+                      />
+                    </View>
+                  )}
                 </View>
               );
             })}
@@ -186,3 +150,44 @@ export default function ContentEntry({
     </ScrollView>
   );
 }
+
+const getStyles = (colors: ColorTheme) =>
+  StyleSheet.create({
+    content: {
+      flex: 1,
+      padding: 10,
+      backgroundColor: "transparent",
+      borderRadius: 8,
+      marginBottom: 10,
+    },
+    commentContainer: {
+      flex: 1,
+      padding: 0,
+      marginLeft: 15,
+      width: "75%",
+      alignItems: "flex-start",
+      borderRadius: 8,
+      backgroundColor: colors.aiCommentBackground,
+      marginBottom: 20,
+      position: "relative",
+    },
+    loaderContainer: {
+      width: "75%",
+      alignItems: "flex-start",
+      padding: 10,
+    },
+    questionContainer: {
+      width: "80%",
+      marginBottom: 20,
+      padding: 10,
+      backgroundColor: colors.questionBackground,
+    },
+    answerContainer: {
+      width: "75%",
+      alignItems: "flex-start",
+      backgroundColor: colors.aiCommentBackground,
+      padding: 10,
+      marginLeft: 10,
+      borderRadius: 8,
+    },
+  });

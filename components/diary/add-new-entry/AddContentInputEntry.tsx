@@ -1,6 +1,6 @@
 import { StyleSheet, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import type { ColorTheme, Entry, EntrySettings } from "@/types";
+import { ColorTheme, Entry, EntrySettings, Font } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import SettingsEntry from "@/components/diary/add-new-entry/settings-entry/SettingsEntry";
@@ -95,84 +95,73 @@ export default function AddContentInputEntry({
     debouncedSave(content);
   }, [content]);
 
-  const handleBackgroundAction = () => {
-    setShowBackgroundSetting(true);
-  };
+  const handleBackgroundAction = useCallback(
+    () => setShowBackgroundSetting(true),
+    [setShowBackgroundSetting],
+  );
 
-  const handleBoldAction = () => {
-    setIsBoldAction(!isBoldAction);
-  };
+  const handleBoldAction = useCallback(() => setIsBoldAction((v) => !v), []);
+  const handleItalicAction = useCallback(
+    () => setIsItalicAction((v) => !v),
+    [],
+  );
+  const handleUnderlineAction = useCallback(
+    () => setIsUnderlineAction((v) => !v),
+    [],
+  );
+  const handleBulletedListAction = useCallback(
+    () => setIsBulletedListAction((v) => !v),
+    [],
+  );
+  const handleOrderedListAction = useCallback(
+    () => setIsOrderedListAction((v) => !v),
+    [],
+  );
+  const handleColorAction = useCallback(
+    () => isKeyboardOpen && setShowColorSetting(true),
+    [isKeyboardOpen, setShowColorSetting],
+  );
+  const handleSizeAction = useCallback(
+    () => isKeyboardOpen && setShowSizeSetting(true),
+    [isKeyboardOpen, setShowSizeSetting],
+  );
+  const handleFontAction = useCallback(
+    () => setShowFontSetting(true),
+    [setShowFontSetting],
+  );
+  const handleEmojiAction = useCallback(
+    () => setShowEmojiSetting(true),
+    [setShowEmojiSetting],
+  );
+  const handleEmoji = useCallback(
+    (e: string) => {
+      addEmoji(e);
+      setShowEmojiSetting(false);
+    },
+    [addEmoji, setShowEmojiSetting],
+  );
 
-  const handleItalicAction = () => {
-    setIsItalicAction(!isItalicAction);
-  };
+  const setColor = useCallback((c: string) => {
+    setSelectedColor(c);
+    setColorAction(c);
+  }, []);
+  const setSize = useCallback((sz: number) => {
+    setSelectedSize(sz);
+    setSizeAction(sz);
+  }, []);
+  const setFont = useCallback((f: any) => setSelectedFont(f), []);
 
-  const handleUnderlineAction = () => {
-    setIsUnderlineAction(!isUnderlineAction);
-  };
+  const handleFocus = useCallback(
+    () => setIsFocusTextRichEditor(true),
+    [setIsFocusTextRichEditor],
+  );
+  const handleBlur = useCallback(
+    () => setIsFocusTextRichEditor(false),
+    [setIsFocusTextRichEditor],
+  );
 
-  const setColor = (color: string) => {
-    setSelectedColor(color);
-    setColorAction(color);
-  };
-
-  const setSize = (size: number) => {
-    setSelectedSize(size);
-    setSizeAction(size);
-  };
-
-  const handleBulletedListAction = () => {
-    setIsBulletedListAction(!isBulletedListAction);
-  };
-
-  const handleOrderedListAction = () => {
-    setIsOrderedListAction(!isOrderedListAction);
-  };
-
-  const handleColorAction = () => {
-    if (isKeyboardOpen) {
-      setShowColorSetting(true);
-    }
-  };
-
-  const handleSizeAction = () => {
-    if (isKeyboardOpen) {
-      setShowSizeSetting(true);
-    }
-  };
-
-  const handleFontAction = () => {
-    setShowFontSetting(true);
-  };
-
-  const setFont = (font: any) => {
-    setSelectedFont(font);
-  };
-
-  const handleEmojiAction = () => {
-    setShowEmojiSetting(true);
-  };
-
-  const handleEmoji = (emoji: string) => {
-    addEmoji(emoji);
-    setShowEmojiSetting(false);
-  };
-
-  const handleFocus = () => {
-    setIsFocusTextRichEditor(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocusTextRichEditor(false);
-  };
-
-  const handleImageAction = () => {
-    setShowImageSetting(true);
-  };
-
-  const handlePhotoAction = () => {
-    setShowPhotoSetting(true);
-  };
+  const handleImageAction = useCallback(() => setShowImageSetting(true), []);
+  const handlePhotoAction = useCallback(() => setShowPhotoSetting(true), []);
 
   return (
     <View

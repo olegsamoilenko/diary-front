@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Pressable } from "react-native";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import * as Localization from "expo-localization";
 import { FIRST_DAY_BY_LOCALE } from "@/constants/FirstDayByLocale";
 import {
@@ -13,17 +13,17 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import i18n from "i18next";
-import { Entry, MoodByDate } from "@/types";
-import { getEmojiByMood } from "@/constants/Mood";
+import { ColorTheme, MoodByDate } from "@/types";
 import { CENTER, CLOCK_RADIUS, EMOJI_SIZE } from "@/constants/Calendar";
 import { ThemedText } from "@/components/ThemedText";
+import EmojiBadge from "@/components/diary/EmojiBadge";
 
 function getWeekDates(
   selectedDate: string | number | Date,
   firstDayOfWeek = 1,
 ) {
   const date = new Date(selectedDate);
-  let weekDay = date.getDay(); // 0 (Sun) ... 6 (Sat)
+  let weekDay = date.getDay();
   let diff = weekDay - firstDayOfWeek;
   if (diff < 0) diff += 7;
 
@@ -45,13 +45,15 @@ function getWeekDates(
 type WeekViewProps = {
   weekAnchorDay: string | number | Date;
   setWeekAnchorDay: (d: string) => void;
-  selectedDay: string | number | Date | undefined;
-  setSelectedDay: (day: string | undefined) => void;
+  selectedDay: string;
+  setSelectedDay: React.Dispatch<React.SetStateAction<string>>;
   moodsByDate: Record<string, MoodByDate[] | undefined>;
   setMonth: (month: number) => void;
   setYear: (year: number) => void;
   onBackToMonth: () => void;
   loadingDays: boolean;
+  setInitialDate: (date: string) => void;
+  activeMoods: { id: number }[];
 };
 
 export default function WeekView({
@@ -64,134 +66,96 @@ export default function WeekView({
   setYear,
   onBackToMonth,
   loadingDays,
+  setInitialDate,
+  activeMoods = [],
 }: WeekViewProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme];
-  const localeArr = Localization.getLocales();
-  const locale = localeArr!.find((loc) => {
-    return loc.languageCode === (i18n.language || "uk");
-  })?.languageTag;
-  const firstDayOfWeek = FIRST_DAY_BY_LOCALE[locale!] ?? 1;
-  const lang = i18n.language || "uk";
+  const colors = Colors[colorScheme ?? "light"];
 
-  const weekDates = getWeekDates(weekAnchorDay, firstDayOfWeek);
+  const lang = i18n.language || "en";
 
-  const weekdayLabels = getWeekdayLabels(lang, firstDayOfWeek);
+  const locale = useMemo(() => {
+    const arr = Localization.getLocales();
+    return arr?.find((loc) => loc.languageCode === lang)?.languageTag;
+  }, [lang]);
 
-  const monthYearStr = getMonthYearStr(weekDates[3], lang);
+  const firstDayOfWeek = FIRST_DAY_BY_LOCALE[locale as string] ?? 1;
 
-  const prevWeek = () => {
+  const styles = useMemo(() => getStyles(colors), [colors]);
+
+  const weekDates = useMemo(
+    () => getWeekDates(weekAnchorDay, firstDayOfWeek),
+    [weekAnchorDay, firstDayOfWeek],
+  );
+
+  const weekdayLabels = useMemo(
+    () => getWeekdayLabels(lang, firstDayOfWeek),
+    [lang, firstDayOfWeek],
+  );
+
+  const monthYearStr = useMemo(
+    () => getMonthYearStr(weekDates[3], lang),
+    [weekDates, lang],
+  );
+
+  const prevWeek = useCallback(() => {
     const newDate = addDays(weekDates[0], -7);
     setWeekAnchorDay(newDate);
-    setSelectedDay(undefined);
-
     const { month, year } = getNumbersMonthAndYear(newDate);
     setMonth(month);
     setYear(year);
-  };
-  const nextWeek = () => {
+  }, [weekDates, setWeekAnchorDay, setMonth, setYear]);
+
+  const nextWeek = useCallback(() => {
     const newDate = addDays(weekDates[0], 7);
     setWeekAnchorDay(newDate);
-    setSelectedDay(undefined);
-
     const { month, year } = getNumbersMonthAndYear(newDate);
     setMonth(month);
     setYear(year);
-  };
+  }, [weekDates, setWeekAnchorDay, setMonth, setYear]);
 
-  const handleDayPress = (item: string) => {
-    setSelectedDay(item);
-  };
+  const handleDayPress = useCallback(
+    (item: string) => setSelectedDay(item),
+    [setSelectedDay],
+  );
+
+  const handleBackToMonth = useCallback(() => {
+    onBackToMonth();
+    setInitialDate(weekDates[3]);
+  }, [onBackToMonth, setInitialDate, weekDates]);
 
   return (
-    <View style={{ paddingHorizontal: 12, marginTop: 9 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 8,
-        }}
-      >
-        <Pressable
-          onPress={prevWeek}
-          style={{
-            width: 40,
-            height: 40,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+    <View style={styles.container}>
+      <View style={styles.calendarHeader}>
+        <Pressable onPress={prevWeek} style={styles.arrow}>
           <MaterialCommunityIcons
             name="triangle"
             size={12}
             color={colors.primary}
-            style={{
-              transform: [
-                { rotate: "270deg" },
-                { scaleX: 1.4 },
-                { scaleY: 0.8 },
-              ],
-              marginLeft: 11,
-            }}
+            style={styles.iconLeft}
           />
         </Pressable>
         <ThemedText style={{ fontSize: 18 }}>
           {monthYearStr.slice(0, 1).toUpperCase() + monthYearStr.slice(1)}
         </ThemedText>
-        <Pressable
-          onPress={nextWeek}
-          style={{
-            width: 40,
-            height: 40,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <Pressable onPress={nextWeek} style={styles.arrow}>
           <MaterialCommunityIcons
             name="triangle"
             size={12}
             color={colors.primary}
-            style={{
-              transform: [
-                { rotate: "90deg" },
-                { scaleX: 1.4 },
-                { scaleY: 0.8 },
-              ],
-              marginRight: 11,
-            }}
+            style={styles.iconRight}
           />
         </Pressable>
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginBottom: 2,
-        }}
-      >
+      <View style={styles.dayNameContainer}>
         {weekdayLabels.map((label, i) => (
-          <ThemedText
-            key={label}
-            style={{
-              width: 40,
-              textAlign: "center",
-              color: colors.calendarDayLabels,
-              fontSize: 14,
-            }}
-          >
+          <ThemedText key={label} style={styles.dayName}>
             {label}
           </ThemedText>
         ))}
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingVertical: 8,
-        }}
-      >
+      <View style={styles.daysContainer}>
         {weekDates.map((item) => {
           const moods = moodsByDate[item] || [];
           const isSelected = selectedDay === item;
@@ -202,90 +166,84 @@ export default function WeekView({
             <Pressable
               key={item}
               onPress={() => handleDayPress(item)}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor:
-                  isSelected && !loadingDays
-                    ? colors.primary
-                    : isSelected && loadingDays
-                      ? colors.disabledPrimary
-                      : "transparent",
-                borderColor:
-                  itemMonth === month && !isSelected
-                    ? colors.calendarEnableDayBorder
-                    : itemMonth !== month && !isSelected
-                      ? colors.calendarDisableDayBorder
-                      : loadingDays
-                        ? colors.calendarDayDisabled
-                        : colors.primary,
-                borderWidth: 2,
-                width: CLOCK_RADIUS * 2,
-                height: CLOCK_RADIUS * 2,
-                borderRadius: CLOCK_RADIUS,
-                position: "relative",
-              }}
+              style={[
+                styles.dayContainer,
+                {
+                  backgroundColor:
+                    isSelected && !loadingDays
+                      ? colors.primary
+                      : isSelected && loadingDays
+                        ? colors.disabledPrimary
+                        : "transparent",
+                  borderColor:
+                    itemMonth === month && !isSelected
+                      ? colors.calendarEnableDayBorder
+                      : itemMonth !== month && !isSelected
+                        ? colors.calendarDisableDayBorder
+                        : loadingDays
+                          ? colors.calendarDayDisabled
+                          : colors.primary,
+                },
+              ]}
               disabled={loadingDays}
             >
               <ThemedText
-                style={{
-                  color:
-                    itemMonth !== month && !isSelected
-                      ? "gray"
-                      : isSelected
-                        ? "#ffffff"
-                        : colors.text,
-                  fontWeight: isSelected ? "bold" : "normal",
-                  fontSize: 14,
-                  position: "absolute",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                style={[
+                  styles.day,
+                  {
+                    color:
+                      itemMonth !== month && !isSelected
+                        ? "gray"
+                        : isSelected
+                          ? "#ffffff"
+                          : colors.text,
+                    fontWeight: isSelected ? "bold" : "normal",
+                  },
+                ]}
               >
                 {day}
               </ThemedText>
-              {moods.map((mood, idx) => {
+              {moods.map((mood) => {
                 const date = new Date(mood.createdAt);
                 const hour = date.getUTCHours() + date.getMinutes() / 60;
                 const angle = (hour / 12) * 2 * Math.PI - Math.PI / 2;
                 const r = CLOCK_RADIUS - EMOJI_SIZE / 10;
                 const { x, y } = polarToCartesian(CENTER, CENTER, r, angle);
+                const activeMood = activeMoods.find((m) => m.id === mood.id);
                 return (
                   <View
-                    key={idx}
-                    style={{
-                      position: "absolute",
-                      left: x - EMOJI_SIZE / 1.5,
-                      top: y - EMOJI_SIZE / 1.5,
-                      borderRadius: EMOJI_SIZE / 2,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
+                    key={mood.id}
+                    style={[
+                      styles.emojiContainer,
+                      {
+                        left: x - EMOJI_SIZE / 1.5,
+                        top: y - EMOJI_SIZE / 1.5,
+                      },
+                    ]}
                   >
                     <View
                       style={{
                         position: "relative",
                       }}
                     >
+                      <EmojiBadge
+                        emoji={mood.mood}
+                        size={EMOJI_SIZE}
+                        zIndex={Math.round(hour)}
+                        ringColor={colors.primary}
+                        active={activeMood?.id === mood.id}
+                      />
                       <Text
-                        style={{
-                          fontSize: EMOJI_SIZE,
-                          zIndex: Math.round(hour),
-                        }}
-                      >
-                        {mood.mood}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 6,
-                          position: "absolute",
-                          top: 0,
-                          right: 0,
-                          zIndex: 1 + Math.round(hour),
-                          backgroundColor:
-                            hour < 7 || hour > 19 ? "#000" : "#fff",
-                          borderRadius: 10,
-                        }}
+                        style={[
+                          styles.emojiLabel,
+                          {
+                            zIndex: activeMood
+                              ? 101 + Math.round(hour)
+                              : Math.round(hour),
+                            backgroundColor:
+                              hour < 7 || hour > 19 ? "#000" : "#fff",
+                          },
+                        ]}
                       >
                         {hour < 7 || hour > 19 ? "🌙" : "☀️"}
                       </Text>
@@ -298,17 +256,8 @@ export default function WeekView({
         })}
       </View>
 
-      <Pressable onPress={onBackToMonth}>
-        <Text
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-            textAlign: "center",
-            marginTop: 10,
-            marginBottom: 10,
-            color: "#888",
-          }}
-        >
+      <Pressable onPress={handleBackToMonth}>
+        <Text style={styles.openFullArrow}>
           <MaterialCommunityIcons
             name="chevron-down"
             size={24}
@@ -323,3 +272,85 @@ export default function WeekView({
     </View>
   );
 }
+
+const getStyles = (colors: ColorTheme) =>
+  StyleSheet.create({
+    container: {
+      paddingHorizontal: 12,
+      marginTop: 9,
+    },
+    calendarHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 8,
+    },
+    arrow: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    iconLeft: {
+      transform: [{ rotate: "270deg" }, { scaleX: 1.4 }, { scaleY: 0.8 }],
+      marginLeft: 11,
+    },
+    iconRight: {
+      transform: [{ rotate: "90deg" }, { scaleX: 1.4 }, { scaleY: 0.8 }],
+      marginRight: 11,
+    },
+    dayNameContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 2,
+    },
+    dayName: {
+      width: 40,
+      textAlign: "center",
+      color: colors.calendarDayLabels,
+      fontSize: 14,
+    },
+    daysContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 8,
+    },
+    dayContainer: {
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 2,
+      width: CLOCK_RADIUS * 2,
+      height: CLOCK_RADIUS * 2,
+      borderRadius: CLOCK_RADIUS,
+      position: "relative",
+    },
+    day: {
+      fontSize: 14,
+      position: "absolute",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    emojiContainer: {
+      position: "absolute",
+      borderRadius: EMOJI_SIZE / 2,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    emoji: {
+      fontSize: EMOJI_SIZE,
+    },
+    emojiLabel: {
+      fontSize: 6,
+      position: "absolute",
+      top: 0,
+      right: 0,
+      borderRadius: 10,
+    },
+    openFullArrow: {
+      justifyContent: "center",
+      alignItems: "center",
+      textAlign: "center",
+      marginTop: 10,
+      marginBottom: 10,
+    },
+  });

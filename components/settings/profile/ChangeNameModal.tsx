@@ -1,6 +1,6 @@
 import Emoji from "@/components/diary/Emoji";
 import ModalPortal from "@/components/ui/Modal";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import {
   ActivityIndicator,
@@ -35,7 +35,7 @@ export default function ChangeNameModal({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
 
   const [error, setError] = useState<string | null>(null);
 

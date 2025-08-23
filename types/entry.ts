@@ -1,6 +1,6 @@
 import { AiComment } from "./ai";
 import { ImageSourcePropType } from "react-native";
-import { Dialog } from "@/types/dialog";
+import type { Dialog } from "@/types/dialog";
 
 export type Entry = {
   id: number;

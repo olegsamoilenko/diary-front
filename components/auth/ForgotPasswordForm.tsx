@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { Formik } from "formik";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ColorTheme, ErrorMessages } from "@/types";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -27,7 +27,7 @@ export default function ForgotPasswordForm({
   const lang = useState<string | null>(i18n.language)[0];
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,13 +71,7 @@ export default function ForgotPasswordForm({
     }
   };
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: 10,
-        backgroundColor: "transparent",
-      }}
-    >
+    <View style={styles.container}>
       <View
         style={{
           marginBottom: 20,
@@ -125,27 +119,13 @@ export default function ForgotPasswordForm({
                 placeholderTextColor={colors.inputPlaceholder}
               />
               {touched.email && errors.email && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
+                <ThemedText type={"small"} style={styles.error}>
                   {errors.email}
                 </ThemedText>
               )}
             </View>
             {error && (
-              <ThemedText
-                type={"small"}
-                style={{
-                  color: colors.error,
-                  marginTop: -10,
-                  marginBottom: 20,
-                }}
-              >
+              <ThemedText type={"small"} style={styles.error}>
                 {error}
               </ThemedText>
             )}
@@ -176,6 +156,11 @@ export default function ForgotPasswordForm({
 
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingTop: 10,
+      backgroundColor: "transparent",
+    },
     input: {
       backgroundColor: colors.inputBackground,
       padding: 14,
@@ -194,5 +179,10 @@ const getStyles = (colors: ColorTheme) =>
       backgroundColor: colors.primary,
       borderRadius: 12,
       textAlign: "center",
+    },
+    error: {
+      color: colors.error,
+      marginTop: -10,
+      marginBottom: 20,
     },
   });

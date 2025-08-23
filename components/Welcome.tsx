@@ -3,13 +3,13 @@ import NemoryLogo from "@/components/ui/logo/NemoryLogo";
 import { ColorTheme } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function Welcome() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const [name, setName] = useState("");
   const { t } = useTranslation();
   return (

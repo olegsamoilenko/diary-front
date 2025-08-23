@@ -1,6 +1,6 @@
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useMemo, useState } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   Pressable,
@@ -28,7 +28,7 @@ import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const styles = getStyles(colors);
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [showPayment, setShowPayment] = React.useState(false);
