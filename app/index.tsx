@@ -5,12 +5,12 @@ import { useEffect } from "react";
 
 GoogleSignin.configure({
   webClientId:
-    "203981333495-fjift3o1qr4q35tv5hscsuutbouspfir.apps.googleusercontent.com",
+    "710892196291-cmo8kv1h9jeim09c6f3kchup3oknosts.apps.googleusercontent.com",
   scopes: ["openid", "email", "profile"],
   offlineAccess: true,
   forceCodeForRefreshToken: false,
   iosClientId:
-    "203981333495-55s91bj0jmma2dl1mrnkku56s8i34ckg.apps.googleusercontent.com",
+    "710892196291-00dbprivpdqs5qe0vbeeu21k9pgibqv7.apps.googleusercontent.com",
 });
 
 export default function IndexScreen() {

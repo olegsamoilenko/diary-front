@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { apiUrl } from "@/constants/env";
 import { Image } from "expo-image";
 import { UserEvents } from "@/utils/events/userEvents";
+import { useEffect } from "react";
 
 export default function GoogleSignInButton({
   forPlanSelect,
@@ -26,29 +27,24 @@ export default function GoogleSignInButton({
 
   GoogleSignin.configure({
     webClientId:
-      "203981333495-fjift3o1qr4q35tv5hscsuutbouspfir.apps.googleusercontent.com",
+      "710892196291-cmo8kv1h9jeim09c6f3kchup3oknosts.apps.googleusercontent.com",
     scopes: ["openid", "email", "profile"],
     offlineAccess: true,
     forceCodeForRefreshToken: false,
     iosClientId:
-      "203981333495-55s91bj0jmma2dl1mrnkku56s8i34ckg.apps.googleusercontent.com",
+      "710892196291-00dbprivpdqs5qe0vbeeu21k9pgibqv7.apps.googleusercontent.com",
   });
 
   const GoogleLogin = async () => {
-    console.log("Starting Google sign-in process");
     try {
-      const play = await GoogleSignin.hasPlayServices();
-
-      console.log("Play services are available", play);
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
 
       const userInfo = await GoogleSignin.signIn();
-      console.log("userInfo", userInfo);
       return userInfo;
     } catch (err: any) {
-      console.error("Error GoogleLogin1:", err);
-      console.error("Error GoogleLogin2:", err.response);
-      console.error("Error GoogleLogin3:", err.response.data);
-      console.error("Error GoogleLogin4:", err.message);
+      console.log("Error GoogleLogin", err);
       throw err;
     }
   };
@@ -56,7 +52,6 @@ export default function GoogleSignInButton({
   const processUserData = async (idToken: string) => {
     const userString = await SecureStore.getItemAsync("user");
     const userObj: User | null = userString ? JSON.parse(userString) : null;
-    console.log("userObj", userObj);
     try {
       const res = await axios.post(`${apiUrl}/auth/sign-in-with-google`, {
         userId: userObj?.id,
@@ -75,8 +70,10 @@ export default function GoogleSignInButton({
       onSuccessSignWithGoogle();
       UserEvents.emit("userLoggedIn", res.data.user);
     } catch (err: any) {
-      console.error("Error during Google sign-in: 1", err);
-      console.error("Error during Google sign-in: 2", err.response);
+      console.error("Error during Google sign-in:1", err);
+      console.error("Error during Google sign-in:2", err.response);
+      console.error("Error during Google sign-in:3", err.response.data);
+      console.error("Error during Google sign-in:4", err.message);
     }
   };
 
@@ -84,17 +81,12 @@ export default function GoogleSignInButton({
     try {
       const response = await GoogleLogin();
 
-      console.log("response", response);
-      console.log("response.data", response.data);
-
       const { idToken } = response.data ?? {};
       if (idToken) {
         await processUserData(idToken);
       }
     } catch (err: any) {
-      console.log("Error googleSignIn0", err);
-      console.log("Error googleSignIn1", err?.response);
-      console.log("Error googleSignIn2", err?.response?.data);
+      console.log("Error googleSignIn", err);
     }
   };
 

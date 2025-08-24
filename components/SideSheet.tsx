@@ -177,7 +177,7 @@ export default SideSheet;
 const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
-    zIndex: 1,
+    zIndex: 0,
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "transparent",
-    elevation: 10,
+    // elevation: 10,
   },
   content: {
     flex: 1,

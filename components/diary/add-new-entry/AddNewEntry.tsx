@@ -67,6 +67,8 @@ const socket = io(process.env.EXPO_PUBLIC_URL, {
   },
 });
 
+console.log("Socket URL:", process.env.EXPO_PUBLIC_URL);
+
 type ResetFn = (opts?: {
   title?: string;
   color?: string;

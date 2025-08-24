@@ -1,12 +1,14 @@
-import React, { useMemo, useState, useCallback } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { ColorTheme, Plan } from "@/types";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import type { ColorTheme, Plan, User } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import Background from "@/components/Background";
 import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
+import * as SecureStore from "@/utils/store/secureStore";
+import { ThemedText } from "@/components/ThemedText";
 
 type SelectPlanProps = {
   setShowRegisterOrNot?: (show: boolean) => void;
@@ -27,6 +29,23 @@ export default function HandleSubscription({
   const [plan, setPlan] = React.useState<Plan | null>(null);
   const [successPaymentPlan, setSuccessPaymentPlan] =
     React.useState<Plan | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userString = await SecureStore.getItemAsync("user");
+      const userObj: User | null = userString ? JSON.parse(userString) : null;
+      setUser(userObj);
+    };
+    fetchUser();
+  }, []);
+
+  const handleNext = () => {
+    console.log("HandleSubscription: handleNext");
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
 
   const onSuccessPayment = useCallback(() => {
     setSuccessPaymentPlan(plan);
@@ -49,6 +68,31 @@ export default function HandleSubscription({
               setSuccessPaymentPlan={setSuccessPaymentPlan}
               continueWithoutRegistration={continueWithoutRegistration}
             />
+            {user && user?.plan && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginBottom: 50,
+                  alignItems: "flex-end",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <TouchableOpacity
+                  style={styles.btn}
+                  onPress={() => handleNext()}
+                >
+                  <ThemedText
+                    style={[
+                      {
+                        color: colors.textInPrimary,
+                      },
+                    ]}
+                  >
+                    {t("common.continue")}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            )}
           </>
         )}
       </View>
@@ -74,5 +118,12 @@ const getStyles = (colors: ColorTheme) =>
       marginBottom: 14,
       textAlign: "center",
       color: colors.text,
+    },
+    btn: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      textAlign: "center",
     },
   });

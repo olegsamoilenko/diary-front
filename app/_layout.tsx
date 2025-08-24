@@ -33,6 +33,7 @@ import { resetAiModel } from "@/store/slices/settings/aiModelSlice";
 import { useHydrateSettings } from "@/hooks/useHydrateSettings";
 import { unstable_batchedUpdates, AppState } from "react-native";
 import * as Localization from "expo-localization";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthGate = lazy(() => import("@/components/auth/AuthGate"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -95,7 +96,15 @@ export default function RootLayout() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // await SecureStore.deleteItemAsync("user");
+      // await Promise.allSettled([
+      //   SecureStore.deleteItemAsync("token"),
+      //   SecureStore.deleteItemAsync("user"),
+      //   SecureStore.deleteItemAsync("user_pin"),
+      //   SecureStore.deleteItemAsync("biometry_enabled"),
+      //   AsyncStorage.removeItem("show_welcome"),
+      // ]);
+      const showWelcome = await AsyncStorage.getItem("show_welcome");
+      console.log("showWelcome", showWelcome);
       if (!cancelled) {
         const stored = await SecureStore.getItemAsync("user");
         let u: User | null = stored ? JSON.parse(stored) : null;
@@ -121,12 +130,12 @@ export default function RootLayout() {
                 <Suspense fallback={null}>
                   <AppContent />
                 </Suspense>
+                <CustomToast />
               </PortalProvider>
             </BiometryProvider>
           </AuthProvider>
         </NavigationThemeWrapper>
       </ThemeProviderCustom>
-      <CustomToast />
     </Provider>
   );
 }

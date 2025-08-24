@@ -1,4 +1,5 @@
 import React from "react";
+import { View, StyleSheet } from "react-native";
 import Toast, {
   SuccessToast,
   ErrorToast,
@@ -9,6 +10,7 @@ import type { RootState } from "@/store";
 import { getFont } from "@/utils";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { Portal } from "@gorhom/portal";
 
 export default function CustomToast() {
   const font = useSelector((state: RootState) => state.font);
@@ -18,7 +20,13 @@ export default function CustomToast() {
     success: (props: any) => (
       <SuccessToast
         {...props}
-        style={{ padding: 10, borderLeftColor: "green", height: "auto" }}
+        style={{
+          padding: 10,
+          borderLeftColor: "green",
+          height: "auto",
+          zIndex: 999999,
+          elevation: 9999,
+        }}
         text1NumberOfLines={0}
         text2NumberOfLines={0}
         text1Style={{
@@ -40,6 +48,8 @@ export default function CustomToast() {
           padding: 10,
           borderLeftColor: "red",
           height: "auto",
+          zIndex: 999999,
+          elevation: 9999,
         }}
         text1NumberOfLines={0}
         text2NumberOfLines={0}
@@ -58,7 +68,13 @@ export default function CustomToast() {
     info: (props: any) => (
       <InfoToast
         {...props}
-        style={{ padding: 10, borderLeftColor: "yellow", height: "auto" }}
+        style={{
+          padding: 10,
+          borderLeftColor: "yellow",
+          height: "auto",
+          zIndex: 999999,
+          elevation: 9999,
+        }}
         text1NumberOfLines={0}
         text2NumberOfLines={0}
         text1Style={{
@@ -74,5 +90,19 @@ export default function CustomToast() {
       />
     ),
   };
-  return <Toast config={toastConfig} visibilityTime={10000} topOffset={60} />;
+  return (
+    <Portal>
+      <View pointerEvents="box-none" style={styles.host}>
+        <Toast config={toastConfig} visibilityTime={6000} topOffset={60} />
+      </View>
+    </Portal>
+  );
 }
+
+const styles = StyleSheet.create({
+  host: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 99999,
+    elevation: 99999,
+  },
+});

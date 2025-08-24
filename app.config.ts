@@ -68,6 +68,7 @@ export default ({ config }: { config: any }) => ({
     },
     android: {
       package: "com.soniac12.nemory",
+      package_name: "com.soniac12.nemory",
       versionCode: 8,
       adaptiveIcon: {
         foregroundImage: "./assets/images/icon.png",
@@ -86,12 +87,12 @@ export default ({ config }: { config: any }) => ({
       API_URL: "https://nemoryai.com/api",
       URL: "https://nemoryai.com",
       // API_URL: "http://192.168.0.102:3001",
-      GOOGLE_CLIENT_WEB_ID:
-        "203981333495-fjift3o1qr4q35tv5hscsuutbouspfir.apps.googleusercontent.com",
-      GOOGLE_CLIENT_ANDROID_ID:
-        "203981333495-8n59u2q1abopsh3nrnpbal3kn0olcf56.apps.googleusercontent.com",
-      GOOGLE_CLIENT_IOS_ID:
-        "203981333495-55s91bj0jmma2dl1mrnkku56s8i34ckg.apps.googleusercontent.com",
+      // GOOGLE_CLIENT_WEB_ID:
+      //   "203981333495-fjift3o1qr4q35tv5hscsuutbouspfir.apps.googleusercontent.com",
+      // GOOGLE_CLIENT_ANDROID_ID:
+      //   "203981333495-8n59u2q1abopsh3nrnpbal3kn0olcf56.apps.googleusercontent.com",
+      // GOOGLE_CLIENT_IOS_ID:
+      //   "203981333495-55s91bj0jmma2dl1mrnkku56s8i34ckg.apps.googleusercontent.com",
       eas: {
         projectId: "be6994c0-5be5-4005-b6e4-1385174eecc3",
         branch: "production",
