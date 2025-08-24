@@ -16,6 +16,7 @@ expo-env.d.ts
 *.p8
 *.p12
 *.key
+*.apk
 *.mobileprovision
 
 # Metro
@@ -43,5 +44,3 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
-
-other/
