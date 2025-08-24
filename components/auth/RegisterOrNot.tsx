@@ -6,6 +6,7 @@ import { ThemedText } from "@/components/ThemedText";
 import NemoryLogo from "@/components/ui/logo/NemoryLogo";
 import React from "react";
 import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type RegisterOrNotProps = {
   setShowAuthForm: (show: boolean) => void;
@@ -21,15 +22,17 @@ export default function RegisterOrNot({
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
 
-  const handleRegistration = () => {
+  const handleRegistration = async () => {
     setShowAuthForm(true);
     onChoice();
+    await AsyncStorage.setItem("register_or_not", "false");
   };
 
-  const handleWithoutRegistration = () => {
+  const handleWithoutRegistration = async () => {
     setContinueWithoutRegistration(true);
     onChoice();
     setShowAuthForm(false);
+    await AsyncStorage.setItem("register_or_not", "false");
   };
   return (
     <Background background={colors.backgroundImage}>
@@ -64,7 +67,7 @@ export default function RegisterOrNot({
               color: colors.textInPrimary,
             }}
           >
-            {t("auth.register")}
+            {t("auth.registerOrLogin")}
           </ThemedText>
         </TouchableOpacity>
         <View

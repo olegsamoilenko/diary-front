@@ -11,6 +11,7 @@ import * as SecureStore from "@/utils/store/secureStore";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useBiometry } from "@/context/BiometryContext";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 type DeleteAccountModalProps = {
   showDeleteAccountModal: boolean;
@@ -39,7 +40,9 @@ export default function DeleteAccountModal({
         SecureStore.deleteItemAsync("user_pin"),
         SecureStore.deleteItemAsync("biometry_enabled"),
         AsyncStorage.removeItem("show_welcome"),
+        AsyncStorage.removeItem("register_or_not"),
       ]);
+      await GoogleSignin.signOut();
       await setBiometry(false);
       UserEvents.emit("userDeleted");
       setShowDeleteAccountModal(false);
@@ -51,6 +54,7 @@ export default function DeleteAccountModal({
       });
     }
   };
+
   return (
     <ModalPortal
       visible={showDeleteAccountModal}

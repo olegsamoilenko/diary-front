@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   TextInput,
@@ -7,10 +7,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "@/utils/store/secureStore";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { ThemedText } from "@/components/ThemedText";
-import type { ColorTheme } from "@/types";
+import type { ColorTheme, User } from "@/types";
 import { ErrorMessages } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -40,6 +40,16 @@ export default function LoginForm({
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const userString = await SecureStore.getItemAsync("user");
+      const userObj = userString ? JSON.parse(userString) : null;
+      setUser(userObj);
+    };
+    getUser();
+  }, []);
 
   const loginSchema = Yup.object().shape({
     email: Yup.string()
@@ -63,11 +73,14 @@ export default function LoginForm({
       const res = await axios.post(`${apiUrl}/auth/login`, {
         email: values.email,
         password: values.password,
+        uuid: user?.uuid,
       });
-      const { accessToken, user } = res.data;
+      const { accessToken, user: userRes } = res.data;
+
+      console.log("Login response data:", res.data);
 
       await SecureStore.setItemAsync("token", accessToken);
-      await SecureStore.setItemAsync("user", JSON.stringify(user));
+      await SecureStore.setItemAsync("user", JSON.stringify(userRes));
 
       setLoading(false);
       resetForm();
@@ -78,9 +91,11 @@ export default function LoginForm({
         text2: t("toast.youHaveSuccessfullyLoggedIn"),
       });
       onSuccessSignIn();
-      UserEvents.emit("userLoggedIn", user);
+      UserEvents.emit("userLoggedIn", userRes);
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("err", err);
+      console.log("err response", err?.response);
+      console.log("err response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(t(`errors.${errorKey}`));

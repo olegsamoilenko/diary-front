@@ -8,6 +8,7 @@
     "confirmPassword": "Підтвердіть Пароль",
     "login": "Увійти",
     "register": "Зареєструватися",
+    "registerOrLogin": "Зареєструватися або увійти",
     "registration": "Реєстрація",
     "enterValidEmailAddress": "Введіть коректний email",
     "emailIsRequired": "Email обов'язковий",
@@ -64,6 +65,8 @@
     "noRecords": "Немає записів за цей день",
     "entry": {
       "deleteEntryConfirmation": "Ви впевнені, що хочете видалити цей запис?",
+      "entryDeleted": "Запис видалено",
+      "youHaveSuccessfullyDeletedThisEntry": "Ви успішно видалили цей запис",
       "settings": {
         "background": "Фон",
         "color": "Кольори",
@@ -182,7 +185,7 @@
       "loggedIn": "Увійшли",
       "notLoggedIn": "Не увійшли",
       "loggedOut": "Вийшли",
-      "notRegister": "Не зареєстрований",
+      "notRegister": "Не зареєстрований"
     }
   },
   "planModal": {
@@ -262,7 +265,7 @@
     "commentNotFound": "Коментар не знайдено",
     "aiCommentNoFoundForThisEntry": "AI коментар не знайдено для цього запису",
     "userExist": "Користувач існує",
-    "userWithThisEmailAlreadyExists": "Користувач з такою електронною поштою вже існує",
+    "userWithThisEmailAlreadyExists": "Користувач з такою електронною поштою вже існує"
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",
@@ -285,7 +288,7 @@
     "youHaveSuccessfullyChangedYourName": "Ви успішно змінили своє ім'я",
     "youHaveSuccessfullyChangedYourEmail": "Ви успішно змінили свою електронну пошту",
     "youHaveSuccessfullyChangedYourPassword": "Ви успішно змінили свій пароль",
-    "successfullyLoggedOut": "Ви успішно вийшли з додатку",
+    "successfullyLoggedOut": "Ви успішно вийшли з додатку"
   },
   "welcome": {
     "title": "Ласкаво просимо до Розумного Щоденника",
@@ -298,7 +301,7 @@
       "list4": "- відстежувати своє ментальне і фізичне здоров’я через щоденні записи",
       "list5": "- передбачати, як зміниться твоє життя, якщо продовжиш в тому ж напрямку"
     },
-    "doNotShowAnymore": "Не показувати більше",
+    "doNotShowAnymore": "Не показувати більше"
   },
   "notFond": {
     "title": "Ця сторінка не існує",

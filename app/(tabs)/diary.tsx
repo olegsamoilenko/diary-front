@@ -30,6 +30,7 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Portal } from "@gorhom/portal";
 import Background from "@/components/Background";
 import WelcomeModal from "@/components/diary/WelcomeModal";
+import Toast from "react-native-toast-message";
 
 function localISODate(d = new Date()) {
   const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -184,6 +185,11 @@ export default function Diary() {
           ...prev,
           [selectedDay]: prev[selectedDay]?.filter((e) => e.id !== id) ?? [],
         }));
+        Toast.show({
+          type: "success",
+          text1: t(`diary.entry.entryDeleted`),
+          text2: t(`diary.entry.youHaveSuccessfullyDeletedThisEntry`),
+        });
         await fetchMoodsByDate();
       } catch (e) {
         console.error("Error deleting entry:", e);

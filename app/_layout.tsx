@@ -102,9 +102,22 @@ export default function RootLayout() {
       //   SecureStore.deleteItemAsync("user_pin"),
       //   SecureStore.deleteItemAsync("biometry_enabled"),
       //   AsyncStorage.removeItem("show_welcome"),
+      //   AsyncStorage.removeItem("register_or_not"),
       // ]);
+      const token = await SecureStore.getItemAsync("token");
+      console.log("token", token);
+      const storedUser = await SecureStore.getItemAsync("user");
+      console.log("storedUser", JSON.parse(storedUser));
+      const userPin = await SecureStore.getItemAsync("user_pin");
+      console.log("userPin", userPin);
+      const biometryEnabled =
+        await SecureStore.getItemAsync("biometry_enabled");
+      console.log("biometryEnabled", biometryEnabled);
       const showWelcome = await AsyncStorage.getItem("show_welcome");
       console.log("showWelcome", showWelcome);
+      const registerOrNot = await AsyncStorage.getItem("register_or_not");
+      console.log("registerOrNot", registerOrNot);
+
       if (!cancelled) {
         const stored = await SecureStore.getItemAsync("user");
         let u: User | null = stored ? JSON.parse(stored) : null;
@@ -254,9 +267,20 @@ function MainAfterAuth({
   setUser: (u: User | null) => void;
 }) {
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
+  const [showRegisterOrNot, setShowRegisterOrNot] = useState<boolean | null>(
+    false,
+  );
   const [continueWithoutRegistration, setContinueWithoutRegistration] =
     useState(false);
+
+  useEffect(() => {
+    const getRegisterOrNot = async () => {
+      const stored = await AsyncStorage.getItem("register_or_not");
+      const value = stored === null ? true : stored === "true";
+      setShowRegisterOrNot(value);
+    };
+    getRegisterOrNot();
+  }, []);
 
   const onSuccessHandleSubscription = async () => {
     const storedUser = await SecureStore.getItemAsync("user");
