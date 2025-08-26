@@ -82,7 +82,7 @@ export default function ContentEntry({
                   <StreamingText
                     key={entry.id}
                     id={`comment-${entry.id}`}
-                    speed={30}
+                    speed={40}
                     style={{ color: colors.text, padding: 10 }}
                     onChange={() => {
                       setTimeout(() => {
@@ -129,7 +129,7 @@ export default function ContentEntry({
                       <StreamingText
                         key={dialog.uuid}
                         id={`dialog-${dialog.uuid}`}
-                        speed={30}
+                        speed={40}
                         style={{ color: colors.text, padding: 10 }}
                         onChange={() => {
                           setTimeout(() => {
