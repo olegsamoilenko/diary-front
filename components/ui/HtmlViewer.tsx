@@ -1,5 +1,5 @@
 import React from "react";
-import { useWindowDimensions } from "react-native";
+import { useWindowDimensions, View, Image } from "react-native";
 import RenderHTML, {
   HTMLElementModel,
   HTMLContentModel,
@@ -60,6 +60,31 @@ export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
       style.lineHeight = getSize(size) + 4;
 
       return TDefaultRenderer({ ...props, style: [props.style, style], tnode });
+    },
+    img: ({ tnode }) => {
+      const src = tnode.attributes?.src;
+      if (!src) return null;
+      return (
+        <View
+          style={{
+            alignSelf: "center",
+            borderRadius: 16,
+            overflow: "hidden",
+            marginVertical: 8,
+          }}
+        >
+          <Image
+            source={{ uri: src }}
+            style={{
+              width: "100%",
+              height: undefined,
+              aspectRatio: 1.2,
+              borderRadius: 16,
+            }}
+            resizeMode="contain"
+          />
+        </View>
+      );
     },
   };
 

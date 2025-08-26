@@ -1,5 +1,5 @@
-import { StyleSheet, View } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { ColorTheme, Entry, EntrySettings, Font } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -79,6 +79,7 @@ export default function AddContentInputEntry({
   const [activeActions, setActiveActions] = useState<Record<string, boolean>>(
     {},
   );
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   const setEntryContent = (content: any) => {
     onChangeEntry((prev: Entry) => ({ ...prev, content }));
@@ -133,10 +134,13 @@ export default function AddContentInputEntry({
     () => setShowEmojiSetting(true),
     [setShowEmojiSetting],
   );
+
+  const counterTextEmojiRef = useRef(0);
   const handleEmoji = useCallback(
     (e: string) => {
       addEmoji(e);
       setShowEmojiSetting(false);
+      counterTextEmojiRef.current++;
     },
     [addEmoji, setShowEmojiSetting],
   );
@@ -182,6 +186,7 @@ export default function AddContentInputEntry({
         content={content}
         setContent={setContent}
         isKeyboardOpen={isKeyboardOpen}
+        keyboardHeight={keyboardHeight}
         isBoldAction={isBoldAction}
         isItalicAction={isItalicAction}
         isUnderlineAction={isUnderlineAction}
@@ -198,6 +203,7 @@ export default function AddContentInputEntry({
         showPhotoSetting={showPhotoSetting}
         setShowPhotoSetting={setShowPhotoSetting}
         emoji={emoji}
+        counterTextEmojiRef={counterTextEmojiRef}
       />
 
       {isKeyboardOpen && isFocusTextRichEditor && (

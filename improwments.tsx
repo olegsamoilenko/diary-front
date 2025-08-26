@@ -1,22 +1,21 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useImperativeHandle,
-} from "react";
 import { RichEditor } from "react-native-pell-rich-editor";
+import {
+  ActivityIndicator,
+  ScrollView,
+  View,
+  Keyboard,
+  useWindowDimensions,
+  Platform,
+  KeyboardAvoidingView,
+} from "react-native";
+import React, { useEffect, useRef, useState, RefObject } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { useTranslation } from "react-i18next";
-
 import MarckScriptFontStylesheet from "@/assets/fonts/entry/MarckScriptFontStylesheet";
 import NeuchaFontStylesheet from "@/assets/fonts/entry/NeuchaFontStylesheet";
 import CaveatFontStylesheet from "@/assets/fonts/entry/CaveatFontStylesheet";
-import PacificoFontStylesheet from "@/assets/fonts/entry/PacificoFontStylesheet";
 import AmaticSCFontStylesheet from "@/assets/fonts/entry/AmaticSCFontStylesheet";
+import PacificoFontStylesheet from "@/assets/fonts/entry/PacificoFontStylesheet";
 import UbuntuFontStylesheet from "@/assets/fonts/entry/UbuntuFontStylesheet";
 import RobotoFontStylesheet from "@/assets/fonts/entry/RobotoFontStylesheet";
 import OpenSansFontStylesheet from "@/assets/fonts/entry/OpenSansFontStylesheet";
@@ -24,312 +23,666 @@ import PTMonoFontStylesheet from "@/assets/fonts/entry/PTMonoFontStylesheet";
 import ComforterBrushFontStylesheet from "@/assets/fonts/entry/ComforterBrushFontStylesheet";
 import BadScriptFontStylesheet from "@/assets/fonts/entry/BadScriptFontStylesheet";
 import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStylesheet";
+import uuid from "react-native-uuid";
 
-type FontOption = {
-  name: string;
-  label: string;
-  css: string;
-};
+import * as ImagePicker from "expo-image-picker";
+import { prepareImageForUpload, uploadImageToServer } from "@/utils";
+import { useTranslation } from "react-i18next";
 
-export type TitleReachEditorRef = {
-  reset: (opts?: {
-    title?: string;
-    color?: string;
-    size?: number;
-    fontName?: string;
-  }) => void;
-  insertEmoji: (emoji: string) => void;
-  focus: () => void;
-};
-
-type Props = {
-  disabledTitleReachEditor?: boolean;
-  title: string;
-  titleReachEditorKey: number;
-  setTitle: (title: string) => void;
+type TextReachEditorProps = {
+  textReachEditorKey: number;
+  content: string;
+  setContent: (content: string) => void;
   isKeyboardOpen: boolean;
   isBoldAction: boolean;
   isItalicAction: boolean;
+  isUnderlineAction: boolean;
+  isBulletedListAction: boolean;
+  isOrderedListAction: boolean;
   colorAction: string;
   sizeAction: number;
   handleFocus: () => void;
   handleBlur: () => void;
-  selectedFont: FontOption;
-  setActiveActions: React.Dispatch<
-    React.SetStateAction<Record<string, boolean>>
-  >;
-  /** залишив для зворотної сумісності; можна не передавати */
-  titleEmoji?: string;
+  selectedFont: {
+    name: string;
+    label: string;
+    css: string;
+  };
+  setActiveActions: (actions: (prev: any) => any) => void;
+  showImageSetting: boolean;
+  setShowImageSetting: (show: boolean) => void;
+  showPhotoSetting: boolean;
+  setShowPhotoSetting: (show: boolean) => void;
+  emoji?: string;
+  counterTextEmojiRef: RefObject<number>;
 };
 
-const sizeMap: Record<number, number> = { 12: 2, 16: 3, 18: 4, 22: 5, 28: 6 };
+const sizeMap: Record<number, number> = {
+  12: 2,
+  16: 3,
+  18: 4,
+  22: 5,
+  28: 6,
+};
 
-const TitleReachEditor = forwardRef<TitleReachEditorRef, Props>(
-  function TitleReachEditor(
-    {
-      disabledTitleReachEditor,
-      title,
-      setTitle,
-      isKeyboardOpen,
-      isBoldAction,
-      isItalicAction,
-      colorAction,
-      sizeAction,
-      handleFocus,
-      handleBlur,
-      selectedFont,
-      setActiveActions,
-      titleReachEditorKey,
-      titleEmoji, // опційно, але краще користуйся ref.insertEmoji
-    },
-    ref,
-  ) {
-    const editorRef = useRef<RichEditor>(null);
-    const [editorReady, setEditorReady] = useState(false);
-    const [editorHeight, setEditorHeight] = useState(40);
-    const [hasFocus, setHasFocus] = useState(false);
+export default function TextReachEditor({
+  textReachEditorKey,
+  content,
+  setContent,
+  isKeyboardOpen,
+  isBoldAction,
+  isItalicAction,
+  isUnderlineAction,
+  isBulletedListAction,
+  isOrderedListAction,
+  colorAction,
+  sizeAction,
+  handleFocus,
+  handleBlur,
+  selectedFont,
+  setActiveActions,
+  showImageSetting,
+  setShowImageSetting,
+  showPhotoSetting,
+  setShowPhotoSetting,
+  emoji,
+  counterTextEmojiRef,
+}: TextReachEditorProps) {
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
+  const richText = useRef(null);
+  const scrollRef = useRef(null);
+  const [imageLoading, setImageLoading] = useState(false);
+  const { t } = useTranslation();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const [aspectRatio, setAspectRatio] = useState<number | null>(null);
 
-    const colorScheme = useColorScheme();
-    const colors = Colors[colorScheme ?? "light"];
-    const { t } = useTranslation();
+  useEffect(() => {
+    //   richText.current?.commandDOM(`
+    //   (function() {
+    //     var c = document.getElementsByClassName('content')[0];
+    //     if (c) {
+    //       c.scrollTop = c.scrollHeight;
+    //     }
+    //   })();
+    // `);
+    // console.log("content changed", content);
+  }, [content]);
 
-    const initialCSS = useMemo(
-      () => `
-      ${MarckScriptFontStylesheet}
-      ${NeuchaFontStylesheet}
-      ${CaveatFontStylesheet}
-      ${PacificoFontStylesheet}
-      ${AmaticSCFontStylesheet}
-      ${UbuntuFontStylesheet}
-      ${RobotoFontStylesheet}
-      ${OpenSansFontStylesheet}
-      ${PTMonoFontStylesheet}
-      ${ComforterBrushFontStylesheet}
-      ${BadScriptFontStylesheet}
-      ${YesevaOneFontStylesheet}
-    `,
-      [],
-    );
+  const lockInnerScroll = () => {
+    richText.current?.commandDOM(`
+    (function(){
+      var html = document.documentElement;
+      var body = document.body;
+      html.style.margin = '0'; body.style.margin = '0';
+      html.style.padding = '0'; body.style.padding = '0';
 
-    // ---- helpers ----
-    const runJS = useCallback((code: string) => {
-      // @ts-expect-error pell api
-      editorRef.current?.commandDOM?.(code);
-    }, []);
+      /* тільки зовнішній ScrollView, всередині не скролимо */
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'visible';
 
-    const reportCommandState = useCallback(
-      (cmd: "bold" | "italic") => {
-        runJS(`
-      (function () {
-        var result = document.queryCommandState('${cmd}');
-        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: "is${cmd[0].toUpperCase() + cmd.slice(1)}", value: result })
-        );
-      })();
-    `);
-      },
-      [runJS],
-    );
+      /* скинути будь-яке внутрішнє прокручування */
+      (document.scrollingElement || document.documentElement).scrollTop = 0;
+      window.scrollTo(0,0);
+    })();
+  `);
+  };
 
-    const toggleCommand = useCallback(
-      (cmd: "bold" | "italic") => {
-        runJS(`document.execCommand('${cmd}', false, '');`);
-        reportCommandState(cmd);
-      },
-      [reportCommandState, runJS],
-    );
+  useEffect(() => {
+    lockInnerScroll();
+  }, []);
 
-    const applyColor = useCallback(
-      (color: string) => {
-        runJS(`document.execCommand('foreColor', false, '${color}');`);
-      },
-      [runJS],
-    );
+  const handleEditorMessage = (event: any) => {
+    try {
+      const msg = event;
+      if (msg.type === "imgLoaded") {
+        console.log("imgLoaded", msg.id);
+        const imgWidth = screenWidth * 0.7;
+        const imgHeight = imgWidth * aspectRatio;
+        setMinHeight(editorHeight + imgHeight + 20);
+        setEditorHeight((prev) => prev + imgHeight + 20);
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }
+      if (msg.type === "isInsertUnorderedList" && msg.value) {
+        setActiveActions((prev) => ({
+          ...prev,
+          [msg.type]: msg.value,
+          isInsertOrderedList: false,
+        }));
+      } else if (msg.type === "isInsertOrderedList" && msg.value) {
+        setActiveActions((prev) => ({
+          ...prev,
+          [msg.type]: msg.value,
+          isInsertUnorderedList: false,
+        }));
+      } else {
+        setActiveActions((prev) => ({ ...prev, [msg.type]: msg.value }));
+      }
+    } catch {}
+  };
 
-    const applyFontSize = useCallback(
-      (px: number) => {
-        const htmlSize = sizeMap[px] ?? 3;
-        runJS(`
-      (function(){
-        document.execCommand('fontSize', false, '${htmlSize}');
-        var fontElements = document.getElementsByTagName('font');
-        for (var i = 0; i < fontElements.length; ++i) {
-          if (fontElements[i].size == "7") {
-            fontElements[i].removeAttribute('size');
-            fontElements[i].style.fontSize = "${px}px";
-          }
+  useEffect(() => {
+    if (isKeyboardOpen) {
+      // @ts-ignore
+      richText.current?.commandDOM(
+        'document.getElementsByClassName("content")[0].focus()',
+      );
+      // @ts-ignore
+      richText.current?.commandDOM("document.execCommand('bold', false, '')");
+      // @ts-ignore
+      richText.current?.commandDOM(`
+    (function() {
+      var result = document.queryCommandState('bold');
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "isBold", value: result }));
+    })()
+  `);
+    }
+  }, [isBoldAction]);
+
+  useEffect(() => {
+    // @ts-ignore
+    richText.current?.insertText(emoji);
+  }, [emoji, counterTextEmojiRef.current]);
+
+  useEffect(() => {
+    if (isKeyboardOpen) {
+      // @ts-ignore
+      richText.current?.commandDOM("document.execCommand('italic', false, '')");
+      // @ts-ignore
+      richText.current?.commandDOM(`
+    (function() {
+      var result = document.queryCommandState('italic');
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "isItalic", value: result }));
+    })()
+  `);
+    }
+  }, [isItalicAction]);
+
+  useEffect(() => {
+    if (isKeyboardOpen) {
+      // @ts-ignore
+      richText.current?.commandDOM(
+        "document.execCommand('underline', false, '')",
+      );
+      // @ts-ignore
+      richText.current?.commandDOM(`
+    (function() {
+      var result = document.queryCommandState('underline');
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "isUnderline", value: result }));
+    })()
+  `);
+    }
+  }, [isUnderlineAction]);
+
+  useEffect(() => {
+    if (isKeyboardOpen) {
+      // @ts-ignore
+      richText.current?.commandDOM(
+        "document.execCommand('insertUnorderedList', false, '')",
+      );
+      // @ts-ignore
+      richText.current?.commandDOM(`
+    (function() {
+      var result = document.queryCommandState('insertUnorderedList');
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "isInsertUnorderedList", value: result }));
+    })()
+  `);
+    }
+  }, [isBulletedListAction]);
+
+  useEffect(() => {
+    if (isKeyboardOpen) {
+      // @ts-ignore
+      richText.current?.commandDOM(
+        "document.execCommand('insertOrderedList', false, '')",
+      );
+      // @ts-ignore
+      richText.current?.commandDOM(`
+    (function() {
+      var result = document.queryCommandState('insertOrderedList');
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "isInsertOrderedList", value: result }));
+    })()
+  `);
+    }
+  }, [isOrderedListAction]);
+
+  useEffect(() => {
+    // @ts-ignore
+    richText.current?.setForeColor(colorAction);
+  }, [colorAction]);
+
+  useEffect(() => {
+    // @ts-ignore
+    richText.current?.commandDOM(
+      `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
+      var fontElements = document.getElementsByTagName("font");
+      for (var i = 0; i < fontElements.length; ++i) {
+        if (fontElements[i].size == "7") {
+          fontElements[i].removeAttribute("size");
+          fontElements[i].style.fontSize = "${sizeAction}px";
         }
-      })();
-    `);
-      },
-      [runJS],
+      }`,
     );
+  }, [sizeAction]);
 
-    const applyFontFamily = useCallback(
-      (fontName: string) => {
-        runJS(`document.execCommand('fontName', false, "${fontName}");`);
-      },
-      [runJS],
-    );
+  useEffect(() => {
+    // @ts-ignore
+    richText.current?.commandDOM(`
+    document.execCommand("fontName", false, "${selectedFont.name}");
+  `);
+  }, [selectedFont]);
 
-    const primeStyle = useCallback(
-      (opts?: { color?: string; size?: number; fontName?: string }) => {
-        if (!editorReady) return;
-        applyFontFamily(opts?.fontName ?? selectedFont.name);
-        applyColor(opts?.color ?? colorAction);
-        applyFontSize(opts?.size ?? sizeAction);
-      },
-      [
-        applyColor,
-        applyFontFamily,
-        applyFontSize,
-        colorAction,
-        editorReady,
-        selectedFont.name,
-        sizeAction,
-      ],
-    );
+  const onFocus = () => {
+    handleFocus();
+    // @ts-ignore
+    richText.current?.commandDOM(`
+        document.execCommand("fontName", false, "${selectedFont.name}");
+      `);
+    setTimeout(() => {
+      if (richText.current) {
+        // @ts-ignore
+        richText.current.commandDOM(
+          `document.execCommand('foreColor', false, '${colorAction}')`,
+        );
+        // @ts-ignore
+        richText.current?.commandDOM(
+          `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
+      var fontElements = document.getElementsByTagName("font");
+      for (var i = 0; i < fontElements.length; ++i) {
+        if (fontElements[i].size == "7") {
+          fontElements[i].removeAttribute("size");
+          fontElements[i].style.fontSize = "${sizeAction}px";
+        }
+      }`,
+        );
+      }
+    }, 100);
+  };
 
-    // ---- imperative API ----
-    useImperativeHandle(
-      ref,
-      () => ({
-        reset: (opts) => {
-          setEditorHeight(40);
-          setHasFocus(false);
-          // @ts-expect-error pell api
-          editorRef.current?.setContentHTML?.(opts?.title ?? "");
-          // скидаємо інлайнові стилі у виділеному/вмісті
-          runJS(
-            `document.execCommand('selectAll', false, null); document.execCommand('removeFormat', false, null);`,
-          );
-          // знімаємо виділення до кінця
-          runJS(
-            `window.getSelection && window.getSelection().collapseToEnd && window.getSelection().collapseToEnd();`,
-          );
-          // застосовуємо дефолт
-          primeStyle({
-            color: opts?.color,
-            size: opts?.size,
-            fontName: opts?.fontName,
-          });
-          // скидаємо активні стани тулбара
-          setActiveActions({});
-        },
-        insertEmoji: (emoji: string) => {
-          if (!emoji) return;
-          // @ts-expect-error pell api
-          editorRef.current?.focusContentEditor?.();
-          // @ts-expect-error pell api
-          editorRef.current?.insertText?.(emoji);
-        },
-        focus: () => {
-          // @ts-expect-error pell api
-          editorRef.current?.focusContentEditor?.();
-        },
-      }),
-      [primeStyle, runJS, setActiveActions],
-    );
-
-    // ---- effects ----
-    // bold/italic тригери
-    useEffect(() => {
-      if (editorReady && hasFocus && isKeyboardOpen && isBoldAction)
-        toggleCommand("bold");
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isBoldAction]);
-
-    useEffect(() => {
-      if (editorReady && hasFocus && isKeyboardOpen && isItalicAction)
-        toggleCommand("italic");
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isItalicAction]);
-
-    // стилі
-    useEffect(() => {
-      if (editorReady && hasFocus) applyColor(colorAction);
-    }, [applyColor, colorAction, editorReady, hasFocus]);
-    useEffect(() => {
-      if (editorReady && hasFocus) applyFontSize(sizeAction);
-    }, [applyFontSize, editorReady, hasFocus, sizeAction]);
-    useEffect(() => {
-      if (editorReady && hasFocus) applyFontFamily(selectedFont.name);
-    }, [applyFontFamily, editorReady, hasFocus, selectedFont.name]);
-
-    // legacy: якщо все ж передаєш titleEmoji як проп — вставимо його
-    useEffect(() => {
-      if (!titleEmoji) return;
-      // @ts-expect-error pell api
-      editorRef.current?.focusContentEditor?.();
-      // @ts-expect-error pell api
-      editorRef.current?.insertText?.(titleEmoji);
-    }, [titleEmoji]);
-
-    const onFocus = useCallback(() => {
-      setHasFocus(true);
-      handleFocus();
-      primeStyle();
-      reportCommandState("bold");
-      reportCommandState("italic");
-    }, [handleFocus, primeStyle, reportCommandState]);
-
-    const onBlur = useCallback(() => {
-      setHasFocus(false);
-      handleBlur();
-    }, [handleBlur]);
-
-    const onMessage = useCallback(
-      (event: any) => {
+  useEffect(() => {
+    if (showPhotoSetting) {
+      const onPressAddPhoto = async () => {
         try {
-          const raw =
-            typeof event === "string" ? event : (event?.data ?? event);
-          const msg = typeof raw === "string" ? JSON.parse(raw) : raw;
-          if (msg && typeof msg === "object" && "type" in msg) {
-            setActiveActions((prev) => ({
-              ...prev,
-              [msg.type as string]: !!msg.value,
-            }));
+          const permissionResult =
+            await ImagePicker.requestCameraPermissionsAsync();
+          if (permissionResult.granted === false) {
+            alert("Дозвольте доступ до камери!");
+            return;
           }
-        } catch {}
-      },
-      [setActiveActions],
+
+          let result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: false,
+            quality: 1,
+            base64: true,
+          });
+
+          if (!result.canceled) {
+            handleImageAndPhoto(result.assets[0]);
+          }
+
+          setTimeout(() => {
+            // @ts-ignore
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }, 0);
+
+          setShowPhotoSetting(false);
+        } catch (error) {
+          // TODO: Показати користувачу тоаст з помилкою.
+          // @ts-ignore
+          richText.current?.commandDOM(
+            "document.execCommand('undo', false, null)",
+          );
+          setTimeout(() => {
+            // @ts-ignore
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }, 0);
+          console.error("Error picking image:", error);
+        }
+        setShowPhotoSetting(false);
+      };
+
+      onPressAddPhoto();
+    }
+  }, [showPhotoSetting]);
+
+  useEffect(() => {
+    if (showImageSetting) {
+      const onPressAddImage = async () => {
+        try {
+          let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: false,
+            aspect: [4, 3],
+            quality: 1,
+            base64: true,
+          });
+
+          if (!result.canceled) {
+            handleImageAndPhoto(result.assets[0]);
+          }
+
+          setTimeout(() => {
+            // @ts-ignore
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }, 0);
+
+          setShowImageSetting(false);
+        } catch (error) {
+          // TODO: Показати користувачу тоаст з помилкою.
+          // @ts-ignore
+          richText.current?.commandDOM(
+            "document.execCommand('undo', false, null)",
+          );
+          setTimeout(() => {
+            // @ts-ignore
+            scrollRef.current?.scrollToEnd({ animated: true });
+          }, 0);
+          console.error("Error picking image:", error);
+          setShowImageSetting(false);
+        }
+      };
+
+      onPressAddImage();
+    }
+  }, [showImageSetting]);
+
+  async function replaceImageSrcById(id: string, newUrl: string) {
+    if (!richText.current) return;
+
+    const currentHtml = await richText.current.getContentHtml();
+
+    const regex = new RegExp(
+      `(<img[^>]*id=["']${id}["'][^>]*src=["'])[^\"]*(["'][^>]*>)`,
+      "g",
     );
 
-    return (
-      <RichEditor
-        key={titleReachEditorKey}
-        ref={editorRef}
-        disabled={disabledTitleReachEditor}
-        initialContentHTML={title}
-        onChange={setTitle}
-        editorInitializedCallback={() => {
-          setEditorReady(true);
-          primeStyle(); // застосувати одразу
-        }}
+    const newHtml = currentHtml.replace(regex, `$1${newUrl}$2`);
+    console.log("newHtml", newHtml);
+
+    await richText.current.setContentHTML(newHtml);
+  }
+
+  const handleImageAndPhoto = async (result: any) => {
+    setImageLoading(true);
+    richText.current?.prepareInsert?.();
+    const picked = result;
+    const { width, height } = picked;
+    setAspectRatio(height / width);
+    const localUri = picked.uri;
+    const newUuid = uuid.v4();
+    const imageId = `img-${newUuid}`;
+    const anchorId = `cursor-anchor-${imageId}`;
+    lockInnerScroll();
+    // if (picked.base64) {
+    //   // @ts-ignore
+    //   richText.current?.insertHTML(
+    //     `<img id="${imageId}" src="data:image/jpeg;base64,${picked.base64}" style="visibility:hidden;max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;" />
+    //     <span id="${anchorId}"><br></span>`,
+    //   );
+    // }
+
+    const smallUri = await prepareImageForUpload(localUri);
+
+    const uploaded = await uploadImageToServer(smallUri);
+
+    if (uploaded && uploaded.url) {
+      // @ts-ignore
+      // await replaceImageSrcById(imageId, uploaded.url);
+      richText.current?.insertHTML(`
+        <img id="${imageId}" src="${uploaded.url}"
+             style="max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;"
+             onload="(function(){
+               try {
+                 var e = new Event('input', {bubbles:true});
+                 document.dispatchEvent(e);
+               } catch(_) {
+                 var e = document.createEvent('Event');
+                 e.initEvent('input', true, true);
+                 document.dispatchEvent(e);
+               }
+               window.ReactNativeWebView.postMessage(JSON.stringify({type:'imgLoaded', id:'${imageId}'}));
+             })()"
+        />
+        <span id="${anchorId}"></span>
+`);
+      // richText.current?.commandDOM(`
+      //   (function() {
+      //     var img = document.getElementById("${imageId}");
+      //     if(img) img.style.visibility = "visible";
+      //   })()
+      // `);
+
+      lockInnerScroll();
+
+      setImageLoading(false);
+
+      setTimeout(() => {
+        lockInnerScroll();
+        scrollRef.current?.scrollToEnd({ animated: true });
+        // @ts-ignore
+        // richText.current?.commandDOM(`
+        //   (function() {
+        //     var el = document.getElementById('${anchorId}');
+        //     if (el) {
+        //       var range = document.createRange();
+        //       var sel = window.getSelection();
+        //       range.setStart(el, 0);
+        //       range.collapse(true);
+        //       sel.removeAllRanges();
+        //       sel.addRange(range);
+        //       el.removeAttribute('id');
+        //     }
+        //   })();
+        // `);
+
+        // @ts-ignore
+        richText.current?.commandDOM(`
+                (function() {
+                  document.execCommand('fontName', false, "${selectedFont.name}");
+                })()
+              `);
+        if (sizeAction) {
+          // @ts-ignore
+          richText.current?.commandDOM(
+            `document.execCommand('fontSize', false, "${sizeMap[sizeAction]}");`,
+          );
+        }
+        if (colorAction) {
+          // @ts-ignore
+          richText.current?.commandDOM(
+            `document.execCommand('foreColor', false, "${colorAction}");`,
+          );
+        }
+        if (isBoldAction) {
+          // @ts-ignore
+          richText.current?.commandDOM(
+            "document.execCommand('bold', false, '')",
+          );
+        }
+
+        if (isItalicAction) {
+          // @ts-ignore
+          richText.current?.commandDOM(
+            `document.execCommand('italic', false, null);`,
+          );
+        }
+
+        if (isUnderlineAction) {
+          // @ts-ignore
+          richText.current?.commandDOM(
+            `document.execCommand('underline', false, null);`,
+          );
+        }
+      }, 10);
+    }
+  };
+
+  function placeCaretAfterMarker(r: any, markerId: string) {
+    // @ts-ignore
+    r.current?.commandDOM?.(`
+    (function(){
+      var m = document.getElementById('${markerId}');
+      if (!m) return;
+      var range = document.createRange();
+      range.setStartAfter(m);
+      range.collapse(true);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      m.parentNode && m.parentNode.removeChild(m);
+    })();
+  `);
+  }
+
+  function focusEditor(r: any) {
+    // @ts-ignore
+    r.current?.commandDOM?.(
+      "document.getElementsByClassName('content')[0]?.focus()",
+    );
+  }
+
+  function insertParagraphAtEndAndFocus(richText) {
+    console.log("insertParagraphAtEndAndFocus");
+    const paragraphId = `new-paragraph-${uuid.v4()}`;
+
+    richText.current?.commandDOM(`
+    if(window.getSelection && document.body) {
+      window.getSelection().selectAllChildren(document.body);
+      window.getSelection().collapseToEnd();
+    }
+  `);
+
+    setTimeout(() => {
+      richText.current?.insertHTML(`<p id="${paragraphId}"><br></p>`);
+
+      setTimeout(() => {
+        richText.current?.commandDOM(`
+        (function() {
+          var el = document.getElementById('${paragraphId}');
+          if (el) {
+            var range = document.createRange();
+            var sel = window.getSelection();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        })();
+      `);
+      }, 0);
+    }, 0);
+  }
+
+  useEffect(() => {
+    if (!isKeyboardOpen) {
+      setShowImageSetting(false);
+      setShowPhotoSetting(false);
+    }
+  }, [isKeyboardOpen]);
+
+  const [minHeight, setMinHeight] = useState(60);
+  const [editorHeight, setEditorHeight] = useState(60);
+
+  // useEffect(() => {
+  //   if (editorHeight > screenHeight) {
+  //     setMinHeight(screenHeight - 120);
+  //   }
+  //   console.log("editorHeight", editorHeight);
+  //   console.log("screenHeight", screenHeight);
+  // }, [editorHeight]);
+
+  useEffect(() => {
+    console.log("minHeight", minHeight);
+  }, [minHeight]);
+
+  useEffect(() => {
+    console.log("editorHeight", editorHeight);
+  }, [editorHeight]);
+
+  return (
+    <>
+      <View
         style={{
-          minHeight: 40,
-          height: editorHeight,
-          maxHeight: 300,
-          width: "80%",
-          marginRight: 5,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
+          flex: 1,
+          position: "relative",
+          bottom: isKeyboardOpen ? 0 : 0,
+          top: 0,
         }}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onHeightChange={(h) => setEditorHeight(Math.max(h ?? 40, 40))}
-        placeholder={t("diary.addEntryTitle")}
-        editorStyle={{
-          backgroundColor: "transparent",
-          placeholderColor: colors.textAdditional ?? colors.text,
-          color: colors.text,
-          initialCSSText: initialCSS,
-          contentCSSText: `font-family: '${selectedFont.name}', sans-serif;`,
-        }}
-        onMessage={onMessage}
-      />
-    );
-  },
-);
-
-export default TitleReachEditor;
+      >
+        <ScrollView
+          ref={scrollRef}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ height: editorHeight }}
+          // nestedScrollEnabled={true}
+        >
+          <RichEditor
+            key={textReachEditorKey}
+            ref={richText}
+            initialContentHTML={content}
+            onChange={setContent}
+            style={{ flex: 1, minHeight: minHeight }}
+            onFocus={onFocus}
+            onBlur={handleBlur}
+            editorInitializedCallback={() => {}}
+            placeholder={t("diary.addEntryText")}
+            onHeightChange={(height) => setEditorHeight(height)}
+            editorStyle={{
+              backgroundColor: "transparent",
+              color: "#6c6b6b",
+              placeholderColor: colors.inputPlaceholder,
+              initialCSSText: `
+            ${MarckScriptFontStylesheet}
+            ${NeuchaFontStylesheet}
+            ${CaveatFontStylesheet}
+            ${PacificoFontStylesheet}
+            ${AmaticSCFontStylesheet}
+            ${UbuntuFontStylesheet}
+            ${RobotoFontStylesheet}
+            ${OpenSansFontStylesheet}
+            ${PTMonoFontStylesheet}
+            ${ComforterBrushFontStylesheet}
+            ${BadScriptFontStylesheet}
+            ${YesevaOneFontStylesheet}
+            div:empty { min-height: 1em; }
+            div:last-child { padding-bottom: 0 !important; }
+          `,
+              contentCSSText: `font-family: '${selectedFont.name}', sans-serif; display:block;
+            min-height: 60px;
+            box-sizing:border-box;
+            img{max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;}`,
+            }}
+            useContainer={true}
+            onCursorPosition={(scrollY) => {
+              // @ts-ignore
+              scrollRef.current?.scrollTo({ y: scrollY - 30, animated: true });
+            }}
+            onMessage={handleEditorMessage}
+          />
+        </ScrollView>
+        {imageLoading && (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        )}
+      </View>
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    height: isKeyboardOpen ? 40 : 0,*/}
+      {/*    width: screenWidth,*/}
+      {/*    backgroundColor: "transparent",*/}
+      {/*  }}*/}
+      {/*></View>*/}
+    </>
+  );
+}

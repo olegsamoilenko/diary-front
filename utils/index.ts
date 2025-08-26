@@ -18,6 +18,9 @@ import {
   consumeAiChunkBuffer,
   resetAiChunkBuffer,
 } from "./events/aiChunkBuffer";
+import { runAIStream } from "./diary/socket/runAIStream";
+import { compressImageFixed } from "./files/compressImageFixed";
+import { prepareImageForUpload } from "./files/prepareImageForUpload";
 
 export {
   apiRequest,
@@ -38,4 +41,7 @@ export {
   addToAiChunkBuffer,
   consumeAiChunkBuffer,
   resetAiChunkBuffer,
+  runAIStream,
+  compressImageFixed,
+  prepareImageForUpload,
 };

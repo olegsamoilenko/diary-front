@@ -53,7 +53,7 @@ export default function EmojiBadge({
     outputRange: [0, 0.7],
   });
 
-  const ringSize = size + ringPadding * 2;
+  const ringSize = size - 1;
 
   return (
     <View

@@ -60,7 +60,8 @@ export default function ContentEntry({
         }}
       >
         <View style={styles.content}>
-          <ViewReachEditor content={entry.content} />
+          <HtmlViewer htmlContent={entry.content} />
+          {/*<ViewReachEditor content={entry.content} />*/}
         </View>
         {entry && entry.aiComment && !strimCommentError && (
           <>

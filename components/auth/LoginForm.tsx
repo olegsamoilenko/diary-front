@@ -77,8 +77,6 @@ export default function LoginForm({
       });
       const { accessToken, user: userRes } = res.data;
 
-      console.log("Login response data:", res.data);
-
       await SecureStore.setItemAsync("token", accessToken);
       await SecureStore.setItemAsync("user", JSON.stringify(userRes));
 

@@ -104,19 +104,19 @@ export default function RootLayout() {
       //   AsyncStorage.removeItem("show_welcome"),
       //   AsyncStorage.removeItem("register_or_not"),
       // ]);
-      const token = await SecureStore.getItemAsync("token");
-      console.log("token", token);
-      const storedUser = await SecureStore.getItemAsync("user");
-      console.log("storedUser", JSON.parse(storedUser));
-      const userPin = await SecureStore.getItemAsync("user_pin");
-      console.log("userPin", userPin);
-      const biometryEnabled =
-        await SecureStore.getItemAsync("biometry_enabled");
-      console.log("biometryEnabled", biometryEnabled);
-      const showWelcome = await AsyncStorage.getItem("show_welcome");
-      console.log("showWelcome", showWelcome);
-      const registerOrNot = await AsyncStorage.getItem("register_or_not");
-      console.log("registerOrNot", registerOrNot);
+      // const token = await SecureStore.getItemAsync("token");
+      // console.log("token", token);
+      // const storedUser = await SecureStore.getItemAsync("user");
+      // console.log("storedUser", JSON.parse(storedUser));
+      // const userPin = await SecureStore.getItemAsync("user_pin");
+      // console.log("userPin", userPin);
+      // const biometryEnabled =
+      //   await SecureStore.getItemAsync("biometry_enabled");
+      // console.log("biometryEnabled", biometryEnabled);
+      // const showWelcome = await AsyncStorage.getItem("show_welcome");
+      // console.log("showWelcome", showWelcome);
+      // const registerOrNot = await AsyncStorage.getItem("register_or_not");
+      // console.log("registerOrNot", registerOrNot);
 
       if (!cancelled) {
         const stored = await SecureStore.getItemAsync("user");
@@ -199,7 +199,6 @@ function AppContent() {
           await i18n.changeLanguage(lang);
           LocaleConfig.defaultLocale = lang;
         }
-        console.log("Init complete, user:", u);
       } catch (e) {
         console.warn("Failed to init user/lang", e);
       }

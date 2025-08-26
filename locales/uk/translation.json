@@ -63,6 +63,8 @@
     "addEntryText": "Що у вас на думці?",
     "addEntryButton": "Зберегти",
     "noRecords": "Немає записів за цей день",
+    "showDialogWithNemory": "Показати діалог з Nemory",
+    "hideDialogWithNemory": "Приховати діалог з Nemory",
     "entry": {
       "deleteEntryConfirmation": "Ви впевнені, що хочете видалити цей запис?",
       "entryDeleted": "Запис видалено",

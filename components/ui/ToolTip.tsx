@@ -86,9 +86,9 @@ export default function ToolTip({
 
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="box-none">
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay} />
-      </TouchableWithoutFeedback>
+      {/*<TouchableWithoutFeedback onPress={onClose}>*/}
+      {/*  <View style={styles.overlay} />*/}
+      {/*</TouchableWithoutFeedback>*/}
       <Animated.View style={[styles.tip, animatedStyle]}>
         <View style={styles.arrow}></View>
         <ThemedText onLinesCount={setLines}>{children}</ThemedText>

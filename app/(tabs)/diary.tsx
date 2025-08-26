@@ -20,7 +20,7 @@ import AddButton from "@/components/ui/AddButton";
 import { SideSheetRef } from "@/components/SideSheet";
 import AddNewEntry from "@/components/diary/add-new-entry/AddNewEntry";
 import { apiRequest } from "@/utils";
-import { Entry, MoodByDate } from "@/types";
+import { Entry, MoodByDate, type User } from "@/types";
 import WeekView from "@/components/diary/calendar/WeekView";
 import MonthView from "@/components/diary/calendar/MonthView";
 import Animated from "react-native-reanimated";
@@ -31,6 +31,7 @@ import { Portal } from "@gorhom/portal";
 import Background from "@/components/Background";
 import WelcomeModal from "@/components/diary/WelcomeModal";
 import Toast from "react-native-toast-message";
+import { UserEvents } from "@/utils/events/userEvents";
 
 function localISODate(d = new Date()) {
   const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -72,10 +73,6 @@ export default function Diary() {
   useEffect(() => {
     setActiveMoods([]);
   }, [selectedDay]);
-
-  useEffect(() => {
-    console.log("activeMoods", activeMoods);
-  }, [activeMoods]);
 
   const openingRef = useRef(false);
 
@@ -142,6 +139,17 @@ export default function Diary() {
   useEffect(() => {
     fetchMoodsByDate();
   }, [fetchMoodsByDate]);
+
+  const updateDiary = useCallback(() => {
+    fetchMoodsByDate();
+    fetchDiaryEntriesFor(selectedDay);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => updateDiary();
+    UserEvents.on("userLoggedIn", handler);
+    return () => UserEvents.off("userLoggedIn", handler);
+  }, []);
 
   const handleBack = useCallback(
     async (back: boolean) => {

@@ -29,6 +29,7 @@ import {
   aiStreamEmitter,
   addToAiChunkBuffer,
   resetAiChunkBuffer,
+  runAIStream,
 } from "@/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
@@ -47,7 +48,6 @@ import { FONTS } from "@/assets/fonts/entry";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
 import * as SecureStore from "@/utils/store/secureStore";
-import { io } from "socket.io-client";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
 import Toast from "react-native-toast-message";
@@ -59,22 +59,6 @@ type ActiveActions = {
   isInsertUnorderedList?: boolean;
   isInsertOrderedList?: boolean;
 };
-const socket = io(process.env.EXPO_PUBLIC_URL, {
-  transports: ["websocket"],
-  auth: async (cb) => {
-    const token = await getToken();
-    cb({ token });
-  },
-});
-
-console.log("Socket URL:", process.env.EXPO_PUBLIC_URL);
-
-type ResetFn = (opts?: {
-  title?: string;
-  color?: string;
-  size?: number;
-  fontName?: string;
-}) => void;
 
 const AddNewEntry = forwardRef<
   SideSheetRef,
@@ -256,9 +240,12 @@ const AddNewEntry = forwardRef<
   );
   const handleFocus = useCallback(() => setIsFocusTitleRichEditor(true), []);
   const handleBlur = useCallback(() => setIsFocusTitleRichEditor(false), []);
+
+  const counterTitleEmojiRef = useRef(0);
   const handleTitleEmoji = useCallback((e: string) => {
     setTitleEmoji(e);
     setShowTitleEmojiSetting(false);
+    counterTitleEmojiRef.current++;
   }, []);
 
   useEffect(() => {
@@ -289,19 +276,6 @@ const AddNewEntry = forwardRef<
 
     await SecureStore.setItemAsync("user", JSON.stringify(user));
   };
-
-  const removeAllStreamListeners = useCallback(() => {
-    socket.off("ai_stream_comment_chunk");
-    socket.off("ai_stream_comment_done");
-    socket.off("ai_stream_dialog_chunk");
-    socket.off("ai_stream_dialog_done");
-    socket.off("unauthorized_error");
-    socket.off("ai_stream_comment_error");
-    socket.off("ai_stream_dialog_error");
-    socket.off("user_error");
-    socket.off("plan_error");
-  }, []);
-  useEffect(() => removeAllStreamListeners, [removeAllStreamListeners]);
 
   const toastError = useCallback(
     (error: any) => {
@@ -365,45 +339,49 @@ const AddNewEntry = forwardRef<
       setAiLoading(true);
       setStrimCommentError(false);
 
-      removeAllStreamListeners();
+      await runAIStream({
+        endpoint: "stream_ai_comment",
+        data: {
+          entryId: newEntry.id,
+          content: newEntry.content,
+          aiModel: aiModel,
+          mood: newEntry.mood,
+        },
+        eventNames: {
+          chunk: "ai_stream_comment_chunk",
+          done: "ai_stream_comment_done",
+          error: [
+            "unauthorized_error",
+            "ai_stream_comment_error",
+            "user_error",
+            "plan_error",
+          ],
+        },
+        handlers: {
+          onChunk: ({ text }) => {
+            addToAiChunkBuffer(`comment-${newEntry.id}`, text);
+            aiStreamEmitter.emit(`comment-${newEntry.id}`, text);
 
-      socket.emit("stream_ai_comment", {
-        entryId: Number(newEntry!.id),
-        content: newEntry!.content,
-        aiModel: aiModel,
-        mood: newEntry!.mood,
-      });
+            if (aiLoadingRef.current) {
+              aiLoadingRef.current = false;
 
-      socket.on("ai_stream_comment_chunk", ({ text }) => {
-        addToAiChunkBuffer(`comment-${newEntry.id}`, text);
-        aiStreamEmitter.emit(`comment-${newEntry.id}`, text);
-        if (aiLoadingRef.current) {
-          aiLoadingRef.current = false;
-
-          setTimeout(() => {
+              setTimeout(() => {
+                setAiLoading(false);
+              }, 0);
+            }
+          },
+          onDone: ({ aiComment }) => {
+            resetAiChunkBuffer(`comment-${newEntry.id}`);
+            setEntry((prev) => ({ ...prev, aiComment: aiComment }));
             setAiLoading(false);
-          }, 0);
-        }
-      });
-
-      const onAnyError = (error: any) => {
-        console.log("AI stream error:", error);
-        toastError(error);
-        setAiLoading(false);
-        setStrimCommentError(true);
-      };
-      socket.on("unauthorized_error", onAnyError);
-      socket.on("ai_stream_comment_error", onAnyError);
-      socket.on("user_error", onAnyError);
-      socket.on("plan_error", (error) => {
-        onAnyError(error);
-        if (error?.planStatus)
-          changeUserPlanStatus(error.planStatus as PlanStatus);
-      });
-
-      socket.on("ai_stream_comment_done", ({ aiComment }) => {
-        resetAiChunkBuffer(`comment-${newEntry.id}`);
-        setEntry((prev) => ({ ...prev, aiComment: aiComment }));
+          },
+          onError: (error) => {
+            setAiLoading(false);
+            toastError(error);
+            setStrimCommentError(true);
+          },
+        },
+        getToken: async () => await getToken(),
       });
     } catch (err: any) {
       console.log("Error saving entry.ts:", err?.response?.data);
@@ -417,7 +395,6 @@ const AddNewEntry = forwardRef<
     entry.mood,
     entry.title,
     entrySettings,
-    removeAllStreamListeners,
     toastError,
     aiLoading,
   ]);
@@ -439,70 +416,73 @@ const AddNewEntry = forwardRef<
     async (dialog: Dialog) => {
       setAiDialogLoading(true);
       setStrimDialogError(null);
-      removeAllStreamListeners();
 
-      socket.emit("stream_ai_dialog", {
-        entryId: Number(entry!.id),
-        uuid: dialog.uuid,
-        content: dialogQuestion,
-        aiModel,
-        mood: entry!.mood,
-      });
-
-      socket.on("ai_stream_dialog_chunk", ({ text }) => {
-        addToAiChunkBuffer(`dialog-${dialog.uuid}`, text);
-        aiStreamEmitter.emit(`dialog-${dialog.uuid}`, text);
-        if (aiDialogLoadingRef.current) {
-          aiDialogLoadingRef.current = false;
-
-          setEntry((prev) => ({
-            ...prev,
-            dialogs: prev.dialogs.map((d) => {
-              if (d.uuid === dialog.uuid) {
-                return { ...d, loading: false };
-              }
-              return d;
-            }),
-          }));
-
-          setTimeout(() => {
-            setAiDialogLoading(false);
-          }, 0);
-        }
-      });
-
-      const onAnyError = (error: any) => {
-        console.log("AI stream dialog error:", error);
-        toastError(error);
-        setAiDialogLoading(false);
-        setStrimDialogError({
+      await runAIStream({
+        endpoint: "stream_ai_dialog",
+        data: {
+          entryId: Number(entry!.id),
           uuid: dialog.uuid,
-        });
-      };
-      socket.on("unauthorized_error", onAnyError);
-      socket.on("ai_stream_dialog_error", onAnyError);
-      socket.on("user_error", onAnyError);
-      socket.on("plan_error", (error) => {
-        onAnyError(error);
-        if (error?.planStatus)
-          changeUserPlanStatus(error.planStatus as PlanStatus);
-      });
+          content: dialogQuestion,
+          aiModel,
+          mood: entry!.mood,
+        },
+        eventNames: {
+          chunk: "ai_stream_dialog_chunk",
+          done: "ai_stream_dialog_done",
+          error: [
+            "unauthorized_error",
+            "ai_stream_dialog_error",
+            "user_error",
+            "plan_error",
+          ],
+        },
+        handlers: {
+          onChunk: ({ text }) => {
+            addToAiChunkBuffer(`dialog-${dialog.uuid}`, text);
+            aiStreamEmitter.emit(`dialog-${dialog.uuid}`, text);
+            if (aiDialogLoadingRef.current) {
+              aiDialogLoadingRef.current = false;
 
-      socket.on("ai_stream_dialog_done", ({ respDialog }) => {
-        resetAiChunkBuffer(`dialog-${dialog.uuid}`);
-        setEntry((prev) => ({
-          ...prev,
-          dialogs: prev.dialogs.map((d) => {
-            if (d.uuid === dialog.uuid) {
-              const { question, ...restData } = respDialog;
-              return {
-                ...d,
-                ...restData,
-              };
+              setEntry((prev) => ({
+                ...prev,
+                dialogs: prev.dialogs.map((d) => {
+                  if (d.uuid === dialog.uuid) {
+                    return { ...d, loading: false };
+                  }
+                  return d;
+                }),
+              }));
+
+              setTimeout(() => {
+                setAiDialogLoading(false);
+              }, 0);
             }
-            return d;
-          }),
-        }));
+          },
+          onDone: ({ respDialog }) => {
+            resetAiChunkBuffer(`dialog-${dialog.uuid}`);
+            setEntry((prev) => ({
+              ...prev,
+              dialogs: prev.dialogs.map((d) => {
+                if (d.uuid === dialog.uuid) {
+                  const { question, ...restData } = respDialog;
+                  return {
+                    ...d,
+                    ...restData,
+                  };
+                }
+                return d;
+              }),
+            }));
+          },
+          onError: (error) => {
+            toastError(error);
+            setAiDialogLoading(false);
+            setStrimDialogError({
+              uuid: dialog.uuid,
+            });
+          },
+        },
+        getToken: async () => await getToken(),
       });
     },
     [
@@ -512,13 +492,11 @@ const AddNewEntry = forwardRef<
       dialogQuestion,
       entry.id,
       entry.mood,
-      removeAllStreamListeners,
       toastError,
     ],
   );
 
   function handleCloseSheet() {
-    console.log(111);
     setIsFocusTitleRichEditor(false);
     props.handleBack(true);
     setEmoji("");
@@ -643,7 +621,7 @@ const AddNewEntry = forwardRef<
               titleEmoji={titleEmoji}
               setShowTip={setShowTip}
               showTip={showTip}
-              isOpen={props.isOpen}
+              counterTitleEmojiRef={counterTitleEmojiRef}
             />
 
             {contentLoading ? (

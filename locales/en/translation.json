@@ -63,6 +63,8 @@
     "addEntryContent": "Content...",
     "addEntryButton": "Save",
     "noRecords": "There are no records for this day",
+    "showDialogWithNemory": "Show dialog with Nemory",
+    "hideDialogWithNemory": "Hide dialog with Nemory",
     "entry": {
       "deleteEntryConfirmation": "Are you sure you want to delete this entry?",
       "entryDeleted": "Entry deleted",

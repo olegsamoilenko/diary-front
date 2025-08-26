@@ -1,6 +1,15 @@
 import { RichEditor } from "react-native-pell-rich-editor";
-import { ActivityIndicator, ScrollView, View } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  View,
+  Keyboard,
+  useWindowDimensions,
+  Platform,
+  KeyboardAvoidingView,
+  Dimensions,
+} from "react-native";
+import React, { useEffect, useRef, useState, RefObject } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import MarckScriptFontStylesheet from "@/assets/fonts/entry/MarckScriptFontStylesheet";
@@ -18,7 +27,7 @@ import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStyleshee
 import uuid from "react-native-uuid";
 
 import * as ImagePicker from "expo-image-picker";
-import { uploadImageToServer } from "@/utils";
+import { prepareImageForUpload, uploadImageToServer } from "@/utils";
 import { useTranslation } from "react-i18next";
 
 type TextReachEditorProps = {
@@ -46,6 +55,8 @@ type TextReachEditorProps = {
   showPhotoSetting: boolean;
   setShowPhotoSetting: (show: boolean) => void;
   emoji?: string;
+  counterTextEmojiRef: RefObject<number>;
+  keyboardHeight: number;
 };
 
 const sizeMap: Record<number, number> = {
@@ -77,6 +88,8 @@ export default function TextReachEditor({
   showPhotoSetting,
   setShowPhotoSetting,
   emoji,
+  counterTextEmojiRef,
+  keyboardHeight,
 }: TextReachEditorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -84,6 +97,19 @@ export default function TextReachEditor({
   const scrollRef = useRef(null);
   const [imageLoading, setImageLoading] = useState(false);
   const { t } = useTranslation();
+  // const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const scr = Dimensions.get("screen");
+
+  useEffect(() => {
+    //   richText.current?.commandDOM(`
+    //   (function() {
+    //     var c = document.getElementsByClassName('content')[0];
+    //     if (c) {
+    //       c.scrollTop = c.scrollHeight;
+    //     }
+    //   })();
+    // `);
+  }, [content]);
 
   const handleEditorMessage = (event: any) => {
     try {
@@ -127,7 +153,7 @@ export default function TextReachEditor({
   useEffect(() => {
     // @ts-ignore
     richText.current?.insertText(emoji);
-  }, [emoji]);
+  }, [emoji, counterTextEmojiRef.current]);
 
   useEffect(() => {
     if (isKeyboardOpen) {
@@ -349,18 +375,30 @@ export default function TextReachEditor({
 
   const handleImageAndPhoto = async (result: any) => {
     setImageLoading(true);
+    richText.current?.prepareInsert?.();
     const picked = result;
+    // const { width, height } = picked;
     const localUri = picked.uri;
     const newUuid = uuid.v4();
     const imageId = `img-${newUuid}`;
+    const anchorId = `cursor-anchor-${imageId}`;
+    // const imgWidth = screenWidth * 0.7;
+    // const aspectRatio = height / width;
+    // const imgHeight = imgWidth * aspectRatio;
+    // setMinHeight(editorHeight + imgHeight + 40);
     if (picked.base64) {
       // @ts-ignore
       richText.current?.insertHTML(
-        `<img id="${imageId}" src="data:image/jpeg;base64,${picked.base64}" style="visibility:hidden;max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;" />`,
+        `<img id="${imageId}" src="data:image/jpeg;base64,${picked.base64}" 
+            style="visibility:hidden;max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;"
+             />
+        <span id="${anchorId}"><br></span>`,
       );
     }
 
-    const uploaded = await uploadImageToServer(localUri);
+    const smallUri = await prepareImageForUpload(localUri);
+
+    const uploaded = await uploadImageToServer(smallUri);
 
     if (uploaded && uploaded.url) {
       // @ts-ignore
@@ -371,11 +409,27 @@ export default function TextReachEditor({
           if(img) img.style.visibility = "visible";
         })()
       `);
+
       setImageLoading(false);
-      // richText.current?.insertHTML(
-      //   `<img src="${uploaded.url}" style="max-width:70%;height: auto;object-fit:contain;border-radius:12px;margin:10px auto;display:block;" />`,
-      // );
+
       setTimeout(() => {
+        // @ts-ignore
+        richText.current?.commandDOM(`
+          (function() {
+            var el = document.getElementById('${anchorId}');
+            if (el) {
+              var range = document.createRange();
+              var sel = window.getSelection();
+              range.setStart(el, 0);
+              range.collapse(true);
+              sel.removeAllRanges();
+              sel.addRange(range);
+            }
+          })();
+        `);
+
+        scrollEditorToAnchor(anchorId);
+
         // @ts-ignore
         richText.current?.commandDOM(`
                 (function() {
@@ -418,6 +472,21 @@ export default function TextReachEditor({
     }
   };
 
+  const scrollEditorToAnchor = (anchorId: string) => {
+    richText.current?.commandDOM(`
+    (function(){
+      var c = document.getElementsByClassName('content')[0];
+      var a = document.getElementById('${anchorId}');
+      if (!c || !a) return;
+
+      var y = 0, el = a;
+      while (el && el !== c) { y += el.offsetTop; el = el.offsetParent; }
+      var target = Math.max(0, y - c.clientHeight + a.offsetHeight + 16); // 16px запасу
+      c.scrollTo(0, target);
+    })();
+  `);
+  };
+
   useEffect(() => {
     if (!isKeyboardOpen) {
       setShowImageSetting(false);
@@ -425,24 +494,48 @@ export default function TextReachEditor({
     }
   }, [isKeyboardOpen]);
 
+  // const [minHeight, setMinHeight] = useState(60);
+  const [editorHeight, setEditorHeight] = useState(60);
+
+  // useEffect(() => {
+  //   if (editorHeight > screenHeight - 120 && !isKeyboardOpen) {
+  //     console.log(111);
+  //     setMinHeight(screenHeight - 120);
+  //   } else {
+  //     console.log(222);
+  //     setMinHeight(editorHeight);
+  //   }
+  //   console.log("editorHeight", editorHeight);
+  //   console.log("screenHeight", screenHeight);
+  //   console.log("keyboardHeight", keyboardHeight);
+  // }, [editorHeight, isKeyboardOpen]);
+  //
+  // useEffect(() => {
+  //   console.log("minHeight", minHeight);
+  // }, [minHeight]);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        position: "relative",
-      }}
-    >
-      <ScrollView ref={scrollRef} style={{ flex: 1 }}>
+    <>
+      <View
+        style={{
+          flex: 1,
+          position: "relative",
+        }}
+      >
         <RichEditor
           key={textReachEditorKey}
           ref={richText}
           initialContentHTML={content}
           onChange={setContent}
-          style={{ flex: 1, minHeight: 300 }}
+          style={{
+            flex: 1,
+            minHeight: scr,
+          }}
           onFocus={onFocus}
           onBlur={handleBlur}
           editorInitializedCallback={() => {}}
           placeholder={t("diary.addEntryText")}
+          onHeightChange={(height) => setEditorHeight(height)}
           editorStyle={{
             backgroundColor: "transparent",
             color: "#6c6b6b",
@@ -460,10 +553,15 @@ export default function TextReachEditor({
             ${ComforterBrushFontStylesheet}
             ${BadScriptFontStylesheet}
             ${YesevaOneFontStylesheet}
+            div:empty { min-height: 1em; }
+            div:last-child { padding-bottom: 0 !important; }
+            html, body { margin:0; padding:0; height:100%; overflow:hidden; }
           `,
             contentCSSText: `font-family: '${selectedFont.name}', sans-serif; position: absolute; display: flex; 
             flex-direction: column; 
-            min-height: 200px; top: 0; right: 0; bottom: 0; left: 0;`,
+            overflow-y:auto;
+            -webkit-overflow-scrolling: touch;
+            min-height: 60px; top: 0; right: 0; bottom: 0 !important; left: 0;  padding-bottom: 0 !important`,
           }}
           // useContainer={true}
           onCursorPosition={(scrollY) => {
@@ -472,22 +570,22 @@ export default function TextReachEditor({
           }}
           onMessage={handleEditorMessage}
         />
-      </ScrollView>
-      {imageLoading && (
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      )}
-    </View>
+        {imageLoading && (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        )}
+      </View>
+    </>
   );
 }

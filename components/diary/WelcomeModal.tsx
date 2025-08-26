@@ -20,7 +20,6 @@ export default function WelcomeModal({}) {
   useEffect(() => {
     const getData = async () => {
       const value = await AsyncStorage.getItem("show_welcome");
-      console.log("WelcomeModal: show_welcome", value);
       if (value === null) {
         setShowWelcome(true);
       } else {

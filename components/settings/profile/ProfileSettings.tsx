@@ -68,11 +68,6 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   };
 
   useEffect(() => {
-    console.log("user", user);
-    console.log("loggedIn", userLogged);
-  }, [user]);
-
-  useEffect(() => {
     const handler = (user: User) => updateUser(user);
     UserEvents.on("userLoggedIn", handler);
     return () => UserEvents.off("userLoggedIn", handler);

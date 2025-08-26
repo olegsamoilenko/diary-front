@@ -251,7 +251,9 @@ export default React.memo(function EntryCard({
                     textAlign: "center",
                   }}
                 >
-                  Show dialog
+                  {!showAiComment
+                    ? t("diary.showDialogWithNemory")
+                    : t("diary.hideDialogWithNemory")}
                 </ThemedText>
               </TouchableOpacity>
             )}

@@ -41,7 +41,6 @@ export default function HandleSubscription({
   }, []);
 
   const handleNext = () => {
-    console.log("HandleSubscription: handleNext");
     if (onSuccess) {
       onSuccess();
     }

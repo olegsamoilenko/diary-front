@@ -70,6 +70,7 @@ export async function apiRequest<T = any>({
         `Axios error ${status}: ${errorMessage}`,
         err.response.data,
       );
+      console.error(`Axios error response:`, err.response);
 
       Toast.show({
         type: "error",

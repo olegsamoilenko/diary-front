@@ -48,7 +48,7 @@ type TitleEntryProps = {
   titleEmoji: string;
   setShowTip: (show: boolean) => void;
   showTip?: boolean;
-  isOpen: boolean;
+  counterTitleEmojiRef: RefObject<number>;
 };
 export default React.memo(function TitleEntry({
   onChangeEntry,
@@ -69,7 +69,7 @@ export default React.memo(function TitleEntry({
   titleEmoji,
   setShowTip,
   showTip,
-  isOpen,
+  counterTitleEmojiRef,
 }: TitleEntryProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -164,7 +164,7 @@ export default React.memo(function TitleEntry({
         handleBlur={handleBlur}
         setActiveActions={setActiveActions}
         titleEmoji={titleEmoji}
-        isOpen={isOpen}
+        counterTitleEmojiRef={counterTitleEmojiRef}
       />
     </View>
   );
