@@ -59,7 +59,7 @@ export default ({ config }: { config: any }) => ({
     experiments: {
       typedRoutes: true,
     },
-    runtimeVersion: { policy: "nativeVersion" },
+    runtimeVersion: "1.1.0",
     jsEngine: "hermes",
     ios: {
       supportsTablet: true,
