@@ -48,7 +48,7 @@ export async function runAIStream({
   const timeout = setTimeout(() => {
     socket.disconnect();
     handlers.onError({ message: "Timeout" });
-  }, 40000);
+  }, 300000);
 
   socket.on("disconnect", () => clearTimeout(timeout));
 }
