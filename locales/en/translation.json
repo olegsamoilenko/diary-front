@@ -239,7 +239,9 @@
     "invalidHash": "Invalid hash",
     "noDataReturnedFromServer": "No data returned from the server",
     "tokenRequired": "Token is required",
+    "tokenIsRequiredForAuthentication": "Token is required for authentication",
     "invalidToken": "Invalid token",
+    "invalidTokenProvided": "Invalid token provided",
     "planNotFound": "Plan not found",
     "subscriptionNotActive": "Subscription is not active",
     "subscriptionWasCanceled": "Subscription was canceled",
@@ -267,7 +269,9 @@
     "commentNotFound": "Comment not found",
     "aiCommentNoFoundForThisEntry": "AI comment not found for this entry",
     "userExist": "User exists",
-    "userWithThisEmailAlreadyExists": "User with this email already exists"
+    "userWithThisEmailAlreadyExists": "User with this email already exists",
+    "failedToGenerateComment": "Failed to generate comment",
+    "failedToGenerateDialog": "Failed to generate dialog",
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",

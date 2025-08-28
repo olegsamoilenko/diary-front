@@ -239,7 +239,9 @@
     "invalidHash": "Недійсний хеш",
     "noDataReturnedFromServer": "Сервер не повернув даних",
     "tokenRequired": "Токен обов'язковий",
+    "tokenIsRequiredForAuthentication": "Токен обов'язковий для аутентифікації",
     "invalidToken": "Недійсний токен",
+    "invalidTokenProvided": " Надано недійсний токен",
     "planNotFound": "План не знайдено",
     "subscriptionNotActive": "Підписка не активна",
     "subscriptionWasCanceled": "Підписка була скасована",
@@ -267,7 +269,9 @@
     "commentNotFound": "Коментар не знайдено",
     "aiCommentNoFoundForThisEntry": "AI коментар не знайдено для цього запису",
     "userExist": "Користувач існує",
-    "userWithThisEmailAlreadyExists": "Користувач з такою електронною поштою вже існує"
+    "userWithThisEmailAlreadyExists": "Користувач з такою електронною поштою вже існує",
+    "failedToGenerateComment": "Не вдалося створити коментар",
+    "failedToGenerateDialog": "Не вдалося створити діалог",
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",
