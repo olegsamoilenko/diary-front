@@ -272,6 +272,12 @@
     "userWithThisEmailAlreadyExists": "Користувач з такою електронною поштою вже існує",
     "failedToGenerateComment": "Не вдалося створити коментар",
     "failedToGenerateDialog": "Не вдалося створити діалог",
+    "internalTestingHasBeenCompleted": "Внутрішнє тестування завершено",
+    "internalTestingHasBeenCompletedIfYouWouldLike": "Внутрішнє тестування завершено. Якщо ви бажаєте взяти участь у наступному тестуванні, зверніться до служби підтримки.",
+    "closedTestingHasBeenCompleted": "Закрите тестування завершено",
+    "closedTestingHasBeenCompletedIfYouWouldLike": "Закрите тестування завершено. Якщо ви бажаєте взяти участь у наступному тестуванні, зверніться до служби підтримки.",
+    "testingHasBeenCompleted": "Тестування завершено",
+    "testingHasBeenCompletedIfYouWouldLike": "Тестування завершено. Якщо ви бажаєте продовжувати користуватися додатком, підпишіться на план.",
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",

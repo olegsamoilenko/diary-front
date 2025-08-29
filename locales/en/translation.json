@@ -272,6 +272,12 @@
     "userWithThisEmailAlreadyExists": "User with this email already exists",
     "failedToGenerateComment": "Failed to generate comment",
     "failedToGenerateDialog": "Failed to generate dialog",
+    "internalTestingHasBeenCompleted": "Internal testing has been completed",
+    "internalTestingHasBeenCompletedIfYouWouldLike": "Internal testing has been completed. If you would like to participate in the next test, please contact support.",
+    "closedTestingHasBeenCompleted": "closed testing has been completed",
+    "closedTestingHasBeenCompletedIfYouWouldLike": "Closed testing has been completed. If you would like to participate in the next test, please contact support.",
+    "testingHasBeenCompleted": "Testing has been completed",
+    "testingHasBeenCompletedIfYouWouldLike": "Testing has been completed. If you would like to continue using the app, please subscribe the plan.",
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",
