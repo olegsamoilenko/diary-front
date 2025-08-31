@@ -5,12 +5,11 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme, Entry } from "@/types";
-import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
-// import { useTypewriter } from "@/hooks/useTypewriter";
-import TypewriterText from "@/components/diary/add-new-entry/TypewriterText";
 import StreamingText from "@/components/diary/add-new-entry/StreamingText";
 import HtmlViewer from "@/components/ui/HtmlViewer";
+import * as SecureStore from "@/utils/store/secureStore";
+import { hydrateEntryHtmlFromAlbum } from "@/utils/files/html";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -38,6 +37,7 @@ export default function ContentEntry({
   const styles = useMemo(() => getStyles(colors), [colors]);
   const scrollViewRef = useRef(null);
   const [idx, setIdx] = useState<number>(0);
+  const [html, setHtml] = useState(entry.content ?? "");
 
   useEffect(() => {
     if (
@@ -52,6 +52,23 @@ export default function ContentEntry({
     }
   }, [idx, isEntrySaved, aiDialogLoading, entry.content]);
 
+  useEffect(() => {
+    (async () => {
+      const rawUser = await SecureStore.getItemAsync("user");
+      const user = rawUser ? JSON.parse(rawUser) : null;
+      if (user.id && entry.id && entry.content?.includes("nemory://i/")) {
+        const hydrated = await hydrateEntryHtmlFromAlbum(
+          entry.content,
+          Number(user.id),
+          Number(entry.id),
+        );
+        setHtml(hydrated);
+      } else {
+        setHtml(entry.content);
+      }
+    })();
+  }, []);
+
   return (
     <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
       <View
@@ -60,7 +77,7 @@ export default function ContentEntry({
         }}
       >
         <View style={styles.content}>
-          <HtmlViewer htmlContent={entry.content} />
+          <HtmlViewer htmlContent={html} />
           {/*<ViewReachEditor content={entry.content} />*/}
         </View>
         {entry && entry.aiComment && !strimCommentError && (

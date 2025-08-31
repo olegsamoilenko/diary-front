@@ -27,7 +27,12 @@ import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStyleshee
 import uuid from "react-native-uuid";
 
 import * as ImagePicker from "expo-image-picker";
-import { prepareImageForUpload, uploadImageToServer } from "@/utils";
+import {
+  prepareImageForUpload,
+  uploadImageToServer,
+  queueImage,
+  prepareImageForStorage,
+} from "@/utils";
 import { useTranslation } from "react-i18next";
 
 type TextReachEditorProps = {
@@ -97,19 +102,7 @@ export default function TextReachEditor({
   const scrollRef = useRef(null);
   const [imageLoading, setImageLoading] = useState(false);
   const { t } = useTranslation();
-  // const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const scr = Dimensions.get("screen");
-
-  useEffect(() => {
-    //   richText.current?.commandDOM(`
-    //   (function() {
-    //     var c = document.getElementsByClassName('content')[0];
-    //     if (c) {
-    //       c.scrollTop = c.scrollHeight;
-    //     }
-    //   })();
-    // `);
-  }, [content]);
 
   const handleEditorMessage = (event: any) => {
     try {
@@ -358,63 +351,37 @@ export default function TextReachEditor({
     }
   }, [showImageSetting]);
 
-  async function replaceImageSrcById(id: string, newUrl: string) {
-    if (!richText.current) return;
-
-    const currentHtml = await richText.current.getContentHtml();
-
-    const regex = new RegExp(
-      `(<img[^>]*id=["']${id}["'][^>]*src=["'])[^\"]*(["'][^>]*>)`,
-      "g",
-    );
-
-    const newHtml = currentHtml.replace(regex, `$1${newUrl}$2`);
-
-    await richText.current.setContentHTML(newHtml);
-  }
-
   const handleImageAndPhoto = async (result: any) => {
     setImageLoading(true);
     richText.current?.prepareInsert?.();
-    const picked = result;
-    // const { width, height } = picked;
+
+    const picked = result.assets ? result.assets[0] : result;
     const localUri = picked.uri;
     const newUuid = uuid.v4();
     const imageId = `img-${newUuid}`;
     const anchorId = `cursor-anchor-${imageId}`;
-    // const imgWidth = screenWidth * 0.7;
-    // const aspectRatio = height / width;
-    // const imgHeight = imgWidth * aspectRatio;
-    // setMinHeight(editorHeight + imgHeight + 40);
+
     if (picked.base64) {
       // @ts-ignore
       richText.current?.insertHTML(
         `<img id="${imageId}" src="data:image/jpeg;base64,${picked.base64}" 
-            style="visibility:hidden;max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;"
+            style="max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;"
              />
         <span id="${anchorId}"><br></span>`,
       );
     }
 
-    const smallUri = await prepareImageForUpload(localUri);
+    const smallUri = await prepareImageForStorage(localUri);
+    queueImage(smallUri, imageId, {
+      width: picked.width,
+      height: picked.height,
+    });
 
-    const uploaded = await uploadImageToServer(smallUri);
+    setImageLoading(false);
 
-    if (uploaded && uploaded.url) {
+    setTimeout(() => {
       // @ts-ignore
-      await replaceImageSrcById(imageId, uploaded.url);
       richText.current?.commandDOM(`
-        (function() {
-          var img = document.getElementById("${imageId}");
-          if(img) img.style.visibility = "visible";
-        })()
-      `);
-
-      setImageLoading(false);
-
-      setTimeout(() => {
-        // @ts-ignore
-        richText.current?.commandDOM(`
           (function() {
             var el = document.getElementById('${anchorId}');
             if (el) {
@@ -428,48 +395,45 @@ export default function TextReachEditor({
           })();
         `);
 
-        scrollEditorToAnchor(anchorId);
+      scrollEditorToAnchor(anchorId);
 
-        // @ts-ignore
-        richText.current?.commandDOM(`
+      // @ts-ignore
+      richText.current?.commandDOM(`
                 (function() {
                   document.execCommand('fontName', false, "${selectedFont.name}");
                 })()
               `);
-        if (sizeAction) {
-          // @ts-ignore
-          richText.current?.commandDOM(
-            `document.execCommand('fontSize', false, "${sizeMap[sizeAction]}");`,
-          );
-        }
-        if (colorAction) {
-          // @ts-ignore
-          richText.current?.commandDOM(
-            `document.execCommand('foreColor', false, "${colorAction}");`,
-          );
-        }
-        if (isBoldAction) {
-          // @ts-ignore
-          richText.current?.commandDOM(
-            "document.execCommand('bold', false, '')",
-          );
-        }
+      if (sizeAction) {
+        // @ts-ignore
+        richText.current?.commandDOM(
+          `document.execCommand('fontSize', false, "${sizeMap[sizeAction]}");`,
+        );
+      }
+      if (colorAction) {
+        // @ts-ignore
+        richText.current?.commandDOM(
+          `document.execCommand('foreColor', false, "${colorAction}");`,
+        );
+      }
+      if (isBoldAction) {
+        // @ts-ignore
+        richText.current?.commandDOM("document.execCommand('bold', false, '')");
+      }
 
-        if (isItalicAction) {
-          // @ts-ignore
-          richText.current?.commandDOM(
-            `document.execCommand('italic', false, null);`,
-          );
-        }
+      if (isItalicAction) {
+        // @ts-ignore
+        richText.current?.commandDOM(
+          `document.execCommand('italic', false, null);`,
+        );
+      }
 
-        if (isUnderlineAction) {
-          // @ts-ignore
-          richText.current?.commandDOM(
-            `document.execCommand('underline', false, null);`,
-          );
-        }
-      }, 10);
-    }
+      if (isUnderlineAction) {
+        // @ts-ignore
+        richText.current?.commandDOM(
+          `document.execCommand('underline', false, null);`,
+        );
+      }
+    }, 10);
   };
 
   const scrollEditorToAnchor = (anchorId: string) => {
@@ -494,25 +458,7 @@ export default function TextReachEditor({
     }
   }, [isKeyboardOpen]);
 
-  // const [minHeight, setMinHeight] = useState(60);
   const [editorHeight, setEditorHeight] = useState(60);
-
-  // useEffect(() => {
-  //   if (editorHeight > screenHeight - 120 && !isKeyboardOpen) {
-  //     console.log(111);
-  //     setMinHeight(screenHeight - 120);
-  //   } else {
-  //     console.log(222);
-  //     setMinHeight(editorHeight);
-  //   }
-  //   console.log("editorHeight", editorHeight);
-  //   console.log("screenHeight", screenHeight);
-  //   console.log("keyboardHeight", keyboardHeight);
-  // }, [editorHeight, isKeyboardOpen]);
-  //
-  // useEffect(() => {
-  //   console.log("minHeight", minHeight);
-  // }, [minHeight]);
 
   return (
     <>

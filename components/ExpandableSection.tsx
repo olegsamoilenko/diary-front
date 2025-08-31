@@ -1,55 +1,50 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, View, StyleSheet } from "react-native";
+import { Animated, ViewStyle, View } from "react-native";
+
+type Props = {
+  expanded: boolean;
+  children: React.ReactNode;
+  collapsedHeight?: number;
+  duration?: number;
+  style?: ViewStyle | ViewStyle[];
+};
 
 export function ExpandableSection({
   expanded,
   children,
   collapsedHeight = 0,
-  expandedHeight = 180,
+  duration = 250,
   style,
-}) {
-  const animHeight = useRef(
-    new Animated.Value(expanded ? expandedHeight : collapsedHeight),
-  ).current;
-  const animOpacity = useRef(new Animated.Value(expanded ? 1 : 0)).current;
-  const [contentHeight, setContentHeight] = useState(70);
+}: Props) {
+  const [measured, setMeasured] = useState<number | null>(null);
+  const [ready, setReady] = useState(false);
+  const anim = useRef(new Animated.Value(collapsedHeight)).current;
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(animHeight, {
-        toValue: expanded ? contentHeight : collapsedHeight,
-        duration: 250,
-        useNativeDriver: false,
-      }),
-      Animated.timing(animOpacity, {
-        toValue: expanded ? 1 : 0,
-        duration: 200,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  }, [expanded]);
-
-  const onLayout = (e) => {
-    const height = e.nativeEvent.layout.height;
-    if (height > 0 && height !== contentHeight) setContentHeight(height);
-    if (expanded) {
-      animHeight.setValue(height);
+  const onLayout = (e: any) => {
+    const h = e.nativeEvent.layout.height;
+    if (!ready && h > 0) {
+      setMeasured(h);
+      setReady(true);
+      anim.setValue(expanded ? h : collapsedHeight);
+    } else if (ready && expanded && h !== measured) {
+      setMeasured(h);
+      anim.setValue(h);
     }
   };
 
-  useEffect(() => {}, [contentHeight]);
+  useEffect(() => {
+    if (!ready || measured == null) return;
+    Animated.timing(anim, {
+      toValue: expanded ? measured : collapsedHeight,
+      duration,
+      useNativeDriver: false,
+    }).start();
+  }, [expanded, measured, ready, collapsedHeight, duration, anim]);
+
+  const clipStyle = ready ? { height: anim, overflow: "hidden" as const } : {};
 
   return (
-    <Animated.View
-      style={[
-        {
-          height: animHeight,
-          // opacity: animOpacity,
-          overflow: "hidden",
-        },
-        style,
-      ]}
-    >
+    <Animated.View style={[clipStyle, style]}>
       <View onLayout={onLayout}>{children}</View>
     </Animated.View>
   );

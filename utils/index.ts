@@ -21,6 +21,26 @@ import {
 import { runAIStream } from "./diary/socket/runAIStream";
 import { compressImageFixed } from "./files/compressImageFixed";
 import { prepareImageForUpload } from "./files/prepareImageForUpload";
+import {
+  persistToGalleryWithMeta,
+  clearPending,
+  prepareImageForStorage,
+  queueImage,
+  ALBUM_NAME,
+  buildAlbumFilename,
+} from "./files/media";
+import {
+  replaceImgSrcById,
+  tokeniseInlineBase64,
+  extractImageIdsFromHtml,
+  hydrateHtmlWithLocalUris,
+  hydrateEntryHtmlFromAlbum,
+} from "./files/html";
+import {
+  ensureOneTimeMediaAsk,
+  getMediaAccess,
+  MediaAccess,
+} from "./files/media-permissions";
 
 export {
   apiRequest,
@@ -44,4 +64,10 @@ export {
   runAIStream,
   compressImageFixed,
   prepareImageForUpload,
+  persistToGalleryWithMeta,
+  clearPending,
+  prepareImageForStorage,
+  queueImage,
+  replaceImgSrcById,
+  tokeniseInlineBase64,
 };

@@ -65,6 +65,13 @@ export default ({ config }: { config: any }) => ({
       supportsTablet: true,
       jsEngine: "jsc",
       buildNumber: "1.1.2",
+      infoPlist: {
+        NSPhotoLibraryAddUsageDescription:
+          "Зберігати зображення до альбому nemory.",
+        NSPhotoLibraryUsageDescription:
+          "Щоб знаходити зображення в альбомі nemory для відображення в записах.",
+        NSCameraUsageDescription: "Щоб робити фото для записів.",
+      },
     },
     android: {
       package: "com.soniac12.nemory",
@@ -76,6 +83,7 @@ export default ({ config }: { config: any }) => ({
       },
       edgeToEdgeEnabled: true,
       enableProguardInReleaseBuilds: false,
+      permissions: ["READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE"],
     },
     web: {
       bundler: "metro",

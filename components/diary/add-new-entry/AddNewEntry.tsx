@@ -30,6 +30,9 @@ import {
   addToAiChunkBuffer,
   resetAiChunkBuffer,
   runAIStream,
+  persistToGalleryWithMeta,
+  clearPending,
+  tokeniseInlineBase64,
 } from "@/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
@@ -51,6 +54,7 @@ import * as SecureStore from "@/utils/store/secureStore";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
 import Toast from "react-native-toast-message";
+import { hydrateHtmlWithLocalUris } from "@/utils/files/html";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -311,29 +315,72 @@ const AddNewEntry = forwardRef<
     setTitleReachEditorKey((k) => k + 1);
     setContentLoading(true);
 
+    const rawUser = await SecureStore.getItemAsync("user");
+    const userId = rawUser ? JSON.parse(rawUser).id : null;
+
     try {
+      const contentWithTokens = tokeniseInlineBase64(entry.content);
+
       const res = await apiRequest({
         url: `/diary-entries/create`,
         method: "POST",
         data: {
           title: entry.title,
-          content: entry.content,
+          content: contentWithTokens,
           mood: entry.mood,
           aiModel,
           settings: entrySettings,
         },
       });
 
-      if (!res || res.status !== 201) {
+      const status = res?.status ?? 0;
+      if (!(status === 200 || status === 201)) {
         console.log("No data returned from server");
         setLoading(false);
         return;
       }
 
       const newEntry: Entry = await res.data;
-      setEntry((prev) => ({ ...prev, ...newEntry }));
-      setLoading(false);
+      console.log("Entry created", newEntry);
+      setEntry((prev) => ({
+        ...prev,
+        ...newEntry,
+        content: contentWithTokens,
+      }));
       setIsEntrySaved(true);
+
+      if (userId) {
+        try {
+          const meta = await persistToGalleryWithMeta(
+            userId,
+            Number(newEntry.id),
+          );
+
+          if (meta.length) {
+            const hydrated = hydrateHtmlWithLocalUris(contentWithTokens, meta);
+            setEntry((prev) => ({ ...prev, content: hydrated }));
+          }
+
+          const itemsForServer = meta.map(({ localUri, ...rest }) => rest);
+
+          if (itemsForServer.length) {
+            const res2 = await apiRequest({
+              url: `/entry-images/${newEntry.id}`,
+              method: "POST",
+              data: { items: itemsForServer },
+            });
+            console.log("Images persist result:", res2?.status, res2?.data);
+          }
+        } catch (e) {
+          console.warn("Images persist error:", e);
+        } finally {
+          clearPending();
+        }
+      } else {
+        clearPending();
+      }
+
+      setLoading(false);
       setContentLoading(false);
 
       setAiLoading(true);
@@ -343,7 +390,7 @@ const AddNewEntry = forwardRef<
         endpoint: "stream_ai_comment",
         data: {
           entryId: newEntry.id,
-          content: newEntry.content,
+          content: contentWithTokens,
           aiModel: aiModel,
           mood: newEntry.mood,
         },

@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -25,11 +19,13 @@ import { ExpandableSection } from "@/components/ExpandableSection";
 import HtmlViewer from "@/components/ui/HtmlViewer";
 import RotatingIcon from "@/components/ui/RotatingIcon";
 
-import { ColorTheme, Entry, Dialog } from "@/types";
+import { ColorTheme, Entry, Dialog, User } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import type { RootState } from "@/store";
 import { apiRequest } from "@/utils";
+import { hydrateEntryHtmlFromAlbum } from "@/utils/files/html";
+import * as SecureStore from "@/utils/store/secureStore";
 
 type EntryCardProps = {
   entry: Entry;
@@ -50,8 +46,8 @@ export default React.memo(function EntryCard({
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
-  const [loadingDetails, setLoadingDetails] = useState(false);
   const [showAiComment, setShowAiComment] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (isExpanded) {
@@ -63,6 +59,14 @@ export default React.memo(function EntryCard({
     }
   }, [isExpanded]);
 
+  useEffect(() => {
+    (async () => {
+      const rawUser = await SecureStore.getItemAsync("user");
+      const user = rawUser ? JSON.parse(rawUser) : null;
+      setUser(user);
+    })();
+  }, [entry.content, entry.id]);
+
   const [details, setDetails] = useState<{
     content?: string | null;
     aiComment?: { content?: string | null } | null;
@@ -72,10 +76,6 @@ export default React.memo(function EntryCard({
     aiComment: entry.aiComment ?? null,
     dialogs: entry.dialogs ?? null,
   });
-
-  const loadedOnceRef = useRef(
-    Boolean(entry.content || entry.dialogs || entry.aiComment),
-  );
 
   const formattedTime = useMemo(() => {
     try {
@@ -101,30 +101,52 @@ export default React.memo(function EntryCard({
   );
 
   const handleToggle = useCallback(async () => {
-    if (!isExpanded && !loadedOnceRef.current && !loadingDetails) {
-      setLoadingDetails(true);
+    if (!isExpanded) {
       try {
         const res = await apiRequest({
           url: `/diary-entries/get-by-id/${entry.id}`,
           method: "GET",
         });
+        const hydrated = await hydrateEntryHtmlFromAlbum(
+          res.data?.content ?? "",
+          Number(user?.id ?? 0),
+          Number(entry.id),
+        );
         setDetails((prev) => ({
           ...prev,
-          content: res.data?.content ?? prev.content ?? null,
+          content: hydrated ?? prev.content ?? null,
           aiComment: res.data?.aiComment ?? prev.aiComment ?? null,
           dialogs: res.data?.dialogs ?? prev.dialogs ?? null,
         }));
-        loadedOnceRef.current = true;
       } catch (e) {
         console.error("Error fetching diary entry:", e);
       } finally {
-        setLoadingDetails(false);
         setIsExpanded(true);
       }
       return;
     }
     setIsExpanded((v) => !v);
-  }, [entry.id, isExpanded, loadingDetails]);
+  }, [entry.id, isExpanded, user]);
+
+  const hasAi = useMemo(() => {
+    const c = details.aiComment?.content?.trim?.();
+    return Boolean(c);
+  }, [details.aiComment?.content]);
+
+  const hasDialogs = useMemo(() => {
+    const d = Array.isArray(details.dialogs) ? details.dialogs.length : 0;
+    return d > 0;
+  }, [details.dialogs]);
+
+  useEffect(() => {
+    console.log("hasAi", hasAi);
+  }, [hasAi]);
+  useEffect(() => {
+    console.log("hasDialogs", hasDialogs);
+  }, [hasDialogs]);
+  useEffect(() => {
+    console.log("isExpanded", isExpanded);
+  }, [isExpanded]);
 
   const handleDeleteEntry = async (id: number) => {
     setVisibleDeleteModal(false);
@@ -213,7 +235,6 @@ export default React.memo(function EntryCard({
         <ExpandableSection
           expanded={isExpanded}
           collapsedHeight={100}
-          expandedHeight={150}
           style={styles.expandedSectionContainer}
         >
           <Pressable
@@ -224,11 +245,8 @@ export default React.memo(function EntryCard({
             <HtmlViewer
               htmlContent={
                 isExpanded
-                  ? (details.content ??
-                    entry.content ??
-                    entry.previewContent ??
-                    "")
-                  : (entry.previewContent ?? entry.content ?? "")
+                  ? (details.content ?? entry.previewContent ?? "")
+                  : (entry.previewContent ?? "")
               }
             />
             <View style={styles.contentIcon}>
@@ -236,27 +254,24 @@ export default React.memo(function EntryCard({
             </View>
           </Pressable>
 
-          {isExpanded &&
-            (!!details.aiComment?.content ||
-              (Array.isArray(details.dialogs) &&
-                details.dialogs.length > 0)) && (
-              <TouchableOpacity
-                style={styles.showDialogButton}
-                onPress={() => setShowAiComment((v) => !v)}
+          {(hasAi || hasDialogs) && (
+            <TouchableOpacity
+              style={styles.showDialogButton}
+              onPress={() => setShowAiComment((v) => !v)}
+            >
+              <ThemedText
+                type="small"
+                style={{
+                  color: colors.textInPrimary,
+                  textAlign: "center",
+                }}
               >
-                <ThemedText
-                  type="small"
-                  style={{
-                    color: colors.textInPrimary,
-                    textAlign: "center",
-                  }}
-                >
-                  {!showAiComment
-                    ? t("diary.showDialogWithNemory")
-                    : t("diary.hideDialogWithNemory")}
-                </ThemedText>
-              </TouchableOpacity>
-            )}
+                {!showAiComment
+                  ? t("diary.showDialogWithNemory")
+                  : t("diary.hideDialogWithNemory")}
+              </ThemedText>
+            </TouchableOpacity>
+          )}
 
           {isExpanded && showAiComment && !!details.aiComment?.content && (
             <View style={styles.aiCommentContent}>
@@ -418,5 +433,6 @@ const getStyles = (colors: ColorTheme) =>
       borderRadius: 50,
       alignSelf: "center",
       marginBottom: 20,
+      zIndex: 11,
     },
   });
