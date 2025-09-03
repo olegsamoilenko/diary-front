@@ -111,15 +111,12 @@ export default React.memo(function EntryCard({
           Number(user?.id ?? 0),
           Number(entry.id),
         );
-        console.log("res.data", res.data.content);
-        console.log("hydrated", hydrated);
         setDetails((prev) => ({
           ...prev,
           content: hydrated ?? prev.content ?? null,
           aiComment: res.data?.aiComment ?? prev.aiComment ?? null,
           dialogs: res.data?.dialogs ?? prev.dialogs ?? null,
         }));
-        console.log("hydrated", hydrated);
       } catch (e) {
         console.error("Error fetching diary entry:", e);
       } finally {
@@ -139,16 +136,6 @@ export default React.memo(function EntryCard({
     const d = Array.isArray(details.dialogs) ? details.dialogs.length : 0;
     return d > 0;
   }, [details.dialogs]);
-
-  useEffect(() => {
-    console.log("hasAi", hasAi);
-  }, [hasAi]);
-  useEffect(() => {
-    console.log("hasDialogs", hasDialogs);
-  }, [hasDialogs]);
-  useEffect(() => {
-    console.log("isExpanded", isExpanded);
-  }, [isExpanded]);
 
   const handleDeleteEntry = async (entry: Entry) => {
     setVisibleDeleteModal(false);

@@ -79,20 +79,16 @@ export async function hydrateEntryHtmlFromAlbum(
   entryId: number,
 ) {
   const ids = extractImageIdsFromHtml(html);
-  console.log(
-    `Hydrating HTML for user ${userId}, entry ${entryId}, found ${ids} images`,
-  );
+
   if (!ids.length) return html;
-  console.log(111);
 
   const assets = await listAlbumAssets();
-  console.log(`Found ${JSON.stringify(assets, null, 2)} assets in album`);
+
   if (!assets.length) return html;
 
   const byName = new Map<string, MediaLibrary.Asset>();
 
   for (const a of assets) byName.set(a.filename, a);
-  console.log(`Indexing assets by filename`, byName);
 
   let out = html;
 

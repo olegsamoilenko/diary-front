@@ -343,7 +343,7 @@ const AddNewEntry = forwardRef<
       }
 
       const newEntry: Entry = await res.data;
-      console.log("Entry created", newEntry);
+
       setEntry((prev) => ({
         ...prev,
         ...newEntry,
@@ -379,7 +379,6 @@ const AddNewEntry = forwardRef<
               method: "POST",
               data: { items: itemsForServer },
             });
-            console.log("Images persist result:", res2?.status, res2?.data);
           }
         } catch (e) {
           console.warn("Images persist error:", e);
