@@ -91,8 +91,7 @@
     "eslint-plugin-prettier": "^5.5.0",
     "expo": "53.0.22",
     "prettier": "^3.5.3",
-    "typescript": "~5.8.3",
-    "@react-native-community/cli": "latest"
+    "typescript": "~5.8.3"
   },
   "expo": {
     "doctor": {
