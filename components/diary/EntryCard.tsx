@@ -19,17 +19,16 @@ import { ExpandableSection } from "@/components/ExpandableSection";
 import HtmlViewer from "@/components/ui/HtmlViewer";
 import RotatingIcon from "@/components/ui/RotatingIcon";
 
-import { ColorTheme, Entry, Dialog, User } from "@/types";
+import type { ColorTheme, Entry, Dialog, User } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import type { RootState } from "@/store";
-import { apiRequest } from "@/utils";
-import { hydrateEntryHtmlFromAlbum } from "@/utils/files/html";
+import { apiRequest, hydrateEntryHtmlFromAlbum } from "@/utils";
 import * as SecureStore from "@/utils/store/secureStore";
 
 type EntryCardProps = {
   entry: Entry;
-  deleteEntry: (id: number) => void;
+  deleteEntry: (entry: Entry) => void;
   setActiveMoods: React.Dispatch<React.SetStateAction<{ id: number }[]>>;
 };
 export default React.memo(function EntryCard({
@@ -112,12 +111,15 @@ export default React.memo(function EntryCard({
           Number(user?.id ?? 0),
           Number(entry.id),
         );
+        console.log("res.data", res.data.content);
+        console.log("hydrated", hydrated);
         setDetails((prev) => ({
           ...prev,
           content: hydrated ?? prev.content ?? null,
           aiComment: res.data?.aiComment ?? prev.aiComment ?? null,
           dialogs: res.data?.dialogs ?? prev.dialogs ?? null,
         }));
+        console.log("hydrated", hydrated);
       } catch (e) {
         console.error("Error fetching diary entry:", e);
       } finally {
@@ -148,9 +150,9 @@ export default React.memo(function EntryCard({
     console.log("isExpanded", isExpanded);
   }, [isExpanded]);
 
-  const handleDeleteEntry = async (id: number) => {
+  const handleDeleteEntry = async (entry: Entry) => {
     setVisibleDeleteModal(false);
-    deleteEntry(id);
+    deleteEntry(entry);
   };
 
   return (
@@ -217,7 +219,7 @@ export default React.memo(function EntryCard({
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.modalDeleteButton}
-                  onPress={() => handleDeleteEntry(Number(entry.id))}
+                  onPress={() => handleDeleteEntry(entry)}
                 >
                   <ThemedText
                     style={{

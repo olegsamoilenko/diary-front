@@ -30,9 +30,9 @@ import {
   addToAiChunkBuffer,
   resetAiChunkBuffer,
   runAIStream,
-  persistToGalleryWithMeta,
   clearPending,
   tokeniseInlineBase64,
+  hydrateHtmlWithLocalUris,
 } from "@/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
@@ -54,7 +54,7 @@ import * as SecureStore from "@/utils/store/secureStore";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
 import Toast from "react-native-toast-message";
-import { hydrateHtmlWithLocalUris } from "@/utils/files/html";
+import { persistPrivateThenMaybeExportWithMeta } from "@/utils/files/media";
 
 type ActiveActions = {
   isBold?: boolean;
@@ -125,6 +125,7 @@ const AddNewEntry = forwardRef<
       aiModel: aiModel,
     },
     embedding: [],
+    images: [],
     dialogs: [],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -167,6 +168,7 @@ const AddNewEntry = forwardRef<
       aiComment: { content: "", aiModel },
       embedding: [],
       dialogs: [],
+      images: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -351,10 +353,18 @@ const AddNewEntry = forwardRef<
 
       if (userId) {
         try {
-          const meta = await persistToGalleryWithMeta(
+          const meta = await persistPrivateThenMaybeExportWithMeta(
             userId,
             Number(newEntry.id),
+            {
+              exportToGallery: true, // ← твій прапорець
+              // preferSAFOnAndroid: true, // щоб оминати DCIM
+            },
           );
+          // const meta = await persistToGalleryWithMeta(
+          //   userId,
+          //   Number(newEntry.id),
+          // );
 
           if (meta.length) {
             const hydrated = hydrateHtmlWithLocalUris(contentWithTokens, meta);

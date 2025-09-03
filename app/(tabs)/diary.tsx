@@ -19,7 +19,7 @@ import React, {
 import AddButton from "@/components/ui/AddButton";
 import { SideSheetRef } from "@/components/SideSheet";
 import AddNewEntry from "@/components/diary/add-new-entry/AddNewEntry";
-import { apiRequest } from "@/utils";
+import { apiRequest, deleteEntryImages } from "@/utils";
 import { Entry, MoodByDate, type User } from "@/types";
 import WeekView from "@/components/diary/calendar/WeekView";
 import MonthView from "@/components/diary/calendar/MonthView";
@@ -32,6 +32,7 @@ import Background from "@/components/Background";
 import WelcomeModal from "@/components/diary/WelcomeModal";
 import Toast from "react-native-toast-message";
 import { UserEvents } from "@/utils/events/userEvents";
+import { logAllAssetsInAlbum } from "@/utils/files/media";
 
 function localISODate(d = new Date()) {
   const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -106,6 +107,7 @@ export default function Diary() {
           ...prev,
           [day]: response.data,
         }));
+        console.log("Fetched entries for", day, response.data);
         setWeekAnchorDay(day);
         setShowWeek(true);
       } catch (e) {
@@ -179,10 +181,10 @@ export default function Diary() {
   const tabBarHeight = useBottomTabBarHeight();
 
   const deleteEntry = useCallback(
-    async (id: number) => {
+    async (entry: Entry) => {
       try {
         const response = await apiRequest({
-          url: `/diary-entries/${id}`,
+          url: `/diary-entries/${entry.id}`,
           method: "DELETE",
         });
         if (response?.status !== 200) {
@@ -191,8 +193,10 @@ export default function Diary() {
         }
         setDiaryEntries((prev) => ({
           ...prev,
-          [selectedDay]: prev[selectedDay]?.filter((e) => e.id !== id) ?? [],
+          [selectedDay]:
+            prev[selectedDay]?.filter((e) => e.id !== entry.id) ?? [],
         }));
+        await deleteEntryImages(entry.images || []);
         Toast.show({
           type: "success",
           text1: t(`diary.entry.entryDeleted`),

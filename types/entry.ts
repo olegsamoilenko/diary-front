@@ -1,6 +1,6 @@
-import { AiComment } from "./ai";
 import { ImageSourcePropType } from "react-native";
 import type { Dialog } from "@/types/dialog";
+import type { EntryImage, AiComment } from "@/types";
 
 export type Entry = {
   id: number;
@@ -10,6 +10,7 @@ export type Entry = {
   aiComment: AiComment;
   mood: string;
   embedding: number[];
+  images: EntryImage[];
   dialogs: Dialog[];
   settings?: {
     background: {

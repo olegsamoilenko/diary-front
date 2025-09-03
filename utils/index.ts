@@ -22,12 +22,12 @@ import { runAIStream } from "./diary/socket/runAIStream";
 import { compressImageFixed } from "./files/compressImageFixed";
 import { prepareImageForUpload } from "./files/prepareImageForUpload";
 import {
-  persistToGalleryWithMeta,
   clearPending,
   prepareImageForStorage,
   queueImage,
   ALBUM_NAME,
   buildAlbumFilename,
+  deleteEntryImages,
 } from "./files/media";
 import {
   replaceImgSrcById,
@@ -64,10 +64,18 @@ export {
   runAIStream,
   compressImageFixed,
   prepareImageForUpload,
-  persistToGalleryWithMeta,
   clearPending,
   prepareImageForStorage,
   queueImage,
   replaceImgSrcById,
   tokeniseInlineBase64,
+  extractImageIdsFromHtml,
+  hydrateHtmlWithLocalUris,
+  hydrateEntryHtmlFromAlbum,
+  ensureOneTimeMediaAsk,
+  getMediaAccess,
+  MediaAccess,
+  ALBUM_NAME,
+  buildAlbumFilename,
+  deleteEntryImages,
 };

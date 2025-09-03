@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useWindowDimensions, View, Image } from "react-native";
 import RenderHTML, {
   HTMLElementModel,
@@ -7,6 +7,7 @@ import RenderHTML, {
 
 export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
   const { width } = useWindowDimensions();
+  const [ratio, setRatio] = useState<number>(1);
 
   const customHTMLElementModels = {
     font: HTMLElementModel.fromCustomModel({
@@ -63,11 +64,16 @@ export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
     },
     img: ({ tnode }) => {
       const src = tnode.attributes?.src;
+      if (src)
+        Image.getSize(src, (w, h) => {
+          setRatio(w / h);
+        });
       if (!src) return null;
       return (
         <View
           style={{
             alignSelf: "center",
+            width: "85%",
             borderRadius: 16,
             overflow: "hidden",
             marginVertical: 8,
@@ -76,12 +82,13 @@ export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
           <Image
             source={{ uri: src }}
             style={{
-              width: "100%",
+              alignSelf: "center",
+              width: "85%",
               height: undefined,
-              aspectRatio: 1.2,
+              aspectRatio: ratio || 1,
               borderRadius: 16,
             }}
-            resizeMode="contain"
+            resizeMode="cover"
           />
         </View>
       );

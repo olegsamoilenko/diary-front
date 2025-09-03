@@ -1,7 +1,7 @@
 // utils/media/html.ts
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
-import { ALBUM_NAME, buildAlbumFilename } from "./media";
+import { ALBUM_NAME } from "./media";
 
 export function replaceImgSrcById(
   html: string,
@@ -79,19 +79,32 @@ export async function hydrateEntryHtmlFromAlbum(
   entryId: number,
 ) {
   const ids = extractImageIdsFromHtml(html);
+  console.log(
+    `Hydrating HTML for user ${userId}, entry ${entryId}, found ${ids} images`,
+  );
   if (!ids.length) return html;
+  console.log(111);
 
   const assets = await listAlbumAssets();
+  console.log(`Found ${JSON.stringify(assets, null, 2)} assets in album`);
   if (!assets.length) return html;
 
   const byName = new Map<string, MediaLibrary.Asset>();
+
   for (const a of assets) byName.set(a.filename, a);
+  console.log(`Indexing assets by filename`, byName);
 
   let out = html;
 
   for (const imageId of ids) {
-    const filename = buildAlbumFilename(userId, entryId, imageId);
-    const asset = byName.get(filename);
+    const base = buildAlbumBasename(userId, entryId, imageId).toLowerCase();
+
+    const asset =
+      assets.find((a) => {
+        const name = (a.filename || "").toLowerCase();
+        return name.startsWith(base + ".");
+      }) || null;
+
     if (!asset) continue;
 
     let localUri: string | null = null;
@@ -117,4 +130,21 @@ export async function hydrateEntryHtmlFromAlbum(
   }
 
   return out;
+}
+
+export function buildAlbumBasename(
+  userId: number,
+  entryId: number,
+  imageId: string,
+) {
+  return `${ALBUM_NAME}_u${userId}_e${entryId}_${imageId}`;
+}
+
+export function buildAlbumFilename(
+  userId: number,
+  entryId: number,
+  imageId: string,
+  ext: string,
+) {
+  return `${buildAlbumBasename(userId, entryId, imageId)}.${ext}`;
 }

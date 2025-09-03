@@ -9,7 +9,7 @@ import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 import StreamingText from "@/components/diary/add-new-entry/StreamingText";
 import HtmlViewer from "@/components/ui/HtmlViewer";
 import * as SecureStore from "@/utils/store/secureStore";
-import { hydrateEntryHtmlFromAlbum } from "@/utils/files/html";
+import { hydrateEntryHtmlFromAlbum } from "@/utils";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -78,7 +78,6 @@ export default function ContentEntry({
       >
         <View style={styles.content}>
           <HtmlViewer htmlContent={html} />
-          {/*<ViewReachEditor content={entry.content} />*/}
         </View>
         {entry && entry.aiComment && !strimCommentError && (
           <>
