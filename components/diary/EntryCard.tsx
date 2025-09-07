@@ -117,8 +117,13 @@ export default React.memo(function EntryCard({
           aiComment: res.data?.aiComment ?? prev.aiComment ?? null,
           dialogs: res.data?.dialogs ?? prev.dialogs ?? null,
         }));
-      } catch (e) {
-        console.error("Error fetching diary entry:", e);
+      } catch (err: any) {
+        console.error("Error fetching diary entry:", err);
+        console.error("Error fetching diary entry response:", err.response);
+        console.error(
+          "Error fetching diary entry response data:",
+          err.response.data,
+        );
       } finally {
         setIsExpanded(true);
       }

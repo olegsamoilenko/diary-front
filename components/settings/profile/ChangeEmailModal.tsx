@@ -13,7 +13,7 @@ import { Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ColorTheme, ErrorMessages } from "@/types";
+import { CodeStatus, ColorTheme, ErrorMessages } from "@/types";
 import * as Yup from "yup";
 import { apiRequest, passwordRules } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
@@ -43,6 +43,9 @@ export default function ChangeEmailModal({
   const [showChangeEmailForm, setShowChangeEmailForm] = useState(true);
   const [code, setCode] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [resendTimer, setResendTimer] = useState(0);
 
   const changeEmailSchema = Yup.object().shape({
     email: Yup.string()
@@ -77,16 +80,34 @@ export default function ChangeEmailModal({
         },
       });
 
+      if (res.data.status === CodeStatus.COOLDOWN) {
+        setTimer(res.data.retryAfterSec || 0);
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(intervalId);
+              setResendLoading(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        return;
+      }
+
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));
 
       UserEvents.emit("userChanged");
+      setEmail(values.email);
 
       setShowChangeEmailForm(false);
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("change email error", err);
+      console.log("change email error response", err?.response);
+      console.log("change email error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setLoading(false);
     } finally {
       setLoading(false);
@@ -111,13 +132,19 @@ export default function ChangeEmailModal({
         },
       });
 
-      if (res && res.status !== 201) {
-        Toast.show({
-          type: "error",
-          text1: t("toast.failedToResendCode"),
-          text2: t("toast.failedToResendCode"),
-        });
-        throw new Error("Failed to resend code");
+      if (res.data.status === CodeStatus.COOLDOWN) {
+        setResendTimer(res.data.retryAfterSec || 0);
+        const intervalId = setInterval(() => {
+          setResendTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(intervalId);
+              setResendLoading(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        return;
       }
 
       Toast.show({
@@ -126,10 +153,12 @@ export default function ChangeEmailModal({
         text2: t("toast.weHaveSentYouCodeByEmail"),
       });
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("resend code error", err);
+      console.log("resend code error response", err?.response);
+      console.log("resend code error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setCode("");
     } finally {
       setResendLoading(false);
@@ -147,17 +176,8 @@ export default function ChangeEmailModal({
       const res = await apiRequest({
         url: `/auth/new-email-confirm`,
         method: "POST",
-        data: { code },
+        data: { email, code },
       });
-
-      if (res && res.status !== 201) {
-        Toast.show({
-          type: "error",
-          text1: t("toast.failedToConfirmEmail"),
-          text2: t("toast.failedToConfirmEmail"),
-        });
-        throw new Error("Failed to confirm email");
-      }
 
       setCode("");
 
@@ -172,12 +192,17 @@ export default function ChangeEmailModal({
 
       UserEvents.emit("userChanged");
 
+      setShowChangeEmailForm(true);
+      setError(null);
+
       onSuccessChangeEmail();
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("new email confirm", err);
+      console.log("new email confirm response", err?.response);
+      console.log("new email confirm response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setCode("");
     } finally {
       setLoading(false);
@@ -187,7 +212,11 @@ export default function ChangeEmailModal({
   return (
     <ModalPortal
       visible={showChangeEmailModal}
-      onClose={() => setShowChangeEmailModal(false)}
+      onClose={() => {
+        setShowChangeEmailModal(false);
+        setShowChangeEmailForm(true);
+        setError(null);
+      }}
     >
       <ThemedText
         type="subtitleXL"
@@ -305,9 +334,20 @@ export default function ChangeEmailModal({
                   {error}
                 </ThemedText>
               )}
+              {timer > 0 && (
+                <ThemedText
+                  type="small"
+                  style={{ marginBottom: 10, textAlign: "center" }}
+                >
+                  {t("auth.youCanResendCodeIn")} {timer} {t("common.sec")}
+                </ThemedText>
+              )}
               <TouchableOpacity
                 style={styles.btn}
-                onPress={() => handleSubmit()}
+                onPress={() => {
+                  setError(null);
+                  handleSubmit();
+                }}
                 disabled={isSubmitting}
               >
                 {loading ? (
@@ -355,31 +395,41 @@ export default function ChangeEmailModal({
               {error}
             </ThemedText>
           )}
+          {!resendTimer && (
+            <TouchableOpacity
+              style={{
+                paddingHorizontal: 18,
+                paddingVertical: 10,
+                borderRadius: 12,
+                marginBottom: 16,
+              }}
+              onPress={resendCode}
+              disabled={resendLoading}
+            >
+              {resendLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <ThemedText
+                  type="subtitleLG"
+                  style={{
+                    color: colors.text,
+                    textAlign: "center",
+                  }}
+                >
+                  {t("auth.resendCode")}
+                </ThemedText>
+              )}
+            </TouchableOpacity>
+          )}
 
-          <TouchableOpacity
-            style={{
-              paddingHorizontal: 18,
-              paddingVertical: 10,
-              borderRadius: 12,
-              marginBottom: 16,
-            }}
-            onPress={resendCode}
-            disabled={resendLoading}
-          >
-            {resendLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <ThemedText
-                type="subtitleLG"
-                style={{
-                  color: colors.text,
-                  textAlign: "center",
-                }}
-              >
-                {t("auth.resendCode")}
-              </ThemedText>
-            )}
-          </TouchableOpacity>
+          {resendTimer > 0 && (
+            <ThemedText
+              type="small"
+              style={{ marginBottom: 10, textAlign: "center" }}
+            >
+              {t("auth.youCanResendCodeIn")} {resendTimer} {t("common.sec")}
+            </ThemedText>
+          )}
           <TouchableOpacity
             style={styles.btn}
             onPress={() => handleSubmit()}

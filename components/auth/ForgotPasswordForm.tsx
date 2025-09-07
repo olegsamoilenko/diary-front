@@ -8,7 +8,7 @@ import {
 import { ThemedText } from "@/components/ThemedText";
 import { Formik } from "formik";
 import React, { useMemo, useState } from "react";
-import { ColorTheme, ErrorMessages } from "@/types";
+import { CodeStatus, ColorTheme, ErrorMessages } from "@/types";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -21,7 +21,7 @@ import { apiUrl } from "@/constants/env";
 export default function ForgotPasswordForm({
   onSuccess,
 }: {
-  onSuccess: () => void;
+  onSuccess: (email: string) => void;
 }) {
   const { t } = useTranslation();
   const lang = useState<string | null>(i18n.language)[0];
@@ -47,25 +47,38 @@ export default function ForgotPasswordForm({
     setLoading(true);
     setError(null);
     try {
-      await axios.post(`${apiUrl}/auth/reset-password`, {
+      const res = await axios.post(`${apiUrl}/auth/reset-password`, {
         email: values.email,
         lang,
       });
 
+      if (res.data.status === CodeStatus.COOLDOWN) {
+        setError(
+          t("auth.youCanResendCodeIn") +
+            " " +
+            res.data.retryAfterSec +
+            " " +
+            t("common.sec"),
+        );
+        return;
+      }
+
       setLoading(false);
       resetForm();
       setSubmitting(false);
-      onSuccess();
+      onSuccess(values.email);
       Toast.show({
         type: "success",
         text1: t("toast.successfullySend"),
         text2: t("toast.weHaveSuccessfullySentTheCodeToYourEmail"),
       });
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("forgot password error", err);
+      console.log("forgot password error response", err?.response);
+      console.log("forgot password error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
     } finally {
       setLoading(false);
     }

@@ -151,8 +151,10 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         data: { theme: themeName },
       });
       setTheme(themeName as Theme);
-    } catch (error) {
+    } catch (error: any) {
       console.warn("Failed to update theme", error);
+      console.warn("Failed to update theme response", error.response);
+      console.warn("Failed to update theme response data", error.response.data);
     }
   };
 

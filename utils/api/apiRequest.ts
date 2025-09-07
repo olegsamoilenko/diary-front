@@ -3,6 +3,8 @@ import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
 import Constants from "expo-constants";
 import { getToken } from "@/utils/";
+import i18n from "@/i18n";
+import { ErrorMessages } from "@/types";
 
 const apiUrl2 = Constants?.expoConfig?.extra?.API_URL;
 
@@ -55,7 +57,7 @@ export async function apiRequest<T = any>({
         console.error("Network or Axios error:", err.message, err.code);
         Toast.show({
           type: "error",
-          text1: "Network Error",
+          text1: i18n.t("errors.networkOrAxiosError"),
           text2: err.message,
         });
         throw err;
@@ -74,10 +76,13 @@ export async function apiRequest<T = any>({
 
       Toast.show({
         type: "error",
-        text1: err.response.data.statusMessage
-          ? `${err.response.data.statusMessage}`
-          : "Unknown Error",
-        text2: errorMessage,
+        text1: err.response.data.code
+          ? i18n.t(
+              `errors.${ErrorMessages[err.response.data.code as keyof typeof ErrorMessages]}`,
+            )
+          : errorMessage
+            ? errorMessage
+            : i18n.t(`errors.unknownError`),
       });
 
       throw err;
@@ -85,7 +90,7 @@ export async function apiRequest<T = any>({
       console.error("Unexpected Error:", err);
       Toast.show({
         type: "error",
-        text1: "Unexpected Error",
+        text1: i18n.t(`errors.undefined`),
         text2: String(err),
       });
       throw new Error("An unexpected error occurred");

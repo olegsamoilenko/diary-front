@@ -64,7 +64,7 @@ export default function PhoneVerificationCodeForm({
       console.log(err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
     } finally {
       setLoading(false);
     }

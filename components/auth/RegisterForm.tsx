@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ColorTheme, ErrorMessages, User } from "@/types";
+import { CodeStatus, ColorTheme, ErrorMessages, User } from "@/types";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import * as SecureStore from "@/utils/store/secureStore";
 import { passwordRules } from "@/utils/";
@@ -70,6 +70,16 @@ export default function RegisterForm({
         lang,
         uuid: user.uuid,
       });
+      if (res.data.status === CodeStatus.COOLDOWN) {
+        setError(
+          t("auth.youCanResendCodeIn") +
+            " " +
+            res.data.retryAfterSec +
+            " " +
+            t("common.sec"),
+        );
+        return;
+      }
       setLoading(false);
       setShowEmailVerificationCodeForm(true);
       resetForm();
@@ -81,10 +91,12 @@ export default function RegisterForm({
         text2: t("toast.youHaveSuccessfullyRegistered"),
       });
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("handle register error", err);
+      console.log("handle register error response", err?.response);
+      console.log("handle register error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setLoading(false);
     }
   };

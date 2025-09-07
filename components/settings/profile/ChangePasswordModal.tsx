@@ -79,10 +79,12 @@ export default function ChangePasswordModal({
 
       onSuccessChangePassword();
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("change password error", err);
+      console.log("change password error response", err?.response);
+      console.log("change password error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setLoading(false);
     } finally {
       setLoading(false);

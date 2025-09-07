@@ -291,7 +291,7 @@ export default function TextReachEditor({
           }, 0);
 
           setShowPhotoSetting(false);
-        } catch (error) {
+        } catch (error: any) {
           // TODO: Показати користувачу тоаст з помилкою.
           // @ts-ignore
           richText.current?.commandDOM(
@@ -301,7 +301,12 @@ export default function TextReachEditor({
             // @ts-ignore
             scrollRef.current?.scrollToEnd({ animated: true });
           }, 0);
-          console.error("Error picking image:", error);
+          console.error("Error picking photo:", error);
+          console.error("Error picking photo response:", error.response);
+          console.error(
+            "Error picking photo response data:",
+            error.response.data,
+          );
         }
         setShowPhotoSetting(false);
       };
@@ -343,6 +348,11 @@ export default function TextReachEditor({
             scrollRef.current?.scrollToEnd({ animated: true });
           }, 0);
           console.error("Error picking image:", error);
+          console.error("Error picking image response:", error.response);
+          console.error(
+            "Error picking image response data:",
+            error.response.data,
+          );
           setShowImageSetting(false);
         }
       };

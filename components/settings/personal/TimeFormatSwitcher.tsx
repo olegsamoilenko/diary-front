@@ -50,8 +50,13 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         user.settings.timeFormat = format;
         await SecureStore.setItemAsync("user", JSON.stringify(user));
       }
-    } catch (error) {
-      console.warn("Failed to update lang", error);
+    } catch (error: any) {
+      console.warn("Failed to update timeFormat", error);
+      console.warn("Failed to update timeFormat response", error.response);
+      console.warn(
+        "Failed to update timeFormat response data",
+        error.response.data,
+      );
     }
   }
 

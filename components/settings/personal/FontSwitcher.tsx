@@ -48,8 +48,10 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         user.settings.font = font;
         await SecureStore.setItemAsync("user", JSON.stringify(user));
       }
-    } catch (error) {
-      console.warn("Failed to update lang", error);
+    } catch (error: any) {
+      console.warn("Failed to update font", error);
+      console.warn("Failed to update font response", error.response);
+      console.warn("Failed to update font response data", error.response.data);
     }
   };
 

@@ -107,13 +107,16 @@ export default function Diary() {
           ...prev,
           [day]: response.data,
         }));
-        console.log("Fetched entries for", day, response.data);
+
         setWeekAnchorDay(day);
         setShowWeek(true);
-      } catch (e) {
-        if (id === reqIdRef.current) {
-          console.error("Error fetching diary entries:", e);
-        }
+      } catch (err: any) {
+        console.error("Error fetching diary entries:", err);
+        console.error("Error fetching diary entries response:", err.response);
+        console.error(
+          "Error fetching diary entries response data:",
+          err.response.data,
+        );
       } finally {
         if (id === reqIdRef.current) setLoading(false);
       }
@@ -132,9 +135,22 @@ export default function Diary() {
         method: "POST",
         data: { month, year, offsetMinutes },
       });
+      if (response?.status !== 200 && response?.status !== 201) {
+        console.log("No data returned from server");
+        Toast.show({
+          type: "error",
+          text1: t(`error.noDataReturnedFromServer`),
+        });
+        return;
+      }
       setMoodsByDate(response.data);
-    } catch (e) {
-      console.error("Error fetching moods by date:", e);
+    } catch (err: any) {
+      console.error("Error fetching moods by date:", err);
+      console.error("Error fetching moods by date response:", err.response);
+      console.error(
+        "Error fetching moods by date response data:",
+        err.response.data,
+      );
     }
   }, [month, year, offsetMinutes]);
 
@@ -187,8 +203,12 @@ export default function Diary() {
           url: `/diary-entries/${entry.id}`,
           method: "DELETE",
         });
-        if (response?.status !== 200) {
+        if (response?.status !== 200 && response?.status !== 201) {
           console.log("No data returned from server");
+          Toast.show({
+            type: "error",
+            text1: t(`error.noDataReturnedFromServer`),
+          });
           return;
         }
         setDiaryEntries((prev) => ({
@@ -203,8 +223,10 @@ export default function Diary() {
           text2: t(`diary.entry.youHaveSuccessfullyDeletedThisEntry`),
         });
         await fetchMoodsByDate();
-      } catch (e) {
-        console.error("Error deleting entry:", e);
+      } catch (err: any) {
+        console.error("Error deleting entry:", err);
+        console.error("Error deleting entry response:", err.response);
+        console.error("Error deleting entry response data:", err.response.data);
       }
     },
     [selectedDay, fetchMoodsByDate],

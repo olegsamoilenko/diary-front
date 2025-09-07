@@ -92,8 +92,10 @@ export default function AuthGate({
         else if (!pinStr) setStep("setup");
         else if (bio) setStep("biometry");
         else setStep("pin");
-      } catch (e) {
-        console.warn("AuthGate init failed", e);
+      } catch (err: any) {
+        console.warn("AuthGate init failed", err);
+        console.warn("AuthGate init failed response", err.response);
+        console.warn("AuthGate init failed response data", err.response.data);
         setStep("name");
       }
     })();
@@ -124,6 +126,10 @@ export default function AuthGate({
 
         if (!res || (res.status !== 200 && res.status !== 201)) {
           console.log("No data returned from server");
+          Toast.show({
+            type: "error",
+            text1: t(`error.noDataReturnedFromServer`),
+          });
           return;
         }
 
@@ -146,7 +152,9 @@ export default function AuthGate({
         setBiometryEnabled(bio);
         setStep(!pinStr ? "setup" : bio ? "biometry" : "pin");
       } catch (err: any) {
-        console.log(err?.response?.data ?? err);
+        console.log("Set Name error", err);
+        console.log("Set Name error response", err.response);
+        console.log("Set Name error response data", err.response.data);
       } finally {
         setNameLoading(false);
         setSubmitting(false);

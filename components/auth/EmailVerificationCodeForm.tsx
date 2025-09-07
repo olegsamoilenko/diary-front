@@ -7,8 +7,7 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import React, { useMemo, useState } from "react";
-import type { ColorTheme } from "@/types";
-import { ErrorMessages } from "@/types";
+import { ColorTheme, User, ErrorMessages, CodeStatus } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
@@ -17,6 +16,7 @@ import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
 import { UserEvents } from "@/utils/events/userEvents";
+import i18n from "i18next";
 
 type EmailVerificationCodeFormProps = {
   forPlanSelect: boolean;
@@ -34,6 +34,8 @@ export default function EmailVerificationCodeForm({
   const [resendLoading, setResendLoading] = useState(false);
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
+  const lang = useState<string | null>(i18n.language)[0];
+  const [timer, setTimer] = useState(0);
 
   const handleSubmit = async () => {
     if (code.length !== 6) {
@@ -42,8 +44,11 @@ export default function EmailVerificationCodeForm({
     }
     setLoading(true);
     setError(null);
+    const userString = await SecureStore.getItemAsync("user");
+    const user: User = userString ? JSON.parse(userString) : null;
     try {
       const res = await axios.post(`${apiUrl}/auth/confirm-email`, {
+        email: user?.email,
         code,
       });
 
@@ -70,11 +75,17 @@ export default function EmailVerificationCodeForm({
       onSuccessEmailCode();
       UserEvents.emit("userRegistered");
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("confirm email error", err);
+      console.log("confirm email error response", err?.response);
+      console.log("confirm email error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setCode("");
+      Toast.show({
+        type: "error",
+        text1: errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"),
+      });
     } finally {
       setLoading(false);
     }
@@ -85,18 +96,27 @@ export default function EmailVerificationCodeForm({
     const user = rowUser ? JSON.parse(rowUser) : null;
     setCode("");
     setResendLoading(true);
+    setError(null);
     try {
       const res = await axios.post(`${apiUrl}/auth/resend-code`, {
+        lang,
         email: user?.email,
+        type: "register",
       });
 
-      if (res && res.status !== 201) {
-        Toast.show({
-          type: "error",
-          text1: t("toast.failedToResendCode"),
-          text2: t("toast.failedToResendCode"),
-        });
-        throw new Error("Failed to resend code");
+      if (res.data.status === CodeStatus.COOLDOWN) {
+        setTimer(res.data.retryAfterSec || 0);
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(intervalId);
+              setResendLoading(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        return;
       }
 
       Toast.show({
@@ -105,10 +125,12 @@ export default function EmailVerificationCodeForm({
         text2: t("toast.weHaveSentYouCodeByEmail"),
       });
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("resend code error", err);
+      console.log("resend code error response", err?.response);
+      console.log("resend code error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setCode("");
     } finally {
       setResendLoading(false);
@@ -135,27 +157,38 @@ export default function EmailVerificationCodeForm({
         </ThemedText>
       )}
 
-      <TouchableOpacity
-        style={styles.resendCodeBtn}
-        onPress={resendCode}
-        disabled={resendLoading}
-      >
-        {resendLoading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <ThemedText
-            type="subtitleLG"
-            style={[
-              styles.text,
-              {
-                color: colors.text,
-              },
-            ]}
-          >
-            {t("auth.resendCode")}
-          </ThemedText>
-        )}
-      </TouchableOpacity>
+      {!timer && (
+        <TouchableOpacity
+          style={styles.resendCodeBtn}
+          onPress={resendCode}
+          disabled={resendLoading}
+        >
+          {resendLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <ThemedText
+              type="subtitleLG"
+              style={[
+                styles.text,
+                {
+                  color: colors.text,
+                },
+              ]}
+            >
+              {t("auth.resendCode")}
+            </ThemedText>
+          )}
+        </TouchableOpacity>
+      )}
+
+      {timer > 0 && (
+        <ThemedText
+          type="small"
+          style={{ marginBottom: 10, textAlign: "center" }}
+        >
+          {t("auth.youCanResendCodeIn")} {timer} {t("common.sec")}
+        </ThemedText>
+      )}
       <TouchableOpacity
         style={styles.btn}
         onPress={() => handleSubmit()}

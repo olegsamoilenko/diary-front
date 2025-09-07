@@ -16,6 +16,7 @@ import { PlanStatus } from "./plan";
 import { Font, Lang, TimeFormat, ETheme } from "./userSettings";
 import { Dialog } from "./dialog";
 import type { EntryImage } from "./images";
+import { CodeStatus } from "./CodeStatus";
 
 export type {
   ColorTheme,
@@ -46,4 +47,5 @@ export {
   Lang,
   TimeFormat,
   ETheme,
+  CodeStatus,
 };

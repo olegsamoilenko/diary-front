@@ -73,10 +73,12 @@ export default function ChangeNameModal({
 
       onSuccessChangeName();
     } catch (err: any) {
-      console.log(err?.response?.data);
+      console.log("change name error", err);
+      console.log("change name error response", err?.response);
+      console.log("change name error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(t(`errors.${errorKey}`));
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setLoading(false);
     } finally {
       setLoading(false);

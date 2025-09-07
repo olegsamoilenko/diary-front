@@ -91,8 +91,10 @@ export default function Plans({
 
         UserEvents.emit("userChanged");
         onSuccess?.();
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error setting plan:", error);
+        console.error("Error setting plan response:", error.response);
+        console.error("Error setting plan response data:", error.response.data);
       } finally {
         setLoading(false);
       }

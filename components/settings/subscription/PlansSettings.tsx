@@ -73,8 +73,13 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
           "user",
           JSON.stringify({ ...user, plan: null }),
         );
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error unsubscribing:", error);
+        console.error("Error unsubscribing response:", error.response);
+        console.error(
+          "Error unsubscribing response data:",
+          error.response.data,
+        );
       }
     }
   };

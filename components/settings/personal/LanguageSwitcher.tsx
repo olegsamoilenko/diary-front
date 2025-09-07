@@ -57,8 +57,10 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         user.settings.lang = value;
         await SecureStore.setItemAsync("user", JSON.stringify(user));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn("Failed to update lang", error);
+      console.warn("Failed to update lang response", error.response);
+      console.warn("Failed to update lang response data", error.response.data);
     }
   }, []);
 

@@ -54,7 +54,10 @@
     "continueWithoutRegistration": "Продовжити без реєстрації",
     "registerOrNotDescription": "Якщо ви продовжите без реєстрації, ваші записи будуть втрачені при видаленні додатку або перенесенні на інший пристрій.",
     "wantToDeleteAccount": "Ви впевнені, що хочете видалити свій акаунт?",
-    "loseAllRecords": "Ви втратите всі свої записи. Цю дію не можна скасувати."
+    "loseAllRecords": "Ви втратите всі свої записи. Цю дію не можна скасувати.",
+    "weHaveSentYouCodeToDeleteYourAccount": "Ми надіслали вам код для видалення вашого акаунту на електронну пошту.",
+    "pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount": "Будь ласка, введіть цей код, щоб підтвердити видалення вашого акаунту",
+    "youCanResendCodeIn": "Ви можете надіслати код знову через",
   },
   "diary": {
     "title": "Щоденник",
@@ -226,13 +229,15 @@
     "no": "Ні",
     "loading": "Завантаження...",
     "or": "або",
-    "continue": "Продовжити"
+    "continue": "Продовжити",
+    "sec": "сек.",
   },
   "errors": {
     "invalidPassword": "Ви ввели невірний пароль",
     "userNotFound": "Користувача не знайдено",
     "emailNotVerified": "Електронна пошта не підтверджена",
     "invalidCode": "Наданий код є недійсним або простроченим",
+    "expiredCode": "Наданий код є простроченим",
     "emailAlreadyVerified": "Електронна пошта вже підтверджена",
     "userAlreadyExists": "Користувач з такою електронною поштою вже існує",
     "undefined": "Сталася помилка, будь ласка, спробуйте ще раз",
@@ -278,6 +283,19 @@
     "closedTestingHasBeenCompletedIfYouWouldLike": "Закрите тестування завершено. Якщо ви бажаєте взяти участь у наступному тестуванні, зверніться до служби підтримки.",
     "testingHasBeenCompleted": "Тестування завершено",
     "testingHasBeenCompletedIfYouWouldLike": "Тестування завершено. Якщо ви бажаєте продовжувати користуватися додатком, підпишіться на план.",
+    "attemptsExceeded": "Перевищено кількість спроб. Спробуйте пізніше.",
+    "rateLimited": "Обмеження частоти запитів. Спробуйте пізніше.",
+    "networkOrAxiosError": "Помилка мережі або Axios",
+    "unknownError": "Невідома помилка",
+    "adminNotFound": "Адміністратор не знайдений",
+    "invalidGoogleToken": "Недійсний Google токен",
+    "trialAlreadyUsed": "Пробний період вже використано",
+    "planNotActive": "План не активний",
+    "subscriptionError": "Помилка підписки",
+    "tokenCalculationError": "Помилка обчислення токенів",
+    "planAlreadyCanceled": "План вже скасовано",
+    "getEntriesByDateError": "Помилка отримання записів за датою",
+    "getMoodsByDateError": "Помилка отримання настроїв за датою",
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",
@@ -300,6 +318,7 @@
     "youHaveSuccessfullyChangedYourName": "Ви успішно змінили своє ім'я",
     "youHaveSuccessfullyChangedYourEmail": "Ви успішно змінили свою електронну пошту",
     "youHaveSuccessfullyChangedYourPassword": "Ви успішно змінили свій пароль",
+    "successfullyChanged": "Успішно змінено",
     "successfullyLoggedOut": "Ви успішно вийшли з додатку"
   },
   "welcome": {

@@ -39,8 +39,13 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
         user.settings.aiModel = aiModel;
         await SecureStore.setItemAsync("user", JSON.stringify(user));
       }
-    } catch (error) {
-      console.warn("Failed to update lang", error);
+    } catch (error: any) {
+      console.warn("Failed to update aiModel", error);
+      console.warn("Failed to update aiModel response", error.response);
+      console.warn(
+        "Failed to update aiModel response data",
+        error.response.data,
+      );
     }
   };
 

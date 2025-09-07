@@ -12,6 +12,7 @@ import { apiUrl } from "@/constants/env";
 import { Image } from "expo-image";
 import { UserEvents } from "@/utils/events/userEvents";
 import { useEffect } from "react";
+import Toast from "react-native-toast-message";
 
 export default function GoogleSignInButton({
   forPlanSelect,
@@ -45,6 +46,8 @@ export default function GoogleSignInButton({
       return userInfo;
     } catch (err: any) {
       console.log("Error GoogleLogin", err);
+      console.log("Error GoogleLogin response", err.response);
+      console.log("Error GoogleLogin response data", err.response.data);
       throw err;
     }
   };
@@ -59,9 +62,13 @@ export default function GoogleSignInButton({
         idToken,
       });
 
-      if (res && res.status !== 201) {
-        console.log("Unexpected response status:", res);
-        throw new Error("Failed to sign in with Google");
+      if (res?.status !== 200 && res?.status !== 201) {
+        console.log("No data returned from server");
+        Toast.show({
+          type: "error",
+          text1: t(`error.noDataReturnedFromServer`),
+        });
+        return;
       }
 
       await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
@@ -73,7 +80,6 @@ export default function GoogleSignInButton({
       console.error("Error during Google sign-in:1", err);
       console.error("Error during Google sign-in:2", err.response);
       console.error("Error during Google sign-in:3", err.response.data);
-      console.error("Error during Google sign-in:4", err.message);
     }
   };
 

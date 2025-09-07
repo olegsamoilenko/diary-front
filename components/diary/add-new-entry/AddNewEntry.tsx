@@ -335,10 +335,12 @@ const AddNewEntry = forwardRef<
         },
       });
 
-      const status = res?.status ?? 0;
-      if (!(status === 200 || status === 201)) {
+      if (res.status !== 200 && res.status !== 201) {
         console.log("No data returned from server");
-        setLoading(false);
+        Toast.show({
+          type: "error",
+          text1: t(`error.noDataReturnedFromServer`),
+        });
         return;
       }
 
@@ -357,14 +359,9 @@ const AddNewEntry = forwardRef<
             userId,
             Number(newEntry.id),
             {
-              exportToGallery: true, // ← твій прапорець
-              // preferSAFOnAndroid: true, // щоб оминати DCIM
+              exportToGallery: true,
             },
           );
-          // const meta = await persistToGalleryWithMeta(
-          //   userId,
-          //   Number(newEntry.id),
-          // );
 
           if (meta.length) {
             const hydrated = hydrateHtmlWithLocalUris(contentWithTokens, meta);
@@ -380,8 +377,13 @@ const AddNewEntry = forwardRef<
               data: { items: itemsForServer },
             });
           }
-        } catch (e) {
-          console.warn("Images persist error:", e);
+        } catch (err: any) {
+          console.warn("Images persist error:", err);
+          console.warn("Images persist error response:", err.response);
+          console.warn(
+            "Images persist error response data:",
+            err.response.data,
+          );
         } finally {
           clearPending();
         }
@@ -440,7 +442,9 @@ const AddNewEntry = forwardRef<
         getToken: async () => await getToken(),
       });
     } catch (err: any) {
-      console.log("Error saving entry.ts:", err?.response?.data);
+      console.log("Error saving entry.ts:", err);
+      console.log("Error saving entry.ts response:", err?.response);
+      console.log("Error saving entry.ts response data:", err?.response?.data);
       setLoading(false);
       setContentLoading(false);
     }

@@ -310,7 +310,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                 <DeleteAccountModal
                   showDeleteAccountModal={showDeleteAccountModal}
                   setShowDeleteAccountModal={setShowDeleteAccountModal}
-                  userId={Number(user?.id)}
+                  user={user}
                 />
               </View>
             )}

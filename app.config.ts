@@ -84,6 +84,7 @@ export default ({ config }: { config: any }) => ({
       edgeToEdgeEnabled: true,
       enableProguardInReleaseBuilds: false,
       permissions: ["READ_MEDIA_IMAGES", "READ_EXTERNAL_STORAGE"],
+      usesCleartextTraffic: false,
     },
     web: {
       bundler: "metro",

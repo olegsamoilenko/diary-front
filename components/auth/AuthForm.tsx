@@ -43,8 +43,10 @@ export default function AuthForm({
   const { t } = useTranslation();
   const [showForgotPasswordForm, setShowForgotPasswordForm] = useState(false);
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const [emailForPasswordReset, setEmailForPasswordReset] = useState("");
 
-  const onSuccessResetPassword = () => {
+  const onSuccessResetPassword = (email: string) => {
+    setEmailForPasswordReset(email);
     setShowForgotPasswordForm(false);
     setShowChangePasswordForm(true);
   };
@@ -73,7 +75,10 @@ export default function AuthForm({
           ) : showForgotPasswordForm ? (
             <ForgotPasswordForm onSuccess={onSuccessResetPassword} />
           ) : showChangePasswordForm ? (
-            <ChangePasswordForm onSuccess={onSuccessChangePassword} />
+            <ChangePasswordForm
+              email={emailForPasswordReset}
+              onSuccess={onSuccessChangePassword}
+            />
           ) : (
             <View style={styles.container}>
               {/* Tabs */}

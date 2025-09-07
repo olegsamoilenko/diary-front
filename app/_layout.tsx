@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, lazy, Suspense } from "react";
+import { Appearance, unstable_batchedUpdates, AppState } from "react-native";
 import "../i18n";
 import "@/constants/CalendarLocale";
 import { ThemeProvider as NavThemeProvider } from "@react-navigation/native";
@@ -31,7 +32,6 @@ import { resetFont } from "@/store/slices/settings/fontSlice";
 import { resetTimeFormat } from "@/store/slices/settings/timeFormatSlice";
 import { resetAiModel } from "@/store/slices/settings/aiModelSlice";
 import { useHydrateSettings } from "@/hooks/useHydrateSettings";
-import { unstable_batchedUpdates, AppState } from "react-native";
 import * as Localization from "expo-localization";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -154,12 +154,14 @@ export default function RootLayout() {
 }
 
 async function createAnonymousUser(): Promise<User | null> {
+  const lang = i18n.language;
+  const theme = Appearance.getColorScheme();
   try {
     const newUuid = uuid.v4();
     const res = await apiRequest({
       url: `/users/create-by-uuid`,
       method: "POST",
-      data: { uuid: newUuid },
+      data: { uuid: newUuid, lang, theme },
     });
     if (res?.status === 201) {
       const data = await res.data;
@@ -167,8 +169,13 @@ async function createAnonymousUser(): Promise<User | null> {
       await SecureStore.setItemAsync("user", JSON.stringify(data.user));
       return data.user as User;
     }
-  } catch (e) {
-    console.warn("Failed to create anonymous user", e);
+  } catch (err: any) {
+    console.warn("Failed to create anonymous user error", err);
+    console.warn("Failed to create anonymous user response", err.response);
+    console.warn(
+      "Failed to create anonymous user response data",
+      err.response.data,
+    );
   }
   return null;
 }
@@ -199,8 +206,10 @@ function AppContent() {
           await i18n.changeLanguage(lang);
           LocaleConfig.defaultLocale = lang;
         }
-      } catch (e) {
-        console.warn("Failed to init user/lang", e);
+      } catch (err: any) {
+        console.warn("Failed to init user/lang", err);
+        console.warn("Failed to init user/lang response", err.response);
+        console.warn("Failed to init user/lang response data", e.response.data);
       }
     })();
     return () => {

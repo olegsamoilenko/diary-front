@@ -123,8 +123,10 @@ export async function persistPrivateThenMaybeExportWithMeta(
             assetId = asset.id;
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         console.warn("Export failed", e);
+        console.warn("Export failed response", e.response);
+        console.warn("Export failed response data", e.response.data);
       }
     }
 
@@ -308,7 +310,9 @@ export async function deleteEntryImages(entriesImages: EntryImage[]) {
 
   try {
     await MediaLibrary.deleteAssetsAsync(assetIds);
-  } catch (e) {
+  } catch (e: any) {
     console.warn("Failed to delete assets", e);
+    console.warn("Failed to delete assets response", e.response);
+    console.warn("Failed to delete assets response data", e.response.data);
   }
 }
