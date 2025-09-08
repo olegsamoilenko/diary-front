@@ -98,7 +98,7 @@ export default function ChangeEmailModal({
       await SecureStore.setItemAsync("user", JSON.stringify(res.data));
 
       UserEvents.emit("userChanged");
-      setEmail(values.email);
+      setEmail(values.newEmail);
 
       setShowChangeEmailForm(false);
     } catch (err: any) {
@@ -117,8 +117,6 @@ export default function ChangeEmailModal({
 
   const resendCode = async () => {
     setError(null);
-    const rowUser = await SecureStore.getItemAsync("user");
-    const user = rowUser ? JSON.parse(rowUser) : null;
     setCode("");
     setResendLoading(true);
     try {
@@ -126,7 +124,7 @@ export default function ChangeEmailModal({
         url: `/auth/resend-code`,
         method: "POST",
         data: {
-          email: user?.email,
+          email: email,
           lang: i18n.language,
           type: "newEmail",
         },

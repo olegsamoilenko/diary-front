@@ -35,6 +35,7 @@ export default function ChangePasswordForm({
   const lang = useState<string | null>(i18n.language)[0];
   const [resendLoading, setResendLoading] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [resendTimer, setResendTimer] = useState(0);
 
   const passwordSchema = Yup.object().shape({
     code: Yup.string()
@@ -62,11 +63,25 @@ export default function ChangePasswordForm({
     setLoading(true);
     setError(null);
     try {
-      await axios.post(`${apiUrl}/auth/change-password`, {
+      const res = await axios.post(`${apiUrl}/auth/change-password`, {
         email,
         code: values.code,
         password: values.password,
       });
+
+      if (res.data.status === CodeStatus.COOLDOWN) {
+        setTimer(res.data.retryAfterSec || 0);
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(intervalId);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        return;
+      }
 
       setLoading(false);
       resetForm();
@@ -99,9 +114,9 @@ export default function ChangePasswordForm({
       });
 
       if (res.data.status === CodeStatus.COOLDOWN) {
-        setTimer(res.data.retryAfterSec || 0);
+        setResendTimer(res.data.retryAfterSec || 0);
         const intervalId = setInterval(() => {
-          setTimer((prev) => {
+          setResendTimer((prev) => {
             if (prev <= 1) {
               clearInterval(intervalId);
               setResendLoading(false);
@@ -224,7 +239,7 @@ export default function ChangePasswordForm({
                 {error}
               </ThemedText>
             )}
-            {!timer && (
+            {!resendTimer && (
               <TouchableOpacity
                 style={styles.resendCodeBtn}
                 onPress={resendCode}
@@ -248,12 +263,20 @@ export default function ChangePasswordForm({
               </TouchableOpacity>
             )}
 
+            {resendTimer > 0 && (
+              <ThemedText
+                type="small"
+                style={{ marginBottom: 10, textAlign: "center" }}
+              >
+                {t("auth.youCanResendCodeIn")} {resendTimer} {t("common.sec")}
+              </ThemedText>
+            )}
             {timer > 0 && (
               <ThemedText
                 type="small"
                 style={{ marginBottom: 10, textAlign: "center" }}
               >
-                {t("auth.youCanResendCodeIn")} {timer} {t("common.sec")}
+                {t("auth.youCanSendCodeIn")} {timer} {t("common.sec")}
               </ThemedText>
             )}
             <TouchableOpacity

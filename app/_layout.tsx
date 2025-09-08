@@ -280,6 +280,9 @@ function MainAfterAuth({
   );
   const [continueWithoutRegistration, setContinueWithoutRegistration] =
     useState(false);
+  const [handleSubscriptionPrevStep, setHandleSubscriptionPrevStep] = useState<
+    "RegisterOrNot" | "AuthForm" | null
+  >(null);
 
   useEffect(() => {
     const getRegisterOrNot = async () => {
@@ -300,7 +303,10 @@ function MainAfterAuth({
       <RegisterOrNot
         setContinueWithoutRegistration={setContinueWithoutRegistration}
         setShowAuthForm={setShowAuthForm}
-        onChoice={() => setShowRegisterOrNot(false)}
+        onChoice={() => {
+          setShowRegisterOrNot(false);
+          setHandleSubscriptionPrevStep("RegisterOrNot");
+        }}
       />
     );
   }
@@ -309,9 +315,22 @@ function MainAfterAuth({
     return (
       <AuthForm
         forPlanSelect
-        onSuccessSignWithGoogle={() => setShowAuthForm(false)}
-        onSuccessEmailCode={() => setShowAuthForm(false)}
-        onSuccessSignIn={() => setShowAuthForm(false)}
+        onSuccessSignWithGoogle={() => {
+          setShowAuthForm(false);
+          setHandleSubscriptionPrevStep("AuthForm");
+        }}
+        onSuccessEmailCode={() => {
+          setShowAuthForm(false);
+          setHandleSubscriptionPrevStep("AuthForm");
+        }}
+        onSuccessSignIn={() => {
+          setShowAuthForm(false);
+          setHandleSubscriptionPrevStep("AuthForm");
+        }}
+        handleBack={() => {
+          setShowAuthForm(false);
+          setShowRegisterOrNot(true);
+        }}
       />
     );
   }
@@ -322,6 +341,13 @@ function MainAfterAuth({
         setShowRegisterOrNot={setShowRegisterOrNot}
         onSuccess={onSuccessHandleSubscription}
         continueWithoutRegistration={continueWithoutRegistration}
+        back={() => {
+          if (handleSubscriptionPrevStep === "AuthForm") {
+            setShowAuthForm(true);
+          } else {
+            setShowRegisterOrNot(true);
+          }
+        }}
       />
     );
   }

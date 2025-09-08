@@ -77,9 +77,12 @@ export default function GoogleSignInButton({
       onSuccessSignWithGoogle();
       UserEvents.emit("userLoggedIn", res.data.user);
     } catch (err: any) {
-      console.error("Error during Google sign-in:1", err);
-      console.error("Error during Google sign-in:2", err.response);
-      console.error("Error during Google sign-in:3", err.response.data);
+      console.error("Error during Google sign-in:", err);
+      console.error("Error during Google sign-in response:", err.response);
+      console.error(
+        "Error during Google sign-in response data:",
+        err.response.data,
+      );
     }
   };
 
@@ -93,6 +96,8 @@ export default function GoogleSignInButton({
       }
     } catch (err: any) {
       console.log("Error googleSignIn", err);
+      console.log("Error googleSignIn response", err.response);
+      console.log("Error googleSignIn response data", err.response.data);
     }
   };
 

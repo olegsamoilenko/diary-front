@@ -125,61 +125,6 @@ export default function DeleteAccountModal({
         },
       });
 
-      if (res.data.status === CodeStatus.INVALID_CODE) {
-        setError(t(`errors.${ErrorMessages.INVALID_CODE}`));
-        Toast.show({
-          type: "error",
-          text1:
-            t(`errors.${ErrorMessages.INVALID_CODE}`) || t("errors.undefined"),
-        });
-        setLoading(false);
-        setCode("");
-        return;
-      }
-      if (res.data.status === CodeStatus.EXPIRED_CODE) {
-        setError(t(`errors.${ErrorMessages.EXPIRED_CODE}`));
-        Toast.show({
-          type: "error",
-          text1:
-            t(`errors.${ErrorMessages.EXPIRED_CODE}`) || t("errors.undefined"),
-        });
-        setLoading(false);
-        setCode("");
-        return;
-      }
-      if (res.data.status === CodeStatus.ATTEMPTS_EXCEEDED) {
-        setError(t(`errors.${ErrorMessages.ATTEMPTS_EXCEEDED}`));
-        Toast.show({
-          type: "error",
-          text1:
-            t(`errors.${ErrorMessages.ATTEMPTS_EXCEEDED}`) ||
-            t("errors.undefined"),
-        });
-        setLoading(false);
-        setCode("");
-        return;
-      }
-      if (res.data.status === CodeStatus.RATE_LIMITED) {
-        setError(t(`errors.${ErrorMessages.RATE_LIMITED}`));
-        Toast.show({
-          type: "error",
-          text1:
-            t(`errors.${ErrorMessages.RATE_LIMITED}`) || t("errors.undefined"),
-        });
-        setLoading(false);
-        setCode("");
-        return;
-      }
-      if (res.data.status === CodeStatus.BAD) {
-        setError(t(`errors.undefined`));
-        Toast.show({
-          type: "error",
-          text1: t("errors.undefined"),
-        });
-        setLoading(false);
-        setCode("");
-        return;
-      }
       if (res.data.status === CodeStatus.OK) {
         await Promise.allSettled([
           SecureStore.deleteItemAsync("token"),
@@ -194,6 +139,7 @@ export default function DeleteAccountModal({
         UserEvents.emit("userDeleted");
         setShowDeleteAccountModal(false);
         setLoading(false);
+        setCode("");
       }
     } catch (error: any) {
       console.error("Error deleting account:", error);
@@ -202,9 +148,21 @@ export default function DeleteAccountModal({
         "Error deleting account response data:",
         error.response.data,
       );
+      setCode("");
+      setError(
+        error.response.data.code
+          ? t(
+              `errors.${ErrorMessages[error.response.data.code as keyof typeof ErrorMessages]}`,
+            )
+          : t(`errors.errorDeletingAccount`),
+      );
       Toast.show({
         type: "error",
-        text1: t("toast.errorDeletingAccount"),
+        text1: error.response.data.code
+          ? t(
+              `errors.${ErrorMessages[error.response.data.code as keyof typeof ErrorMessages]}`,
+            )
+          : t(`errors.errorDeletingAccount`),
       });
       setLoading(false);
     }

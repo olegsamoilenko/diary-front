@@ -54,7 +54,7 @@ export default function ForgotPasswordForm({
 
       if (res.data.status === CodeStatus.COOLDOWN) {
         setError(
-          t("auth.youCanResendCodeIn") +
+          t("auth.youCanResendEmailIn") +
             " " +
             res.data.retryAfterSec +
             " " +
@@ -76,9 +76,19 @@ export default function ForgotPasswordForm({
       console.log("forgot password error", err);
       console.log("forgot password error response", err?.response);
       console.log("forgot password error response data", err?.response?.data);
+      console.log(
+        "forgot password error response data message",
+        err?.response?.data.message,
+      );
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
-      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
+      setError(
+        errorKey
+          ? t(`errors.${errorKey}`)
+          : err?.response?.data?.message
+            ? err?.response?.data.message
+            : t("errors.undefined"),
+      );
     } finally {
       setLoading(false);
     }

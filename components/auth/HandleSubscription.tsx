@@ -1,5 +1,11 @@
 import React, { useMemo, useState, useCallback, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import type { ColorTheme, Plan, User } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -9,17 +15,20 @@ import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
 import * as SecureStore from "@/utils/store/secureStore";
 import { ThemedText } from "@/components/ThemedText";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type SelectPlanProps = {
   setShowRegisterOrNot?: (show: boolean) => void;
   onSuccess?: () => void;
   continueWithoutRegistration: boolean;
+  back: () => void;
 };
 
 export default function HandleSubscription({
   setShowRegisterOrNot,
   onSuccess,
   continueWithoutRegistration,
+  back,
 }: SelectPlanProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -46,55 +55,81 @@ export default function HandleSubscription({
     }
   };
 
+  const handleBack = () => {
+    if (showPayment) {
+      setShowPayment(false);
+    } else {
+      back();
+    }
+  };
+
   const onSuccessPayment = useCallback(() => {
     setSuccessPaymentPlan(plan);
     setShowPayment(false);
   }, [plan]);
   return (
     <Background background={colors.backgroundImage}>
-      <View style={styles.container}>
-        {showPayment ? (
-          <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
-        ) : (
-          <>
-            <Text style={styles.title}>{t("planModal.title")}</Text>
-            <Plans
-              setShowRegisterOrNot={setShowRegisterOrNot}
-              setShowPayment={setShowPayment}
-              onSuccess={onSuccess}
-              setPlan={setPlan}
-              successPaymentPlan={successPaymentPlan}
-              setSuccessPaymentPlan={setSuccessPaymentPlan}
-              continueWithoutRegistration={continueWithoutRegistration}
-            />
-            {user && user?.plan && (
-              <View
-                style={{
-                  flexDirection: "row",
-                  marginBottom: 50,
-                  alignItems: "flex-end",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => handleNext()}
+      <TouchableOpacity
+        onPress={handleBack}
+        style={[
+          {
+            paddingTop: 40,
+            paddingLeft: 20,
+            width: 40,
+          },
+        ]}
+      >
+        <MaterialCommunityIcons
+          name="arrow-left"
+          size={28}
+          color={colors.primary}
+        />
+      </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.scrollView}>
+        <View style={styles.container}>
+          {showPayment ? (
+            <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
+          ) : (
+            <>
+              <Text style={styles.title}>{t("planModal.title")}</Text>
+              <Plans
+                setShowRegisterOrNot={setShowRegisterOrNot}
+                setShowPayment={setShowPayment}
+                onSuccess={onSuccess}
+                setPlan={setPlan}
+                successPaymentPlan={successPaymentPlan}
+                setSuccessPaymentPlan={setSuccessPaymentPlan}
+                continueWithoutRegistration={continueWithoutRegistration}
+              />
+              {user && user?.plan && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginBottom: 50,
+                    alignItems: "flex-end",
+                    justifyContent: "flex-end",
+                  }}
                 >
-                  <ThemedText
-                    style={[
-                      {
-                        color: colors.textInPrimary,
-                      },
-                    ]}
+                  <TouchableOpacity
+                    style={styles.btn}
+                    onPress={() => handleNext()}
                   >
-                    {t("common.continue")}
-                  </ThemedText>
-                </TouchableOpacity>
-              </View>
-            )}
-          </>
-        )}
-      </View>
+                    <ThemedText
+                      style={[
+                        {
+                          color: colors.textInPrimary,
+                        },
+                      ]}
+                    >
+                      {t("common.continue")}
+                    </ThemedText>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
+          )}
+        </View>
+      </ScrollView>
     </Background>
   );
 }
@@ -107,7 +142,12 @@ const getStyles = (colors: ColorTheme) =>
       backgroundColor: "transparent",
       borderRadius: 18,
       padding: 10,
-      marginTop: 50,
+      marginTop: 30,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    scrollView: {
+      flexGrow: 1,
       alignItems: "center",
       justifyContent: "center",
     },

@@ -58,6 +58,7 @@
     "weHaveSentYouCodeToDeleteYourAccount": "We have sent you a code to delete your account to your email address.",
     "pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount": "Please enter this code to confirm the deletion of your account",
     "youCanResendCodeIn": "You can resend code in",
+    "youCanSendCodeIn": "You can send code in",
   },
   "diary": {
     "title": "Diary",
@@ -283,7 +284,7 @@
     "closedTestingHasBeenCompletedIfYouWouldLike": "Closed testing has been completed. If you would like to participate in the next test, please contact support.",
     "testingHasBeenCompleted": "Testing has been completed",
     "testingHasBeenCompletedIfYouWouldLike": "Testing has been completed. If you would like to continue using the app, please subscribe the plan.",
-    "attemptsExceeded": "Attempts exceeded. Please try again later.",
+    "attemptsExceeded": "The number of attempts has been exceeded. The code has been canceled. Try requesting a new code.",
     "rateLimited": "You have made too many requests in a short period of time. Please try again later.",
     "networkOrAxiosError": "Network or Axios error",
     "unknownError": "Unknown Error",
@@ -296,6 +297,7 @@
     "planAlreadyCanceled": "Plan already canceled",
     "getEntriesByDateError": "Get entries by date error",
     "getMoodsByDateError": "Get moods by date error",
+    "errorDeletingAccount": "Error deleting account",
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",

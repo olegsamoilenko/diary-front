@@ -58,6 +58,7 @@
     "weHaveSentYouCodeToDeleteYourAccount": "Ми надіслали вам код для видалення вашого акаунту на електронну пошту.",
     "pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount": "Будь ласка, введіть цей код, щоб підтвердити видалення вашого акаунту",
     "youCanResendCodeIn": "Ви можете надіслати код знову через",
+    "youCanSendCodeIn": "Ви можете надіслати код через",
   },
   "diary": {
     "title": "Щоденник",
@@ -283,7 +284,7 @@
     "closedTestingHasBeenCompletedIfYouWouldLike": "Закрите тестування завершено. Якщо ви бажаєте взяти участь у наступному тестуванні, зверніться до служби підтримки.",
     "testingHasBeenCompleted": "Тестування завершено",
     "testingHasBeenCompletedIfYouWouldLike": "Тестування завершено. Якщо ви бажаєте продовжувати користуватися додатком, підпишіться на план.",
-    "attemptsExceeded": "Перевищено кількість спроб. Спробуйте пізніше.",
+    "attemptsExceeded": "Перевищено кількість спроб. Код анульовано. Спробуйте запросити новий код",
     "rateLimited": "Обмеження частоти запитів. Спробуйте пізніше.",
     "networkOrAxiosError": "Помилка мережі або Axios",
     "unknownError": "Невідома помилка",
@@ -296,6 +297,7 @@
     "planAlreadyCanceled": "План вже скасовано",
     "getEntriesByDateError": "Помилка отримання записів за датою",
     "getMoodsByDateError": "Помилка отримання настроїв за датою",
+    "errorDeletingAccount": "Помилка видалення акаунту",
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",

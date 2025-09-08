@@ -18,6 +18,8 @@ import { useTranslation } from "react-i18next";
 import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 import ChangePasswordForm from "@/components/auth/ChangePasswordForm";
 import EmailVerificationCodeForm from "@/components/auth/EmailVerificationCodeForm";
+import BackArrow from "@/components/ui/BackArrow";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function AuthForm({
   forPlanSelect = false,
@@ -25,12 +27,14 @@ export default function AuthForm({
   onSuccessEmailCode,
   onSuccessSignIn,
   activeAuthTab = "register",
+  handleBack,
 }: {
   forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
   onSuccessEmailCode: () => void;
   onSuccessSignIn: () => void;
   activeAuthTab?: "login" | "register";
+  handleBack: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"login" | "register">(
     activeAuthTab,
@@ -56,6 +60,20 @@ export default function AuthForm({
     setActiveTab("login");
   };
 
+  const closeSheet = () => {
+    if (showChangePasswordForm) {
+      setShowChangePasswordForm(false);
+      setActiveTab("login");
+    } else if (showForgotPasswordForm) {
+      setShowForgotPasswordForm(false);
+    } else if (showEmailVerificationCodeForm) {
+      setShowEmailVerificationCodeForm(false);
+      setActiveTab("register");
+    } else {
+      handleBack();
+    }
+  };
+
   return (
     <Background background={colors.backgroundImage}>
       <KeyboardAvoidingView
@@ -63,6 +81,23 @@ export default function AuthForm({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
+        <TouchableOpacity
+          onPress={closeSheet}
+          style={[
+            {
+              paddingTop: 40,
+              paddingBottom: 10,
+              paddingLeft: 20,
+              width: 40,
+            },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={28}
+            color={colors.primary}
+          />
+        </TouchableOpacity>
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.logo}>
             <NemoryLogo />
