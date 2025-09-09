@@ -1,8 +1,8 @@
 import React, {
+  RefObject,
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -113,6 +113,12 @@ export default React.memo(function TitleEntry({
     <View style={styles.root}>
       <View style={styles.left}>
         <TouchableOpacity
+          onLayout={(e) => {
+            console.log(
+              "e.nativeEvent.layout.width",
+              e.nativeEvent.layout.width,
+            );
+          }}
           style={styles.moodButton}
           onPress={() => {
             handleEmoji();

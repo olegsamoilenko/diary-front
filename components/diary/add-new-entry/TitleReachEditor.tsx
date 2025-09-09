@@ -15,6 +15,7 @@ import PTMonoFontStylesheet from "@/assets/fonts/entry/PTMonoFontStylesheet";
 import ComforterBrushFontStylesheet from "@/assets/fonts/entry/ComforterBrushFontStylesheet";
 import BadScriptFontStylesheet from "@/assets/fonts/entry/BadScriptFontStylesheet";
 import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStylesheet";
+import { useWindowDimensions } from "react-native";
 
 type TitleReachEditorProps = {
   disabledTitleReachEditor?: boolean;
@@ -68,6 +69,7 @@ export default function TitleReachEditor({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
 
   const handleEditorMessage = (event: any) => {
     try {
@@ -178,15 +180,19 @@ export default function TitleReachEditor({
       ref={richTitle}
       initialContentHTML={title}
       onChange={setTitle}
-      style={{
-        minHeight: 40,
-        height: editorHeight,
-        maxHeight: 300,
-        width: "80%",
-        marginRight: 5,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border,
-      }}
+      style={[
+        {
+          minHeight: 40,
+          height: editorHeight,
+          maxHeight: 300,
+          marginRight: 5,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+        },
+        {
+          width: `${100 - Math.round((74 / width) * 100)}%`,
+        },
+      ]}
       onFocus={onFocus}
       onBlur={handleBlur}
       onHeightChange={(h) => setEditorHeight(Math.max(h, 40))}

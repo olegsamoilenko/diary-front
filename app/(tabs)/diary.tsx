@@ -32,7 +32,6 @@ import Background from "@/components/Background";
 import WelcomeModal from "@/components/diary/WelcomeModal";
 import Toast from "react-native-toast-message";
 import { UserEvents } from "@/utils/events/userEvents";
-import { logAllAssetsInAlbum } from "@/utils/files/media";
 
 function localISODate(d = new Date()) {
   const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000);

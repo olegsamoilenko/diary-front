@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, lazy, Suspense } from "react";
-import { Appearance, unstable_batchedUpdates, AppState } from "react-native";
+import { Appearance, unstable_batchedUpdates, StyleSheet } from "react-native";
 import "../i18n";
 import "@/constants/CalendarLocale";
 import { ThemeProvider as NavThemeProvider } from "@react-navigation/native";
@@ -10,7 +10,7 @@ import { store } from "@/store";
 import { ThemeProviderCustom, useThemeCustom } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { BiometryProvider } from "@/context/BiometryContext";
-import { PortalProvider } from "@gorhom/portal";
+import { PortalHost, PortalProvider } from "@gorhom/portal";
 import CustomToast from "@/components/ui/CustomToast";
 
 import { Colors } from "@/constants/Colors";
@@ -34,6 +34,7 @@ import { resetAiModel } from "@/store/slices/settings/aiModelSlice";
 import { useHydrateSettings } from "@/hooks/useHydrateSettings";
 import * as Localization from "expo-localization";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const AuthGate = lazy(() => import("@/components/auth/AuthGate"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -134,22 +135,24 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <Provider store={store}>
-      <ThemeProviderCustom>
-        <NavigationThemeWrapper>
-          <AuthProvider>
-            <BiometryProvider>
-              <PortalProvider>
-                <Suspense fallback={null}>
-                  <AppContent />
-                </Suspense>
-                <CustomToast />
-              </PortalProvider>
-            </BiometryProvider>
-          </AuthProvider>
-        </NavigationThemeWrapper>
-      </ThemeProviderCustom>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <ThemeProviderCustom>
+          <NavigationThemeWrapper>
+            <AuthProvider>
+              <BiometryProvider>
+                <PortalProvider>
+                  <Suspense fallback={null}>
+                    <AppContent />
+                  </Suspense>
+                  <CustomToast />
+                </PortalProvider>
+              </BiometryProvider>
+            </AuthProvider>
+          </NavigationThemeWrapper>
+        </ThemeProviderCustom>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 
