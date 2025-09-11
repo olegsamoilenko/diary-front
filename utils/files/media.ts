@@ -292,12 +292,15 @@ function getManipulatorFormat(ext: string) {
   return null; // інші формати не підтримуємо → не чіпаємо
 }
 
-export async function deleteEntryImages(entriesImages: EntryImage[]) {
+export async function deleteEntryImages(entryImages: EntryImage[] | []) {
+  if (!entryImages.length) return;
+  console.log("Deleting images, count", entryImages);
   const album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
+  console.log("Deleting images, found album", album);
 
   const assetIds: string[] = [];
 
-  for (const img of entriesImages) {
+  for (const img of entryImages) {
     if (img.assetId) {
       assetIds.push(img.assetId);
     } else if (album && img.filename) {
@@ -305,6 +308,8 @@ export async function deleteEntryImages(entriesImages: EntryImage[]) {
       if (a?.id) assetIds.push(a.id);
     }
   }
+
+  console.log("Deleting images, assetIds", assetIds);
 
   if (!assetIds.length) return;
 

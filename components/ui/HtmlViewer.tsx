@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useWindowDimensions, View, Image } from "react-native";
+import { useWindowDimensions, View, Image, Platform } from "react-native";
 import RenderHTML, {
   HTMLElementModel,
   HTMLContentModel,
@@ -62,6 +62,53 @@ export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
 
       return TDefaultRenderer({ ...props, style: [props.style, style], tnode });
     },
+    b: ({ tnode, TDefaultRenderer, ...props }) => {
+      console.log("b tag attrs:", props.style);
+      return TDefaultRenderer({
+        ...props,
+        style: [props.style, { fontWeight: "700" }],
+        tnode,
+      });
+    },
+    // strong: ({ TDefaultRenderer, ...props }) =>
+    //   TDefaultRenderer({
+    //     ...props,
+    //     style: [
+    //       props.style,
+    //       Platform.OS === "android"
+    //         ? { fontFamily: "MarckScript-Bold" }
+    //         : { fontWeight: "700" },
+    //     ],
+    //   }),
+    //
+    // // <i>/<em>
+    // i: ({ TDefaultRenderer, ...props }) =>
+    //   TDefaultRenderer({
+    //     ...props,
+    //     style: [
+    //       props.style,
+    //       Platform.OS === "android"
+    //         ? { fontFamily: "MarckScript-Italic" } // Потрібен файл Italic
+    //         : { fontStyle: "italic" },
+    //     ],
+    //   }),
+    // em: ({ TDefaultRenderer, ...props }) =>
+    //   TDefaultRenderer({
+    //     ...props,
+    //     style: [
+    //       props.style,
+    //       Platform.OS === "android"
+    //         ? { fontFamily: "MarckScript-Italic" }
+    //         : { fontStyle: "italic" },
+    //     ],
+    //   }),
+    //
+    // // <u>
+    // u: ({ TDefaultRenderer, ...props }) =>
+    //   TDefaultRenderer({
+    //     ...props,
+    //     style: [props.style, { textDecorationLine: "underline" }],
+    //   }),
     img: ({ tnode }) => {
       const src = tnode.attributes?.src;
       if (src)

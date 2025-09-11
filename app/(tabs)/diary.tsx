@@ -117,11 +117,17 @@ export default function Diary() {
           err.response.data,
         );
       } finally {
-        if (id === reqIdRef.current) setLoading(false);
+        if (id === reqIdRef.current) {
+          setTimeout(() => setLoading(false), 100);
+        }
       }
     },
     [timeZone],
   );
+
+  useEffect(() => {
+    console.log("Diary mounted", diaryEntries);
+  }, [diaryEntries]);
 
   useEffect(() => {
     fetchDiaryEntriesFor(selectedDay);
@@ -243,6 +249,7 @@ export default function Diary() {
               setSelectedDay(dayStr);
               setWeekAnchorDay(dayStr);
               setShowWeek(true);
+              setLoading(true);
             }}
             moodsByDate={moodsByDate}
             setMonth={setMonth}
@@ -256,7 +263,10 @@ export default function Diary() {
             weekAnchorDay={weekAnchorDay}
             setWeekAnchorDay={setWeekAnchorDay}
             selectedDay={selectedDay}
-            setSelectedDay={setSelectedDay}
+            setSelectedDay={(day) => {
+              setSelectedDay(day);
+              setLoading(true);
+            }}
             moodsByDate={moodsByDate}
             setMonth={setMonth}
             setYear={setYear}

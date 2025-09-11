@@ -298,6 +298,8 @@
     "getEntriesByDateError": "Помилка отримання записів за датою",
     "getMoodsByDateError": "Помилка отримання настроїв за датою",
     "errorDeletingAccount": "Помилка видалення акаунту",
+    "emailAlreadyInUse": "Електронна пошта вже використовується",
+    "emailAlreadyInUseLoginEmailPassword": "Електронна пошта вже використовується. Увійдіть за допомогою електронної пошти та пароля",
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",

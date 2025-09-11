@@ -298,6 +298,8 @@
     "getEntriesByDateError": "Get entries by date error",
     "getMoodsByDateError": "Get moods by date error",
     "errorDeletingAccount": "Error deleting account",
+    "emailAlreadyInUse": "Email already in use",
+    "emailAlreadyInUseLoginEmailPassword": "Email already in use. Please login with email and password.",
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",

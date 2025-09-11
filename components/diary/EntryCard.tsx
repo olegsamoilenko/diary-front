@@ -25,6 +25,8 @@ import { Colors } from "@/constants/Colors";
 import type { RootState } from "@/store";
 import { apiRequest, hydrateEntryHtmlFromAlbum } from "@/utils";
 import * as SecureStore from "@/utils/store/secureStore";
+import ViewReachEditor from "@/components/diary/ViewReachEditor";
+import WebViewHTML from "@/components/ui/WebViewHTML";
 
 type EntryCardProps = {
   entry: Entry;
@@ -111,6 +113,7 @@ export default React.memo(function EntryCard({
           Number(user?.id ?? 0),
           Number(entry.id),
         );
+        console.log("Hydrated content:", res.data?.content);
         setDetails((prev) => ({
           ...prev,
           content: hydrated ?? prev.content ?? null,
@@ -131,6 +134,10 @@ export default React.memo(function EntryCard({
     }
     setIsExpanded((v) => !v);
   }, [entry.id, isExpanded, user]);
+
+  useEffect(() => {
+    console.log("Entry details updated:", details);
+  }, [details]);
 
   const hasAi = useMemo(() => {
     const c = details.aiComment?.content?.trim?.();
@@ -167,7 +174,7 @@ export default React.memo(function EntryCard({
               marginBottom: 8,
             }}
           >
-            <HtmlViewer htmlContent={entry.title} />
+            <WebViewHTML content={entry.title} />
           </View>
           <View style={styles.timeContainer}>
             <ThemedText type="small" style={styles.time}>
@@ -236,19 +243,20 @@ export default React.memo(function EntryCard({
             style={styles.content}
             accessibilityRole="button"
           >
-            <HtmlViewer
-              htmlContent={
+            <WebViewHTML
+              content={
                 isExpanded
                   ? (details.content ?? entry.previewContent ?? "")
                   : (entry.previewContent ?? "")
               }
             />
+
             <View style={styles.contentIcon}>
               <RotatingIcon expanded={isExpanded} onPress={handleToggle} />
             </View>
           </Pressable>
 
-          {(hasAi || hasDialogs) && (
+          {(hasAi || hasDialogs) && isExpanded && (
             <TouchableOpacity
               style={styles.showDialogButton}
               onPress={() => setShowAiComment((v) => !v)}
@@ -330,7 +338,8 @@ const getStyles = (colors: ColorTheme) =>
       alignItems: "flex-start",
       justifyContent: "space-between",
       backgroundColor: "transparent",
-      marginBottom: 10,
+      marginBottom: 0,
+      marginTop: 5,
     },
     moodContainer: {
       alignItems: "flex-end",

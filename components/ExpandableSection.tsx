@@ -44,7 +44,7 @@ export function ExpandableSection({
   const clipStyle = ready ? { height: anim, overflow: "hidden" as const } : {};
 
   return (
-    <Animated.View style={[clipStyle, style]}>
+    <Animated.View style={[style]}>
       <View onLayout={onLayout}>{children}</View>
     </Animated.View>
   );

@@ -127,6 +127,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
       <Background background={colors.backgroundImage} paddingTop={10}>
         {showAuthForm ? (
           <AuthForm
+            handleBack={() => setShowAuthForm(false)}
             onSuccessSignWithGoogle={() => {
               setShowAuthForm(false);
               getUser();

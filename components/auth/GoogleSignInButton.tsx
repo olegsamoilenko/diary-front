@@ -6,7 +6,8 @@ import { Colors } from "@/constants/Colors";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { User } from "@/types";
+import type { User } from "@/types";
+import { ErrorMessages } from "@/types";
 import { useTranslation } from "react-i18next";
 import { apiUrl } from "@/constants/env";
 import { Image } from "expo-image";
@@ -83,6 +84,12 @@ export default function GoogleSignInButton({
         "Error during Google sign-in response data:",
         err.response.data,
       );
+      Toast.show({
+        type: "error",
+        text1: t(
+          `errors.${ErrorMessages[err.response.data.code as keyof typeof ErrorMessages]}`,
+        ),
+      });
     }
   };
 

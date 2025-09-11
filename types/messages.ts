@@ -35,4 +35,6 @@ export enum ErrorMessages {
   PLAN_ALREADY_CANCELED = "planAlreadyCanceled",
   GET_ENTRIES_BY_DATE_ERROR = "getEntriesByDateError",
   GET_MOODS_BY_DATE_ERROR = "getMoodsByDateError",
+  EMAIL_ALREADY_IN_USE = "emailAlreadyInUse",
+  EMAIL_ALREADY_IN_USE_LOGIN_EMAIL_PASSWORD = "emailAlreadyInUseLoginEmailPassword",
 }
