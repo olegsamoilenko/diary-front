@@ -19,6 +19,7 @@ type Props = WebViewProps & {
   content: string;
   minHeight?: number;
   onAutoHeight?: (h: number) => void;
+  onReady?: (h: number) => void;
 };
 
 export default function WebViewHTML({
@@ -26,6 +27,7 @@ export default function WebViewHTML({
   style,
   minHeight = 20,
   onAutoHeight,
+  onReady,
   ...rest
 }: Props) {
   const [height, setHeight] = useState(minHeight);
@@ -76,33 +78,54 @@ export default function WebViewHTML({
   const injected = useMemo(
     () => `
 (function() {
-  function h() {
+  function whenImagesReady() {
+    var imgs = Array.prototype.slice.call(document.images || []);
+    if (imgs.length === 0) return Promise.resolve();
+    return Promise.all(imgs.map(function(img){
+      return img.complete ? Promise.resolve() :
+        new Promise(function(res){ img.addEventListener('load', res, {once:true}); img.addEventListener('error', res, {once:true}); });
+    }));
+  }
+  function getH() {
     var el = document.getElementById('wrap');
-    if (!el) return;
-    var rect = el.getBoundingClientRect();
-    var height = Math.ceil(rect.height);
-    window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ h: height }));
+    if (!el) return 0;
+    return Math.ceil(el.getBoundingClientRect().height);
   }
-  function burst() { h(); setTimeout(h,0); setTimeout(h,200); setTimeout(h,800); setTimeout(h,1600); }
-
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    burst();
-  } else {
-    document.addEventListener('DOMContentLoaded', burst);
-    window.addEventListener('load', burst);
+  function post(obj) {
+    try { window.ReactNativeWebView.postMessage(JSON.stringify(obj)); } catch(e){}
   }
-
-  // Якщо шрифти докачуються — оновити
-  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(burst).catch(function(){}) }
-
-  // Розмір/DOM змінюється — оновити
-  if (window.ResizeObserver) { new ResizeObserver(h).observe(document.getElementById('wrap')); }
-  if (window.MutationObserver) {
-    new MutationObserver(burst).observe(document.getElementById('wrap'), { childList:true, subtree:true, characterData:true });
+  function measureStable() {
+    return new Promise(function(resolve){
+      var last=-1, same=0;
+      (function tick(){
+        var h=getH();
+        post({ phase:'measure', h:h });
+        if (h===last) same++; else same=0;
+        last=h;
+        if (same>=3) resolve(h); else setTimeout(tick, 100);
+      })();
+    });
   }
 
-  // На всякий, якщо контент дуже довгий і перерахунок забарився:
-  setTimeout(burst, 3000);
+  (async function boot(){
+    if (document.readyState==='loading') {
+      await new Promise(function(res){ document.addEventListener('DOMContentLoaded', res, {once:true}); });
+    }
+    if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e){} }
+    try { await whenImagesReady(); } catch(e){}
+
+    // burst промірів, щоб батько зарезервував місце
+    post({ phase:'measure', h:getH() });
+
+    // чекаємо стабілізації розмітки
+    var stableH = await measureStable();
+
+    // показуємо контент і шлемо готовність
+    document.body.style.visibility='visible';
+    requestAnimationFrame(function(){
+      post({ phase:'ready', h:stableH });
+    });
+  })();
 })();
 true; // <- потрібно для Android, щоб injectedJavaScript завершився значенням
 `,
@@ -116,9 +139,12 @@ true; // <- потрібно для Android, щоб injectedJavaScript заве�
         const h = Number(data?.h);
         if (Number.isFinite(h) && h > 0) setHeight(Math.max(minHeight, h));
         onAutoHeight?.(Math.max(minHeight, h));
+        if (data?.phase === "ready") {
+          onReady?.(Math.max(minHeight, h));
+        }
       } catch {}
     },
-    [minHeight, onAutoHeight],
+    [minHeight, onAutoHeight, onReady],
   );
 
   return (

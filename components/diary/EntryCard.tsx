@@ -1,10 +1,17 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+} from "react";
 import {
   Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Animated,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import i18n from "i18next";
@@ -16,7 +23,6 @@ import EntryCardBackground from "@/components/diary/EntryCardBackground";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 import ModalPortal from "@/components/ui/Modal";
 import { ExpandableSection } from "@/components/ExpandableSection";
-import HtmlViewer from "@/components/ui/HtmlViewer";
 import RotatingIcon from "@/components/ui/RotatingIcon";
 
 import type { ColorTheme, Entry, Dialog, User } from "@/types";
@@ -25,18 +31,19 @@ import { Colors } from "@/constants/Colors";
 import type { RootState } from "@/store";
 import { apiRequest, hydrateEntryHtmlFromAlbum } from "@/utils";
 import * as SecureStore from "@/utils/store/secureStore";
-import ViewReachEditor from "@/components/diary/ViewReachEditor";
 import WebViewHTML from "@/components/ui/WebViewHTML";
 
 type EntryCardProps = {
   entry: Entry;
   deleteEntry: (entry: Entry) => void;
   setActiveMoods: React.Dispatch<React.SetStateAction<{ id: number }[]>>;
+  onReady: () => void;
 };
 export default React.memo(function EntryCard({
   entry,
   deleteEntry,
   setActiveMoods,
+  onReady,
 }: EntryCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -49,6 +56,26 @@ export default React.memo(function EntryCard({
   const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
   const [showAiComment, setShowAiComment] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [readyCount, setReadyCount] = useState(0);
+
+  const REQUIRED = isExpanded ? 2 : 1;
+  const allReady = readyCount >= REQUIRED;
+
+  const opacity = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: allReady ? 1 : 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+    if (allReady) {
+      onReady();
+    }
+  }, [allReady]);
+
+  const onWVReady = useCallback(() => {
+    setReadyCount((c) => c + 1);
+  }, []);
 
   useEffect(() => {
     if (isExpanded) {
@@ -113,7 +140,6 @@ export default React.memo(function EntryCard({
           Number(user?.id ?? 0),
           Number(entry.id),
         );
-        console.log("Hydrated content:", res.data?.content);
         setDetails((prev) => ({
           ...prev,
           content: hydrated ?? prev.content ?? null,
@@ -135,10 +161,6 @@ export default React.memo(function EntryCard({
     setIsExpanded((v) => !v);
   }, [entry.id, isExpanded, user]);
 
-  useEffect(() => {
-    console.log("Entry details updated:", details);
-  }, [details]);
-
   const hasAi = useMemo(() => {
     const c = details.aiComment?.content?.trim?.();
     return Boolean(c);
@@ -155,171 +177,177 @@ export default React.memo(function EntryCard({
   };
 
   return (
-    <EntryCardBackground background={background}>
-      <View style={styles.container}>
-        <View style={styles.titleContainer}>
-          <View style={styles.moodContainer}>
-            <Text
+    <Animated.View
+      style={[{ opacity }]}
+      pointerEvents={allReady ? "auto" : "none"}
+    >
+      <EntryCardBackground background={background}>
+        <View style={[styles.container]}>
+          <View style={styles.titleContainer}>
+            <View style={styles.moodContainer}>
+              <Text
+                style={{
+                  fontSize: 24,
+                  marginRight: 8,
+                }}
+              >
+                {entry.mood}
+              </Text>
+            </View>
+            <View
               style={{
-                fontSize: 24,
-                marginRight: 8,
+                flex: 1,
+                marginBottom: 8,
               }}
             >
-              {entry.mood}
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              marginBottom: 8,
-            }}
-          >
-            <WebViewHTML content={entry.title} />
-          </View>
-          <View style={styles.timeContainer}>
-            <ThemedText type="small" style={styles.time}>
-              {formattedTime}
-            </ThemedText>
-          </View>
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => {
-              setVisibleDeleteModal(true);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={t("common.delete") as string}
-          >
-            <MaterialIcons
-              name="delete-outline"
-              size={24}
-              color={colors.error}
-            />
-          </TouchableOpacity>
-          <ModalPortal
-            visible={visibleDeleteModal}
-            onClose={() => setVisibleDeleteModal(false)}
-          >
-            <View>
-              <ThemedText>
-                {t("diary.entry.deleteEntryConfirmation")}
+              <WebViewHTML content={entry.title} onReady={onWVReady} />
+            </View>
+            <View style={styles.timeContainer}>
+              <ThemedText type="small" style={styles.time}>
+                {formattedTime}
               </ThemedText>
-              <View style={styles.modalInner}>
-                <TouchableOpacity
-                  style={styles.modalCancelButton}
-                  onPress={() => setVisibleDeleteModal(false)}
-                >
-                  <ThemedText
-                    style={{
-                      color: colors.text,
-                    }}
-                  >
-                    {t("common.cancel")}
-                  </ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalDeleteButton}
-                  onPress={() => handleDeleteEntry(entry)}
-                >
-                  <ThemedText
-                    style={{
-                      color: colors.textInPrimary,
-                    }}
-                  >
-                    {t("common.delete")}
-                  </ThemedText>
-                </TouchableOpacity>
-              </View>
             </View>
-          </ModalPortal>
-        </View>
-
-        <ExpandableSection
-          expanded={isExpanded}
-          collapsedHeight={100}
-          style={styles.expandedSectionContainer}
-        >
-          <Pressable
-            onPress={handleToggle}
-            style={styles.content}
-            accessibilityRole="button"
-          >
-            <WebViewHTML
-              content={
-                isExpanded
-                  ? (details.content ?? entry.previewContent ?? "")
-                  : (entry.previewContent ?? "")
-              }
-            />
-
-            <View style={styles.contentIcon}>
-              <RotatingIcon expanded={isExpanded} onPress={handleToggle} />
-            </View>
-          </Pressable>
-
-          {(hasAi || hasDialogs) && isExpanded && (
             <TouchableOpacity
-              style={styles.showDialogButton}
-              onPress={() => setShowAiComment((v) => !v)}
+              style={styles.deleteButton}
+              onPress={() => {
+                setVisibleDeleteModal(true);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t("common.delete") as string}
             >
-              <ThemedText
-                type="small"
-                style={{
-                  color: colors.textInPrimary,
-                  textAlign: "center",
-                }}
-              >
-                {!showAiComment
-                  ? t("diary.showDialogWithNemory")
-                  : t("diary.hideDialogWithNemory")}
-              </ThemedText>
+              <MaterialIcons
+                name="delete-outline"
+                size={24}
+                color={colors.error}
+              />
             </TouchableOpacity>
-          )}
-
-          {isExpanded && showAiComment && !!details.aiComment?.content && (
-            <View style={styles.aiCommentContent}>
-              <View
-                style={{
-                  paddingLeft: 5,
-                  paddingTop: 10,
-                }}
-              >
-                <NemoryIcon />
-              </View>
-              <ThemedText style={{ padding: 5 }}>
-                {details.aiComment.content}
-              </ThemedText>
-            </View>
-          )}
-          {isExpanded &&
-            showAiComment &&
-            Array.isArray(details.dialogs) &&
-            details.dialogs.length > 0 &&
-            details.dialogs.map((dialog) => (
-              <View key={dialog.id} style={{ marginBottom: 18 }}>
-                <View style={styles.question}>
-                  <ThemedText
-                    style={{
-                      marginTop: 6,
-                      justifyContent: "flex-end",
-                      alignItems: "flex-end",
-                    }}
+            <ModalPortal
+              visible={visibleDeleteModal}
+              onClose={() => setVisibleDeleteModal(false)}
+            >
+              <View>
+                <ThemedText>
+                  {t("diary.entry.deleteEntryConfirmation")}
+                </ThemedText>
+                <View style={styles.modalInner}>
+                  <TouchableOpacity
+                    style={styles.modalCancelButton}
+                    onPress={() => setVisibleDeleteModal(false)}
                   >
-                    {dialog.question}
-                  </ThemedText>
-                </View>
-                <View style={styles.answer}>
-                  <View style={{ paddingTop: 10 }}>
-                    <NemoryIcon />
-                  </View>
-                  <ThemedText style={{ marginTop: 6 }}>
-                    {dialog.answer}
-                  </ThemedText>
+                    <ThemedText
+                      style={{
+                        color: colors.text,
+                      }}
+                    >
+                      {t("common.cancel")}
+                    </ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalDeleteButton}
+                    onPress={() => handleDeleteEntry(entry)}
+                  >
+                    <ThemedText
+                      style={{
+                        color: colors.textInPrimary,
+                      }}
+                    >
+                      {t("common.delete")}
+                    </ThemedText>
+                  </TouchableOpacity>
                 </View>
               </View>
-            ))}
-        </ExpandableSection>
-      </View>
-    </EntryCardBackground>
+            </ModalPortal>
+          </View>
+
+          <ExpandableSection
+            expanded={isExpanded}
+            collapsedHeight={100}
+            style={styles.expandedSectionContainer}
+          >
+            <Pressable
+              onPress={handleToggle}
+              style={styles.content}
+              accessibilityRole="button"
+            >
+              <WebViewHTML
+                content={
+                  isExpanded
+                    ? (details.content ?? entry.previewContent ?? "")
+                    : (entry.previewContent ?? "")
+                }
+                onReady={onWVReady}
+              />
+
+              <View style={styles.contentIcon}>
+                <RotatingIcon expanded={isExpanded} onPress={handleToggle} />
+              </View>
+            </Pressable>
+
+            {(hasAi || hasDialogs) && isExpanded && (
+              <TouchableOpacity
+                style={styles.showDialogButton}
+                onPress={() => setShowAiComment((v) => !v)}
+              >
+                <ThemedText
+                  type="small"
+                  style={{
+                    color: colors.textInPrimary,
+                    textAlign: "center",
+                  }}
+                >
+                  {!showAiComment
+                    ? t("diary.showDialogWithNemory")
+                    : t("diary.hideDialogWithNemory")}
+                </ThemedText>
+              </TouchableOpacity>
+            )}
+
+            {isExpanded && showAiComment && !!details.aiComment?.content && (
+              <View style={styles.aiCommentContent}>
+                <View
+                  style={{
+                    paddingLeft: 5,
+                    paddingTop: 10,
+                  }}
+                >
+                  <NemoryIcon />
+                </View>
+                <ThemedText style={{ padding: 5 }}>
+                  {details.aiComment.content}
+                </ThemedText>
+              </View>
+            )}
+            {isExpanded &&
+              showAiComment &&
+              Array.isArray(details.dialogs) &&
+              details.dialogs.length > 0 &&
+              details.dialogs.map((dialog) => (
+                <View key={dialog.id} style={{ marginBottom: 18 }}>
+                  <View style={styles.question}>
+                    <ThemedText
+                      style={{
+                        marginTop: 6,
+                        justifyContent: "flex-end",
+                        alignItems: "flex-end",
+                      }}
+                    >
+                      {dialog.question}
+                    </ThemedText>
+                  </View>
+                  <View style={styles.answer}>
+                    <View style={{ paddingTop: 10 }}>
+                      <NemoryIcon />
+                    </View>
+                    <ThemedText style={{ marginTop: 6 }}>
+                      {dialog.answer}
+                    </ThemedText>
+                  </View>
+                </View>
+              ))}
+          </ExpandableSection>
+        </View>
+      </EntryCardBackground>
+    </Animated.View>
   );
 });
 

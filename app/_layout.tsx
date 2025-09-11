@@ -86,7 +86,7 @@ export default function RootLayout() {
     "Marck Script": require("@/assets/fonts/entry/MarckScript-Regular.ttf"),
     Neucha: require("@/assets/fonts/entry/Neucha-Regular.ttf"),
     Pacifico: require("@/assets/fonts/entry/Pacifico-Regular.ttf"),
-    Caveat: require("@/assets/fonts/entry/Caveat-VariableFont_wght.ttf"),
+    Caveat: require("@/assets/fonts/entry/Caveat-Regular.ttf"),
     "Amatic SC": require("@/assets/fonts/entry/AmaticSC-Regular.ttf"),
     "PT Mono": require("@/assets/fonts/entry/PTMono.ttf"),
     "Comforter Brush": require("@/assets/fonts/entry/ComforterBrush-Regular.ttf"),

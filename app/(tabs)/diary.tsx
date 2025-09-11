@@ -126,10 +126,6 @@ export default function Diary() {
   );
 
   useEffect(() => {
-    console.log("Diary mounted", diaryEntries);
-  }, [diaryEntries]);
-
-  useEffect(() => {
     fetchDiaryEntriesFor(selectedDay);
   }, [fetchDiaryEntriesFor, selectedDay]);
 
@@ -239,6 +235,16 @@ export default function Diary() {
 
   const entriesForDay = diaryEntries[selectedDay] ?? [];
 
+  const total = entriesForDay.length;
+  const [readySet, setReadySet] = useState<Set<number>>(new Set());
+
+  // якщо список змінюється — скидаємо готовність
+  useEffect(() => {
+    setReadySet(new Set());
+  }, [total]);
+
+  const allReady = readySet.size === total;
+
   return (
     <Background background={colors.backgroundImage} paddingTop={40}>
       <>
@@ -246,10 +252,10 @@ export default function Diary() {
           <MonthView
             selectedDay={selectedDay}
             onDayPress={(dayStr: string) => {
+              setLoading(true);
               setSelectedDay(dayStr);
               setWeekAnchorDay(dayStr);
               setShowWeek(true);
-              setLoading(true);
             }}
             moodsByDate={moodsByDate}
             setMonth={setMonth}
@@ -264,8 +270,8 @@ export default function Diary() {
             setWeekAnchorDay={setWeekAnchorDay}
             selectedDay={selectedDay}
             setSelectedDay={(day) => {
-              setSelectedDay(day);
               setLoading(true);
+              setSelectedDay(day);
             }}
             moodsByDate={moodsByDate}
             setMonth={setMonth}
@@ -277,18 +283,26 @@ export default function Diary() {
           />
         )}
         <ParallaxScrollView scrollRef={scrollRef}>
-          <View style={{ flex: 1 }}>
-            {loading ? (
+          <View style={{ flex: 1, position: "relative" }}>
+            {(loading || !allReady) && (
               <View style={styles.activeIndicatorContainer}>
                 <ActivityIndicator size="large" color={colors.primary} />
               </View>
-            ) : entriesForDay.length ? (
+            )}
+            {entriesForDay.length ? (
               entriesForDay.map((entry) => (
                 <EntryCard
                   entry={entry}
                   key={entry.id}
                   deleteEntry={deleteEntry}
                   setActiveMoods={setActiveMoods}
+                  onReady={() => {
+                    setReadySet((prev) => {
+                      const next = new Set(prev);
+                      next.add(entry.id);
+                      return next;
+                    });
+                  }}
                 />
               ))
             ) : (
@@ -317,6 +331,11 @@ export default function Diary() {
 const styles = StyleSheet.create({
   activeIndicatorContainer: {
     flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
   },
