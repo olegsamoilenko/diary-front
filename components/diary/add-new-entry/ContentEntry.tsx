@@ -10,6 +10,7 @@ import StreamingText from "@/components/diary/add-new-entry/StreamingText";
 import HtmlViewer from "@/components/ui/HtmlViewer";
 import * as SecureStore from "@/utils/store/secureStore";
 import { hydrateEntryHtmlFromAlbum } from "@/utils";
+import WebViewHTML from "@/components/ui/WebViewHTML";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -53,6 +54,7 @@ export default function ContentEntry({
   }, [idx, isEntrySaved, aiDialogLoading, entry.content]);
 
   useEffect(() => {
+    console.log("Hydrating entry content...////", entry);
     (async () => {
       const rawUser = await SecureStore.getItemAsync("user");
       const user = rawUser ? JSON.parse(rawUser) : null;
@@ -77,7 +79,7 @@ export default function ContentEntry({
         }}
       >
         <View style={styles.content}>
-          <HtmlViewer htmlContent={html} />
+          <WebViewHTML content={html} />
         </View>
         {entry && entry.aiComment && !strimCommentError && (
           <>

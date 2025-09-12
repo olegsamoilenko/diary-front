@@ -558,6 +558,7 @@ const AddNewEntry = forwardRef<
 
   function handleCloseSheet() {
     setIsFocusTitleRichEditor(false);
+    setIsFocusTextRichEditor(false);
     props.handleBack(true);
     setEmoji("");
     setTitleEmoji("");

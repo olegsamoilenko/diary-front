@@ -15,11 +15,11 @@ export default ({ config }: { config: any }) => ({
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     splash: {
-      image: "./assets/images/icon_light.png",
+      image: "./assets/images/icon.png",
       backgroundColor: "#FFFFFF",
       resizeMode: "contain",
       dark: {
-        image: "./assets/images/icon_dark.png",
+        image: "./assets/images/icon.png",
         backgroundColor: "#000000",
       },
     },

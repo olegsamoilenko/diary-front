@@ -164,6 +164,10 @@ export default function AddContentInputEntry({
     [setIsFocusTextRichEditor],
   );
 
+  useEffect(() => {
+    console.log("IsFocusTextRichEditor", isFocusTextRichEditor);
+  }, [isFocusTextRichEditor]);
+
   const handleImageAction = useCallback(() => setShowImageSetting(true), []);
   const handlePhotoAction = useCallback(() => setShowPhotoSetting(true), []);
 
