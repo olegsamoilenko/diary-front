@@ -24,6 +24,7 @@ export default ({ config }: { config: any }) => ({
       },
     },
     plugins: [
+      "react-native-iap",
       "expo-router",
       "expo-localization",
       [
@@ -42,6 +43,7 @@ export default ({ config }: { config: any }) => ({
             enablePngCrunchInReleaseBuilds: false,
             extraProguardRules:
               "-keep class com.swmansion.reanimated.** { *; }\n-dontwarn com.facebook.react.**",
+            kotlinVersion: "2.1.20",
           },
         },
       ],

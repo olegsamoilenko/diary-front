@@ -18,9 +18,10 @@ import { useTranslation } from "react-i18next";
 import { ColorTheme, Plan, PlanStatus, User } from "@/types";
 import { PLANS } from "@/constants/Plans";
 import { ThemedText } from "@/components/ThemedText";
-import { apiRequest, getStatusColor } from "@/utils";
+import { apiRequest, getStatusColor, isSub, isInapp } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
 import * as SecureStore from "@/utils/store/secureStore";
+import { useIap } from "@/context/IapContext";
 
 type PlansProps = {
   onSuccess?: () => void;
@@ -47,8 +48,9 @@ export default function Plans({
   const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const navigatingRef = useRef(false);
+  const { connected, loading, products, buySubById } = useIap();
 
   useEffect(() => {
     let mounted = true;
@@ -73,7 +75,7 @@ export default function Plans({
 
   const saveToDatabase = useCallback(
     async (plan: Plan) => {
-      setLoading(true);
+      // setLoading(true);
       try {
         const res = await apiRequest({
           url: `/plans/subscribe`,
@@ -96,7 +98,7 @@ export default function Plans({
         console.error("Error setting plan response:", error.response);
         console.error("Error setting plan response data:", error.response.data);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     },
     [onSuccess],
@@ -104,7 +106,7 @@ export default function Plans({
 
   const onSelect = useCallback(
     async (plan: Plan) => {
-      if (loading || navigatingRef.current) return;
+      // if (loading || navigatingRef.current) return;
       if (plan.name === "Start") {
         await saveToDatabase(plan);
         return;
@@ -138,9 +140,11 @@ export default function Plans({
     ],
   );
 
+  const subs = products.filter(isSub);
+
   return (
     <View style={styles.container}>
-      {loading ? (
+      {loading || !connected ? (
         <View style={styles.loaderWrap}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>

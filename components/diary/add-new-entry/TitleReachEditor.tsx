@@ -1,5 +1,5 @@
 import { RichEditor } from "react-native-pell-rich-editor";
-import React, { useEffect, useRef, useState } from "react";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";

@@ -41,6 +41,7 @@ import {
   getMediaAccess,
   MediaAccess,
 } from "./files/media-permissions";
+import { isInapp, isSub, getAndroidOfferTokenFromProduct } from "./iap/helpers";
 
 export {
   apiRequest,
@@ -78,4 +79,7 @@ export {
   ALBUM_NAME,
   buildAlbumFilename,
   deleteEntryImages,
+  isSub,
+  isInapp,
+  getAndroidOfferTokenFromProduct,
 };

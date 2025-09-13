@@ -35,6 +35,7 @@ import { useHydrateSettings } from "@/hooks/useHydrateSettings";
 import * as Localization from "expo-localization";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { IapProvider } from "@/context/IapContext";
 
 const AuthGate = lazy(() => import("@/components/auth/AuthGate"));
 const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
@@ -138,18 +139,20 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <ThemeProviderCustom>
-          <NavigationThemeWrapper>
-            <AuthProvider>
-              <BiometryProvider>
-                <PortalProvider>
-                  <Suspense fallback={null}>
-                    <AppContent />
-                  </Suspense>
-                  <CustomToast />
-                </PortalProvider>
-              </BiometryProvider>
-            </AuthProvider>
-          </NavigationThemeWrapper>
+          <IapProvider>
+            <NavigationThemeWrapper>
+              <AuthProvider>
+                <BiometryProvider>
+                  <PortalProvider>
+                    <Suspense fallback={null}>
+                      <AppContent />
+                    </Suspense>
+                    <CustomToast />
+                  </PortalProvider>
+                </BiometryProvider>
+              </AuthProvider>
+            </NavigationThemeWrapper>
+          </IapProvider>
         </ThemeProviderCustom>
       </Provider>
     </GestureHandlerRootView>

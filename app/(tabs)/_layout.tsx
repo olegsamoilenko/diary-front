@@ -67,31 +67,31 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/*<Tabs.Screen*/}
-      {/*  name="chat"*/}
-      {/*  options={{*/}
-      {/*    tabBarLabel: ({ color }) => {*/}
-      {/*      return (*/}
-      {/*        <Text*/}
-      {/*          style={{*/}
-      {/*            fontFamily: getFont(font, "regular"),*/}
-      {/*            color,*/}
-      {/*            fontSize: 13,*/}
-      {/*          }}*/}
-      {/*        >*/}
-      {/*          {t("chat.title")}*/}
-      {/*        </Text>*/}
-      {/*      );*/}
-      {/*    },*/}
-      {/*    tabBarIcon: ({ color }) => (*/}
-      {/*      <MaterialCommunityIcons*/}
-      {/*        name="robot-outline"*/}
-      {/*        size={28}*/}
-      {/*        color={color}*/}
-      {/*      />*/}
-      {/*    ),*/}
-      {/*  }}*/}
-      {/*/>*/}
+      <Tabs.Screen
+        name="iap-diagnostics"
+        options={{
+          tabBarLabel: ({ color }) => {
+            return (
+              <Text
+                style={{
+                  fontFamily: getFont(font, "regular"),
+                  color,
+                  fontSize: 13,
+                }}
+              >
+                iap-diagnostics
+              </Text>
+            );
+          },
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="robot-outline"
+              size={28}
+              color={color}
+            />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="settings"
         options={{
