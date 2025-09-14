@@ -8,7 +8,7 @@ export default ({ config }: { config: any }) => ({
     name: "Nemory",
     slug: "nemory",
     owner: "soniac12",
-    version: "1.1.7",
+    version: "1.1.8",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "nemory",
@@ -61,12 +61,12 @@ export default ({ config }: { config: any }) => ({
     experiments: {
       typedRoutes: true,
     },
-    runtimeVersion: "1.1.7",
+    runtimeVersion: "1.1.8",
     jsEngine: "hermes",
     ios: {
       supportsTablet: true,
       jsEngine: "jsc",
-      buildNumber: "1.1.7",
+      buildNumber: "1.1.8",
       infoPlist: {
         NSPhotoLibraryAddUsageDescription:
           "Зберігати зображення до альбому nemory.",

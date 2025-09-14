@@ -3,7 +3,10 @@ export type Plan = {
   price: number;
   tokensLimit: number;
   descriptionKey: string;
-  status: PlanStatus;
+  periodStart?: Date;
+  periodEnd?: Date;
+  status?: PlanStatus;
+  usedTrial?: boolean;
 };
 
 export enum PlanStatus {
