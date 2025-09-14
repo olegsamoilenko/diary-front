@@ -5,7 +5,7 @@ import { useIAP } from "react-native-iap";
 
 // підстав свої айдішки
 const INAPP_SKUS = ["your.inapp.sku"];
-const SUB_SKUS = ["nem_lite", "nem_base", "nem_pro"];
+const SUB_SKUS = ["nemory_lite", "nemory_base", "nemory_pro"];
 
 export default function IapDiagnostics() {
   const {
@@ -32,6 +32,7 @@ export default function IapDiagnostics() {
       await fetchProducts({ skus: SUB_SKUS, type: "subs" });
       await fetchProducts({ skus: INAPP_SKUS, type: "inapp" });
       add(`products.length = ${products.length}`);
+      add(`product = ${products[0]}`);
       const subsCount = products.filter((p: any) =>
         Array.isArray(p.subscriptionOfferDetails),
       ).length;

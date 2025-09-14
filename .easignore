@@ -1,0 +1,35 @@
+# не вантажити зайве на EAS (воно збирається наново на сервері)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# VCS і кеші
+.git/
+.gitignore
+.expo/
+.expo-shared/
+.vscode/
+.idea/
+.DS_Store
+
+# білд-артефакти, локальні SDK-шляхи
+android/app/build/
+android/build/
+android/.gradle/
+android/.cxx/
+android/local.properties
+ios/Pods/
+ios/build/
+
+# кежі/звітність
+coverage/
+dist/
+build/
+web-build/
+*.log
+
+# велика нефункціональна графіка/маркетинг (якщо тримаєш у репо)
+marketing/**
+screenshots/**
+docs/**
