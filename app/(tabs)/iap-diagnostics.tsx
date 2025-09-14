@@ -5,7 +5,7 @@ import { useIAP } from "react-native-iap";
 
 // підстав свої айдішки
 const INAPP_SKUS = ["your.inapp.sku"];
-const SUB_SKUS = ["your.sub.sku"];
+const SUB_SKUS = ["nem_lite", "nem_base", "nem_pro"];
 
 export default function IapDiagnostics() {
   const {

@@ -142,6 +142,8 @@ export default function Plans({
 
   const subs = products.filter(isSub);
 
+  console.log("products", products, subs);
+
   return (
     <View style={styles.container}>
       {loading || !connected ? (
