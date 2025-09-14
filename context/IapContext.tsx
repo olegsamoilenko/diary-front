@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Alert } from "react-native";
+import * as IAP from "react-native-iap";
 import { useIAP, type PurchaseError, type Product } from "react-native-iap";
 import { INAPP_SKUS, SUB_SKUS } from "@/constants/iap";
 import { isSub, getAndroidOfferTokenFromProduct } from "@/utils";
@@ -27,7 +28,6 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const {
     connected,
-    fetchProducts,
     requestPurchase,
     currentPurchase,
     finishTransaction,
@@ -42,14 +42,31 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   });
 
   const [catalog, setCatalog] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchWithRetry = async (
+    args: Parameters<typeof IAP.fetchProducts>[0],
+    tries = 3,
+    delayMs = 400,
+  ): Promise<Product[]> => {
+    for (let i = 0; i < tries; i++) {
+      const res = (await IAP.fetchProducts(args)) ?? [];
+      if (res.length) return res;
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+    return [];
+  };
 
   const loadCatalogAndState = async () => {
+    if (!connected) return;
+    setLoading(true);
     try {
       const list: Product[] = [];
 
       if (SUB_SKUS.length) {
-        const subs =
-          (await fetchProducts({ skus: SUB_SKUS, type: "subs" })) ?? [];
+        const subs = SUB_SKUS.length
+          ? await fetchWithRetry({ skus: SUB_SKUS, type: "subs" })
+          : [];
         console.log("subs", subs);
         console.log(
           "[IAP] subs fetched:",
@@ -63,8 +80,9 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (INAPP_SKUS.length) {
-        const inapps =
-          (await fetchProducts({ skus: INAPP_SKUS, type: "inapp" })) ?? [];
+        const inapps = INAPP_SKUS.length
+          ? await fetchWithRetry({ skus: INAPP_SKUS, type: "inapp" })
+          : [];
         console.log(
           "[IAP] inapps fetched:",
           inapps.map((p) => ({ id: p.id, title: (p as any).title })),
@@ -127,21 +145,16 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
-  // const restore = async () => {
-  //   await getAvailablePurchases();
-  //   await getActiveSubscriptions();
-  // };
-
   const value = useMemo<IapContextValue>(
     () => ({
       connected,
-      loading: !connected,
+      loading: loading || !connected,
       products: catalog,
       buySubById,
       buyInappById,
       restore: loadCatalogAndState,
     }),
-    [connected, catalog],
+    [connected, catalog, loading],
   );
 
   return <IapCtx.Provider value={value}>{children}</IapCtx.Provider>;
