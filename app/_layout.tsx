@@ -215,7 +215,10 @@ function AppContent() {
       } catch (err: any) {
         console.warn("Failed to init user/lang", err);
         console.warn("Failed to init user/lang response", err.response);
-        console.warn("Failed to init user/lang response data", e.response.data);
+        console.warn(
+          "Failed to init user/lang response data",
+          err.response.data,
+        );
       }
     })();
     return () => {

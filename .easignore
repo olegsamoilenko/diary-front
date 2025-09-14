@@ -1,57 +1,35 @@
-# deps (виключити будь-де)
-**/node_modules/**
+# не вантажити зайве на EAS (воно збирається наново на сервері)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
 
-# Android build junk
-android/.gradle/
-android/app/build/
-android/build/
-android/.cxx/
-android/local.properties
-
-# iOS build junk (якщо є)
-ios/Pods/
-ios/build/
-
-# Expo/Metro caches
+# VCS і кеші
+.git/
+.gitignore
 .expo/
 .expo-shared/
-dist/
-build/
-web-build/
-coverage/
-tmp/
-temp/
-
-# VCS/IDE
-.git/
-.git/**
-.gitignore
 .vscode/
 .idea/
 .DS_Store
 
-# Важкі бінарники/бекупи, які не потрібні для збірки
-*.jks
-*.keystore
-*.zip
-*.jar
-*.7z
-*.rar
-*.apk
-*.aab
-*.ipa
-*.xcarchive
-*.dSYM.zip
-*.bak
-*OLD*
-*bak.jks
+# білд-артефакти, локальні SDK-шляхи
+android/app/build/
+android/build/
+android/.gradle/
+android/.cxx/
+android/local.properties
+ios/Pods/
+ios/build/
 
-# Маркетингові матеріали / документи
+# кежі/звітність
+coverage/
+dist/
+build/
+web-build/
+*.log
+
+# велика нефункціональна графіка/маркетинг (якщо тримаєш у репо)
 marketing/**
 screenshots/**
 docs/**
-**/*.psd
-**/*.ai
-**/*.sketch
-**/*.pdf
-

@@ -1,4 +1,3 @@
-// context/IapProvider.tsx
 import React, {
   createContext,
   useContext,
@@ -7,14 +6,14 @@ import React, {
   useState,
 } from "react";
 import { Alert } from "react-native";
-import { useIAP, type Product, type PurchaseError } from "react-native-iap";
+import { useIAP, type PurchaseError, type Product } from "react-native-iap";
 import { INAPP_SKUS, SUB_SKUS } from "@/constants/iap";
 import { isSub, getAndroidOfferTokenFromProduct } from "@/utils";
 
 type IapContextValue = {
   connected: boolean;
   loading: boolean;
-  products: Product[];
+  products: Product[]; // наш каталог
   buySubById: (sku: string) => Promise<void>;
   buyInappById: (sku: string) => Promise<void>;
   restore: () => Promise<void>;
@@ -45,31 +44,49 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   const [catalog, setCatalog] = useState<Product[]>([]);
 
   const loadCatalogAndState = async () => {
-    const list: Product[] = [];
+    try {
+      const list: Product[] = [];
 
-    if (SUB_SKUS.length) {
-      const subs =
-        (await fetchProducts({ skus: SUB_SKUS, type: "subs" })) ?? [];
-      list.push(...subs);
+      if (SUB_SKUS.length) {
+        const subs =
+          (await fetchProducts({ skus: SUB_SKUS, type: "subs" })) ?? [];
+        console.log("subs", subs);
+        console.log(
+          "[IAP] subs fetched:",
+          subs.map((p) => ({
+            id: p.id,
+            title: (p as any).title,
+            hasOffers: !!(p as any).subscriptionOfferDetails,
+          })),
+        );
+        list.push(...subs);
+      }
+
+      if (INAPP_SKUS.length) {
+        const inapps =
+          (await fetchProducts({ skus: INAPP_SKUS, type: "inapp" })) ?? [];
+        console.log(
+          "[IAP] inapps fetched:",
+          inapps.map((p) => ({ id: p.id, title: (p as any).title })),
+        );
+        list.push(...inapps);
+      }
+
+      setCatalog(list);
+      console.log("[IAP] catalog size:", list.length);
+
+      await getAvailablePurchases();
+      await getActiveSubscriptions();
+    } catch (e) {
+      console.warn("[IAP] loadCatalog error:", e);
     }
-    if (INAPP_SKUS.length) {
-      const inapps =
-        (await fetchProducts({ skus: INAPP_SKUS, type: "inapp" })) ?? [];
-      list.push(...inapps);
-    }
-
-    setCatalog(list);
-
-    await getAvailablePurchases();
-    await getActiveSubscriptions();
   };
 
   useEffect(() => {
-    if (!connected) return;
-    loadCatalogAndState().catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (connected) loadCatalogAndState();
   }, [connected]);
 
+  // 2) Завершуємо транзакції
   useEffect(() => {
     if (!currentPurchase) return;
     (async () => {
@@ -82,7 +99,7 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
         console.warn("finishTransaction failed", e);
       }
     })();
-  }, [currentPurchase, finishTransaction]);
+  }, [currentPurchase]);
 
   const buySubById = async (sku: string) => {
     const product = catalog.find((p) => p.id === sku);
@@ -109,6 +126,11 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
       request: { ios: { sku }, android: { skus: [sku] } },
     });
   };
+
+  // const restore = async () => {
+  //   await getAvailablePurchases();
+  //   await getActiveSubscriptions();
+  // };
 
   const value = useMemo<IapContextValue>(
     () => ({
