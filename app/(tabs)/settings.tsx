@@ -60,7 +60,7 @@ export default function Settings() {
         >
           <NemoryLogo />
         </View>
-        {/*<ThemedText type="titleXL">{t("settings.title")}</ThemedText>*/}
+        <ThemedText type="titleXL">version: 1.1.6</ThemedText>
         <ThemedText type="subtitleXL">{t("settings.personal")}</ThemedText>
         <PersonalSettingsBlock
           themeSwitcherRef={themeSwitcherRef}

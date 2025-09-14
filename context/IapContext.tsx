@@ -1,11 +1,13 @@
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+// context/IapProvider.tsx
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Alert } from "react-native";
-import {
-  useIAP,
-  type Purchase,
-  type PurchaseError,
-  type Product,
-} from "react-native-iap";
+import { useIAP, type Product, type PurchaseError } from "react-native-iap";
 import { INAPP_SKUS, SUB_SKUS } from "@/constants/iap";
 import { isSub, getAndroidOfferTokenFromProduct } from "@/utils";
 
@@ -26,7 +28,6 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const {
     connected,
-    products,
     fetchProducts,
     requestPurchase,
     currentPurchase,
@@ -41,22 +42,38 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     },
   });
 
+  const [catalog, setCatalog] = useState<Product[]>([]);
+
+  const loadCatalogAndState = async () => {
+    const list: Product[] = [];
+
+    if (SUB_SKUS.length) {
+      const subs =
+        (await fetchProducts({ skus: SUB_SKUS, type: "subs" })) ?? [];
+      list.push(...subs);
+    }
+    if (INAPP_SKUS.length) {
+      const inapps =
+        (await fetchProducts({ skus: INAPP_SKUS, type: "inapp" })) ?? [];
+      list.push(...inapps);
+    }
+
+    setCatalog(list);
+
+    await getAvailablePurchases();
+    await getActiveSubscriptions();
+  };
+
   useEffect(() => {
     if (!connected) return;
-
-    fetchProducts({ skus: INAPP_SKUS, type: "inapp" });
-    // Каталог підписок
-    fetchProducts({ skus: SUB_SKUS, type: "subs" });
-
-    getAvailablePurchases();
-    getActiveSubscriptions();
-  }, [connected, fetchProducts, getAvailablePurchases, getActiveSubscriptions]);
+    loadCatalogAndState().catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected]);
 
   useEffect(() => {
     if (!currentPurchase) return;
     (async () => {
       try {
-        // TODO: Валідую на бекенді (purchaseToken/JWS) перед наданням доступу
         await finishTransaction({
           purchase: currentPurchase,
           isConsumable: false,
@@ -68,7 +85,7 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [currentPurchase, finishTransaction]);
 
   const buySubById = async (sku: string) => {
-    const product = products.find((p) => p.id === sku);
+    const product = catalog.find((p) => p.id === sku);
     const offerToken =
       product && isSub(product)
         ? getAndroidOfferTokenFromProduct(product)
@@ -89,28 +106,20 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   const buyInappById = async (sku: string) => {
     await requestPurchase({
       type: "inapp",
-      request: {
-        ios: { sku },
-        android: { skus: [sku] },
-      },
+      request: { ios: { sku }, android: { skus: [sku] } },
     });
-  };
-
-  const restore = async () => {
-    await getAvailablePurchases();
-    await getActiveSubscriptions();
   };
 
   const value = useMemo<IapContextValue>(
     () => ({
       connected,
       loading: !connected,
-      products,
+      products: catalog,
       buySubById,
       buyInappById,
-      restore,
+      restore: loadCatalogAndState,
     }),
-    [connected, products],
+    [connected, catalog],
   );
 
   return <IapCtx.Provider value={value}>{children}</IapCtx.Provider>;
