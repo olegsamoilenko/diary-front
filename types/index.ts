@@ -12,11 +12,15 @@ import type { EntrySettings, BackgroundSettings } from "./entrySettings";
 import { ErrorMessages } from "./messages";
 import type { ErrorsType } from "./errors";
 import { StatusCode } from "./statusCode";
-import { PlanStatus } from "./plan";
+import { PlanStatus, PlanTypes } from "./plan";
 import { Font, Lang, TimeFormat, ETheme } from "./userSettings";
 import { Dialog } from "./dialog";
 import type { EntryImage } from "./images";
 import { CodeStatus } from "./CodeStatus";
+import type {
+  ReleaseNotification,
+  ReleaseNotificationTranslation,
+} from "./notifications";
 
 export type {
   ColorTheme,
@@ -36,6 +40,8 @@ export type {
   ErrorsType,
   Dialog,
   EntryImage,
+  ReleaseNotification,
+  ReleaseNotificationTranslation,
 };
 
 export {
@@ -48,4 +54,5 @@ export {
   TimeFormat,
   ETheme,
   CodeStatus,
+  PlanTypes,
 };

@@ -131,7 +131,15 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!currentPurchase) return;
     (async () => {
       try {
-        const payload = buildVerificationPayload(currentPurchase); // NEW
+        const payload = buildVerificationPayload(currentPurchase);
+        const anyP = currentPurchase as any;
+        console.log("IAP DEBUG", {
+          packageNameAndroid: anyP.packageNameAndroid,
+          productId: getProductId(currentPurchase),
+          orderIdAndroid: anyP.orderIdAndroid,
+          purchaseTokenAndroid: anyP.purchaseTokenAndroid,
+          applicationId: Application.applicationId,
+        });
         const { data } = await apiRequest<VerifyResp>({
           url: "/iap/verify",
           method: "POST",
@@ -233,8 +241,8 @@ function buildVerificationPayload(p: Purchase) {
   if (Platform.OS === "android") {
     return {
       platform: "android",
-      packageName: anyP.packageNameAndroid ?? Application.applicationId,
-      productId,
+      packageName: anyP.packageNameAndroid,
+      productId: getProductId(p),
       purchaseToken: anyP.purchaseTokenAndroid ?? anyP.purchaseToken,
       orderId: anyP.orderIdAndroid ?? anyP.orderId,
     };

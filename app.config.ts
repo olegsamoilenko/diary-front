@@ -8,7 +8,7 @@ export default ({ config }: { config: any }) => ({
     name: "Nemory",
     slug: "nemory",
     owner: "soniac12",
-    version: "1.1.8",
+    version: process.env.EXPO_PUBLIC_VERSION,
     orientation: "portrait",
     icon: "./assets/images/icon.png",
     scheme: "nemory",
@@ -61,12 +61,12 @@ export default ({ config }: { config: any }) => ({
     experiments: {
       typedRoutes: true,
     },
-    runtimeVersion: "1.1.8",
+    runtimeVersion: process.env.EXPO_PUBLIC_VERSION,
     jsEngine: "hermes",
     ios: {
       supportsTablet: true,
       jsEngine: "jsc",
-      buildNumber: "1.1.8",
+      buildNumber: process.env.EXPO_PUBLIC_VERSION,
       infoPlist: {
         NSPhotoLibraryAddUsageDescription:
           "Зберігати зображення до альбому nemory.",
@@ -78,7 +78,7 @@ export default ({ config }: { config: any }) => ({
     android: {
       package: "com.soniac12.nemory",
       package_name: "com.soniac12.nemory",
-      versionCode: 8,
+      versionCode: process.env.EXPO_PUBLIC_BUILD,
       adaptiveIcon: {
         foregroundImage: "./assets/images/icon.png",
         backgroundColor: "#ffffff",

@@ -32,6 +32,7 @@ import Background from "@/components/Background";
 import WelcomeModal from "@/components/diary/WelcomeModal";
 import Toast from "react-native-toast-message";
 import { UserEvents } from "@/utils/events/userEvents";
+import ReleaseNotificationModal from "@/components/diary/ReleaseNotificationModal";
 
 function localISODate(d = new Date()) {
   const dt = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -117,9 +118,9 @@ export default function Diary() {
           err.response.data,
         );
       } finally {
-        if (id === reqIdRef.current) {
-          setTimeout(() => setLoading(false), 100);
-        }
+        // if (id === reqIdRef.current) {
+        setTimeout(() => setLoading(false), 100);
+        // }
       }
     },
     [timeZone],
@@ -218,6 +219,11 @@ export default function Diary() {
             prev[selectedDay]?.filter((e) => e.id !== entry.id) ?? [],
         }));
         await deleteEntryImages(entry.images || []);
+        setReadySet((prev) => {
+          const next = new Set(prev);
+          next.delete(entry.id);
+          return next;
+        });
         Toast.show({
           type: "success",
           text1: t(`diary.entry.entryDeleted`),
@@ -238,10 +244,9 @@ export default function Diary() {
   const total = entriesForDay.length;
   const [readySet, setReadySet] = useState<Set<number>>(new Set());
 
-  // якщо список змінюється — скидаємо готовність
   useEffect(() => {
     setReadySet(new Set());
-  }, [total]);
+  }, [selectedDay]);
 
   const allReady = readySet.size === total;
 
@@ -324,6 +329,7 @@ export default function Diary() {
         </Portal>
       </>
       <WelcomeModal />
+      <ReleaseNotificationModal />
     </Background>
   );
 }
@@ -338,5 +344,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 10000,
   },
 });

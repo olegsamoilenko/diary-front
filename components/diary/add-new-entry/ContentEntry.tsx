@@ -7,7 +7,6 @@ import { Colors } from "@/constants/Colors";
 import { ColorTheme, Entry } from "@/types";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 import StreamingText from "@/components/diary/add-new-entry/StreamingText";
-import HtmlViewer from "@/components/ui/HtmlViewer";
 import * as SecureStore from "@/utils/store/secureStore";
 import { hydrateEntryHtmlFromAlbum } from "@/utils";
 import WebViewHTML from "@/components/ui/WebViewHTML";

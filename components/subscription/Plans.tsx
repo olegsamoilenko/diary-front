@@ -15,7 +15,8 @@ import React, {
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import { ColorTheme, Plan, PlanStatus, User } from "@/types";
+import type { ColorTheme, Plan, User } from "@/types";
+import { PlanStatus, PlanTypes } from "@/types";
 import { PLANS } from "@/constants/Plans";
 import { ThemedText } from "@/components/ThemedText";
 import { apiRequest, getStatusColor, isSub } from "@/utils";
@@ -51,6 +52,7 @@ export default function Plans({
   // const [loading, setLoading] = useState(false);
   const navigatingRef = useRef(false);
   const { connected, loading, products, buySubById } = useIap();
+  const [planType, setPlanType] = useState<PlanTypes | undefined>(undefined);
 
   useEffect(() => {
     let mounted = true;
@@ -58,10 +60,26 @@ export default function Plans({
       const storedUser = await SecureStore.getItemAsync("user");
       if (!mounted) return;
       setUser(storedUser ? JSON.parse(storedUser) : null);
+      await getPlanType();
     })();
     return () => {
       mounted = false;
     };
+  }, []);
+
+  const getPlanType = useCallback(async () => {
+    try {
+      const res = await apiRequest({
+        url: `/plans/plan-type`,
+        method: "GET",
+      });
+
+      setPlanType(res.data);
+    } catch (error: any) {
+      console.error("Error get plan type:", error);
+      console.error("Error get plan type response:", error.response);
+      console.error("Error get plan type response data:", error.response.data);
+    }
   }, []);
 
   // useEffect(() => {
@@ -104,9 +122,12 @@ export default function Plans({
     [onSuccess],
   );
 
-  const onSelectTrial = useCallback(async () => {
-    await saveToDatabase("Start");
-  }, [saveToDatabase]);
+  const onSelectTrial = useCallback(
+    async (planName: string) => {
+      await saveToDatabase(planName);
+    },
+    [saveToDatabase],
+  );
 
   const onSelect = useCallback(
     async (plan: any) => {
@@ -116,6 +137,8 @@ export default function Plans({
     },
     [buySubById],
   );
+
+  console.log("products", products);
 
   const subs = products.filter(isSub).map((plan) => {
     return {
@@ -127,7 +150,7 @@ export default function Plans({
     };
   });
 
-  console.log("products", products, subs);
+  console.log("subs", subs);
 
   return (
     <View style={styles.container}>
@@ -138,21 +161,69 @@ export default function Plans({
       ) : (
         <ScrollView contentContainerStyle={styles.scrollView}>
           <View style={styles.plansContainer}>
-            {((user && !user.plan) ||
+            {planType === PlanTypes.OPEN_TESTING ||
+              planType === PlanTypes.CLOSED_TESTING ||
+              (planType === PlanTypes.INTERNAL_TESTING && (
+                <TouchableOpacity onPress={() => onSelectTrial("For testing")}>
+                  <View
+                    style={[
+                      styles.card,
+                      {
+                        borderColor:
+                          user && user.plan && user.plan.name === "For testing"
+                            ? colors.primary
+                            : "transparent",
+                      },
+                    ]}
+                  >
+                    <View style={styles.cardInner}>
+                      <ThemedText type="subtitleLG">
+                        {t("planModal.forTesting")}
+                      </ThemedText>
+                      {user?.plan?.name === "For testing" && (
+                        <View
+                          style={[
+                            styles.status,
+                            {
+                              backgroundColor: getStatusColor(
+                                user.plan.status!,
+                              ),
+                            },
+                          ]}
+                        >
+                          <ThemedText
+                            style={{
+                              color: colors.textInPrimary,
+                            }}
+                          >
+                            {user.plan.status!.slice(0, 1).toUpperCase() +
+                              user.plan.status!.slice(1)}
+                          </ThemedText>
+                        </View>
+                      )}
+                    </View>
+                    <ThemedText style={styles.desc}>{}</ThemedText>
+                    <ThemedText type="subtitleLG" style={styles.price}>
+                      {t("planModal.freeForTesting")}
+                    </ThemedText>
+                    <ThemedText style={styles.tokens}>
+                      800 000 {t("planModal.tokens")}
+                    </ThemedText>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            {((user && !user.plan && planType === PlanTypes.PRODUCTION) ||
               (user &&
                 user.plan &&
-                user.plan.periodEnd!.getTime() >
-                  user.plan.periodStart!.getTime())) && (
-              <TouchableOpacity onPress={() => onSelectTrial()}>
+                planType === PlanTypes.PRODUCTION &&
+                user.plan.name === PLANS[0].name)) && (
+              <TouchableOpacity onPress={() => onSelectTrial("Start")}>
                 <View
                   style={[
                     styles.card,
                     {
                       borderColor:
-                        user &&
-                        user.plan &&
-                        user.plan.periodEnd!.getTime() >
-                          user.plan.periodStart!.getTime()
+                        user && user.plan && user.plan.name === PLANS[0].name
                           ? colors.primary
                           : "transparent",
                     },
@@ -160,7 +231,7 @@ export default function Plans({
                 >
                   <View style={styles.cardInner}>
                     <ThemedText type="subtitleLG">Start</ThemedText>
-                    {user?.plan?.name === "Start" && (
+                    {user?.plan?.name === PLANS[0].name && (
                       <View
                         style={[
                           styles.status,
@@ -187,7 +258,7 @@ export default function Plans({
                     {t("planModal.free")}
                   </ThemedText>
                   <ThemedText style={styles.tokens}>
-                    350000 {t("planModal.tokensPerMonth")}
+                    350 000 {t("planModal.tokensPerMonth")}
                   </ThemedText>
                 </View>
               </TouchableOpacity>
@@ -251,7 +322,7 @@ export default function Plans({
                       {t(plan.descriptionKey)}
                     </ThemedText>
                     <ThemedText type="subtitleLG" style={styles.price}>
-                      {`${plan.price} $ / ${t("planModal.month")}`}
+                      {`${plan.displayPrice} / ${t("planModal.month")}`}
                     </ThemedText>
                     <ThemedText style={styles.tokens}>
                       {plan.tokensLimit.toLocaleString()}{" "}

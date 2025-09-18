@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useState, lazy, Suspense } from "react";
-import { Appearance, unstable_batchedUpdates, StyleSheet } from "react-native";
+import {
+  Appearance,
+  unstable_batchedUpdates,
+  StyleSheet,
+  Platform,
+} from "react-native";
 import "../i18n";
 import "@/constants/CalendarLocale";
 import { ThemeProvider as NavThemeProvider } from "@react-navigation/native";
@@ -162,12 +167,13 @@ export default function RootLayout() {
 async function createAnonymousUser(): Promise<User | null> {
   const lang = i18n.language;
   const theme = Appearance.getColorScheme();
+  const platform = Platform.OS;
   try {
     const newUuid = uuid.v4();
     const res = await apiRequest({
       url: `/users/create-by-uuid`,
       method: "POST",
-      data: { uuid: newUuid, lang, theme },
+      data: { uuid: newUuid, lang, theme, platform },
     });
     if (res?.status === 201) {
       const data = await res.data;

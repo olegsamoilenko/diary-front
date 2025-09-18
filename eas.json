@@ -9,7 +9,9 @@
       "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_API_URL": "http://192.168.0.100:3001",
-        "EXPO_PUBLIC_URL": "http://192.168.0.100:3001"
+        "EXPO_PUBLIC_URL": "http://192.168.0.100:3001",
+        "EXPO_PUBLIC_BUILD": "57",
+        "EXPO_PUBLIC_VERSION": "1.1.8"
       }
     },
     "production": {
@@ -18,7 +20,9 @@
       "channel": "production",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://nemoryai.com/api",
-        "EXPO_PUBLIC_URL": "https://nemoryai.com"
+        "EXPO_PUBLIC_URL": "https://nemoryai.com",
+        "EXPO_PUBLIC_BUILD": "57",
+        "EXPO_PUBLIC_VERSION": "1.1.8"
       },
       "autoIncrement": true
     }

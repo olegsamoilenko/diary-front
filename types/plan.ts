@@ -3,6 +3,7 @@ export type Plan = {
   price: number;
   tokensLimit: number;
   descriptionKey: string;
+  type?: PlanTypes;
   periodStart?: Date;
   periodEnd?: Date;
   status?: PlanStatus;
@@ -19,4 +20,11 @@ export enum PlanStatus {
   PAUSED = "paused",
   RESTARTED = "restarted",
   REFUNDED = "refunded",
+}
+
+export enum PlanTypes {
+  INTERNAL_TESTING = "internal_testing",
+  CLOSED_TESTING = "closed_testing",
+  OPEN_TESTING = "open_testing",
+  PRODUCTION = "production",
 }

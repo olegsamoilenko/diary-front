@@ -1,154 +1,53 @@
-import React, { useState } from "react";
-import { useWindowDimensions, View, Image, Platform } from "react-native";
-import RenderHTML, {
-  HTMLElementModel,
-  HTMLContentModel,
-} from "react-native-render-html";
+import React from "react";
+import RenderHTML, { type RenderHTMLProps } from "react-native-render-html";
+import { useWindowDimensions, Linking } from "react-native";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
 
-export default function HtmlViewer({ htmlContent }: { htmlContent: string }) {
+type Props = {
+  htmlContent: string;
+  horizontalPadding?: number;
+} & Omit<RenderHTMLProps, "source" | "contentWidth">;
+
+export default function HtmlViewer({
+  htmlContent,
+  horizontalPadding = 0,
+  renderersProps,
+  ...rest
+}: Props) {
   const { width } = useWindowDimensions();
-  const [ratio, setRatio] = useState<number>(1);
+  const contentWidth = Math.max(0, width - horizontalPadding);
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme];
 
-  const customHTMLElementModels = {
-    font: HTMLElementModel.fromCustomModel({
-      tagName: "font",
-      contentModel: HTMLContentModel.textual,
-    }),
-  };
-
-  const getSize = (size: string | undefined): number => {
-    switch (size) {
-      case "1":
-        return 10;
-      case "2":
-        return 12;
-      case "3":
-        return 16;
-      case "4":
-        return 18;
-      case "5":
-        return 22;
-      case "6":
-        return 28;
-      case "7":
-        return 32;
-      default:
-        return 16;
-    }
-  };
-
-  const renderers = {
-    font: ({ tnode, TDefaultRenderer, ...props }) => {
-      if (!tnode || !tnode.domNode || !tnode.domNode.attribs) {
-        return null;
-      }
-      const { color, face, size } = tnode.domNode.attribs || {};
-
-      const style = {};
-
-      if (color) {
-        style.color = color;
-      }
-
-      if (face) {
-        style.fontFamily = face;
-      }
-
-      if (size) {
-        style.fontSize = getSize(size);
-      }
-
-      style.lineHeight = getSize(size) + 4;
-
-      return TDefaultRenderer({ ...props, style: [props.style, style], tnode });
-    },
-    b: ({ tnode, TDefaultRenderer, ...props }) => {
-      console.log("b tag attrs:", props.style);
-      return TDefaultRenderer({
-        ...props,
-        style: [props.style, { fontWeight: "700" }],
-        tnode,
-      });
-    },
-    // strong: ({ TDefaultRenderer, ...props }) =>
-    //   TDefaultRenderer({
-    //     ...props,
-    //     style: [
-    //       props.style,
-    //       Platform.OS === "android"
-    //         ? { fontFamily: "MarckScript-Bold" }
-    //         : { fontWeight: "700" },
-    //     ],
-    //   }),
-    //
-    // // <i>/<em>
-    // i: ({ TDefaultRenderer, ...props }) =>
-    //   TDefaultRenderer({
-    //     ...props,
-    //     style: [
-    //       props.style,
-    //       Platform.OS === "android"
-    //         ? { fontFamily: "MarckScript-Italic" } // Потрібен файл Italic
-    //         : { fontStyle: "italic" },
-    //     ],
-    //   }),
-    // em: ({ TDefaultRenderer, ...props }) =>
-    //   TDefaultRenderer({
-    //     ...props,
-    //     style: [
-    //       props.style,
-    //       Platform.OS === "android"
-    //         ? { fontFamily: "MarckScript-Italic" }
-    //         : { fontStyle: "italic" },
-    //     ],
-    //   }),
-    //
-    // // <u>
-    // u: ({ TDefaultRenderer, ...props }) =>
-    //   TDefaultRenderer({
-    //     ...props,
-    //     style: [props.style, { textDecorationLine: "underline" }],
-    //   }),
-    img: ({ tnode }) => {
-      const src = tnode.attributes?.src;
-      if (src)
-        Image.getSize(src, (w, h) => {
-          setRatio(w / h);
-        });
-      if (!src) return null;
-      return (
-        <View
-          style={{
-            alignSelf: "center",
-            width: "85%",
-            borderRadius: 16,
-            overflow: "hidden",
-            marginVertical: 8,
-          }}
-        >
-          <Image
-            source={{ uri: src }}
-            style={{
-              alignSelf: "center",
-              width: "85%",
-              height: undefined,
-              aspectRatio: ratio || 1,
-              borderRadius: 16,
-            }}
-            resizeMode="cover"
-          />
-        </View>
-      );
-    },
-  };
+  const tagsStyles = {
+    body: { color: colors.text, fontSize: 14, lineHeight: 20 },
+    h1: { fontSize: 20, fontWeight: "700", marginBottom: 2 },
+    h2: { fontSize: 18, fontWeight: "700", marginBottom: 2 },
+    h3: { fontSize: 16, fontWeight: "600", marginBottom: 2 },
+    p: { marginBottom: 2 },
+    li: { marginBottom: 2 },
+    ul: { marginBottom: 2 },
+    ol: { marginBottom: 2 },
+    blockquote: { borderLeftWidth: 3, paddingLeft: 10, opacity: 0.9 },
+    a: { textDecorationLine: "underline" },
+  } as const;
 
   return (
     <RenderHTML
-      contentWidth={width}
       source={{ html: htmlContent }}
-      renderers={renderers}
-      customHTMLElementModels={customHTMLElementModels}
-      defaultTextProps={{ selectable: true }}
+      contentWidth={contentWidth}
+      tagsStyles={tagsStyles}
+      renderersProps={{
+        img: { enableExperimentalPercentWidth: true },
+        a: {
+          onPress: (_evt, href) => {
+            if (href) Linking.openURL(href);
+          },
+        },
+        ...renderersProps,
+      }}
+      {...rest}
     />
   );
 }

@@ -467,10 +467,11 @@ const getStyles = (colors: ColorTheme) =>
       borderRadius: 8,
       marginBottom: 12,
       fontSize: 16,
+      minWidth: "100%",
     },
     label: {
       marginBottom: 16,
-      textAlign: "center",
+      textAlign: "left",
     },
     btn: {
       paddingHorizontal: 18,

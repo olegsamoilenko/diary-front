@@ -37,4 +37,5 @@ export enum ErrorMessages {
   GET_MOODS_BY_DATE_ERROR = "getMoodsByDateError",
   EMAIL_ALREADY_IN_USE = "emailAlreadyInUse",
   EMAIL_ALREADY_IN_USE_LOGIN_EMAIL_PASSWORD = "emailAlreadyInUseLoginEmailPassword",
+  ALREADY_SKIPPED = "alreadySkipped",
 }

@@ -4,8 +4,6 @@ import {
   View,
   TouchableWithoutFeedback,
   StyleSheet,
-  Platform,
-  KeyboardAvoidingView,
   Pressable,
   Dimensions,
   ScrollView,
@@ -47,9 +45,9 @@ export default function ModalPortal({
     };
   }, []);
 
-  const computedMaxHeight = maxHeight
-    ? SCREEN_HEIGHT * 0.8
-    : SCREEN_HEIGHT - keyboardHeight - 40;
+  useEffect(() => {
+    console.log("visible", visible);
+  }, [visible]);
   return (
     <Modal
       animationType="fade"
@@ -58,51 +56,44 @@ export default function ModalPortal({
       onRequestClose={onClose}
       statusBarTranslucent={true}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback
+        onPress={(e) => {
+          onClose();
+        }}
+      >
         <View style={[styles.overlay]}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
+          <View
             style={[
-              styles.centeredView,
+              styles.modalView,
               {
                 maxHeight:
-                  keyboardHeight === 0 && !maxHeight
-                    ? contentHeight + 48
-                    : computedMaxHeight,
+                  keyboardHeight === 0 && contentHeight > SCREEN_HEIGHT * 0.9
+                    ? SCREEN_HEIGHT * 0.9
+                    : keyboardHeight > 0 &&
+                        contentHeight > SCREEN_HEIGHT * 0.9 - keyboardHeight
+                      ? SCREEN_HEIGHT * 0.9 - keyboardHeight
+                      : contentHeight + 78,
               },
             ]}
           >
-            <Pressable
-              onPress={(e) => e.stopPropagation()}
-              style={[
-                styles.modalView,
-                {
-                  maxHeight:
-                    keyboardHeight === 0 && !maxHeight
-                      ? contentHeight + 48
-                      : computedMaxHeight,
-                  backgroundColor: colors.background,
-                },
-              ]}
-            >
-              <ScrollView
-                contentContainerStyle={{
-                  flexGrow: keyboardHeight === 0 ? 0 : 1,
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Pressable
+                onPress={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
                 }}
-                showsVerticalScrollIndicator={false}
-                bounces={false}
+                onLayout={(e) => {
+                  const h = e.nativeEvent.layout.height;
+                  console.log("SCREEN_HEIGHT", SCREEN_HEIGHT);
+                  console.log("Content height:", h);
+                  console.log("keyboardHeight", keyboardHeight);
+                  setContentHeight(h);
+                }}
               >
-                <View
-                  onLayout={(e) => {
-                    const h = e.nativeEvent.layout.height;
-                    setContentHeight(h);
-                  }}
-                >
-                  {children}
-                </View>
-              </ScrollView>
-            </Pressable>
-          </KeyboardAvoidingView>
+                {children}
+              </Pressable>
+            </ScrollView>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -111,27 +102,33 @@ export default function ModalPortal({
 
 const styles = StyleSheet.create({
   overlay: {
-    height: "100%",
-    width: "100%",
+    flex: 1,
     backgroundColor: "rgba(0,0,0,0.27)",
     justifyContent: "center",
     alignItems: "center",
   },
   centeredView: {
+    flex: 1,
+    height: "100%",
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.27)",
   },
   modalView: {
-    minWidth: 280,
-    maxWidth: "85%",
-    padding: 24,
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    elevation: 6,
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 25,
+    alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 14,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: "80%",
   },
 });
