@@ -105,26 +105,28 @@ export default function Plans({
   const saveToDatabase = useCallback(
     async (basePlanId: BasePlanIds) => {
       // setLoading(true);
-      const newDate = new Date();
+      const now = new Date();
+      const expiry =
+        basePlanId === BasePlanIds.START
+          ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+          : null;
+
       const data = {
         subscriptionId: Subscriptions.NEMORY,
         basePlanId,
-        startTime: newDate,
-        expiryTime:
-          basePlanId === BasePlanIds.START
-            ? newDate.setDate(newDate.getDate() + 7)
-            : null,
+        startTime: now.toISOString(),
+        expiryTime: expiry ? expiry.toISOString() : null,
         planStatus: PlanStatus.ACTIVE,
         autoRenewEnabled: false,
         platform: Platform.OS,
-        regionCode: regionCode,
+        regionCode: regionCode ?? null,
         price: 0,
       };
       try {
         const res = await apiRequest({
           url: `/plans/subscribe`,
           method: "POST",
-          data: { data },
+          data,
         });
 
         const stored = await SecureStore.getItemAsync("user");
