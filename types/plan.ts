@@ -16,15 +16,15 @@ export type Plan = {
 };
 
 export enum PlanStatus {
-  ACTIVE = "active",
-  INACTIVE = "inactive",
-  CANCELED = "canceled",
-  EXPIRED = "expired",
-  IN_GRACE_PERIOD = "in grace period",
-  ON_HOLD = "on hold",
-  PAUSED = "paused",
-  RESTARTED = "restarted",
-  REFUNDED = "refunded",
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  CANCELED = "CANCELED",
+  EXPIRED = "EXPIRED",
+  IN_GRACE = "IN_GRACE",
+  ON_HOLD = "ON_HOLD",
+  PAUSED = "PAUSED",
+  RESTARTED = "RESTARTED",
+  REFUNDED = "REFUNDED",
 }
 
 export enum PlanTypes {
