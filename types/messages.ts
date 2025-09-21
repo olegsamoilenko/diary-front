@@ -38,4 +38,5 @@ export enum ErrorMessages {
   EMAIL_ALREADY_IN_USE = "emailAlreadyInUse",
   EMAIL_ALREADY_IN_USE_LOGIN_EMAIL_PASSWORD = "emailAlreadyInUseLoginEmailPassword",
   ALREADY_SKIPPED = "alreadySkipped",
+  RESUBSCRIPTION_ERROR = "resubscriptionError",
 }

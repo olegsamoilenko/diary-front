@@ -12,7 +12,7 @@ import type { EntrySettings, BackgroundSettings } from "./entrySettings";
 import { ErrorMessages } from "./messages";
 import type { ErrorsType } from "./errors";
 import { StatusCode } from "./statusCode";
-import { PlanStatus, PlanTypes } from "./plan";
+import { PlanStatus, PlanTypes, Subscriptions, BasePlanIds } from "./plan";
 import { Font, Lang, TimeFormat, ETheme } from "./userSettings";
 import { Dialog } from "./dialog";
 import type { EntryImage } from "./images";
@@ -55,4 +55,6 @@ export {
   ETheme,
   CodeStatus,
   PlanTypes,
+  Subscriptions,
+  BasePlanIds,
 };

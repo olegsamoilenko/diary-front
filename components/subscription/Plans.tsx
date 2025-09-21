@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Platform,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -15,14 +16,22 @@ import React, {
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import type { ColorTheme, Plan, User } from "@/types";
-import { PlanStatus, PlanTypes } from "@/types";
+import {
+  BasePlanIds,
+  ColorTheme,
+  Plan,
+  PlanStatus,
+  PlanTypes,
+  Subscriptions,
+  User,
+} from "@/types";
 import { PLANS } from "@/constants/Plans";
 import { ThemedText } from "@/components/ThemedText";
-import { apiRequest, getStatusColor, isSub } from "@/utils";
+import { apiRequest, getPlanName, getStatusColor } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
 import * as SecureStore from "@/utils/store/secureStore";
 import { useIap } from "@/context/IapContext";
+import * as Localization from "expo-localization";
 
 type PlansProps = {
   onSuccess?: () => void;
@@ -51,8 +60,10 @@ export default function Plans({
   const [user, setUser] = useState<User | null>(null);
   // const [loading, setLoading] = useState(false);
   const navigatingRef = useRef(false);
-  const { connected, loading, products, buySubById } = useIap();
+  const { connected, loading, subscriptions, buySubById, buyPlan } = useIap();
   const [planType, setPlanType] = useState<PlanTypes | undefined>(undefined);
+  const locales = Localization.getLocales();
+  const regionCode = locales[0].regionCode;
 
   useEffect(() => {
     let mounted = true;
@@ -92,13 +103,28 @@ export default function Plans({
   // }, [successPaymentPlan]);
 
   const saveToDatabase = useCallback(
-    async (name: string) => {
+    async (basePlanId: BasePlanIds) => {
       // setLoading(true);
+      const newDate = new Date();
+      const data = {
+        subscriptionId: Subscriptions.NEMORY,
+        basePlanId,
+        startTime: newDate,
+        expiryTime:
+          basePlanId === BasePlanIds.START
+            ? newDate.setDate(newDate.getDate() + 7)
+            : null,
+        planStatus: PlanStatus.ACTIVE,
+        autoRenewEnabled: false,
+        platform: Platform.OS,
+        regionCode: regionCode,
+        price: 0,
+      };
       try {
         const res = await apiRequest({
           url: `/plans/subscribe`,
           method: "POST",
-          data: { name: name },
+          data: { data },
         });
 
         const stored = await SecureStore.getItemAsync("user");
@@ -123,34 +149,43 @@ export default function Plans({
   );
 
   const onSelectTrial = useCallback(
-    async (planName: string) => {
-      await saveToDatabase(planName);
+    async (basePlanId: BasePlanIds) => {
+      await saveToDatabase(basePlanId);
     },
     [saveToDatabase],
   );
 
   const onSelect = useCallback(
     async (plan: any) => {
-      const resp = await buySubById(plan.id);
+      console.log("Selected plan", plan);
+      // const resp = await buySubById(plan.id);
+      const resp = await buyPlan(plan.basePlanId, { obfuscatedId: user?.uuid });
 
       console.log("buySubById resp", resp);
     },
-    [buySubById],
+    [buySubById, buyPlan],
   );
 
-  console.log("products", products);
+  console.log("subscriptions", subscriptions);
 
-  const subs = products.filter(isSub).map((plan) => {
-    return {
-      ...plan,
-      descriptionKey:
-        PLANS.find((p) => p.name === plan.displayName)?.descriptionKey || "",
-      tokensLimit:
-        PLANS.find((p) => p.name === plan.displayName)?.tokensLimit || "",
-    };
-  });
+  const subscription = subscriptions.find((s) => s.id === Subscriptions.NEMORY);
 
-  console.log("subs", subs);
+  console.log("subscription", subscription);
+
+  const baseSubPlans = subscription?.subscriptionOfferDetailsAndroid.map(
+    (plan) => {
+      return {
+        ...plan,
+        name: getPlanName(plan.basePlanId as Subscriptions),
+        descriptionKey:
+          PLANS.find((p) => p.id === plan.basePlanId)?.descriptionKey || "",
+        tokensLimit:
+          PLANS.find((p) => p.id === plan.basePlanId)?.tokensLimit || "",
+      };
+    },
+  );
+
+  console.log("baseSubPlans", baseSubPlans);
 
   return (
     <View style={styles.container}>
@@ -164,7 +199,9 @@ export default function Plans({
             {planType === PlanTypes.OPEN_TESTING ||
               planType === PlanTypes.CLOSED_TESTING ||
               (planType === PlanTypes.INTERNAL_TESTING && (
-                <TouchableOpacity onPress={() => onSelectTrial("For testing")}>
+                <TouchableOpacity
+                  onPress={() => onSelectTrial(BasePlanIds.TESTING)}
+                >
                   <View
                     style={[
                       styles.card,
@@ -217,7 +254,9 @@ export default function Plans({
                 user.plan &&
                 planType === PlanTypes.PRODUCTION &&
                 user.plan.name === PLANS[0].name)) && (
-              <TouchableOpacity onPress={() => onSelectTrial("Start")}>
+              <TouchableOpacity
+                onPress={() => onSelectTrial(BasePlanIds.START)}
+              >
                 <View
                   style={[
                     styles.card,
@@ -264,14 +303,14 @@ export default function Plans({
               </TouchableOpacity>
             )}
 
-            {subs.map((plan) => {
+            {baseSubPlans.map((plan) => {
               return (
                 <TouchableOpacity
-                  key={plan.id}
+                  key={plan.basePlanId}
                   disabled={
                     user &&
                     user.plan &&
-                    plan.displayName === user.plan.name &&
+                    plan.name === user.plan.name &&
                     (user.plan.status === PlanStatus.ACTIVE ||
                       user.plan.status === PlanStatus.REFUNDED)
                   }
@@ -282,47 +321,41 @@ export default function Plans({
                       styles.card,
                       {
                         borderColor:
-                          user &&
-                          user.plan &&
-                          plan.displayName === user.plan.name
+                          user && user.plan && plan.name === user.plan.name
                             ? colors.primary
                             : "transparent",
                       },
                     ]}
                   >
                     <View style={styles.cardInner}>
-                      <ThemedText type="subtitleLG">
-                        {plan.displayName}
-                      </ThemedText>
-                      {user &&
-                        user.plan &&
-                        user.plan.name === plan.displayName && (
-                          <View
-                            style={[
-                              styles.status,
-                              {
-                                backgroundColor: getStatusColor(
-                                  user.plan.status!,
-                                ),
-                              },
-                            ]}
+                      <ThemedText type="subtitleLG">{plan.name}</ThemedText>
+                      {user && user.plan && user.plan.name === plan.name && (
+                        <View
+                          style={[
+                            styles.status,
+                            {
+                              backgroundColor: getStatusColor(
+                                user.plan.status!,
+                              ),
+                            },
+                          ]}
+                        >
+                          <ThemedText
+                            style={{
+                              color: colors.textInPrimary,
+                            }}
                           >
-                            <ThemedText
-                              style={{
-                                color: colors.textInPrimary,
-                              }}
-                            >
-                              {user.plan.status!.slice(0, 1).toUpperCase() +
-                                user.plan.status!.slice(1)}
-                            </ThemedText>
-                          </View>
-                        )}
+                            {user.plan.status!.slice(0, 1).toUpperCase() +
+                              user.plan.status!.slice(1)}
+                          </ThemedText>
+                        </View>
+                      )}
                     </View>
                     <ThemedText style={styles.desc}>
                       {t(plan.descriptionKey)}
                     </ThemedText>
                     <ThemedText type="subtitleLG" style={styles.price}>
-                      {`${plan.displayPrice} / ${t("planModal.month")}`}
+                      {`${plan.pricingPhases.pricingPhaseList[0].formattedPrice} / ${t("planModal.month")}`}
                     </ThemedText>
                     <ThemedText style={styles.tokens}>
                       {plan.tokensLimit.toLocaleString()}{" "}

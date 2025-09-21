@@ -47,6 +47,7 @@ import {
   getProductPrice,
   getProductTitle,
 } from "./iap/helpers";
+import { getPlanName } from "./subscription/plans";
 
 export {
   apiRequest,
@@ -88,4 +89,5 @@ export {
   getAndroidOfferTokenFromProduct,
   getProductPrice,
   getProductTitle,
+  getPlanName,
 };

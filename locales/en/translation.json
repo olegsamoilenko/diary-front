@@ -304,6 +304,7 @@
     "emailAlreadyInUse": "Email already in use",
     "emailAlreadyInUseLoginEmailPassword": "Email already in use. Please login with email and password.",
     "alreadySkipped": "This version has already been skipped",
+    "resubscriptionError": "Resubscription error"
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",

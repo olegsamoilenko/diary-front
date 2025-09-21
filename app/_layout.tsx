@@ -168,12 +168,15 @@ async function createAnonymousUser(): Promise<User | null> {
   const lang = i18n.language;
   const theme = Appearance.getColorScheme();
   const platform = Platform.OS;
+  const locales = Localization.getLocales();
+  const regionCode = locales[0].regionCode;
+  console.log("locales1", locales);
   try {
     const newUuid = uuid.v4();
     const res = await apiRequest({
       url: `/users/create-by-uuid`,
       method: "POST",
-      data: { uuid: newUuid, lang, theme, platform },
+      data: { uuid: newUuid, lang, theme, platform, regionCode },
     });
     if (res?.status === 201) {
       const data = await res.data;

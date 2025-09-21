@@ -304,6 +304,7 @@
     "emailAlreadyInUse": "Електронна пошта вже використовується",
     "emailAlreadyInUseLoginEmailPassword": "Електронна пошта вже використовується. Увійдіть за допомогою електронної пошти та пароля",
     "alreadySkipped": "Ця версія вже пропущена",
+    "resubscriptionError": "Помилка повторної підписки"
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",

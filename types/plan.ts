@@ -1,3 +1,8 @@
+export enum Subscriptions {
+  NEMORY = "nemory",
+  NEMORY_BASE = "nemory_base",
+}
+
 export type Plan = {
   name: string;
   price: number;
@@ -27,4 +32,12 @@ export enum PlanTypes {
   CLOSED_TESTING = "closed_testing",
   OPEN_TESTING = "open_testing",
   PRODUCTION = "production",
+}
+
+export enum BasePlanIds {
+  TESTING = "testing",
+  START = "start-d7",
+  LITE_M1 = "lite-m1",
+  BASE_M1 = "base-m1",
+  PRO_M1 = "pro-m1",
 }

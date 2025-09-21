@@ -13,10 +13,24 @@ import {
   type PurchaseError,
   type Product,
   type Purchase,
+  purchaseUpdatedListener,
+  PurchaseStateAndroid,
 } from "react-native-iap";
-import { INAPP_SKUS, SUB_SKUS } from "@/constants/iap";
+import { INAPP_SKUS, SUB_SKUS, SUB_BASE } from "@/constants/iap";
 import { isSub, getAndroidOfferTokenFromProduct, apiRequest } from "@/utils";
 import * as Application from "expo-application";
+import { Subscriptions } from "@/types";
+
+type AndroidOffer = {
+  basePlanId?: string;
+  offerTags?: string[];
+  offerToken: string;
+  pricingPhases?: any;
+};
+
+type SubProduct = IAP.Product & {
+  subscriptionOfferDetailsAndroid?: AndroidOffer[];
+};
 
 type VerifyResp = {
   planId: string;
@@ -29,14 +43,19 @@ type VerifyResp = {
 type IapContextValue = {
   connected: boolean;
   loading: boolean;
-  products: Product[];
+  subscriptions: Product[];
   buySubById: (sku: string) => Promise<VerifyResp>;
-  buyInappById: (sku: string) => Promise<void>;
+  buyPlan: (
+    basePlanId: "lite-m1" | "pro-m1" | "ultra-m1",
+    opts?: { oldToken?: string; obfuscatedId?: string },
+  ) => Promise<VerifyResp>;
   restore: () => Promise<void>;
 };
 
 const IapCtx = createContext<IapContextValue>({} as any);
 export const useIap = () => useContext(IapCtx);
+
+let purchaseListenerSet = false;
 
 export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -44,7 +63,7 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   const {
     connected,
     requestPurchase,
-    currentPurchase,
+    // currentPurchase,
     finishTransaction,
     getAvailablePurchases,
     getActiveSubscriptions,
@@ -56,8 +75,42 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     },
   });
 
+  const inFlightByToken = useRef<Set<string>>(new Set());
+  const handledTokens = useRef<Set<string>>(new Set());
+  function extractToken(p: any) {
+    return (
+      p.purchaseTokenAndroid ??
+      p.purchaseToken ??
+      p.transactionIdIOS ??
+      p.transactionId
+    );
+  }
+
   const [catalog, setCatalog] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const baseSub = catalog.find((p) => p.id === Subscriptions.NEMORY);
+
+  function pickOfferToken(
+    p: SubProduct,
+    opts: { basePlanId: string; preferTrial?: boolean; tag?: string },
+  ) {
+    const offers = p.subscriptionOfferDetailsAndroid ?? [];
+    let candidates = offers.filter((o) => o.basePlanId === opts.basePlanId);
+    if (opts.tag)
+      candidates = candidates.filter((o) =>
+        (o.offerTags ?? []).includes(opts.tag),
+      );
+    if (opts.preferTrial) {
+      const withTrial = candidates.find((o) =>
+        (o.pricingPhases?.pricingPhaseList ?? []).some(
+          (ph: any) => ph.recurrenceMode === 2 || ph.priceAmountMicros === "0",
+        ),
+      );
+      if (withTrial) return withTrial.offerToken;
+    }
+    return candidates[0]?.offerToken;
+  }
 
   const pending = useRef<{
     resolve?: (v: VerifyResp) => void;
@@ -77,6 +130,68 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     return [];
   };
+
+  function isPurchasedAndroid(purchase: any) {
+    const stringState = purchase?.purchaseState as string | undefined;
+    if (stringState) return stringState === "purchased";
+
+    const numericState = purchase?.purchaseStateAndroid as number | undefined;
+    if (typeof numericState === "number") {
+      return numericState === PurchaseStateAndroid.PURCHASED;
+    }
+    return false;
+  }
+
+  useEffect(() => {
+    if (purchaseListenerSet) return;
+    purchaseListenerSet = true;
+    const sub = purchaseUpdatedListener(async (purchase) => {
+      const token = extractToken(purchase);
+      console.log("token", token, purchase);
+      if (!token) return;
+
+      if (Platform.OS === "android" && !isPurchasedAndroid(purchase)) {
+        return;
+      }
+
+      if (handledTokens.current.has(token)) {
+        console.log("[IAP] skip: token already handled", token);
+        return;
+      }
+
+      if (inFlightByToken.current.has(token)) {
+        console.log("[IAP] skip: verification in-flight", token);
+        return;
+      }
+      inFlightByToken.current.add(token);
+
+      try {
+        const payload = buildVerificationPayload(purchase);
+        console.log("Verifying purchase...", payload);
+        const { data } = await apiRequest<VerifyResp>({
+          url: "/iap/create-sub",
+          method: "POST",
+          data: payload,
+        });
+        console.log("Purchase verified:", data);
+        await finishTransaction({ purchase, isConsumable: false });
+
+        handledTokens.current.add(token);
+        pending.current.resolve?.(data);
+      } catch (e) {
+        pending.current.reject?.(e);
+      } finally {
+        inFlightByToken.current.delete(token);
+        setTimeout(() => handledTokens.current.delete(token), 5 * 60 * 1000);
+        pending.current = {};
+      }
+    });
+
+    return () => {
+      sub.remove();
+      purchaseListenerSet = false;
+    };
+  }, [finishTransaction]);
 
   const loadCatalogAndState = async () => {
     if (!connected) return;
@@ -100,17 +215,6 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
         list.push(...subs);
       }
 
-      if (INAPP_SKUS.length) {
-        const inapps = INAPP_SKUS.length
-          ? await fetchWithRetry({ skus: INAPP_SKUS, type: "inapp" })
-          : [];
-        console.log(
-          "[IAP] inapps fetched:",
-          inapps.map((p) => ({ id: p.id, title: (p as any).title })),
-        );
-        list.push(...inapps);
-      }
-
       setCatalog(list);
       console.log("[IAP] catalog size:", list.length);
 
@@ -126,39 +230,6 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (connected) loadCatalogAndState();
   }, [connected]);
-
-  useEffect(() => {
-    if (!currentPurchase) return;
-    (async () => {
-      try {
-        const payload = buildVerificationPayload(currentPurchase);
-        const anyP = currentPurchase as any;
-        console.log("IAP DEBUG", {
-          packageNameAndroid: anyP.packageNameAndroid,
-          productId: getProductId(currentPurchase),
-          orderIdAndroid: anyP.orderIdAndroid,
-          purchaseTokenAndroid: anyP.purchaseTokenAndroid,
-          applicationId: Application.applicationId,
-        });
-        const { data } = await apiRequest<VerifyResp>({
-          url: "/iap/verify",
-          method: "POST",
-          data: payload,
-        });
-
-        await finishTransaction({
-          purchase: currentPurchase,
-          isConsumable: false,
-        });
-
-        pending.current.resolve?.(data);
-      } catch (e) {
-        pending.current.reject?.(e);
-      } finally {
-        pending.current = {};
-      }
-    })();
-  }, [currentPurchase]);
 
   const buySubById = async (sku: string) => {
     const product = catalog.find((p) => p.id === sku);
@@ -184,20 +255,44 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     return p;
   };
 
-  const buyInappById = async (sku: string) => {
-    await requestPurchase({
-      type: "inapp",
-      request: { ios: { sku }, android: { skus: [sku] } },
+  async function buyPlan(
+    basePlanId: "lite-m1" | "pro-m1" | "ultra-m1",
+    opts?: { oldToken?: string; obfuscatedId?: string },
+  ): Promise<void> {
+    const offerToken = pickOfferToken(baseSub, {
+      basePlanId,
+      preferTrial: true,
     });
-  };
+    if (!offerToken)
+      throw new Error(`No offerToken for basePlanId=${basePlanId}`);
+
+    await requestPurchase({
+      type: "subs",
+      request: {
+        ios: { sku: SUB_BASE },
+        android: {
+          skus: [SUB_BASE],
+          subscriptionOffers: [{ sku: SUB_BASE, offerToken }],
+          obfuscatedAccountIdAndroid: opts?.obfuscatedId,
+          ...(opts?.oldToken
+            ? {
+                subscriptionUpdateParamsAndroid: {
+                  oldPurchaseToken: opts.oldToken,
+                },
+              }
+            : {}),
+        },
+      },
+    });
+  }
 
   const value = useMemo<IapContextValue>(
     () => ({
       connected,
       loading: loading || !connected,
-      products: catalog,
+      subscriptions: catalog,
       buySubById,
-      buyInappById,
+      buyPlan,
       restore: loadCatalogAndState,
     }),
     [connected, catalog, loading],

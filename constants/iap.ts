@@ -7,4 +7,6 @@ export const SUB_IDS = [
 
 export const INAPP_SKUS = [];
 
-export const SUB_SKUS = ["nemory_lite", "nemory_base", "nemory_pro"];
+export const SUB_SKUS = ["nemory"];
+
+export const SUB_BASE = "nemory";
