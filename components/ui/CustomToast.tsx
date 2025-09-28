@@ -11,16 +11,19 @@ import { getFont } from "@/utils";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { Portal } from "@gorhom/portal";
+import { Font } from "@/types";
 
 export default function CustomToast() {
-  const font = useSelector((state: RootState) => state.font);
+  const { value: settings } = useSelector((s: RootState) => s.settings);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+
   const toastConfig = {
     success: (props: any) => (
       <SuccessToast
         {...props}
         style={{
+          backgroundColor: colors.backgroundAdditional,
           padding: 10,
           borderLeftColor: "green",
           height: "auto",
@@ -31,12 +34,12 @@ export default function CustomToast() {
         text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
-          fontFamily: getFont(font, "bold"),
+          fontFamily: getFont(settings?.font ?? Font.NUNITO, "bold"),
           color: colors.text,
         }}
         text2Style={{
           fontSize: 14,
-          fontFamily: getFont(font, "regular"),
+          fontFamily: getFont(settings?.font ?? Font.NUNITO, "regular"),
           color: colors.text,
         }}
       />
@@ -55,12 +58,12 @@ export default function CustomToast() {
         text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
-          fontFamily: getFont(font, "bold"),
+          fontFamily: getFont(settings?.font ?? Font.NUNITO, "bold"),
           color: colors.text,
         }}
         text2Style={{
           fontSize: 14,
-          fontFamily: getFont(font, "regular"),
+          fontFamily: getFont(settings?.font ?? Font.NUNITO, "regular"),
           color: colors.text,
         }}
       />
@@ -79,12 +82,12 @@ export default function CustomToast() {
         text2NumberOfLines={0}
         text1Style={{
           fontSize: 16,
-          fontFamily: getFont(font, "bold"),
+          fontFamily: getFont(settings?.font ?? Font.NUNITO, "bold"),
           color: colors.text,
         }}
         text2Style={{
           fontSize: 14,
-          fontFamily: getFont(font, "regular"),
+          fontFamily: getFont(settings?.font ?? Font.NUNITO, "regular"),
           color: colors.text,
         }}
       />

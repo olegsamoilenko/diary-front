@@ -1,29 +1,7 @@
-export type Theme =
-  | "light"
-  | "silentPeaks"
-  | "goldenHour"
-  | "vintagePaper"
-  | "zenMind"
-  | "mindset"
-  | "fallLight"
-  | "seaWhisper"
-  | "whiteLotus"
-  | "balance"
-  | "slowDown"
-  | "pinkWhisper"
-  | "blueBloom"
-  | "softWaves"
-  | "calmMind"
-  | "orange"
-  | "dark"
-  | "goodLuck"
-  | "oceanDepths"
-  | "dreamAchieve"
-  | "compass"
-  | "neonFocus"
-  | "cipheredNight"
-  | "timeToLive"
-  | "ball";
+import { ETheme } from "@/types";
+
+export type Theme = `${ETheme}`;
+
 export type ThemeContextType = {
   theme: Theme;
   setTheme: (theme: Theme) => void;

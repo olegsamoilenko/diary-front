@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useMemo } from "react";
+import React, { forwardRef, useMemo } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import {
   ScrollView,
@@ -11,15 +11,12 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/store";
 import BackArrow from "@/components/ui/BackArrow";
 import Background from "@/components/Background";
-import { Theme, TimeFormat, type User } from "@/types";
-import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
-import { apiRequest } from "@/utils";
-import { UserEvents } from "@/utils/events/userEvents";
-import * as SecureStore from "expo-secure-store";
+import { TimeFormat } from "@/types";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@/store";
+import { updateSettings } from "@/store/thunks/settings/updateSettings";
 
 const timeFormatOptions: TimeFormat[] = [
   TimeFormat["12_H"],
@@ -31,25 +28,12 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
-  const dispatch = useDispatch<AppDispatch>();
-  const format = useSelector((state: RootState) => state.timeFormat);
+  const dispatch = useAppDispatch();
+  const settings = useSelector((s: RootState) => s.settings.value);
 
-  async function handleFormat(format: TimeFormat) {
+  async function handleFormat(timeFormat: TimeFormat) {
     try {
-      await apiRequest({
-        url: `/users/update-settings`,
-        method: "POST",
-        data: { timeFormat: format },
-      });
-
-      dispatch(setTimeFormat(format));
-      const stored = await SecureStore.getItemAsync("user");
-      const user: User | null = stored ? JSON.parse(stored) : null;
-
-      if (user?.settings) {
-        user.settings.timeFormat = format;
-        await SecureStore.setItemAsync("user", JSON.stringify(user));
-      }
+      await dispatch(updateSettings({ timeFormat })).unwrap();
     } catch (error: any) {
       console.warn("Failed to update timeFormat", error);
       console.warn("Failed to update timeFormat response", error.response);
@@ -59,18 +43,6 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
       );
     }
   }
-
-  const updateTimeFormat = (user: User) => {
-    if (user?.settings?.timeFormat) {
-      dispatch(setTimeFormat(user?.settings?.timeFormat));
-    }
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updateTimeFormat(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
 
   return (
     <SideSheet ref={ref}>
@@ -90,12 +62,12 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                 <View
                   style={[
                     styles.radio,
-                    format === f && {
+                    settings?.timeFormat === f && {
                       borderColor: colors.primary,
                     },
                   ]}
                 >
-                  {format === f && (
+                  {settings?.timeFormat === f && (
                     <View
                       style={[
                         styles.radioDot,

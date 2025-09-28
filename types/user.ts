@@ -7,6 +7,7 @@ import type { UserSettings } from "@/types/userSettings";
 export type User = {
   id: string;
   uuid: string;
+  hash: string;
   email?: string | null;
   phone?: string | null;
   oauthProvider?: string | null;
@@ -20,7 +21,8 @@ export type User = {
   emailVerificationToken?: string | null;
   settings: UserSettings;
   diaryEntries: Entry[];
-  plan: Plan;
+  plans: Plan[];
   tokenUsageHistory: TokenUsageHistory[];
   payments: Payment[];
+  lastActiveAt: Date | string;
 };

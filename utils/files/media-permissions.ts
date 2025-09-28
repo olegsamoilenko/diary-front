@@ -1,5 +1,5 @@
 import * as MediaLibrary from "expo-media-library";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 
 const ASKED_KEY = "media_perm_asked_once";
 

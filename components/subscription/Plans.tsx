@@ -18,74 +18,76 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import {
   BasePlanIds,
-  ColorTheme,
-  Plan,
   PlanStatus,
   PlanTypes,
   Subscriptions,
-  User,
+  IapProduct,
 } from "@/types";
+import type { ColorTheme, Plan, User } from "@/types";
 import { PLANS } from "@/constants/Plans";
 import { ThemedText } from "@/components/ThemedText";
-import { apiRequest, getPlanName, getStatusColor } from "@/utils";
-import { UserEvents } from "@/utils/events/userEvents";
-import * as SecureStore from "@/utils/store/secureStore";
+import {
+  apiRequest,
+  getPlanName,
+  getStatusColor,
+  logStoredUserData,
+} from "@/utils";
 import { useIap } from "@/context/IapContext";
-import * as Localization from "expo-localization";
+import { PlanEvents } from "@/utils/events/planEvents";
+import { useSelector } from "react-redux";
+import { store, RootState, useAppDispatch } from "@/store";
+import { setPlan } from "@/store/slices/planSlice";
+import { getUserPlan } from "@/store/thunks/subscription/getUserPlan";
+import { getPlanTypeApi } from "@/utils/api/endpoints/subscription/getPlanTypeApi";
+import { saveTrialPlanToDatabase } from "@/store/thunks/subscription/saveTrialPlanToDatabase";
 
 type PlansProps = {
   onSuccess?: () => void;
-  setShowRegisterOrNot?: (show: boolean) => void;
-  setShowPayment?: (show: boolean) => void;
-  setPlan: (plan: Plan | null) => void;
-  successPaymentPlan: Plan | null;
-  setSuccessPaymentPlan: (plan: Plan | null) => void;
-  showStartPlan?: boolean;
+  ascForRegister?: () => void;
   continueWithoutRegistration: boolean;
 };
 export default function Plans({
   onSuccess,
-  setShowRegisterOrNot,
-  setShowPayment,
-  setPlan,
-  successPaymentPlan,
-  setSuccessPaymentPlan,
-  showStartPlan = true,
+  ascForRegister,
   continueWithoutRegistration,
 }: PlansProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
-  const [user, setUser] = useState<User | null>(null);
-  // const [loading, setLoading] = useState(false);
-  const navigatingRef = useRef(false);
-  const { connected, loading, subscriptions, buySubById, buyPlan } = useIap();
-  const [planType, setPlanType] = useState<PlanTypes | undefined>(undefined);
-  const locales = Localization.getLocales();
-  const regionCode = locales[0].regionCode;
+  const { connected, subscriptions, loading, buyPlan } = useIap();
+  const [planType, setPlanType] = useState<PlanTypes | null>(null);
+
+  const dispatch = useAppDispatch();
+  const user = useSelector((s: RootState) => s.user.value);
+  const plan = useSelector((s: RootState) => s.plan.value);
 
   useEffect(() => {
-    let mounted = true;
+    console.log("colorScheme", colorScheme);
+    console.log("colors", colors);
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      const storedUser = await SecureStore.getItemAsync("user");
-      if (!mounted) return;
-      setUser(storedUser ? JSON.parse(storedUser) : null);
       await getPlanType();
+      await getPlan();
     })();
-    return () => {
-      mounted = false;
-    };
+  }, []);
+
+  const getPlan = useCallback(async () => {
+    try {
+      await dispatch(getUserPlan()).unwrap();
+    } catch (err: any) {
+      console.error("Error get plan:", err);
+      console.error("Error get plan response:", err.response);
+    }
   }, []);
 
   const getPlanType = useCallback(async () => {
     try {
-      const res = await apiRequest({
-        url: `/plans/plan-type`,
-        method: "GET",
-      });
+      const res = await getPlanTypeApi();
 
-      setPlanType(res.data);
+      setPlanType(res);
     } catch (error: any) {
       console.error("Error get plan type:", error);
       console.error("Error get plan type response:", error.response);
@@ -93,58 +95,17 @@ export default function Plans({
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (!successPaymentPlan) return;
-  //   (async () => {
-  //     await saveToDatabase(successPaymentPlan);
-  //     setPlan(successPaymentPlan);
-  //     setSuccessPaymentPlan(null);
-  //   })();
-  // }, [successPaymentPlan]);
-
   const saveToDatabase = useCallback(
     async (basePlanId: BasePlanIds) => {
-      // setLoading(true);
-      const now = new Date();
-      const expiry =
-        basePlanId === BasePlanIds.START
-          ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-          : null;
-
-      const data = {
-        subscriptionId: Subscriptions.NEMORY,
-        basePlanId,
-        startTime: now.toISOString(),
-        expiryTime: expiry ? expiry.toISOString() : null,
-        planStatus: PlanStatus.ACTIVE,
-        autoRenewEnabled: false,
-        platform: Platform.OS,
-        regionCode: regionCode ?? null,
-        price: 0,
-      };
       try {
-        const res = await apiRequest({
-          url: `/plans/subscribe`,
-          method: "POST",
-          data,
-        });
+        await dispatch(saveTrialPlanToDatabase({ basePlanId })).unwrap();
 
-        const stored = await SecureStore.getItemAsync("user");
-        const userObj: User | null = stored ? JSON.parse(stored) : null;
-        if (userObj) {
-          userObj.plan = res.data;
-          await SecureStore.setItemAsync("user", JSON.stringify(userObj));
-          setUser({ ...userObj });
-        }
-
-        UserEvents.emit("userChanged");
+        PlanEvents.emit("planChanged");
         onSuccess?.();
       } catch (error: any) {
         console.error("Error setting plan:", error);
         console.error("Error setting plan response:", error.response);
-        console.error("Error setting plan response data:", error.response.data);
       } finally {
-        // setLoading(false);
       }
     },
     [onSuccess],
@@ -159,22 +120,29 @@ export default function Plans({
 
   const onSelect = useCallback(
     async (plan: any) => {
-      console.log("Selected plan", plan);
-      // const resp = await buySubById(plan.id);
+      if (!user?.isRegistered && !continueWithoutRegistration) {
+        if (ascForRegister) {
+          ascForRegister();
+          return;
+        }
+      }
       const resp = await buyPlan(plan.basePlanId, { obfuscatedId: user?.uuid });
-
-      console.log("buySubById resp", resp);
+      if (resp) {
+        dispatch(setPlan(resp));
+        PlanEvents.emit("planChanged");
+        onSuccess?.();
+      }
     },
-    [buySubById, buyPlan],
+    [buyPlan],
   );
 
-  console.log("subscriptions", subscriptions);
-
-  const subscription = subscriptions.find((s) => s.id === Subscriptions.NEMORY);
+  const subscription: IapProduct = subscriptions.find(
+    (s) => s.id === Subscriptions.NEMORY,
+  ) as IapProduct;
 
   console.log("subscription", subscription);
 
-  const baseSubPlans = subscription?.subscriptionOfferDetailsAndroid.map(
+  const baseSubPlans = subscription?.subscriptionOfferDetailsAndroid?.map(
     (plan) => {
       return {
         ...plan,
@@ -187,8 +155,6 @@ export default function Plans({
     },
   );
 
-  console.log("baseSubPlans", baseSubPlans);
-
   return (
     <View style={styles.container}>
       {loading || !connected ? (
@@ -196,20 +162,24 @@ export default function Plans({
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.plansContainer}>
             {planType === PlanTypes.OPEN_TESTING ||
               planType === PlanTypes.CLOSED_TESTING ||
               (planType === PlanTypes.INTERNAL_TESTING && (
                 <TouchableOpacity
                   onPress={() => onSelectTrial(BasePlanIds.TESTING)}
+                  disabled={plan?.basePlanId === BasePlanIds.TESTING}
                 >
                   <View
                     style={[
                       styles.card,
                       {
                         borderColor:
-                          user && user.plan && user.plan.name === "For testing"
+                          plan && plan.basePlanId === BasePlanIds.TESTING
                             ? colors.primary
                             : "transparent",
                       },
@@ -219,14 +189,12 @@ export default function Plans({
                       <ThemedText type="subtitleLG">
                         {t("planModal.forTesting")}
                       </ThemedText>
-                      {user?.plan?.name === "For testing" && (
+                      {plan && plan.basePlanId === BasePlanIds.TESTING && (
                         <View
                           style={[
                             styles.status,
                             {
-                              backgroundColor: getStatusColor(
-                                user.plan.status!,
-                              ),
+                              backgroundColor: getStatusColor(plan.planStatus!),
                             },
                           ]}
                         >
@@ -235,13 +203,14 @@ export default function Plans({
                               color: colors.textInPrimary,
                             }}
                           >
-                            {user.plan.status!.slice(0, 1).toUpperCase() +
-                              user.plan.status!.slice(1)}
+                            {plan.planStatus}
                           </ThemedText>
                         </View>
                       )}
                     </View>
-                    <ThemedText style={styles.desc}>{}</ThemedText>
+                    <ThemedText style={styles.desc}>
+                      {t("planModal.forTesting")}
+                    </ThemedText>
                     <ThemedText type="subtitleLG" style={styles.price}>
                       {t("planModal.freeForTesting")}
                     </ThemedText>
@@ -251,20 +220,20 @@ export default function Plans({
                   </View>
                 </TouchableOpacity>
               ))}
-            {((user && !user.plan && planType === PlanTypes.PRODUCTION) ||
-              (user &&
-                user.plan &&
+            {((!plan && planType === PlanTypes.PRODUCTION) ||
+              (plan &&
                 planType === PlanTypes.PRODUCTION &&
-                user.plan.name === PLANS[0].name)) && (
+                plan.basePlanId === BasePlanIds.START)) && (
               <TouchableOpacity
                 onPress={() => onSelectTrial(BasePlanIds.START)}
+                disabled={plan?.basePlanId === BasePlanIds.START}
               >
                 <View
                   style={[
                     styles.card,
                     {
                       borderColor:
-                        user && user.plan && user.plan.name === PLANS[0].name
+                        plan && plan.basePlanId === BasePlanIds.START
                           ? colors.primary
                           : "transparent",
                     },
@@ -272,12 +241,12 @@ export default function Plans({
                 >
                   <View style={styles.cardInner}>
                     <ThemedText type="subtitleLG">Start</ThemedText>
-                    {user?.plan?.name === PLANS[0].name && (
+                    {plan && plan.basePlanId === BasePlanIds.START && (
                       <View
                         style={[
                           styles.status,
                           {
-                            backgroundColor: getStatusColor(user.plan.status!),
+                            backgroundColor: getStatusColor(plan.planStatus!),
                           },
                         ]}
                       >
@@ -286,8 +255,7 @@ export default function Plans({
                             color: colors.textInPrimary,
                           }}
                         >
-                          {user.plan.status!.slice(0, 1).toUpperCase() +
-                            user.plan.status!.slice(1)}
+                          {plan.planStatus}
                         </ThemedText>
                       </View>
                     )}
@@ -305,40 +273,32 @@ export default function Plans({
               </TouchableOpacity>
             )}
 
-            {baseSubPlans.map((plan) => {
+            {baseSubPlans?.map((p) => {
               return (
                 <TouchableOpacity
-                  key={plan.basePlanId}
-                  disabled={
-                    user &&
-                    user.plan &&
-                    plan.name === user.plan.name &&
-                    (user.plan.status === PlanStatus.ACTIVE ||
-                      user.plan.status === PlanStatus.REFUNDED)
-                  }
-                  onPress={() => onSelect(plan)}
+                  key={p.basePlanId}
+                  disabled={plan?.basePlanId === p.basePlanId}
+                  onPress={() => onSelect(p)}
                 >
                   <View
                     style={[
                       styles.card,
                       {
                         borderColor:
-                          user && user.plan && plan.name === user.plan.name
+                          plan && p.basePlanId === plan.basePlanId
                             ? colors.primary
                             : "transparent",
                       },
                     ]}
                   >
                     <View style={styles.cardInner}>
-                      <ThemedText type="subtitleLG">{plan.name}</ThemedText>
-                      {user && user.plan && user.plan.name === plan.name && (
+                      <ThemedText type="subtitleLG">{p.name}</ThemedText>
+                      {plan && p.basePlanId === plan.basePlanId && (
                         <View
                           style={[
                             styles.status,
                             {
-                              backgroundColor: getStatusColor(
-                                user.plan.status!,
-                              ),
+                              backgroundColor: getStatusColor(plan.planStatus!),
                             },
                           ]}
                         >
@@ -347,20 +307,19 @@ export default function Plans({
                               color: colors.textInPrimary,
                             }}
                           >
-                            {user.plan.status!.slice(0, 1).toUpperCase() +
-                              user.plan.status!.slice(1)}
+                            {plan.planStatus}
                           </ThemedText>
                         </View>
                       )}
                     </View>
                     <ThemedText style={styles.desc}>
-                      {t(plan.descriptionKey)}
+                      {t(p.descriptionKey)}
                     </ThemedText>
                     <ThemedText type="subtitleLG" style={styles.price}>
-                      {`${plan.pricingPhases.pricingPhaseList[0].formattedPrice} / ${t("planModal.month")}`}
+                      {`${p.pricingPhases.pricingPhaseList[0].formattedPrice} / ${t("planModal.month")}`}
                     </ThemedText>
                     <ThemedText style={styles.tokens}>
-                      {plan.tokensLimit.toLocaleString()}{" "}
+                      {p.tokensLimit.toLocaleString()}{" "}
                       {t("planModal.tokensPerMonth")}
                     </ThemedText>
                   </View>

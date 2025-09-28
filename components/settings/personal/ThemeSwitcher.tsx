@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import React, { forwardRef, useMemo } from "react";
 import {
   View,
   TouchableOpacity,
@@ -12,16 +12,13 @@ import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { ThemedText } from "@/components/ThemedText";
-import { Theme, User } from "@/types";
+import type { Theme, UserSettings } from "@/types";
 import BackArrow from "@/components/ui/BackArrow";
 import Background from "@/components/Background";
-import * as SecureStore from "@/utils/store/secureStore";
-import { apiRequest } from "@/utils";
-import { UserEvents } from "@/utils/events/userEvents";
-import i18n from "i18next";
-import { LocaleConfig } from "react-native-calendars";
+import { useAppDispatch } from "@/store";
+import { updateSettings } from "@/store/thunks/settings/updateSettings";
 
-const themes = [
+const themes: { name: Theme; img: any }[] = [
   {
     name: "light",
     img: require("@/assets/images/theme/breathe.jpg"),
@@ -142,33 +139,22 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const dispatch = useAppDispatch();
 
-  const handleTheme = async (themeName: string) => {
+  const handleTheme = async (themeName: Theme) => {
     try {
-      await apiRequest({
-        url: `/users/update-settings`,
-        method: "POST",
-        data: { theme: themeName },
-      });
-      setTheme(themeName as Theme);
+      const res: UserSettings | null = await dispatch(
+        updateSettings({
+          theme: themeName,
+        }),
+      ).unwrap();
+
+      setTheme(res?.theme as Theme);
     } catch (error: any) {
       console.warn("Failed to update theme", error);
       console.warn("Failed to update theme response", error.response);
-      console.warn("Failed to update theme response data", error.response.data);
     }
   };
-
-  const updateTheme = (user: User) => {
-    if (user?.settings?.theme) {
-      setTheme(user?.settings?.theme as Theme);
-    }
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updateTheme(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
 
   return (
     <SideSheet ref={ref}>

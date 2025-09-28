@@ -2,12 +2,12 @@ import { TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { RefObject } from "react";
 import { SideSheetRef } from "@/components/SideSheet";
-import { useAppSelector } from "@/store/hooks";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export default function AiSettingsBlock({
   modelSwitcherRef,
@@ -17,7 +17,7 @@ export default function AiSettingsBlock({
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const aiModel = useAppSelector((state) => state.aiModel);
+  const settings = useSelector((s: RootState) => s.settings.value);
 
   return (
     <View
@@ -59,7 +59,7 @@ export default function AiSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>{t(`settings.model.${aiModel}`)}</ThemedText>
+            <ThemedText>{t(`settings.model.${settings?.aiModel}`)}</ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}

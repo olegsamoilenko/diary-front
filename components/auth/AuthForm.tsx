@@ -20,23 +20,24 @@ import ChangePasswordForm from "@/components/auth/ChangePasswordForm";
 import EmailVerificationCodeForm from "@/components/auth/EmailVerificationCodeForm";
 import BackArrow from "@/components/ui/BackArrow";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { EPlatform } from "@/types";
 
 export default function AuthForm({
   forPlanSelect = false,
   onSuccessSignWithGoogle,
   onSuccessEmailCode,
   onSuccessSignIn,
-  activeAuthTab = "register",
+  activeAuthTab = "registerUser",
   handleBack,
 }: {
   forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
   onSuccessEmailCode: () => void;
   onSuccessSignIn: () => void;
-  activeAuthTab?: "login" | "register";
-  handleBack: () => void;
+  activeAuthTab?: "login" | "registerUser";
+  handleBack?: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<"login" | "register">(
+  const [activeTab, setActiveTab] = useState<"login" | "registerUser">(
     activeAuthTab,
   );
   const colorScheme = useColorScheme();
@@ -68,7 +69,7 @@ export default function AuthForm({
       setShowForgotPasswordForm(false);
     } else if (showEmailVerificationCodeForm) {
       setShowEmailVerificationCodeForm(false);
-      setActiveTab("register");
+      setActiveTab("registerUser");
     } else {
       handleBack();
     }
@@ -78,8 +79,8 @@ export default function AuthForm({
     <Background background={colors.backgroundImage}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === EPlatform.IOS ? 0 : 0}
       >
         <TouchableOpacity
           onPress={closeSheet}
@@ -138,15 +139,15 @@ export default function AuthForm({
                 <TouchableOpacity
                   style={[
                     styles.tab,
-                    activeTab === "register" && styles.activeTab,
+                    activeTab === "registerUser" && styles.activeTab,
                   ]}
-                  onPress={() => setActiveTab("register")}
+                  onPress={() => setActiveTab("registerUser")}
                 >
                   <ThemedText
                     type="subtitleLG"
                     style={[
                       styles.tabText,
-                      activeTab === "register" && styles.activeTabText,
+                      activeTab === "registerUser" && styles.activeTabText,
                     ]}
                   >
                     {t("auth.registration")}

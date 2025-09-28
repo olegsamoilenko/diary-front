@@ -1,0 +1,30 @@
+import * as SecureStore from "expo-secure-store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+export const logStoredUserData = async () => {
+  const accessToken = await SecureStore.getItemAsync("access_token");
+  console.log("accessToken", accessToken);
+  const refreshToken = await SecureStore.getItemAsync("refresh_token");
+  console.log("refreshToken", refreshToken);
+  const deviceId = await SecureStore.getItemAsync("device_id");
+  console.log("deviceId", deviceId);
+  const userPin = await SecureStore.getItemAsync("user_pin");
+  console.log("userPin", userPin);
+  const skKey = await SecureStore.getItemAsync("device_sk_b64");
+  console.log("skKey", skKey);
+  const pkKey = await SecureStore.getItemAsync("device_pk_b64");
+  console.log("pkKey", pkKey);
+  const biometryEnabled = await SecureStore.getItemAsync("biometry_enabled");
+  console.log("biometryEnabled", biometryEnabled);
+  const showWelcome = await AsyncStorage.getItem("show_welcome");
+  console.log("showWelcome", showWelcome);
+  const registerOrNot = await AsyncStorage.getItem("register_or_not");
+  console.log("registerOrNot", registerOrNot);
+  const storedUser = await SecureStore.getItemAsync("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  console.log("user", user);
+  const storedPlan = await AsyncStorage.getItem("plan");
+  console.log("plan", storedPlan ? JSON.parse(storedPlan) : null);
+  const storedSettings = await AsyncStorage.getItem("settings");
+  console.log("settings", storedSettings ? JSON.parse(storedSettings) : null);
+};

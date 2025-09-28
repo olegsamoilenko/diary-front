@@ -58,7 +58,7 @@
     "weHaveSentYouCodeToDeleteYourAccount": "We have sent you a code to delete your account to your email address.",
     "pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount": "Please enter this code to confirm the deletion of your account",
     "youCanResendCodeIn": "You can resend code in",
-    "youCanSendCodeIn": "You can send code in",
+    "youCanSendCodeIn": "You can send code in"
   },
   "diary": {
     "title": "Diary",
@@ -85,7 +85,7 @@
         "tag": "Tag"
       }
     },
-    "askAnything": "Ask anything",
+    "askAnything": "Ask anything"
   },
   "chat": {
     "title": "Chat"
@@ -156,7 +156,7 @@
       "gpt-4o": "GPT-4o",
       "gpt-4-turbo": "GPT-4 Turbo",
       "gpt-4.1": "GPT-4.1",
-      "gpt-5": "GPT-5",
+      "gpt-5": "GPT-5"
     },
     "subscription": "Subscription settings",
     "plans": {
@@ -165,7 +165,8 @@
       "youCurrentPlan": "Your current plan",
       "getTheVersion": "Get the version",
       "subscribe": "Subscribe",
-      "unsubscribe": "Unsubscribe"
+      "unsubscribe": "Unsubscribe",
+      "manageSubscription": "Manage Subscription"
     },
     "security": "Security",
     "biometry": {
@@ -191,7 +192,7 @@
       "loggedIn": "Logged in",
       "notLoggedIn": "Not logged in",
       "loggedOut": "Logged out",
-      "notRegister": "Not registered",
+      "notRegister": "Not registered"
     }
   },
   "planModal": {
@@ -201,7 +202,7 @@
     "forTesting": "For testing",
     "freeForTesting": "Free during the testing period",
     "tokensPerMonth": "Tokens/month",
-    "tokens": "Tokens",
+    "tokens": "Tokens"
   },
   "plans": {
     "start": {
@@ -304,7 +305,30 @@
     "emailAlreadyInUse": "Email already in use",
     "emailAlreadyInUseLoginEmailPassword": "Email already in use. Please login with email and password.",
     "alreadySkipped": "This version has already been skipped",
-    "resubscriptionError": "Resubscription error"
+    "resubscriptionError": "Resubscription error",
+    "generationTagsFailed": "Generation tags failed",
+    "staleOrFutureTimestamp": "Stale or future timestamp",
+    "invalidDeviceSignature": "Invalid device signature",
+    "sessionNotFound": "Session not found. Please contact support",
+    "invalidRefreshToken": "Invalid refresh token. Please contact support.",
+    "invalidGoogleIdToken": "Invalid Google ID token.",
+    "sha256InputEmpty": "SHA256 input is empty",
+    "emailSendFailed": "Email send failed.",
+    "missingEnvVariables": "Missing required env variables.",
+    "failedCreatePlan": "Failed to create plan",
+    "errorProcessingSubscription": "Error processing subscription",
+    "failedUpdatePlan": "Failed to update plan",
+    "translationsRequired": "Translations required",
+    "localeRequired": "Locale required",
+    "duplicateLocale": "Duplicate locale",
+    "notificationExists": "Notification exists",
+    "allTranslationsEmpty": "All translations empty",
+    "translationExists": "Translation exists",
+    "planRetrievalError": "Plan retrieval error",
+    "planUpdateError": "Plan update error",
+    "userSettingsNotFound": "User settings not found",
+    "userUpdateError": "User update error",
+    "userNotFoundAfterUpdate": "User not found after update",
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",
@@ -326,9 +350,10 @@
     "successfullyUpdated": "Successfully updated",
     "youHaveSuccessfullyChangedYourName": "You have successfully changed your name",
     "youHaveSuccessfullyChangedYourEmail": "You have successfully changed your email",
+    "youHaveSuccessfullyUpdateYourName": "You have successfully update your name",
     "successfullyChanged": "Successfully changed",
     "youHaveSuccessfullyChangedYourPassword": "You have successfully changed your password",
-    "successfullyLoggedOut": "Successfully logged out",
+    "successfullyLoggedOut": "Successfully logged out"
   },
   "welcome": {
     "title": "Welcome to Smart Diary",
@@ -341,12 +366,12 @@
       "list4": "- track your mental and physical health through daily records",
       "list5": "- foresee how your life will change if you continue in the same direction"
     },
-    "doNotShowAnymore": "Do not show anymore",
+    "doNotShowAnymore": "Do not show anymore"
   },
   "releaseNotify": {
     "skipThisVersion": "Skip this version",
     "goToPlayMarket": "Go to Play Market",
-    "goToAppStore": "Go to App Store",
+    "goToAppStore": "Go to App Store"
   },
   "notFond": {
     "title": "This screen does not exist.",

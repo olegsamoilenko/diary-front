@@ -18,10 +18,6 @@ export default function IapDiagnostics() {
   const testFetchOnce = async () => {
     try {
       const subs = await fetchProducts({ skus: SUB_SKUS, type: "subs" });
-      console.log(
-        "[IAP] DIRECT subs:",
-        subs?.map((p) => p),
-      );
       Alert.alert("Direct fetch", `Count: ${subs?.length ?? 0}`);
     } catch (e: any) {
       console.warn("[IAP] DIRECT fetch error:", e?.message || String(e));

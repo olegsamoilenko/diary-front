@@ -13,9 +13,11 @@ import { useTranslation } from "react-i18next";
 import Background from "@/components/Background";
 import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Provider, useSelector } from "react-redux";
+import { store, RootState, useAppDispatch } from "@/store";
 
 type SelectPlanProps = {
   setShowRegisterOrNot?: (show: boolean) => void;
@@ -35,19 +37,10 @@ export default function HandleSubscription({
   const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
   const [showPayment, setShowPayment] = React.useState(false);
-  const [plan, setPlan] = React.useState<Plan | null>(null);
   const [successPaymentPlan, setSuccessPaymentPlan] =
     React.useState<Plan | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userString = await SecureStore.getItemAsync("user");
-      const userObj: User | null = userString ? JSON.parse(userString) : null;
-      setUser(userObj);
-    };
-    fetchUser();
-  }, []);
+  const user = useSelector((s: RootState) => s.user.value);
+  const plan = useSelector((s: RootState) => s.plan.value);
 
   const handleNext = () => {
     if (onSuccess) {
@@ -91,41 +84,39 @@ export default function HandleSubscription({
             <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
           ) : (
             <>
-              <Text style={styles.title}>{t("planModal.title")}</Text>
+              <ThemedText style={styles.title}>
+                {t("planModal.title")}
+              </ThemedText>
               <Plans
-                setShowRegisterOrNot={setShowRegisterOrNot}
-                setShowPayment={setShowPayment}
                 onSuccess={onSuccess}
-                setPlan={setPlan}
-                successPaymentPlan={successPaymentPlan}
-                setSuccessPaymentPlan={setSuccessPaymentPlan}
+                // setPlan={setPlan}
                 continueWithoutRegistration={continueWithoutRegistration}
               />
-              {user && user?.plan && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    marginBottom: 50,
-                    alignItems: "flex-end",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <TouchableOpacity
-                    style={styles.btn}
-                    onPress={() => handleNext()}
-                  >
-                    <ThemedText
-                      style={[
-                        {
-                          color: colors.textInPrimary,
-                        },
-                      ]}
-                    >
-                      {t("common.continue")}
-                    </ThemedText>
-                  </TouchableOpacity>
-                </View>
-              )}
+              {/*{user && user?.plan && (*/}
+              {/*  <View*/}
+              {/*    style={{*/}
+              {/*      flexDirection: "row",*/}
+              {/*      marginBottom: 50,*/}
+              {/*      alignItems: "flex-end",*/}
+              {/*      justifyContent: "flex-end",*/}
+              {/*    }}*/}
+              {/*  >*/}
+              {/*    <TouchableOpacity*/}
+              {/*      style={styles.btn}*/}
+              {/*      onPress={() => handleNext()}*/}
+              {/*    >*/}
+              {/*      <ThemedText*/}
+              {/*        style={[*/}
+              {/*          {*/}
+              {/*            color: colors.textInPrimary,*/}
+              {/*          },*/}
+              {/*        ]}*/}
+              {/*      >*/}
+              {/*        {t("common.continue")}*/}
+              {/*      </ThemedText>*/}
+              {/*    </TouchableOpacity>*/}
+              {/*  </View>*/}
+              {/*)}*/}
             </>
           )}
         </View>

@@ -2,23 +2,23 @@ import { PlanStatus } from "@/types/";
 
 export function getStatusColor(status: PlanStatus): string {
   switch (status) {
-    case "active":
+    case "ACTIVE":
       return "green";
-    case "inactive":
+    case "INACTIVE":
       return "gray";
-    case "canceled":
+    case "CANCELED":
       return "red";
-    case "expired":
+    case "EXPIRED":
       return "orange";
-    case "in grace period":
+    case "IN_GRACE":
       return "yellow";
-    case "on hold":
+    case "ON_HOLD":
       return "blue";
-    case "paused":
+    case "PAUSED":
       return "purple";
-    case "restarted":
+    case "RESTARTED":
       return "teal";
-    case "refunded":
+    case "REFUNDED":
       return "pink";
     default:
       return "black";

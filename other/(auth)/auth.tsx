@@ -12,7 +12,7 @@ import RegisterForm from "@/components/auth/RegisterForm";
 import LoginForm from "@/components/auth/LoginForm";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ColorTheme } from "@/types";
+import { ColorTheme, EPlatform } from "@/types";
 
 type Tab = "register" | "login";
 
@@ -25,7 +25,7 @@ export default function AuthScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: colors.background }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === EPlatform.IOS ? "padding" : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.container}

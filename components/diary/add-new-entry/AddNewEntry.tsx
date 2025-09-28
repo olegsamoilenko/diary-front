@@ -18,7 +18,7 @@ import {
   ActivityIndicator,
   Pressable,
 } from "react-native";
-import { ColorTheme, Entry, PlanStatus } from "@/types";
+import { ColorTheme, Entry, EPlatform, PlanStatus } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import {
@@ -50,7 +50,7 @@ import SettingsEntry from "@/components/diary/add-new-entry/settings-entry/Setti
 import { FONTS } from "@/assets/fonts/entry";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
 import Toast from "react-native-toast-message";
@@ -204,9 +204,9 @@ const AddNewEntry = forwardRef<
     };
 
     const showEvt =
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+      Platform.OS === EPlatform.IOS ? "keyboardWillShow" : "keyboardDidShow";
     const hideEvt =
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+      Platform.OS === EPlatform.IOS ? "keyboardWillHide" : "keyboardDidHide";
 
     const showL = Keyboard.addListener(showEvt, onShow);
     const hideL = Keyboard.addListener(hideEvt, onHide);
@@ -259,11 +259,11 @@ const AddNewEntry = forwardRef<
     const onHide = () => setKeyboardHeight(0);
 
     const showListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      Platform.OS === EPlatform.IOS ? "keyboardWillShow" : "keyboardDidShow",
       onShow,
     );
     const hideListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      Platform.OS === EPlatform.IOS ? "keyboardWillHide" : "keyboardDidHide",
       onHide,
     );
 
@@ -634,8 +634,8 @@ const AddNewEntry = forwardRef<
           />
           <KeyboardAvoidingView
             style={{ flex: 1, position: "relative" }}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 44 : 0}
+            behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === EPlatform.IOS ? 44 : 0}
           >
             <View style={styles.header}>
               <ThemedText>{todayDate}</ThemedText>

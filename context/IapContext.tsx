@@ -19,7 +19,7 @@ import {
 import { INAPP_SKUS, SUB_SKUS, SUB_BASE } from "@/constants/iap";
 import { isSub, getAndroidOfferTokenFromProduct, apiRequest } from "@/utils";
 import * as Application from "expo-application";
-import { Subscriptions } from "@/types";
+import { EPlatform, Plan, Subscriptions } from "@/types";
 
 type AndroidOffer = {
   basePlanId?: string;
@@ -48,7 +48,7 @@ type IapContextValue = {
   buyPlan: (
     basePlanId: "lite-m1" | "pro-m1" | "ultra-m1",
     opts?: { oldToken?: string; obfuscatedId?: string },
-  ) => Promise<VerifyResp>;
+  ) => Promise<Plan>;
   restore: () => Promise<void>;
 };
 
@@ -147,10 +147,9 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     purchaseListenerSet = true;
     const sub = purchaseUpdatedListener(async (purchase) => {
       const token = extractToken(purchase);
-      console.log("token", token, purchase);
       if (!token) return;
 
-      if (Platform.OS === "android" && !isPurchasedAndroid(purchase)) {
+      if (Platform.OS === EPlatform.ANDROID && !isPurchasedAndroid(purchase)) {
         return;
       }
 
@@ -167,13 +166,11 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
 
       try {
         const payload = buildVerificationPayload(purchase);
-        console.log("Verifying purchase...", payload);
         const { data } = await apiRequest<VerifyResp>({
           url: "/iap/create-sub",
           method: "POST",
           data: payload,
         });
-        console.log("Purchase verified:", data);
         await finishTransaction({ purchase, isConsumable: false });
 
         handledTokens.current.add(token);
@@ -203,20 +200,11 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
         const subs = SUB_SKUS.length
           ? await fetchWithRetry({ skus: SUB_SKUS, type: "subs" })
           : [];
-        console.log("subs", subs);
-        console.log(
-          "[IAP] subs fetched:",
-          subs.map((p) => ({
-            id: p.id,
-            title: (p as any).title,
-            hasOffers: !!(p as any).subscriptionOfferDetailsAndroid,
-          })),
-        );
+
         list.push(...subs);
       }
 
       setCatalog(list);
-      console.log("[IAP] catalog size:", list.length);
 
       await getAvailablePurchases();
       await getActiveSubscriptions();
@@ -258,13 +246,17 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   async function buyPlan(
     basePlanId: "lite-m1" | "pro-m1" | "ultra-m1",
     opts?: { oldToken?: string; obfuscatedId?: string },
-  ): Promise<void> {
+  ): Promise<Plan> {
     const offerToken = pickOfferToken(baseSub, {
       basePlanId,
       preferTrial: true,
     });
     if (!offerToken)
       throw new Error(`No offerToken for basePlanId=${basePlanId}`);
+
+    const p = new Promise<Plan>((resolve, reject) => {
+      pending.current = { resolve, reject, basePlanId };
+    });
 
     await requestPurchase({
       type: "subs",
@@ -284,6 +276,7 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
         },
       },
     });
+    return p;
   }
 
   const value = useMemo<IapContextValue>(
@@ -333,9 +326,9 @@ function buildVerificationPayload(p: Purchase) {
   const anyP = p as any;
   const productId = getProductId(p);
 
-  if (Platform.OS === "android") {
+  if (Platform.OS === EPlatform.ANDROID) {
     return {
-      platform: "android",
+      platform: EPlatform.ANDROID,
       packageName: anyP.packageNameAndroid,
       productId: getProductId(p),
       purchaseToken: anyP.purchaseTokenAndroid ?? anyP.purchaseToken,
@@ -344,7 +337,7 @@ function buildVerificationPayload(p: Purchase) {
   }
 
   return {
-    platform: "ios",
+    platform: EPlatform.IOS,
     productId,
     transactionId: anyP.transactionIdIOS ?? anyP.transactionId,
     receipt: anyP.transactionReceiptIOS ?? anyP.transactionReceipt,

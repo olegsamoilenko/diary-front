@@ -13,14 +13,14 @@ import { Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ColorTheme, ErrorMessages } from "@/types";
+import { ColorTheme, ErrorMessages, type Rejected } from "@/types";
 import * as Yup from "yup";
 import { apiRequest, passwordRules } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
-import axios from "axios";
-import { apiUrl } from "@/constants/env";
 import * as SecureStore from "expo-secure-store";
 import i18n from "i18next";
+import { changeUserAuthData } from "@/store/thunks/auth/changeUserAuthData";
+import { useAppDispatch } from "@/store";
 
 type ChangePasswordModalProps = {
   showChangePasswordModal: boolean;
@@ -37,7 +37,8 @@ export default function ChangePasswordModal({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
-
+  const dispatch = useAppDispatch();
+  const lang = useState<string>(i18n.language)[0];
   const [error, setError] = useState<string | null>(null);
 
   const changePasswordSchema = Yup.object().shape({
@@ -61,29 +62,21 @@ export default function ChangePasswordModal({
   ) => {
     setLoading(true);
     setError(null);
+    const data = {
+      email: values.email,
+      password: values.password,
+      newPassword: values.newPassword,
+      lang,
+    };
     try {
-      const res = await apiRequest({
-        url: `/users/change-user-auth-data`,
-        method: "POST",
-        data: {
-          email: values.email,
-          password: values.password,
-          newPassword: values.newPassword,
-          lang: i18n.language,
-        },
-      });
-
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data));
-
-      UserEvents.emit("userChanged");
+      await dispatch(changeUserAuthData(data)).unwrap();
 
       onSuccessChangePassword();
     } catch (err: any) {
-      console.log("change password error", err);
-      console.log("change password error response", err?.response);
-      console.log("change password error response data", err?.response?.data);
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
-      const errorKey = ErrorMessages[code];
+      const payload = err as Rejected;
+      console.log("handle handleChangePassword error", payload);
+      const errorKey =
+        ErrorMessages[payload.code as keyof typeof ErrorMessages];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setLoading(false);
     } finally {
@@ -238,6 +231,7 @@ const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
     input: {
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       borderWidth: 1,
       borderColor: colors.inputBorder,
       padding: 14,

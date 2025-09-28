@@ -30,7 +30,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import type { RootState } from "@/store";
 import { apiRequest, hydrateEntryHtmlFromAlbum } from "@/utils";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import WebViewHTML from "@/components/ui/WebViewHTML";
 
 type EntryCardProps = {

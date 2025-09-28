@@ -48,6 +48,8 @@ const Base = {
     // rich
     toolbarBackground: "#",
     toolbarIcon: "#",
+    // Modal
+    modalBackground: "#FFFFFF",
   },
 };
 
@@ -65,7 +67,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#aec2c6",
     secondary: "#",
     text: "#2c3b3e",
-    textAdditional: "#",
+    textAdditional: "#6d878c",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#cee0e3",
@@ -100,6 +102,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#526D73526D73",
+    // Modal
+    modalBackground: "#FFFFFF",
   },
   silentPeaks: {
     background: "#E6E5E3",
@@ -114,7 +118,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#878184",
     secondary: "#",
     text: "#3a3639",
-    textAdditional: "#",
+    textAdditional: "#878285",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#ccc0c7",
@@ -149,6 +153,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#3D383B",
+    // Modal
+    modalBackground: "#dfdede",
   },
   goldenHour: {
     background: "#E6D9D3",
@@ -163,7 +169,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#bfae99",
     secondary: "#",
     text: "#322618",
-    textAdditional: "#",
+    textAdditional: "#857159",
     textInPrimary: "#FFFFFF",
     link: "#0000ff",
     border: "#ccbaa4",
@@ -198,6 +204,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#836e53",
+    // Modal
+    modalBackground: "#DCDCDE",
   },
   vintagePaper: {
     // General
@@ -249,6 +257,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#F8F8F8",
     toolbarIcon: "#604d3f",
+    // Modal
+    modalBackground: "#EFEFEF",
   },
   zenMind: {
     background: "#EDECE4",
@@ -263,7 +273,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#99a1a6",
     secondary: "#",
     text: "#2b2e30",
-    textAdditional: "#",
+    textAdditional: "#727678",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#b6bfc5",
@@ -298,6 +308,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#43484B",
+    // Modal
+    modalBackground: "#dcdcd6",
   },
   mindset: {
     background: "#F3E7D9",
@@ -312,7 +324,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#d1c0b3",
     secondary: "#",
     text: "#4c3422",
-    textAdditional: "#",
+    textAdditional: "#8e796b",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#e1d0c3",
@@ -347,6 +359,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#C6A186",
+    // Modal
+    modalBackground: "#e3dad0",
   },
   balance: {
     background: "#DDD9D6",
@@ -361,7 +375,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#9a6d4b",
     secondary: "#",
     text: "#1e150e",
-    textAdditional: "#",
+    textAdditional: "#594c41",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#cdb9a9",
@@ -396,6 +410,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#3D2B1D",
+    // Modal
+    modalBackground: "#DDD9D6",
   },
   leafScape: {
     background: "#E6E5E1",
@@ -410,7 +426,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#6fa591",
     secondary: "#",
     text: "#0c1713",
-    textAdditional: "#",
+    textAdditional: "#476359",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#b8d3c9",
@@ -445,6 +461,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#213F34",
+    // Modal
+    modalBackground: "#E6E5E1",
   },
   pastelCollage: {
     background: "#F7F6F2",
@@ -459,7 +477,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#cbd8cd",
     secondary: "#",
     text: "#303331",
-    textAdditional: "#",
+    textAdditional: "#7b8f83",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#d6e4d9",
@@ -494,6 +512,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#929c94",
+    // Modal
+    modalBackground: "#F8F9F4",
   },
   seaWhisper: {
     background: "#d8cdc4",
@@ -508,7 +528,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#9f9399",
     secondary: "#",
     text: "#232122",
-    textAdditional: "#",
+    textAdditional: "#6c6066",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#d1c7cc",
@@ -543,6 +563,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#474144",
+    // Modal
+    modalBackground: "#d6cfcb",
   },
   whiteLotus: {
     background: "#FEFEFE",
@@ -557,7 +579,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#8c9c9f",
     secondary: "#",
     text: "#222829",
-    textAdditional: "#",
+    textAdditional: "#576163",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#bed9dd",
@@ -592,6 +614,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#414C4E",
+    // Modal
+    modalBackground: "#FBFBF5",
   },
   slowDown: {
     background: "#ede3d4",
@@ -606,7 +630,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#869fb1",
     secondary: "#",
     text: "#10202c",
-    textAdditional: "#",
+    textAdditional: "#456075",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#b7c6d1",
@@ -641,6 +665,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#2D5C80",
+    // Modal
+    modalBackground: "#f3ede4",
   },
   fallLight: {
     background: "#FBF3DC",
@@ -655,7 +681,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#f6a369",
     secondary: "#",
     text: "#421c02",
-    textAdditional: "#",
+    textAdditional: "#875b3e",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#f8dbc7",
@@ -690,6 +716,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#FF6C05",
+    // Modal
+    modalBackground: "#f8f4e8",
   },
   pinkWhisper: {
     background: "#E5DBDC",
@@ -704,7 +732,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#b3a19f",
     secondary: "#",
     text: "#402d2a",
-    textAdditional: "#",
+    textAdditional: "#856864",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#baabaa",
@@ -739,6 +767,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#B77E77",
+    // Modal
+    modalBackground: "#E2D6D8",
   },
   paperRose: {
     background: "#c0c9d1",
@@ -753,7 +783,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#aabaca",
     secondary: "#",
     text: "#2d3945",
-    textAdditional: "#",
+    textAdditional: "#6c757e",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#aabaca",
@@ -788,6 +818,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#627A91",
+    // Modal
+    modalBackground: "#CFD6E1",
   },
   blueBloom: {
     // General
@@ -840,6 +872,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#FFFFFF",
     toolbarIcon: "#2A7BA7",
+    // Modal
+    modalBackground: "#E9E8E4",
   },
   softWaves: {
     // General
@@ -892,6 +926,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#FFFFFF",
     toolbarIcon: "#344360",
+    // Modal
+    modalBackground: "#D3D1D4",
   },
   calmMind: {
     background: "#F6F7F9",
@@ -941,6 +977,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#F6F7F9",
     toolbarIcon: "#5BA9A6",
+    // Modal
+    modalBackground: "#f8f8f5",
   },
   orange: {
     background: "#FFF9F4",
@@ -955,7 +993,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#bc7d69",
     secondary: "#FFB354",
     text: "#351910",
-    textAdditional: "#A86800",
+    textAdditional: "#7c4e03",
     textInPrimary: "#FFF",
     link: "#FF8200",
     border: "#FFD09A",
@@ -990,6 +1028,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#FFE4C7",
     toolbarIcon: "#A54E32",
+    // Modal
+    modalBackground: "#F9F1E1",
   },
   ball: {
     // General
@@ -1040,6 +1080,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#222020",
     toolbarIcon: "#7e7d6f",
+    // Modal
+    modalBackground: "#383838",
   },
   compass: {
     background: "#403837",
@@ -1054,7 +1096,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#493c37",
     secondary: "#",
     text: "#e4ccc7",
-    textAdditional: "#",
+    textAdditional: "#786c6a",
     textInPrimary: "#e4ccc7",
     link: "#0000ff",
     border: "#3a3533",
@@ -1089,6 +1131,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#4a403e",
     toolbarIcon: "#382A27",
+    // Modal
+    modalBackground: "#4C4442",
   },
   oceanDepths: {
     background: "#19232D",
@@ -1103,7 +1147,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#0c1925",
     secondary: "#",
     text: "#abbfd5",
-    textAdditional: "#",
+    textAdditional: "#56606a",
     textInPrimary: "#abbfd5",
     link: "#0000ff",
     border: "#15222e",
@@ -1138,6 +1182,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#19232D",
     toolbarIcon: "#2b5580",
+    // Modal
+    modalBackground: "#121C26",
   },
   neonFocus: {
     background: "#111515",
@@ -1152,7 +1198,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#2a4e27",
     secondary: "#",
     text: "#c2eabe",
-    textAdditional: "#",
+    textAdditional: "#657563",
     textInPrimary: "#c2eabe",
     link: "#0000ff",
     border: "#162915",
@@ -1187,6 +1233,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#111515",
     toolbarIcon: "#62B959",
+    // Modal
+    modalBackground: "#0C0E10",
   },
   cipheredNight: {
     background: "#1A2C2E",
@@ -1201,7 +1249,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#79a8a4",
     secondary: "#",
     text: "#9abdba",
-    textAdditional: "#",
+    textAdditional: "#596c6a",
     textInPrimary: "#9abdba",
     link: "#0000ff",
     border: "#223534",
@@ -1236,6 +1284,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#0F181A",
     toolbarIcon: "#466a67",
+    // Modal
+    modalBackground: "#1A2829",
   },
   goodLuck: {
     background: "#424041",
@@ -1250,7 +1300,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#95a8af",
     secondary: "#",
     text: "#ffffff",
-    textAdditional: "#",
+    textAdditional: "#8a8888",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#384242",
@@ -1285,6 +1335,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#424041",
     toolbarIcon: "#54676E",
+    // Modal
+    modalBackground: "#000000",
   },
   dreamAchieve: {
     background: "#1E1E1E",
@@ -1299,7 +1351,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#072e1c",
     secondary: "#",
     text: "#d9efe5",
-    textAdditional: "#",
+    textAdditional: "#616865",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#202523",
@@ -1334,6 +1386,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#1E1E1E",
     toolbarIcon: "#0d5132",
+    // Modal
+    modalBackground: "#171717",
   },
   timeToLive: {
     background: "#1b1b1b",
@@ -1348,7 +1402,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#330106",
     secondary: "#",
     text: "#ffffff",
-    textAdditional: "#",
+    textAdditional: "#706f6f",
     textInPrimary: "#ffffff",
     link: "#0000ff",
     border: "#202020",
@@ -1383,6 +1437,8 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#1b1b1b",
     toolbarIcon: "#5B010B",
+    // Modal
+    modalBackground: "#000000",
   },
   dark: {
     // General
@@ -1398,7 +1454,7 @@ export const Colors: Record<string, ColorTheme> = {
     disabledPrimary: "#2d3340",
     secondary: "",
     text: "#ECEDEE",
-    textAdditional: "#a5a5a6",
+    textAdditional: "#7f7f80",
     textInPrimary: "#FFFFFF",
     link: "#0000ff",
     border: "#2A2D2F",
@@ -1433,5 +1489,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#151718",
     toolbarIcon: "#344360",
+    // Modal
+    modalBackground: "#060907",
   },
 };

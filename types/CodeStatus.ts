@@ -6,4 +6,5 @@ export enum CodeStatus {
   RATE_LIMITED = "RATE_LIMITED",
   COOLDOWN = "COOLDOWN",
   BAD = "BAD",
+  SENT = "SENT",
 }

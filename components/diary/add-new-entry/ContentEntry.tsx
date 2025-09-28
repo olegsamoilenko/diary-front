@@ -7,7 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { ColorTheme, Entry } from "@/types";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 import StreamingText from "@/components/diary/add-new-entry/StreamingText";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import { hydrateEntryHtmlFromAlbum } from "@/utils";
 import WebViewHTML from "@/components/ui/WebViewHTML";
 
@@ -53,7 +53,6 @@ export default function ContentEntry({
   }, [idx, isEntrySaved, aiDialogLoading, entry.content]);
 
   useEffect(() => {
-    console.log("Hydrating entry content...////", entry);
     (async () => {
       const rawUser = await SecureStore.getItemAsync("user");
       const user = rawUser ? JSON.parse(rawUser) : null;

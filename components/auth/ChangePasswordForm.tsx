@@ -266,7 +266,10 @@ export default function ChangePasswordForm({
             {resendTimer > 0 && (
               <ThemedText
                 type="small"
-                style={{ marginBottom: 10, textAlign: "center" }}
+                style={[
+                  styles.error,
+                  { marginBottom: 10, textAlign: "center" },
+                ]}
               >
                 {t("auth.youCanResendCodeIn")} {resendTimer} {t("common.sec")}
               </ThemedText>
@@ -274,7 +277,10 @@ export default function ChangePasswordForm({
             {timer > 0 && (
               <ThemedText
                 type="small"
-                style={{ marginBottom: 10, textAlign: "center" }}
+                style={[
+                  styles.error,
+                  { marginBottom: 10, textAlign: "center" },
+                ]}
               >
                 {t("auth.youCanSendCodeIn")} {timer} {t("common.sec")}
               </ThemedText>
@@ -313,6 +319,7 @@ const getStyles = (colors: ColorTheme) =>
     },
     input: {
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       padding: 14,
       borderRadius: 8,
       marginBottom: 12,

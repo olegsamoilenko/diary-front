@@ -9,93 +9,71 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Linking,
+  Platform,
 } from "react-native";
+import * as Application from "expo-application";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import { PLANS } from "@/constants/Plans";
 import type { ColorTheme, Plan, User } from "@/types";
+import { Subscriptions } from "@/types";
 import Background from "@/components/Background";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import Plans from "@/components/subscription/Plans";
 import Payment from "@/components/subscription/Payment";
 import AuthForm from "@/components/auth/AuthForm";
 import { apiRequest } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
 import RegisterOrNot from "@/components/auth/RegisterOrNot";
-import { setTimeFormat } from "@/store/slices/settings/timeFormatSlice";
+import { Provider, useSelector } from "react-redux";
+import { store, RootState, useAppDispatch } from "@/store";
 
 const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
-  const [user, setUser] = useState<User | null>(null);
-  const [showPayment, setShowPayment] = React.useState(false);
+  const user = useSelector((s: RootState) => s.user.value);
   const [successPaymentPlan, setSuccessPaymentPlan] =
     React.useState<Plan | null>(null);
-  const [plan, setPlan] = React.useState<Plan | null>(null);
+  const plan = useSelector((s: RootState) => s.plan.value);
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [showRegisterOrNot, setShowRegisterOrNot] = useState(false);
   const [continueWithoutRegistration, setContinueWithoutRegistration] =
     useState(false);
 
-  useEffect(() => {
-    const getUser = async () => {
-      const storedUser = await SecureStore.getItemAsync("user");
-      setUser(storedUser ? JSON.parse(storedUser) : null);
-    };
-    getUser();
-  }, []);
-
-  const onSuccessPayment = () => {
-    setSuccessPaymentPlan(plan);
-    setShowPayment(false);
-  };
-
   const onAuthSuccess = () => {
     setShowAuthForm(false);
   };
 
-  const onSuccess = async () => {
-    setUser({ ...user, plan: plan });
+  const ascForRegister = () => {
+    setShowRegisterOrNot(true);
   };
 
-  const onUnsubscribe = async () => {
-    if (user && user.isRegistered) {
-      try {
-        await apiRequest({
-          url: "/plans/unsubscribe",
-          method: "POST",
-        });
-        setUser({ ...user, plan: null });
-        await SecureStore.setItemAsync(
-          "user",
-          JSON.stringify({ ...user, plan: null }),
-        );
-      } catch (error: any) {
-        console.error("Error unsubscribing:", error);
-        console.error("Error unsubscribing response:", error.response);
-        console.error(
-          "Error unsubscribing response data:",
-          error.response.data,
-        );
+  const onSuccess = async () => {};
+
+  async function openPlaySubscriptions() {
+    if (Platform.OS !== "android") return;
+
+    const pkg = Application.applicationId;
+    let url = "https://play.google.com/store/account/subscriptions";
+
+    if (pkg) {
+      url += `?sku=${encodeURIComponent(Subscriptions.NEMORY)}&package=${encodeURIComponent(pkg)}`;
+    }
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        await Linking.openURL(`market://details?id=${pkg}`);
       }
+    } catch (e) {
+      await Linking.openURL(url);
     }
-  };
-
-  const updatePlan = (user: User) => {
-    if (user?.plan) {
-      setUser(user);
-      // setPlan(user.plan);
-    }
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updatePlan(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
+  }
   return (
     <SideSheet ref={ref}>
       <Background background={colors.backgroundImage} paddingTop={10}>
@@ -107,14 +85,13 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               setShowRegisterOrNot(false);
             }}
           />
-        ) : showPayment ? (
-          <Payment onSuccessPayment={onSuccessPayment} plan={plan} />
         ) : showAuthForm ? (
           <AuthForm
             forPlanSelect={true}
             onSuccessSignWithGoogle={onAuthSuccess}
             onSuccessEmailCode={onAuthSuccess}
             onSuccessSignIn={() => setShowAuthForm(false)}
+            handleBack={() => setShowAuthForm(false)}
           />
         ) : (
           <View style={styles.container}>
@@ -127,7 +104,7 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
             >
               {t("settings.plans.titlePlural")}
             </ThemedText>
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
               <View
                 style={{
                   flex: 1,
@@ -135,33 +112,20 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                 }}
               >
                 <Plans
-                  setShowPayment={setShowPayment}
                   onSuccess={onSuccess}
-                  setPlan={setPlan}
-                  successPaymentPlan={successPaymentPlan}
-                  setSuccessPaymentPlan={setSuccessPaymentPlan}
-                  setShowRegisterOrNot={setShowRegisterOrNot}
+                  ascForRegister={ascForRegister}
                   continueWithoutRegistration={continueWithoutRegistration}
                 />
-                {user && user!.plan && (
-                  <TouchableOpacity onPress={onUnsubscribe}>
-                    <View
-                      style={[
-                        styles.button,
-                        {
-                          borderWidth: 1,
-                          borderColor: colors.border,
-                          borderRadius: 12,
-                        },
-                      ]}
-                    >
+                {plan && (
+                  <TouchableOpacity onPress={openPlaySubscriptions}>
+                    <View style={[styles.button]}>
                       <ThemedText
                         type="subtitleLG"
                         style={{
                           color: colors.text,
                         }}
                       >
-                        {t("settings.plans.unsubscribe")}
+                        {t("settings.plans.manageSubscription")}
                       </ThemedText>
                     </View>
                   </TouchableOpacity>

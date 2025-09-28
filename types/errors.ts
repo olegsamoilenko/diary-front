@@ -1,3 +1,5 @@
+import { CodeStatus, StatusCode } from "@/types";
+
 export type ErrorsType = {
   response: {
     data: {
@@ -7,4 +9,11 @@ export type ErrorsType = {
       statusMessage: string;
     };
   };
+};
+
+export type Rejected = {
+  message: string;
+  status?: CodeStatus | StatusCode;
+  code?: string;
+  retryAfterSec?: number;
 };

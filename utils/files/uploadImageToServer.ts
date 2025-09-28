@@ -1,12 +1,16 @@
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 import { apiRequest } from "@/utils";
+import { EPlatform } from "@/types";
 
 export async function uploadImageToServer(localUri: string) {
   const user = await SecureStore.getItemAsync("user");
   const formData = new FormData();
   formData.append("file", {
-    uri: Platform.OS === "android" ? localUri : localUri.replace("file://", ""),
+    uri:
+      Platform.OS === EPlatform.ANDROID
+        ? localUri
+        : localUri.replace("file://", ""),
     name: `/user-${JSON.parse(user!).id}/image_${Date.now()}.jpg`,
     type: "image/jpeg",
   } as any);

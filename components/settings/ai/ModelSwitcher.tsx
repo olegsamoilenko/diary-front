@@ -4,62 +4,37 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AI_MODELS } from "@/constants/AIModels";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { setAiModel } from "@/store/slices/settings/aiModelSlice";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import Background from "@/components/Background";
-import { AiModel, type User } from "@/types";
+import { AiModel } from "@/types";
 import { apiRequest } from "@/utils";
-import { UserEvents } from "@/utils/events/userEvents";
-import * as SecureStore from "expo-secure-store";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@/store";
+import { updateSettings } from "@/store/thunks/settings/updateSettings";
 
 const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const aiModel = useAppSelector((state) => state.aiModel);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const settings = useSelector((s: RootState) => s.settings.value);
 
   const handleAiModel = async (aiModel: AiModel) => {
     try {
+      await dispatch(updateSettings({ aiModel })).unwrap();
       await apiRequest({
         url: `/users/update-settings`,
         method: "POST",
         data: { aiModel },
       });
-      dispatch(setAiModel(aiModel));
-
-      const stored = await SecureStore.getItemAsync("user");
-      const user: User | null = stored ? JSON.parse(stored) : null;
-
-      if (user?.settings) {
-        user.settings.aiModel = aiModel;
-        await SecureStore.setItemAsync("user", JSON.stringify(user));
-      }
     } catch (error: any) {
       console.warn("Failed to update aiModel", error);
       console.warn("Failed to update aiModel response", error.response);
-      console.warn(
-        "Failed to update aiModel response data",
-        error.response.data,
-      );
     }
   };
-
-  const updateAiModel = (user: User) => {
-    if (user?.settings?.aiModel) {
-      dispatch(setAiModel(user.settings.aiModel));
-    }
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updateAiModel(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
 
   return (
     <SideSheet ref={ref}>
@@ -79,7 +54,7 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                 <View
                   style={[
                     styles.radio,
-                    aiModel === model && {
+                    settings?.aiModel === model && {
                       borderColor: colors.primary,
                     },
                     {
@@ -87,7 +62,7 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                     },
                   ]}
                 >
-                  {aiModel === model && (
+                  {settings?.aiModel === model && (
                     <View
                       style={[
                         styles.radioDot,

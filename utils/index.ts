@@ -48,6 +48,8 @@ import {
   getProductTitle,
 } from "./iap/helpers";
 import { getPlanName } from "./subscription/plans";
+import { logStoredUserData } from "./storedUserData";
+import { normErr } from "./error/error";
 
 export {
   apiRequest,
@@ -90,4 +92,6 @@ export {
   getProductPrice,
   getProductTitle,
   getPlanName,
+  logStoredUserData,
+  normErr,
 };

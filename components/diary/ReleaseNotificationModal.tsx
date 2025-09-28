@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ColorTheme } from "@/types";
+import { ColorTheme, EPlatform } from "@/types";
 import type { ReleaseNotification } from "@/types";
 import {
   StyleSheet,
@@ -37,7 +37,6 @@ export default function ReleaseNotificationModal() {
   const lang = i18n.language || "en";
 
   useEffect(() => {
-    console.log("Build:", build, "Platform:", platform);
     (async () => {
       await fetchNotification();
     })();
@@ -58,8 +57,6 @@ export default function ReleaseNotificationModal() {
         console.log("No data returned from server");
         return;
       }
-
-      console.log("Response data:", res.data);
 
       if (res.data) {
         setNotification(res.data);
@@ -113,8 +110,6 @@ export default function ReleaseNotificationModal() {
   }, []);
 
   useEffect(() => {
-    console.log("Checked changed:", checked);
-    console.log("Show modal:", showModal);
     if (showModal) return;
     if (!checked) return;
     (async () => {
@@ -178,7 +173,7 @@ export default function ReleaseNotificationModal() {
               textAlign: "center",
             }}
           >
-            {platform === "android"
+            {platform === EPlatform.ANDROID
               ? t("releaseNotify.goToPlayMarket")
               : t("releaseNotify.goToAppStore")}
           </ThemedText>

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
+import { ColorTheme } from "@/types";
 
 type ModalPortalProps = {
   visible: boolean;
@@ -30,6 +31,7 @@ export default function ModalPortal({
   const [contentHeight, setContentHeight] = useState(0);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
+  const styles = React.useMemo(() => getStyles(colors), [colors]);
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
@@ -45,9 +47,6 @@ export default function ModalPortal({
     };
   }, []);
 
-  useEffect(() => {
-    console.log("visible", visible);
-  }, [visible]);
   return (
     <Modal
       animationType="fade"
@@ -84,9 +83,6 @@ export default function ModalPortal({
                 }}
                 onLayout={(e) => {
                   const h = e.nativeEvent.layout.height;
-                  console.log("SCREEN_HEIGHT", SCREEN_HEIGHT);
-                  console.log("Content height:", h);
-                  console.log("keyboardHeight", keyboardHeight);
                   setContentHeight(h);
                 }}
               >
@@ -100,35 +96,36 @@ export default function ModalPortal({
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.27)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  centeredView: {
-    flex: 1,
-    height: "100%",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.27)",
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 25,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const getStyles = (colors: ColorTheme) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.27)",
+      justifyContent: "center",
+      alignItems: "center",
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: "80%",
-  },
-});
+    centeredView: {
+      flex: 1,
+      height: "100%",
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0,0,0,0.27)",
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: colors.modalBackground,
+      borderRadius: 20,
+      padding: 25,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+      width: "80%",
+    },
+  });

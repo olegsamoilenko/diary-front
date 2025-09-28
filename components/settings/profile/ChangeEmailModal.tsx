@@ -1,4 +1,3 @@
-import Emoji from "@/components/diary/Emoji";
 import ModalPortal from "@/components/ui/Modal";
 import React, { useState, useMemo } from "react";
 import { ThemedText } from "@/components/ThemedText";
@@ -13,15 +12,15 @@ import { Formik } from "formik";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { CodeStatus, ColorTheme, ErrorMessages } from "@/types";
+import { CodeStatus, ColorTheme, ErrorMessages, type Rejected } from "@/types";
 import * as Yup from "yup";
-import { apiRequest, passwordRules } from "@/utils";
-import { UserEvents } from "@/utils/events/userEvents";
-import axios from "axios";
-import { apiUrl } from "@/constants/env";
-import * as SecureStore from "expo-secure-store";
+import { passwordRules } from "@/utils";
 import Toast from "react-native-toast-message";
 import i18n from "i18next";
+import { changeUserAuthData } from "@/store/thunks/auth/changeUserAuthData";
+import { useAppDispatch } from "@/store";
+import { verifyUserEmail } from "@/store/thunks/auth/verifyUserEmail";
+import { resendEmailVerificationCodeApi } from "@/utils/api/endpoints/auth/resendEmailVerificationCodeApi";
 
 type ChangeEmailModalProps = {
   showChangeEmailModal: boolean;
@@ -44,8 +43,11 @@ export default function ChangeEmailModal({
   const [code, setCode] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [timer, setTimer] = useState(0);
   const [resendTimer, setResendTimer] = useState(0);
+  const dispatch = useAppDispatch();
+  const lang = useState<string>(i18n.language)[0];
 
   const changeEmailSchema = Yup.object().shape({
     email: Yup.string()
@@ -68,20 +70,17 @@ export default function ChangeEmailModal({
   ) => {
     setLoading(true);
     setError(null);
+    const data = {
+      email: values.email,
+      password: values.password,
+      newEmail: values.newEmail,
+      lang: i18n.language,
+    };
     try {
-      const res = await apiRequest({
-        url: `/users/change-user-auth-data`,
-        method: "POST",
-        data: {
-          email: values.email,
-          password: values.password,
-          newEmail: values.newEmail,
-          lang: i18n.language,
-        },
-      });
+      const res = await dispatch(changeUserAuthData(data)).unwrap();
 
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setTimer(res.data.retryAfterSec || 0);
+      if (res.status === CodeStatus.COOLDOWN) {
+        setTimer(res.retryAfterSec || 0);
         const intervalId = setInterval(() => {
           setTimer((prev) => {
             if (prev <= 1) {
@@ -94,21 +93,30 @@ export default function ChangeEmailModal({
         }, 1000);
         return;
       }
-
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data));
-
-      UserEvents.emit("userChanged");
-      setEmail(values.newEmail);
+      setEmail(values.email);
+      setNewEmail(values.newEmail);
 
       setShowChangeEmailForm(false);
     } catch (err: any) {
-      console.log("change email error", err);
-      console.log("change email error response", err?.response);
-      console.log("change email error response data", err?.response?.data);
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
-      const errorKey = ErrorMessages[code];
-      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
-      setLoading(false);
+      const payload = err as Rejected;
+      if (payload.code === CodeStatus.COOLDOWN) {
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(intervalId);
+              setLoading(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        console.log("handle handleChangeEmail error", payload);
+        const errorKey =
+          ErrorMessages[payload.code as keyof typeof ErrorMessages];
+        setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
+        setLoading(false);
+      }
     } finally {
       setLoading(false);
       setSubmitting(false);
@@ -120,18 +128,16 @@ export default function ChangeEmailModal({
     setCode("");
     setResendLoading(true);
     try {
-      const res = await apiRequest({
-        url: `/auth/resend-code`,
-        method: "POST",
-        data: {
-          email: email,
-          lang: i18n.language,
-          type: "newEmail",
-        },
-      });
+      const res = await resendEmailVerificationCodeApi(
+        newEmail,
+        lang,
+        "newEmail",
+      );
 
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setResendTimer(res.data.retryAfterSec || 0);
+      if (!res) throw new Error("No response from server");
+
+      if (res.status === CodeStatus.COOLDOWN) {
+        setResendTimer(res.retryAfterSec || 0);
         const intervalId = setInterval(() => {
           setResendTimer((prev) => {
             if (prev <= 1) {
@@ -151,9 +157,7 @@ export default function ChangeEmailModal({
         text2: t("toast.weHaveSentYouCodeByEmail"),
       });
     } catch (err: any) {
-      console.log("resend code error", err);
       console.log("resend code error response", err?.response);
-      console.log("resend code error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
@@ -171,16 +175,15 @@ export default function ChangeEmailModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await apiRequest({
-        url: `/auth/new-email-confirm`,
-        method: "POST",
-        data: { email, code },
-      });
+      await dispatch(
+        verifyUserEmail({
+          email,
+          code,
+          type: "email_change",
+        }),
+      ).unwrap();
 
       setCode("");
-
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
-      await SecureStore.setItemAsync("token", res.data.accessToken);
 
       Toast.show({
         type: "success",
@@ -188,20 +191,18 @@ export default function ChangeEmailModal({
         text2: t("toast.youHaveSuccessfullyVerifiedYourEmail"),
       });
 
-      UserEvents.emit("userChanged");
-
       setShowChangeEmailForm(true);
       setError(null);
 
       onSuccessChangeEmail();
     } catch (err: any) {
-      console.log("new email confirm", err);
-      console.log("new email confirm response", err?.response);
-      console.log("new email confirm response data", err?.response?.data);
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
-      const errorKey = ErrorMessages[code];
+      const payload = err as Rejected;
+      console.log("handle verify new email error", payload);
+      const errorKey =
+        ErrorMessages[payload.code as keyof typeof ErrorMessages];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setCode("");
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -461,6 +462,7 @@ const getStyles = (colors: ColorTheme) =>
     },
     input: {
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       borderWidth: 1,
       borderColor: colors.inputBorder,
       padding: 14,

@@ -140,6 +140,7 @@ const getStyles = (colors: ColorTheme) =>
       width: 180,
       textAlign: "center",
       backgroundColor: colors.inputBackground,
+      color: colors.text,
     },
     btn: {
       paddingHorizontal: 18,

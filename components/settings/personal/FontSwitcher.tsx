@@ -9,24 +9,20 @@ import {
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
-import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import React, { forwardRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Fonts } from "@/constants/Fonts";
-import { useSelector, useDispatch } from "react-redux";
-import { setFont } from "@/store/slices/settings/fontSlice";
-import type { RootState } from "@/store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { apiRequest, getFont } from "@/utils";
-import { UserEvents } from "@/utils/events/userEvents";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@/store";
+import { getFont } from "@/utils";
 import Background from "@/components/Background";
-import * as SecureStore from "expo-secure-store";
-import type { User } from "@/types";
 import { Font } from "@/types";
+import { updateSettings } from "@/store/thunks/settings/updateSettings";
 
 const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
-  const font = useSelector((state: RootState) => state.font);
-  const dispatch = useDispatch();
+  const settings = useSelector((s: RootState) => s.settings.value);
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -34,38 +30,12 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   const handleFont = async (font: Font) => {
     try {
-      await apiRequest({
-        url: `/users/update-settings`,
-        method: "POST",
-        data: { font },
-      });
-      dispatch(setFont(font));
-
-      const stored = await SecureStore.getItemAsync("user");
-      const user: User | null = stored ? JSON.parse(stored) : null;
-
-      if (user?.settings) {
-        user.settings.font = font;
-        await SecureStore.setItemAsync("user", JSON.stringify(user));
-      }
+      await dispatch(updateSettings({ font })).unwrap();
     } catch (error: any) {
       console.warn("Failed to update font", error);
       console.warn("Failed to update font response", error.response);
-      console.warn("Failed to update font response data", error.response.data);
     }
   };
-
-  const updateFont = (user: User) => {
-    if (user?.settings?.font) {
-      dispatch(setFont(user.settings.font));
-    }
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updateFont(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
 
   return (
     <SideSheet ref={ref}>
@@ -118,7 +88,9 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
                         borderRadius: 10,
                         borderWidth: 3,
                         borderColor:
-                          f.name === font ? colors.primary : "transparent",
+                          f.name === settings?.font
+                            ? colors.primary
+                            : "transparent",
                       }}
                     />
                   </TouchableOpacity>

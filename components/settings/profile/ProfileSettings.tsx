@@ -8,70 +8,45 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { ColorTheme, Plan } from "@/types";
 import Background from "@/components/Background";
-import * as SecureStore from "@/utils/store/secureStore";
-import type { User } from "@/types";
 import AuthForm from "@/components/auth/AuthForm";
-import { UserEvents } from "@/utils/events/userEvents";
 import ProfileCard from "./ProfileCard";
 import ChangeNameModal from "@/components/settings/profile/ChangeNameModal";
 import Toast from "react-native-toast-message";
 import ChangeEmailModal from "@/components/settings/profile/ChangeEmailModal";
 import ChangePasswordModal from "@/components/settings/profile/ChangePasswordModal";
 import DeleteAccountModal from "@/components/settings/profile/DeleteAccountModal";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { loadAccessToken } from "@/utils/store/storage";
 
 const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const { t } = useTranslation();
-  const [user, setUser] = useState<User | null>(null);
+  const user = useSelector((s: RootState) => s.user.value);
   const [userLogged, setUserLogged] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showChangeEmailModal, setShowChangeEmailModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<"login" | "register">("register");
+  const [activeTab, setActiveTab] = useState<"login" | "registerUser">(
+    "registerUser",
+  );
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
 
   useEffect(() => {
-    getUser();
+    getUserLogged();
   }, []);
 
-  const getUser = async () => {
-    const [storedUser, token] = await Promise.all([
-      SecureStore.getItemAsync("user"),
-      SecureStore.getItemAsync("token"),
-    ]);
+  const getUserLogged = async () => {
+    const token = await loadAccessToken();
+    console.log("Token:", token);
 
-    const parsed: User | null = storedUser ? JSON.parse(storedUser) : null;
-    setUser(parsed);
-
-    const logged = !!token && !!parsed?.isLogged;
+    const logged = !!token && !!user?.isLogged;
+    console.log("User logged:", logged);
     setUserLogged(logged);
   };
-
-  useEffect(() => {
-    const refresh = () => {
-      void getUser();
-    };
-    UserEvents.on("userChanged", refresh);
-    UserEvents.on("userRegistered", refresh);
-    return () => {
-      UserEvents.off("userChanged", refresh);
-      UserEvents.off("userRegistered", refresh);
-    };
-  }, []);
-
-  const updateUser = async (u: User) => {
-    setUser(u);
-    setUserLogged(!!u.isLogged);
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updateUser(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
 
   const onSuccessChangeName = () => {
     Toast.show({
@@ -101,7 +76,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   };
 
   const handleRegister = async () => {
-    setActiveTab("register");
+    setActiveTab("registerUser");
     setShowAuthForm(true);
   };
 
@@ -130,15 +105,12 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
             handleBack={() => setShowAuthForm(false)}
             onSuccessSignWithGoogle={() => {
               setShowAuthForm(false);
-              getUser();
             }}
             onSuccessSignIn={() => {
               setShowAuthForm(false);
-              getUser();
             }}
             onSuccessEmailCode={() => {
               setShowAuthForm(false);
-              getUser();
             }}
             activeAuthTab={activeTab}
           />
@@ -257,7 +229,7 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                       textAlign: "center",
                     }}
                   >
-                    {t("auth.register")}
+                    {t("auth.registration")}
                   </ThemedText>
                 </TouchableOpacity>
               </View>
@@ -311,7 +283,6 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
                 <DeleteAccountModal
                   showDeleteAccountModal={showDeleteAccountModal}
                   setShowDeleteAccountModal={setShowDeleteAccountModal}
-                  user={user}
                 />
               </View>
             )}

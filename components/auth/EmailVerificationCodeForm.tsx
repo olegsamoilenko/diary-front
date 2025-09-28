@@ -7,16 +7,17 @@ import {
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import React, { useMemo, useState } from "react";
-import { ColorTheme, User, ErrorMessages, CodeStatus } from "@/types";
+import { ColorTheme, ErrorMessages, CodeStatus, type Rejected } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
-import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
-import { apiUrl } from "@/constants/env";
 import { UserEvents } from "@/utils/events/userEvents";
 import i18n from "i18next";
+import { RootState, useAppDispatch } from "@/store";
+import { verifyUserEmail } from "@/store/thunks/auth/verifyUserEmail";
+import { useSelector } from "react-redux";
+import { resendEmailVerificationCodeApi } from "@/utils/api/endpoints/auth/resendEmailVerificationCodeApi";
 
 type EmailVerificationCodeFormProps = {
   forPlanSelect: boolean;
@@ -34,8 +35,10 @@ export default function EmailVerificationCodeForm({
   const [resendLoading, setResendLoading] = useState(false);
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
-  const lang = useState<string | null>(i18n.language)[0];
+  const lang = useState<string>(i18n.language)[0];
   const [timer, setTimer] = useState(0);
+  const dispatch = useAppDispatch();
+  const user = useSelector((s: RootState) => s.user.value);
 
   const handleSubmit = async () => {
     if (code.length !== 6) {
@@ -44,27 +47,15 @@ export default function EmailVerificationCodeForm({
     }
     setLoading(true);
     setError(null);
-    const userString = await SecureStore.getItemAsync("user");
-    const user: User = userString ? JSON.parse(userString) : null;
     try {
-      const res = await axios.post(`${apiUrl}/auth/confirm-email`, {
-        email: user?.email,
-        code,
-      });
-
-      if (res && res.status !== 201) {
-        Toast.show({
-          type: "error",
-          text1: t("toast.failedToConfirmEmail"),
-          text2: t("toast.failedToConfirmEmail"),
-        });
-        throw new Error("Failed to confirm email");
-      }
+      await dispatch(
+        verifyUserEmail({
+          email: user!.email as string,
+          code,
+        }),
+      ).unwrap();
 
       setCode("");
-
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
-      await SecureStore.setItemAsync("token", res.data.accessToken);
 
       Toast.show({
         type: "success",
@@ -75,37 +66,33 @@ export default function EmailVerificationCodeForm({
       onSuccessEmailCode();
       UserEvents.emit("userRegistered");
     } catch (err: any) {
-      console.log("confirm email error", err);
-      console.log("confirm email error response", err?.response);
-      console.log("confirm email error response data", err?.response?.data);
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
-      const errorKey = ErrorMessages[code];
+      const payload = err as Rejected;
+      console.log("handle verify email error", payload);
+      const errorKey =
+        ErrorMessages[payload.code as keyof typeof ErrorMessages];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setCode("");
-      Toast.show({
-        type: "error",
-        text1: errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"),
-      });
+      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
 
   const resendCode = async () => {
-    const rowUser = await SecureStore.getItemAsync("user");
-    const user = rowUser ? JSON.parse(rowUser) : null;
     setCode("");
     setResendLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/resend-code`, {
+      const res = await resendEmailVerificationCodeApi(
+        user?.email as string,
         lang,
-        email: user?.email,
-        type: "register",
-      });
+        "register",
+      );
 
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setTimer(res.data.retryAfterSec || 0);
+      if (!res) throw new Error("No response from server");
+
+      if (res.status === CodeStatus.COOLDOWN) {
+        setTimer(res.retryAfterSec || 0);
         const intervalId = setInterval(() => {
           setTimer((prev) => {
             if (prev <= 1) {
@@ -125,9 +112,7 @@ export default function EmailVerificationCodeForm({
         text2: t("toast.weHaveSentYouCodeByEmail"),
       });
     } catch (err: any) {
-      console.log("resend code error", err);
       console.log("resend code error response", err?.response);
-      console.log("resend code error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
@@ -240,6 +225,7 @@ const getStyles = (colors: ColorTheme) =>
       width: 180,
       textAlign: "center",
       backgroundColor: colors.inputBackground,
+      color: colors.text,
     },
     btn: {
       paddingHorizontal: 18,

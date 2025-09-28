@@ -1,5 +1,7 @@
+import { Theme } from "@/types";
+
 export type UserSettings = {
-  theme: ETheme;
+  theme: Theme;
   font: Font;
   aiModel: AiModel;
   timeFormat: TimeFormat;
@@ -19,11 +21,14 @@ export enum ETheme {
   GOLDEN_HOUR = "goldenHour",
   VINTAGE_PAPER = "vintagePaper",
   ZEN_MIND = "zenMind",
-  MIND_SET = "mindSet",
+  MIND_SET = "mindset",
   FALL_LIGHT = "fallLight",
   SEA_WHISPER = "seaWhisper",
   WHITE_LOTUS = "whiteLotus",
   BALANCE = "balance",
+  LEAF_SCAPE = "leafScape",
+  PASTEL_COLLAGE = "pastelCollage",
+  PAPER_ROSE = "paperRose",
   SLOW_DOWN = "slowDown",
   PINK_WHISPER = "pinkWhisper",
   BLUE_BLOOM = "blueBloom",

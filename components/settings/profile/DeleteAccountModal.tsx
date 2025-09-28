@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  unstable_batchedUpdates,
   View,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
@@ -13,23 +14,28 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { apiRequest } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useBiometry } from "@/context/BiometryContext";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import type { ColorTheme, User } from "@/types";
 import { CodeStatus, ErrorMessages } from "@/types";
+import { RootState, store, useAppDispatch } from "@/store";
+import { resetUser } from "@/store/slices/userSlice";
+import { resetSettings } from "@/store/slices/settingsSlice";
+import { resetPlan } from "@/store/slices/planSlice";
+import { sendVerificationCodeForUserDeleteApi } from "@/utils/api/endpoints/auth/sendVerificationCodeForUserDeleteApi";
+import { useSelector } from "react-redux";
+import { deleteAccount } from "@/store/thunks/auth/deleteAccount";
 
 type DeleteAccountModalProps = {
   showDeleteAccountModal: boolean;
   setShowDeleteAccountModal: (show: boolean) => void;
-  user: User;
 };
 export default function DeleteAccountModal({
   showDeleteAccountModal,
   setShowDeleteAccountModal,
-  user,
 }: DeleteAccountModalProps) {
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
@@ -42,73 +48,50 @@ export default function DeleteAccountModal({
   const [loading, setLoading] = React.useState(false);
   const [resendLoading, setResendLoading] = React.useState(false);
   const [timer, setTimer] = React.useState(0);
+  const user = useSelector((s: RootState) => s.user.value);
+  const dispatch = useAppDispatch();
 
-  const handleSentCode = async () => {
+  const handleSentCode = async (type: "send" | "resend") => {
     setError("");
-    setLoading(true);
-    try {
-      const res = await apiRequest({
-        url: `/users/send-verification-code-for-delete`,
-        method: "POST",
-        data: {
-          email: user.email,
-        },
-      });
+    if (type === "send") {
+      setLoading(true);
+    } else {
+      setResendLoading(true);
+    }
 
-      setShowEnterCodeForm(true);
-      setLoading(false);
+    try {
+      const res = await sendVerificationCodeForUserDeleteApi(
+        user!.email as string,
+        type,
+      );
+
+      if (type === "send") {
+        setShowEnterCodeForm(true);
+        setLoading(false);
+      } else {
+        if (res && res.status === CodeStatus.COOLDOWN) {
+          setTimer(res.retryAfterSec || 0);
+          const intervalId = setInterval(() => {
+            setTimer((prev) => {
+              if (prev <= 1) {
+                clearInterval(intervalId);
+                setResendLoading(false);
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+          return;
+        }
+        Toast.show({
+          type: "success",
+          text1: t("toast.codeResent"),
+        });
+        setResendLoading(false);
+      }
     } catch (error: any) {
       console.error("Error sending code:", error);
-      console.error("Error sending code response:", error.response);
-      console.error("Error sending code response data:", error.response.data);
-      Toast.show({
-        type: "error",
-        text1: t("toast.errorSendingCode"),
-      });
       setLoading(false);
-    }
-  };
-
-  const resendCode = async () => {
-    setError("");
-    setResendLoading(true);
-    try {
-      const res = await apiRequest({
-        url: `/users/send-verification-code-for-delete`,
-        method: "POST",
-        data: {
-          email: user.email,
-        },
-      });
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setTimer(res.data.retryAfterSec || 0);
-        const intervalId = setInterval(() => {
-          setTimer((prev) => {
-            if (prev <= 1) {
-              clearInterval(intervalId);
-              setResendLoading(false);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        return;
-      }
-
-      Toast.show({
-        type: "success",
-        text1: t("toast.codeResent"),
-      });
-      setResendLoading(false);
-    } catch (error: any) {
-      setResendLoading(false);
-      console.error("Error resending code:", error);
-      console.error("Error resending code response:", error.response);
-      console.error("Error resending code response data:", error.response.data);
-      Toast.show({
-        type: "error",
-        text1: t("toast.errorResendingCode"),
-      });
     }
   };
 
@@ -116,24 +99,11 @@ export default function DeleteAccountModal({
     setError("");
     setLoading(true);
     try {
-      const res = await apiRequest({
-        url: `/users/delete-account-by-verification-code`,
-        method: "POST",
-        data: {
-          email: user.email,
-          code,
-        },
-      });
+      const res = await dispatch(
+        deleteAccount({ email: user!.email as string, code }),
+      ).unwrap();
 
-      if (res.data.status === CodeStatus.OK) {
-        await Promise.allSettled([
-          SecureStore.deleteItemAsync("token"),
-          SecureStore.deleteItemAsync("user"),
-          SecureStore.deleteItemAsync("user_pin"),
-          SecureStore.deleteItemAsync("biometry_enabled"),
-          AsyncStorage.removeItem("show_welcome"),
-          AsyncStorage.removeItem("register_or_not"),
-        ]);
+      if (res.status === CodeStatus.OK) {
         await GoogleSignin.signOut();
         await setBiometry(false);
         UserEvents.emit("userDeleted");
@@ -143,27 +113,14 @@ export default function DeleteAccountModal({
       }
     } catch (error: any) {
       console.error("Error deleting account:", error);
-      console.error("Error deleting account response:", error.response);
-      console.error(
-        "Error deleting account response data:",
-        error.response.data,
-      );
       setCode("");
       setError(
-        error.response.data.code
+        error.code
           ? t(
-              `errors.${ErrorMessages[error.response.data.code as keyof typeof ErrorMessages]}`,
+              `errors.${ErrorMessages[error.code as keyof typeof ErrorMessages]}`,
             )
           : t(`errors.errorDeletingAccount`),
       );
-      Toast.show({
-        type: "error",
-        text1: error.response.data.code
-          ? t(
-              `errors.${ErrorMessages[error.response.data.code as keyof typeof ErrorMessages]}`,
-            )
-          : t(`errors.errorDeletingAccount`),
-      });
       setLoading(false);
     }
   };
@@ -203,7 +160,7 @@ export default function DeleteAccountModal({
           {!timer && (
             <TouchableOpacity
               style={styles.resendCodeBtn}
-              onPress={resendCode}
+              onPress={() => handleSentCode("resend")}
               disabled={resendLoading}
             >
               {resendLoading ? (
@@ -284,7 +241,7 @@ export default function DeleteAccountModal({
               </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleSentCode}
+              onPress={() => handleSentCode("send")}
               style={{
                 backgroundColor: "red",
                 paddingHorizontal: 14,
@@ -323,6 +280,7 @@ const getStyles = (colors: ColorTheme) =>
       width: 180,
       textAlign: "center",
       backgroundColor: colors.inputBackground,
+      color: colors.text,
     },
     btn: {
       paddingHorizontal: 18,

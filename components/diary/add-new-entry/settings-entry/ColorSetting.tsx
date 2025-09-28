@@ -42,7 +42,6 @@ export default function ColorSetting({
   useEffect(() => {
     if (COLORS[0].code === colors.text) return;
     COLORS.unshift({ name: "default", code: colors.text });
-    console.log("COLORS", COLORS);
   }, [colors.text]);
 
   return (

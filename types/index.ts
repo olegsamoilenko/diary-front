@@ -10,10 +10,11 @@ import type { Theme, ThemeContextType, LogoTheme } from "./theme";
 import type { MoodByDate } from "./moodByDate";
 import type { EntrySettings, BackgroundSettings } from "./entrySettings";
 import { ErrorMessages } from "./messages";
-import type { ErrorsType } from "./errors";
+import type { ErrorsType, Rejected } from "./errors";
 import { StatusCode } from "./statusCode";
 import { PlanStatus, PlanTypes, Subscriptions, BasePlanIds } from "./plan";
 import { Font, Lang, TimeFormat, ETheme } from "./userSettings";
+import type { UserSettings } from "./userSettings";
 import { Dialog } from "./dialog";
 import type { EntryImage } from "./images";
 import { CodeStatus } from "./CodeStatus";
@@ -21,6 +22,8 @@ import type {
   ReleaseNotification,
   ReleaseNotificationTranslation,
 } from "./notifications";
+import { EPlatform } from "./platform";
+import { IapProduct } from "./subscription";
 
 export type {
   ColorTheme,
@@ -42,6 +45,8 @@ export type {
   EntryImage,
   ReleaseNotification,
   ReleaseNotificationTranslation,
+  UserSettings,
+  Rejected,
 };
 
 export {
@@ -57,4 +62,6 @@ export {
   PlanTypes,
   Subscriptions,
   BasePlanIds,
+  EPlatform,
+  IapProduct,
 };

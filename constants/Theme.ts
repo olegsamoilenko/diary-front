@@ -58,7 +58,7 @@ export const NavigationThemes = {
   },
   pinkWhisper: {
     dark: false,
-    colors: Colors["mindset"],
+    colors: Colors["pinkWhisper"],
     fonts: {},
   },
   blueBloom: {

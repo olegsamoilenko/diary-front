@@ -6,9 +6,9 @@ import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SideSheetRef } from "@/components/SideSheet";
 import { useTranslation } from "react-i18next";
-import type { User } from "@/types";
-import * as SecureStore from "@/utils/store/secureStore";
-import { UserEvents } from "@/utils/events/userEvents";
+import type { Plan } from "@/types";
+import { PlanEvents } from "@/utils/events/planEvents";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SubscriptionSettingsBlock({
   plansRef,
@@ -18,33 +18,21 @@ export default function SubscriptionSettingsBlock({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
-  const [user, setUser] = useState<User | null>(null);
+  const [plan, setPlan] = useState<Plan | null>(null);
 
-  const getUser = async () => {
-    const storedUser = await SecureStore.getItemAsync("user");
-    setUser(storedUser ? JSON.parse(storedUser) : null);
+  const getPlan = async () => {
+    const storedPlan = await AsyncStorage.getItem("plan");
+    setPlan(storedPlan ? JSON.parse(storedPlan) : null);
   };
 
   useEffect(() => {
-    getUser();
+    getPlan();
   }, []);
 
   useEffect(() => {
-    const handler = () => getUser();
-    UserEvents.on("userChanged", handler);
-    return () => UserEvents.off("userChanged", handler);
-  }, []);
-
-  const updatePlan = (user: User) => {
-    if (user?.plan) {
-      setUser(user);
-    }
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updatePlan(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
+    const handler = () => getPlan();
+    PlanEvents.on("planChanged", handler);
+    return () => PlanEvents.off("planChanged", handler);
   }, []);
 
   return (
@@ -89,7 +77,7 @@ export default function SubscriptionSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>{user?.plan?.name}</ThemedText>
+            <ThemedText>{plan?.name}</ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}

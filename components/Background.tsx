@@ -21,7 +21,6 @@ export default function Background({
           width: "100%",
           height: "100%",
           flex: 1,
-          paddingBottom: 40,
         }}
         resizeMode="cover"
       >

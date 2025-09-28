@@ -12,22 +12,22 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import * as LocalAuthentication from "expo-local-authentication";
-import * as SecureStore from "@/utils/store/secureStore";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { ColorTheme, User } from "@/types";
+import { ColorTheme, EPlatform, User } from "@/types";
 import Background from "@/components/Background";
 import { ThemedText } from "@/components/ThemedText";
 import NemoryLogo from "@/components/ui/logo/NemoryLogo";
-import { apiRequest } from "@/utils";
 import Toast from "react-native-toast-message";
 import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
 import { useBiometry } from "@/context/BiometryContext";
-
-const PIN_KEY = "user_pin";
-const BIOMETRY_KEY = "biometry_enabled";
+import { RootState, useAppDispatch } from "@/store";
+import { useSelector } from "react-redux";
+import { loadPin, savePin } from "@/utils/store/storage";
+import { updateUser } from "@/store/thunks/auth/updateUser";
+import { logStoredUserData } from "@/utils";
 
 export default function AuthGate({
   onAuthenticated,
@@ -39,16 +39,18 @@ export default function AuthGate({
   >("loading");
   const [pin, setPin] = useState("");
   const [savedPin, setSavedPin] = useState("");
-  const [biometryEnabled, setBiometryEnabled] = useState(false);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const [errorPin, setErrorPin] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  const dispatch = useAppDispatch();
+  const user = useSelector((s: RootState) => s.user.value);
+  const settings = useSelector((s: RootState) => s.settings.value);
+
   const [nameLoading, setNameLoading] = useState(false);
   const [pinLoading, setPinLoading] = useState(false);
-  const { setBiometry } = useBiometry();
+  const { setBiometry, biometryEnabled } = useBiometry();
 
   const PinSchema = Yup.object().shape({
     pin: Yup.string()
@@ -69,33 +71,24 @@ export default function AuthGate({
     let cancelled = false;
     (async () => {
       try {
-        const [userStr, pinStr, bioFlag] = await Promise.all([
-          SecureStore.getItemAsync("user"),
-          SecureStore.getItemAsync(PIN_KEY),
-          SecureStore.getItemAsync(BIOMETRY_KEY),
-        ]);
         if (cancelled) return;
 
-        const u: User | null = userStr ? JSON.parse(userStr) : null;
-        setUser(u);
-        const bio = bioFlag === "true";
-        setBiometryEnabled(bio);
+        const [pinStr] = await Promise.all([loadPin()]);
+
         setSavedPin(pinStr ?? "");
 
-        const lang = u?.settings?.lang;
+        const lang = settings?.lang;
         if (lang) {
           await i18n.changeLanguage(lang);
           LocaleConfig.defaultLocale = lang;
         }
 
-        if (!u?.name) setStep("name");
+        if (!user?.name) setStep("name");
         else if (!pinStr) setStep("setup");
-        else if (bio) setStep("biometry");
+        else if (biometryEnabled) setStep("biometry");
         else setStep("pin");
       } catch (err: any) {
-        console.warn("AuthGate init failed", err);
         console.warn("AuthGate init failed response", err.response);
-        console.warn("AuthGate init failed response data", err.response.data);
         setStep("name");
       }
     })();
@@ -114,47 +107,20 @@ export default function AuthGate({
     ) => {
       setNameLoading(true);
       try {
-        const userString = await SecureStore.getItemAsync("user");
-        const u: User | null = userString ? JSON.parse(userString) : null;
-        if (!u?.id) throw new Error("User not found");
-
-        const res = await apiRequest({
-          url: `/users/update`,
-          method: "POST",
-          data: { name: values.name },
-        });
-
-        if (!res || (res.status !== 200 && res.status !== 201)) {
-          console.log("No data returned from server");
-          Toast.show({
-            type: "error",
-            text1: t(`error.noDataReturnedFromServer`),
-          });
-          return;
-        }
-
-        const updated = res.data?.user ?? res.data;
-        await SecureStore.setItemAsync("user", JSON.stringify(updated));
-        setUser(updated);
+        await dispatch(
+          updateUser({
+            name: values.name,
+          }),
+        ).unwrap();
 
         Toast.show({
           type: "success",
           text1: t("toast.successfullySaved"),
           text2: t("toast.youHaveSuccessfullySavedYourName"),
         });
-
-        const [pinStr, bioFlag] = await Promise.all([
-          SecureStore.getItemAsync(PIN_KEY),
-          SecureStore.getItemAsync(BIOMETRY_KEY),
-        ]);
-        setSavedPin(pinStr ?? "");
-        const bio = bioFlag === "true";
-        setBiometryEnabled(bio);
-        setStep(!pinStr ? "setup" : bio ? "biometry" : "pin");
+        setStep(!savedPin ? "setup" : biometryEnabled ? "biometry" : "pin");
       } catch (err: any) {
-        console.log("Set Name error", err);
-        console.log("Set Name error response", err.response);
-        console.log("Set Name error response data", err.response.data);
+        console.log("Set Name error response", err);
       } finally {
         setNameLoading(false);
         setSubmitting(false);
@@ -174,7 +140,7 @@ export default function AuthGate({
     ) => {
       setPinLoading(true);
       try {
-        await SecureStore.setItemAsync(PIN_KEY, values.pin);
+        await savePin(values.pin);
         setSavedPin(values.pin);
         setStep("biometry-ask");
       } finally {
@@ -187,9 +153,7 @@ export default function AuthGate({
   );
 
   const handleBiometryChoice = useCallback(async (enable: boolean) => {
-    await SecureStore.setItemAsync(BIOMETRY_KEY, enable ? "true" : "false");
     await setBiometry(enable);
-    setBiometryEnabled(enable);
     setStep(enable ? "biometry" : "pin");
   }, []);
 
@@ -223,7 +187,7 @@ export default function AuthGate({
   }, [step, t, onAuthenticated]);
 
   const handleCheckPin = useCallback(async () => {
-    const storedPin = await SecureStore.getItemAsync(PIN_KEY);
+    const storedPin = await loadPin();
     if (pin && storedPin && pin === storedPin) {
       onAuthenticated();
     } else {
@@ -250,7 +214,7 @@ export default function AuthGate({
       <Background background={colors.backgroundImage}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
           keyboardVerticalOffset={0}
         >
           <ScrollView contentContainerStyle={styles.scrollCenter}>
@@ -322,7 +286,7 @@ export default function AuthGate({
       <Background background={colors.backgroundImage}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
           keyboardVerticalOffset={0}
         >
           <ScrollView contentContainerStyle={styles.scrollCenter}>
@@ -461,7 +425,7 @@ export default function AuthGate({
     <Background background={colors.backgroundImage}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
         keyboardVerticalOffset={0}
       >
         <ScrollView contentContainerStyle={styles.scrollCenter}>
@@ -539,6 +503,7 @@ const getStyles = (colors: ColorTheme) =>
       width: 180,
       textAlign: "center",
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       borderColor: colors.border,
       borderWidth: 1,
     },

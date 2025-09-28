@@ -11,12 +11,8 @@ import PTMonoFontStylesheet from "@/assets/fonts/entry/PTMonoFontStylesheet";
 import ComforterBrushFontStylesheet from "@/assets/fonts/entry/ComforterBrushFontStylesheet";
 import BadScriptFontStylesheet from "@/assets/fonts/entry/BadScriptFontStylesheet";
 import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStylesheet";
-import { useEffect } from "react";
 
 export default function ViewReachEditor({ content }: { content: string }) {
-  useEffect(() => {
-    console.log("ViewReachEditor content", content);
-  }, []);
   return (
     <RichEditor
       disabled={true}

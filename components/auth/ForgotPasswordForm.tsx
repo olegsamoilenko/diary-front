@@ -186,6 +186,7 @@ const getStyles = (colors: ColorTheme) =>
     },
     input: {
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       padding: 14,
       borderRadius: 8,
       marginBottom: 12,

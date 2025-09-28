@@ -9,17 +9,18 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import i18n from "i18next";
-import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { CodeStatus, ColorTheme, ErrorMessages, User } from "@/types";
+import { CodeStatus, ColorTheme, ErrorMessages } from "@/types";
+import type { Rejected, User } from "@/types";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
-import * as SecureStore from "@/utils/store/secureStore";
-import { passwordRules } from "@/utils/";
+import { logStoredUserData, passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
-import { apiUrl } from "@/constants/env";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@/store";
+import { registerUser } from "@/store/thunks/auth/registerUser";
 
 interface RegisterFormProps {
   forPlanSelect: boolean;
@@ -33,12 +34,15 @@ export default function RegisterForm({
   setShowEmailVerificationCodeForm,
 }: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
-  const lang = useState<string | null>(i18n.language)[0];
+  const lang = useState<string>(i18n.language)[0];
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const [error, setError] = useState<string | null>(null);
+  const [timer, setTimer] = useState(0);
+  const user = useSelector((s: RootState) => s.user.value);
+  const dispatch = useAppDispatch();
 
   const registerSchema = Yup.object().shape({
     email: Yup.string()
@@ -59,45 +63,47 @@ export default function RegisterForm({
       resetForm,
     }: { setSubmitting: (submitting: boolean) => void; resetForm: () => void },
   ) => {
-    const userString = await SecureStore.getItemAsync("user");
-    const user: User = userString ? JSON.parse(userString) : null;
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/registration`, {
-        email: values.email,
-        password: values.password,
-        lang,
-        uuid: user.uuid,
-      });
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setError(
-          t("auth.youCanResendCodeIn") +
-            " " +
-            res.data.retryAfterSec +
-            " " +
-            t("common.sec"),
-        );
-        return;
-      }
+      await dispatch(
+        registerUser({
+          email: values.email,
+          password: values.password,
+          lang,
+          uuid: user!.uuid,
+        }),
+      ).unwrap();
+
       setLoading(false);
       setShowEmailVerificationCodeForm(true);
       resetForm();
       setSubmitting(false);
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
       Toast.show({
         type: "success",
         text1: t("toast.successfullyRegistered"),
         text2: t("toast.youHaveSuccessfullyRegistered"),
       });
     } catch (err: any) {
-      console.log("handle register error", err);
-      console.log("handle register error response", err?.response);
-      console.log("handle register error response data", err?.response?.data);
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
-      const errorKey = ErrorMessages[code];
-      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
-      setLoading(false);
+      const payload = err as Rejected;
+      if (payload.code === CodeStatus.COOLDOWN) {
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(intervalId);
+              setLoading(false);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        console.log("handle registerUser error", payload);
+        const errorKey =
+          ErrorMessages[payload.code as keyof typeof ErrorMessages];
+        setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
+        setLoading(false);
+      }
     }
   };
 
@@ -218,6 +224,17 @@ export default function RegisterForm({
                 {error}
               </ThemedText>
             )}
+            {timer > 0 && (
+              <ThemedText
+                type="small"
+                style={[
+                  styles.error,
+                  { marginBottom: 10, textAlign: "center" },
+                ]}
+              >
+                {t("auth.youCanSendCodeIn")} {timer} {t("common.sec")}
+              </ThemedText>
+            )}
             <TouchableOpacity
               style={styles.btn}
               onPress={() => handleSubmit()}
@@ -234,7 +251,7 @@ export default function RegisterForm({
                     },
                   ]}
                 >
-                  {t("auth.register")}
+                  {t("auth.registration")}
                 </ThemedText>
               )}
             </TouchableOpacity>
@@ -276,6 +293,7 @@ const getStyles = (colors: ColorTheme) =>
     },
     input: {
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       padding: 14,
       borderRadius: 8,
       marginBottom: 12,

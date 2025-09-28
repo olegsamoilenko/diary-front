@@ -1,4 +1,4 @@
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import axios, { isAxiosError } from "axios";
 import { apiUrl } from "@/constants/env";
 import Toast from "react-native-toast-message";

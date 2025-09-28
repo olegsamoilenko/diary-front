@@ -1,3 +1,4 @@
+import "react-native-get-random-values";
 import { Redirect } from "expo-router";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { AppState } from "react-native";

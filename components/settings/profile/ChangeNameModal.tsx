@@ -15,11 +15,9 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme, ErrorMessages } from "@/types";
 import * as Yup from "yup";
-import { UserEvents } from "@/utils/events/userEvents";
-import axios from "axios";
-import { apiUrl } from "@/constants/env";
-import * as SecureStore from "expo-secure-store";
-import { apiRequest } from "@/utils";
+import { useAppDispatch } from "@/store";
+import { updateUser } from "@/store/thunks/auth/updateUser";
+import Toast from "react-native-toast-message";
 
 type ChangeNameModalProps = {
   showChangeNameModal: boolean;
@@ -38,6 +36,7 @@ export default function ChangeNameModal({
   const styles = useMemo(() => getStyles(colors), [colors]);
 
   const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
 
   const changeNameSchema = Yup.object().shape({
     newName: Yup.string().required(t("settings.profile.nameIsRequired")),
@@ -52,31 +51,25 @@ export default function ChangeNameModal({
   ) => {
     setLoading(true);
     setError(null);
-    const userRaw = await SecureStore.getItemAsync("user");
-    const user = userRaw ? JSON.parse(userRaw) : {};
-    const uuid = user.uuid;
-    const hash = user.hash;
     try {
-      const res = await apiRequest({
-        url: `/users/change`,
-        method: "POST",
-        data: {
-          uuid,
-          hash,
-          newName: values.newName,
-        },
+      await dispatch(
+        updateUser({
+          name: values.newName,
+        }),
+      ).unwrap();
+
+      Toast.show({
+        type: "success",
+        text1: t("toast.successfullyUpdated"),
+        text2: t("toast.youHaveSuccessfullyUpdateYourName"),
       });
 
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data));
-
-      UserEvents.emit("userChanged");
-
+      resetForm();
       onSuccessChangeName();
     } catch (err: any) {
       console.log("change name error", err);
       console.log("change name error response", err?.response);
-      console.log("change name error response data", err?.response?.data);
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
+      const code = err?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setLoading(false);
@@ -184,6 +177,7 @@ const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
     input: {
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       borderWidth: 1,
       borderColor: colors.inputBorder,
       padding: 14,

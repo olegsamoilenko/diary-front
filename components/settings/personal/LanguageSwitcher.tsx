@@ -1,25 +1,17 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useState,
-  useMemo,
-  useEffect,
-} from "react";
+import React, { forwardRef, useState, useMemo } from "react";
 import SideSheet, { SideSheetRef } from "@/components/SideSheet";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { Colors } from "@/constants/Colors";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import * as SecureStore from "expo-secure-store";
 import { LocaleConfig } from "react-native-calendars";
 import BackArrow from "@/components/ui/BackArrow";
 import { ThemedText } from "@/components/ThemedText";
 import Background from "@/components/Background";
-import type { User } from "@/types";
 import { Lang } from "@/types";
-import { apiRequest } from "@/utils";
-import { UserEvents } from "@/utils/events/userEvents";
+import { updateSettings } from "@/store/thunks/settings/updateSettings";
+import { useAppDispatch } from "@/store";
 
 const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [lang, setLang] = useState<Lang>(i18n.language as Lang);
@@ -27,6 +19,7 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const dispatch = useAppDispatch();
 
   const languages = useMemo(() => {
     const resources = (i18n.options?.resources ?? { en: {} }) as Record<
@@ -39,44 +32,22 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
     }));
   }, []);
 
-  const handleSelect = useCallback(async (value: Lang) => {
+  async function handleLang(lang: Lang) {
     try {
-      await apiRequest({
-        url: `/users/update-settings`,
-        method: "POST",
-        data: { lang: value },
-      });
-      await i18n.changeLanguage(value);
-      LocaleConfig.defaultLocale = value;
-      setLang(value);
+      await dispatch(updateSettings({ lang })).unwrap();
 
-      const stored = await SecureStore.getItemAsync("user");
-      const user: User | null = stored ? JSON.parse(stored) : null;
-
-      if (user?.settings) {
-        user.settings.lang = value;
-        await SecureStore.setItemAsync("user", JSON.stringify(user));
-      }
+      await i18n.changeLanguage(lang);
+      LocaleConfig.defaultLocale = lang;
+      setLang(lang);
     } catch (error: any) {
-      console.warn("Failed to update lang", error);
-      console.warn("Failed to update lang response", error.response);
-      console.warn("Failed to update lang response data", error.response.data);
+      console.warn("Failed to update timeFormat", error);
+      console.warn("Failed to update timeFormat response", error.response);
+      console.warn(
+        "Failed to update timeFormat response data",
+        error.response.data,
+      );
     }
-  }, []);
-
-  const updateLang = async (user: User) => {
-    if (user?.settings?.lang) {
-      await i18n.changeLanguage(user?.settings?.lang);
-      LocaleConfig.defaultLocale = user?.settings?.lang;
-      setLang(user?.settings?.lang);
-    }
-  };
-
-  useEffect(() => {
-    const handler = (user: User) => updateLang(user);
-    UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
+  }
 
   return (
     <SideSheet ref={ref}>
@@ -91,7 +62,7 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
               <TouchableOpacity
                 key={option.value}
                 style={styles.row}
-                onPress={() => handleSelect(option.value)}
+                onPress={() => handleLang(option.value)}
               >
                 <View
                   style={[

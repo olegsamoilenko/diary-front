@@ -58,7 +58,7 @@
     "weHaveSentYouCodeToDeleteYourAccount": "Ми надіслали вам код для видалення вашого акаунту на електронну пошту.",
     "pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount": "Будь ласка, введіть цей код, щоб підтвердити видалення вашого акаунту",
     "youCanResendCodeIn": "Ви можете надіслати код знову через",
-    "youCanSendCodeIn": "Ви можете надіслати код через",
+    "youCanSendCodeIn": "Ви можете надіслати код через"
   },
   "diary": {
     "title": "Щоденник",
@@ -165,7 +165,8 @@
       "youCurrentPlan": "Ваш поточний план",
       "getTheVersion": "Отримати версію",
       "subscribe": "Підписатися",
-      "unsubscribe": "Відписатися"
+      "unsubscribe": "Відписатися",
+      "manageSubscription": "Керувати підпискою"
     },
     "security": "Безпека",
     "biometry": {
@@ -201,7 +202,7 @@
     "forTesting": "Для тестування",
     "freeForTesting": "Безкоштовно на час тестування",
     "tokensPerMonth": "Токенів/міс",
-    "tokens": "Токенів",
+    "tokens": "Токенів"
   },
   "plans": {
     "start": {
@@ -234,7 +235,7 @@
     "loading": "Завантаження...",
     "or": "або",
     "continue": "Продовжити",
-    "sec": "сек.",
+    "sec": "сек."
   },
   "errors": {
     "invalidPassword": "Ви ввели невірний пароль",
@@ -304,7 +305,30 @@
     "emailAlreadyInUse": "Електронна пошта вже використовується",
     "emailAlreadyInUseLoginEmailPassword": "Електронна пошта вже використовується. Увійдіть за допомогою електронної пошти та пароля",
     "alreadySkipped": "Ця версія вже пропущена",
-    "resubscriptionError": "Помилка повторної підписки"
+    "resubscriptionError": "Помилка повторної підписки",
+    "generationTagsFailed": "Не вдалося створити теги",
+    "staleOrFutureTimestamp": "Застарілий або майбутній часовий штамп",
+    "invalidDeviceSignature": "Недійсний підпис пристрою",
+    "sessionNotFound": "Сесія не знайдена. Зверніться до служби підтримки",
+    "invalidRefreshToken": "Недійсний токен оновлення. Зверніться до служби підтримки.",
+    "invalidGoogleIdToken": "Недійсний Google ID токен.",
+    "sha256InputEmpty": "Вхідні дані для SHA256 порожні",
+    "emailSendFailed": "Не вдалося надіслати електронну пошту.",
+    "missingEnvVariables": "Відсутні необхідні змінні середовища",
+    "failedCreatePlan": "Не вдалося створити план",
+    "errorProcessingSubscription": "Помилка обробки підписки",
+    "failedUpdatePlan": "Не вдалося оновити план",
+    "translationsRequired": "Потрібні переклади",
+    "localeRequired": "Потрібна локаль",
+    "duplicateLocale": "Дубльована локаль",
+    "notificationExists": "Сповіщення вже існує",
+    "allTranslationsEmpty": "Всі переклади порожні",
+    "translationExists": "Переклад вже існує",
+    "planRetrievalError": "Помилка отримання плану",
+    "planUpdateError": "Помилка оновлення плану",
+    "userSettingsNotFound": "Налаштування користувача не знайдено",
+    "userUpdateError": "Помилка оновлення користувача",
+    "userNotFoundAfterUpdate": "Користувача не знайдено після оновлення",
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",
@@ -326,6 +350,7 @@
     "successfullyUpdated": "Успішно оновлено",
     "youHaveSuccessfullyChangedYourName": "Ви успішно змінили своє ім'я",
     "youHaveSuccessfullyChangedYourEmail": "Ви успішно змінили свою електронну пошту",
+    "youHaveSuccessfullyUpdateYourName": "Ви успішно оновили своє ім'я",
     "youHaveSuccessfullyChangedYourPassword": "Ви успішно змінили свій пароль",
     "successfullyChanged": "Успішно змінено",
     "successfullyLoggedOut": "Ви успішно вийшли з додатку"
@@ -346,7 +371,7 @@
   "releaseNotify": {
     "skipThisVersion": "Пропустити цю версію",
     "goToPlayMarket": "Перейти в Play Market",
-    "goToAppStore": "Перейти в App Store",
+    "goToAppStore": "Перейти в App Store"
   },
   "notFond": {
     "title": "Ця сторінка не існує",

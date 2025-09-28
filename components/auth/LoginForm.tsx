@@ -7,20 +7,27 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import * as SecureStore from "@/utils/store/secureStore";
+import * as SecureStore from "expo-secure-store";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { ThemedText } from "@/components/ThemedText";
-import type { ColorTheme, User } from "@/types";
+import type { ColorTheme, Rejected, User } from "@/types";
 import { ErrorMessages } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { passwordRules } from "@/utils/";
+import { logStoredUserData, passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
 import { UserEvents } from "@/utils/events/userEvents";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
+import { RootState, useAppDispatch } from "@/store";
+import { loginUser } from "@/store/thunks/auth/loginUser";
+import { setUser } from "@/store/slices/userSlice";
+import { setSettings } from "@/store/slices/settingsSlice";
+import { setPlan } from "@/store/slices/planSlice";
 
 type LoginFormProps = {
   forPlanSelect?: boolean;
@@ -40,16 +47,8 @@ export default function LoginForm({
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const userString = await SecureStore.getItemAsync("user");
-      const userObj = userString ? JSON.parse(userString) : null;
-      setUser(userObj);
-    };
-    getUser();
-  }, []);
+  const user = useSelector((s: RootState) => s.user.value);
+  const dispatch = useAppDispatch();
 
   const loginSchema = Yup.object().shape({
     email: Yup.string()
@@ -70,15 +69,13 @@ export default function LoginForm({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/login`, {
-        email: values.email,
-        password: values.password,
-        uuid: user?.uuid,
-      });
-      const { accessToken, user: userRes } = res.data;
-
-      await SecureStore.setItemAsync("token", accessToken);
-      await SecureStore.setItemAsync("user", JSON.stringify(userRes));
+      await dispatch(
+        loginUser({
+          email: values.email,
+          password: values.password,
+          uuid: user!.uuid,
+        }),
+      ).unwrap();
 
       setLoading(false);
       resetForm();
@@ -89,13 +86,11 @@ export default function LoginForm({
         text2: t("toast.youHaveSuccessfullyLoggedIn"),
       });
       onSuccessSignIn();
-      UserEvents.emit("userLoggedIn", userRes);
     } catch (err: any) {
-      console.log("err", err);
-      console.log("err response", err?.response);
-      console.log("err response data", err?.response?.data);
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
-      const errorKey = ErrorMessages[code];
+      const payload = err as Rejected;
+      console.log("handle registerUser error", payload);
+      const errorKey =
+        ErrorMessages[payload.code as keyof typeof ErrorMessages];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
       setLoading(false);
     }
@@ -271,6 +266,7 @@ const getStyles = (colors: ColorTheme) =>
     },
     input: {
       backgroundColor: colors.inputBackground,
+      color: colors.text,
       padding: 14,
       borderRadius: 8,
       marginBottom: 12,

@@ -27,8 +27,7 @@ export default function PersonalSettingsBlock({
   const colorScheme = useColorScheme();
   const { theme } = useThemeCustom();
   const colors = Colors[colorScheme];
-  const format = useSelector((state: RootState) => state.timeFormat);
-  const font = useSelector((state: RootState) => state.font);
+  const settings = useSelector((s: RootState) => s.settings.value);
 
   return (
     <View
@@ -105,7 +104,7 @@ export default function PersonalSettingsBlock({
             }}
           >
             <ThemedText>
-              {Fonts.find((f) => f.name === font).title ?? "Default"}
+              {Fonts.find((f) => f.name === settings?.font)?.title ?? "Default"}
             </ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
@@ -137,7 +136,9 @@ export default function PersonalSettingsBlock({
               gap: 10,
             }}
           >
-            <ThemedText>{t(`settings.timeFormat.${format}`)}</ThemedText>
+            <ThemedText>
+              {t(`settings.timeFormat.${settings?.timeFormat}`)}
+            </ThemedText>
             <MaterialCommunityIcons
               name="chevron-right"
               size={28}

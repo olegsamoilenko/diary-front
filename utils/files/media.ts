@@ -4,7 +4,7 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as Crypto from "expo-crypto";
 import { Platform } from "react-native";
 import { ensureOneTimeMediaAsk, getMediaAccess } from "@/utils";
-import type { EntryImage } from "@/types";
+import { EntryImage, EPlatform } from "@/types";
 
 export const ALBUM_NAME = "Nemory";
 
@@ -59,7 +59,7 @@ export async function persistPrivateThenMaybeExportWithMeta(
   const out: OutItem[] = [];
 
   let album: MediaLibrary.Album | null = null;
-  if (opts?.exportToGallery && Platform.OS === "ios") {
+  if (opts?.exportToGallery && Platform.OS === EPlatform.IOS) {
     album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
   }
 
@@ -99,7 +99,7 @@ export async function persistPrivateThenMaybeExportWithMeta(
           if (!album) album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
 
           if (!album) {
-            if (Platform.OS === "android") {
+            if (Platform.OS === EPlatform.ANDROID) {
               album = await MediaLibrary.createAlbumAsync(
                 ALBUM_NAME,
                 undefined as any,
@@ -287,16 +287,14 @@ function getExtFromUri(uri: string): string {
 function getManipulatorFormat(ext: string) {
   if (ext === "jpg" || ext === "jpeg") return ImageManipulator.SaveFormat.JPEG;
   if (ext === "png") return ImageManipulator.SaveFormat.PNG;
-  if (Platform.OS === "android" && ext === "webp")
+  if (Platform.OS === EPlatform.ANDROID && ext === "webp")
     return ImageManipulator.SaveFormat.WEBP;
   return null; // інші формати не підтримуємо → не чіпаємо
 }
 
 export async function deleteEntryImages(entryImages: EntryImage[] | []) {
   if (!entryImages.length) return;
-  console.log("Deleting images, count", entryImages);
   const album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
-  console.log("Deleting images, found album", album);
 
   const assetIds: string[] = [];
 
@@ -308,8 +306,6 @@ export async function deleteEntryImages(entryImages: EntryImage[] | []) {
       if (a?.id) assetIds.push(a.id);
     }
   }
-
-  console.log("Deleting images, assetIds", assetIds);
 
   if (!assetIds.length) return;
 

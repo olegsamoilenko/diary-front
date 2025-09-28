@@ -1,17 +1,31 @@
+import { EPlatform } from "@/types";
+
 export enum Subscriptions {
   NEMORY = "nemory",
   NEMORY_BASE = "nemory_base",
 }
 
 export type Plan = {
-  name: string;
+  platform: EPlatform;
+  regionCode: string | null;
+  subscriptionId: Subscriptions;
+  basePlanId: BasePlanIds;
+  name: Plans;
   price: number;
+  currency: string | null;
   tokensLimit: number;
+  usedTokens: number;
   descriptionKey: string;
+  purchaseToken: string | null;
+  linkedPurchaseToken: string | null;
+  startTime: Date | string;
+  expiryTime: Date | string | null;
+  autoRenewEnabled: boolean | null;
   type?: PlanTypes;
-  periodStart?: Date;
-  periodEnd?: Date;
-  status?: PlanStatus;
+  userId?: number;
+  payments: any[];
+  planStatus?: PlanStatus;
+  actual: boolean;
   usedTrial?: boolean;
 };
 
@@ -40,4 +54,12 @@ export enum BasePlanIds {
   LITE_M1 = "lite-m1",
   BASE_M1 = "base-m1",
   PRO_M1 = "pro-m1",
+}
+
+export enum Plans {
+  FOR_TESTING = "For testing",
+  START = "Start",
+  LITE = "Lite",
+  BASE = "Base",
+  PRO = "Pro",
 }

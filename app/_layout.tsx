@@ -10,44 +10,41 @@ import "@/constants/CalendarLocale";
 import { ThemeProvider as NavThemeProvider } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
-import { Provider, useDispatch } from "react-redux";
-import { store } from "@/store";
+import { Provider, useSelector } from "react-redux";
+import { store, RootState, useAppDispatch } from "@/store";
 import { ThemeProviderCustom, useThemeCustom } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { BiometryProvider } from "@/context/BiometryContext";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
 import CustomToast from "@/components/ui/CustomToast";
-
 import { Colors } from "@/constants/Colors";
 import { NavigationThemes } from "@/constants/Theme";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-
-import * as SecureStore from "@/utils/store/secureStore";
 import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
-import uuid from "react-native-uuid";
-import { apiRequest } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
-import type { User } from "@/types";
+import type { User, UserSettings } from "@/types";
 import { Lang } from "@/types";
-
-import { resetFont } from "@/store/slices/settings/fontSlice";
-import { resetTimeFormat } from "@/store/slices/settings/timeFormatSlice";
-import { resetAiModel } from "@/store/slices/settings/aiModelSlice";
-import { useHydrateSettings } from "@/hooks/useHydrateSettings";
+import { resetPlan } from "@/store/slices/planSlice";
+import { resetSettings } from "@/store/slices/settingsSlice";
+import { resetUser, setUser } from "@/store/slices/userSlice";
 import * as Localization from "expo-localization";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IapProvider } from "@/context/IapContext";
-
-const AuthGate = lazy(() => import("@/components/auth/AuthGate"));
-const AuthForm = lazy(() => import("@/components/auth/AuthForm"));
-const HandleSubscription = lazy(
-  () => import("@/components/auth/HandleSubscription"),
-);
-const RegisterOrNot = lazy(() => import("@/components/auth/RegisterOrNot"));
+import { hydrateAll } from "@/store/hydrate";
+import { initAnonymousUser } from "@/store/thunks/auth/initAnonymousUser";
+import { loadRegisterOrNot } from "@/utils/store/storage";
+import { updateUser } from "@/store/thunks/auth/updateUser";
+import { logStoredUserData } from "@/utils/storedUserData";
+import { getMe } from "@/store/thunks/auth/getMe";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import AuthGate from "@/components/auth/AuthGate";
+import AuthForm from "@/components/auth/AuthForm";
+import HandleSubscription from "@/components/auth/HandleSubscription";
+import RegisterOrNot from "@/components/auth/RegisterOrNot";
 
 function NavigationThemeWrapper({ children }: { children: React.ReactNode }) {
   const { theme } = useThemeCustom();
@@ -100,43 +97,51 @@ export default function RootLayout() {
     "Yeseva One": require("@/assets/fonts/entry/YesevaOne-Regular.ttf"),
   });
 
+  const [loader, setLoader] = useState(false);
+
   useEffect(() => {
-    let cancelled = false;
+    setLoader(true);
+    if (!loaded) return;
     (async () => {
       // await Promise.allSettled([
-      //   SecureStore.deleteItemAsync("token"),
+      //   SecureStore.deleteItemAsync("access_token"),
+      //   SecureStore.deleteItemAsync("refresh_token"),
+      //   SecureStore.deleteItemAsync("device_id"),
       //   SecureStore.deleteItemAsync("user"),
       //   SecureStore.deleteItemAsync("user_pin"),
       //   SecureStore.deleteItemAsync("biometry_enabled"),
+      //   SecureStore.deleteItemAsync("device_sk_b64"),
+      //   SecureStore.deleteItemAsync("device_pk_b64"),
       //   AsyncStorage.removeItem("show_welcome"),
       //   AsyncStorage.removeItem("register_or_not"),
+      //   AsyncStorage.removeItem("plan"),
+      //   AsyncStorage.removeItem("settings"),
       // ]);
-      // const token = await SecureStore.getItemAsync("token");
-      // console.log("token", token);
-      // const storedUser = await SecureStore.getItemAsync("user");
-      // console.log("storedUser", JSON.parse(storedUser));
-      // const userPin = await SecureStore.getItemAsync("user_pin");
-      // console.log("userPin", userPin);
-      // const biometryEnabled =
-      //   await SecureStore.getItemAsync("biometry_enabled");
-      // console.log("biometryEnabled", biometryEnabled);
-      // const showWelcome = await AsyncStorage.getItem("show_welcome");
-      // console.log("showWelcome", showWelcome);
-      // const registerOrNot = await AsyncStorage.getItem("register_or_not");
-      // console.log("registerOrNot", registerOrNot);
+      // unstable_batchedUpdates(() => {
+      //   store.dispatch(resetUser());
+      //   store.dispatch(resetSettings());
+      //   store.dispatch(resetPlan());
+      // });
+      await logStoredUserData();
 
-      if (!cancelled) {
-        const stored = await SecureStore.getItemAsync("user");
-        let u: User | null = stored ? JSON.parse(stored) : null;
-        if (!u) {
-          u = await createAnonymousUser();
+      const token = await SecureStore.getItemAsync("access_token");
+
+      if (token) {
+        try {
+          await store.dispatch(getMe()).unwrap();
+        } catch (err) {
+          console.error("Get me failed", err);
+        }
+      } else {
+        const state = store.getState() as any;
+        if (!state.user.value) {
+          await store.dispatch(initAnonymousUser()).unwrap();
         }
       }
+
+      setLoader(false);
     })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  }, [loaded]);
 
   if (!loaded) return null;
 
@@ -149,9 +154,13 @@ export default function RootLayout() {
               <AuthProvider>
                 <BiometryProvider>
                   <PortalProvider>
-                    <Suspense fallback={null}>
-                      <AppContent />
-                    </Suspense>
+                    {!loader && (
+                      <>
+                        <Suspense fallback={null}>
+                          <AppContent />
+                        </Suspense>
+                      </>
+                    )}
                     <CustomToast />
                   </PortalProvider>
                 </BiometryProvider>
@@ -164,93 +173,22 @@ export default function RootLayout() {
   );
 }
 
-async function createAnonymousUser(): Promise<User | null> {
-  const lang = i18n.language;
-  const theme = Appearance.getColorScheme();
-  const platform = Platform.OS;
-  const locales = Localization.getLocales();
-  const regionCode = locales[0].regionCode;
-  console.log("locales1", locales);
-  try {
-    const newUuid = uuid.v4();
-    const res = await apiRequest({
-      url: `/users/create-by-uuid`,
-      method: "POST",
-      data: { uuid: newUuid, lang, theme, platform, regionCode },
-    });
-    if (res?.status === 201) {
-      const data = await res.data;
-      await SecureStore.setItemAsync("token", data.accessToken);
-      await SecureStore.setItemAsync("user", JSON.stringify(data.user));
-      return data.user as User;
-    }
-  } catch (err: any) {
-    console.warn("Failed to create anonymous user error", err);
-    console.warn("Failed to create anonymous user response", err.response);
-    console.warn(
-      "Failed to create anonymous user response data",
-      err.response.data,
-    );
-  }
-  return null;
-}
-
 function AppContent() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const { resetToSystem } = useThemeCustom();
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const stored = await SecureStore.getItemAsync("user");
-        const u: User | null = stored ? JSON.parse(stored) : null;
-
-        if (cancelled) return;
-
-        setUser(u);
-
-        const lang = u?.settings?.lang;
-        if (lang) {
-          await i18n.changeLanguage(lang);
-          LocaleConfig.defaultLocale = lang;
-        }
-      } catch (err: any) {
-        console.warn("Failed to init user/lang", err);
-        console.warn("Failed to init user/lang response", err.response);
-        console.warn(
-          "Failed to init user/lang response data",
-          err.response.data,
-        );
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useHydrateSettings(user);
+  const user = useSelector((s: RootState) => s.user.value);
+  const settings = useSelector((s: RootState) => s.settings.value);
 
   useUpdateLastActive(user);
 
   useEffect(() => {
     let cancelled = false;
     const onUserDeleted = async () => {
-      const fresh = await createAnonymousUser();
-
       if (cancelled) return;
-      setUser(fresh);
-      unstable_batchedUpdates(() => {
-        dispatch(resetFont());
-        dispatch(resetAiModel());
-        dispatch(resetTimeFormat());
-      });
       resetToSystem();
       setIsAuthenticated(false);
 
@@ -259,6 +197,12 @@ function AppContent() {
 
       await i18n.changeLanguage(deviceLanguage);
       LocaleConfig.defaultLocale = deviceLanguage;
+
+      try {
+        await store.dispatch(initAnonymousUser()).unwrap();
+      } catch (err) {
+        console.log("Failed to init anonymous user after deletion", err);
+      }
     };
 
     UserEvents.on("userDeleted", onUserDeleted);
@@ -279,22 +223,16 @@ function AppContent() {
 
   return (
     <>
-      <MainAfterAuth user={user} setUser={setUser} />
+      <MainAfterAuth />
       <StatusBar translucent style={colors.barStyle} />
     </>
   );
 }
 
-function MainAfterAuth({
-  user,
-  setUser,
-}: {
-  user: User | null;
-  setUser: (u: User | null) => void;
-}) {
+function MainAfterAuth() {
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [showRegisterOrNot, setShowRegisterOrNot] = useState<boolean | null>(
-    false,
+    null,
   );
   const [continueWithoutRegistration, setContinueWithoutRegistration] =
     useState(false);
@@ -302,19 +240,21 @@ function MainAfterAuth({
     "RegisterOrNot" | "AuthForm" | null
   >(null);
 
+  const plan = useSelector((s: RootState) => s.plan.value);
+
+  const getRegisterOrNot = async () => {
+    const v = await loadRegisterOrNot();
+    if (typeof v !== "boolean") {
+      console.warn("register_or_not is NOT boolean:", v);
+      setShowRegisterOrNot(v === true || v === "true");
+      return;
+    }
+    setShowRegisterOrNot(v);
+  };
+
   useEffect(() => {
-    const getRegisterOrNot = async () => {
-      const stored = await AsyncStorage.getItem("register_or_not");
-      const value = stored === null ? true : stored === "true";
-      setShowRegisterOrNot(value);
-    };
     getRegisterOrNot();
   }, []);
-
-  const onSuccessHandleSubscription = async () => {
-    const storedUser = await SecureStore.getItemAsync("user");
-    setUser(storedUser ? JSON.parse(storedUser) : null);
-  };
 
   if (showRegisterOrNot) {
     return (
@@ -353,11 +293,10 @@ function MainAfterAuth({
     );
   }
 
-  if (!user?.plan) {
+  if (!plan) {
     return (
       <HandleSubscription
         setShowRegisterOrNot={setShowRegisterOrNot}
-        onSuccess={onSuccessHandleSubscription}
         continueWithoutRegistration={continueWithoutRegistration}
         back={() => {
           if (handleSubscriptionPrevStep === "AuthForm") {
@@ -372,7 +311,9 @@ function MainAfterAuth({
 
   return <Stack screenOptions={{ headerShown: false }} />;
 }
+
 function useUpdateLastActive(user: User | null) {
+  const dispatch = useAppDispatch();
   useEffect(() => {
     if (!user?.id) return;
 
@@ -382,19 +323,16 @@ function useUpdateLastActive(user: User | null) {
       if (now - last < 15_000) return;
       last = now;
       try {
-        await apiRequest({
-          url: `/users/update`,
-          method: "POST",
-          data: { lastActiveAt: new Date().toISOString() },
-        });
-      } catch {}
+        await dispatch(
+          updateUser({
+            lastActiveAt: new Date().toISOString(),
+          }),
+        ).unwrap();
+      } catch (err: any) {
+        console.log("Set Name error response", err);
+      }
     };
 
-    // const sub = AppState.addEventListener("change", (s) => {
-    //   if (s === "active") send();
-    // });
     send();
-
-    // return () => sub.remove();
   }, [user?.id]);
 }
