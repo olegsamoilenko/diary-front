@@ -29,10 +29,9 @@ export const changeUserAuthData = createAsyncThunk<
 
       if (!data) {
         return rejectWithValue({
-          message: "updateUser Unexpected empty response",
+          message: "changeUserAuthData Unexpected empty response",
         });
       }
-      console.log("changeUserAuthData data", data);
 
       if (data.user) {
         dispatch(setUser(data.user));
@@ -46,7 +45,9 @@ export const changeUserAuthData = createAsyncThunk<
         | StatusCode
         | undefined;
       const msg =
-        err?.response?.data?.message ?? err?.message ?? "Update user failed";
+        err?.response?.data?.message ??
+        err?.message ??
+        "changeUserAuthData failed";
       return rejectWithValue({ status, message: msg, code });
     }
   },

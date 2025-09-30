@@ -58,7 +58,14 @@
     "weHaveSentYouCodeToDeleteYourAccount": "Ми надіслали вам код для видалення вашого акаунту на електронну пошту.",
     "pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount": "Будь ласка, введіть цей код, щоб підтвердити видалення вашого акаунту",
     "youCanResendCodeIn": "Ви можете надіслати код знову через",
-    "youCanSendCodeIn": "Ви можете надіслати код через"
+    "youCanSendCodeIn": "Ви можете надіслати код через",
+    "textRequired": "Текст обов'язковий",
+    "categoryRequired": "Категорія обов'язкова",
+    "refreshSession": "Оновити сесію",
+    "refreshWithGoogle": "Оновити через Google",
+    "signUpWithGoogle": "Зареєструватися через Google",
+    "refreshWithEmail": "Оновити через Email",
+    "titleRequired": "Заголовок обов'язковий"
   },
   "diary": {
     "title": "Щоденник",
@@ -193,6 +200,19 @@
       "notLoggedIn": "Не увійшли",
       "loggedOut": "Вийшли",
       "notRegister": "Не зареєстрований"
+    },
+    "support": {
+      "title": "Підтримка",
+      "askQuestion": "Задати питання",
+      "reportABug": "Повідомити про помилку",
+      "suggestAnImprovement": "Запропонувати покращення",
+      "leaveAReview": "Залишити відгук",
+      "other": "Інше",
+      "selectCategory": "Виберіть категорію",
+      "describeYourRequest": "Опишіть Ваше звернення",
+      "addDetails": "Додайте деталі, які допоможуть нам швидше вам допомогти",
+      "messageSent": "Повідомлення надіслано",
+      "thankYouForReachingOut": "Дякуємо, що звернулися до нас! Ми цінуємо ваш відгук відповімо якомога швидше."
     }
   },
   "planModal": {
@@ -235,7 +255,9 @@
     "loading": "Завантаження...",
     "or": "або",
     "continue": "Продовжити",
-    "sec": "сек."
+    "sec": "сек.",
+    "select": "Вибрати",
+    "title": "Заголовок",
   },
   "errors": {
     "invalidPassword": "Ви ввели невірний пароль",
@@ -329,6 +351,7 @@
     "userSettingsNotFound": "Налаштування користувача не знайдено",
     "userUpdateError": "Помилка оновлення користувача",
     "userNotFoundAfterUpdate": "Користувача не знайдено після оновлення",
+    "userMismatch": "Надані userId та uuid не відповідають жодному існуючому користувачеві"
   },
   "toast": {
     "successfullyLogged": "Успішно увійшли",
@@ -353,7 +376,9 @@
     "youHaveSuccessfullyUpdateYourName": "Ви успішно оновили своє ім'я",
     "youHaveSuccessfullyChangedYourPassword": "Ви успішно змінили свій пароль",
     "successfullyChanged": "Успішно змінено",
-    "successfullyLoggedOut": "Ви успішно вийшли з додатку"
+    "successfullyLoggedOut": "Ви успішно вийшли з додатку",
+    "successfullyRefreshed": "Успішно оновлено",
+    "youHaveSuccessfullyRefreshedYourSession": "Ви успішно оновили свою сесію"
   },
   "welcome": {
     "title": "Ласкаво просимо до Розумного Щоденника",

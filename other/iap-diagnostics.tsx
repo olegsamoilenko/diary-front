@@ -25,7 +25,10 @@ export default function IapDiagnostics() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScrollView
+      contentContainerStyle={{ padding: 16 }}
+      showsVerticalScrollIndicator={false}
+    >
       <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 8 }}>
         IAP diagnostics
       </Text>

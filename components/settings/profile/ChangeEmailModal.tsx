@@ -21,6 +21,8 @@ import { changeUserAuthData } from "@/store/thunks/auth/changeUserAuthData";
 import { useAppDispatch } from "@/store";
 import { verifyUserEmail } from "@/store/thunks/auth/verifyUserEmail";
 import { resendEmailVerificationCodeApi } from "@/utils/api/endpoints/auth/resendEmailVerificationCodeApi";
+import ThemedTextInput from "@/components/ui/ThemedTextInput";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 type ChangeEmailModalProps = {
   showChangeEmailModal: boolean;
@@ -48,6 +50,7 @@ export default function ChangeEmailModal({
   const [resendTimer, setResendTimer] = useState(0);
   const dispatch = useAppDispatch();
   const lang = useState<string>(i18n.language)[0];
+  const ui = useUIStyles();
 
   const changeEmailSchema = Yup.object().shape({
     email: Yup.string()
@@ -247,79 +250,53 @@ export default function ChangeEmailModal({
                   marginBottom: 20,
                 }}
               >
-                <ThemedText style={styles.label}>{t("auth.email")}</ThemedText>
-                <TextInput
+                <ThemedText style={ui.label}>{t("auth.email")}</ThemedText>
+                <ThemedTextInput
+                  name="email"
+                  touched={touched}
+                  errors={errors}
                   placeholder={t("auth.email")}
-                  style={styles.input}
+                  containerStyle={{
+                    marginBottom: 16,
+                  }}
                   value={values.email}
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  placeholderTextColor={colors.inputPlaceholder}
                 />
-                {touched.email && errors.email && (
-                  <ThemedText
-                    type={"small"}
-                    style={{
-                      color: colors.error,
-                      marginTop: -10,
-                      marginBottom: 20,
-                    }}
-                  >
-                    {errors.email}
-                  </ThemedText>
-                )}
-                <ThemedText style={styles.label}>
-                  {t("auth.password")}
-                </ThemedText>
-                <TextInput
+                <ThemedText style={ui.label}>{t("auth.password")}</ThemedText>
+                <ThemedTextInput
+                  name="password"
+                  touched={touched}
+                  errors={errors}
                   placeholder={t("auth.password")}
-                  style={styles.input}
+                  containerStyle={{
+                    marginBottom: 16,
+                  }}
                   value={values.password}
                   onChangeText={handleChange("password")}
                   onBlur={handleBlur("password")}
                   secureTextEntry
                   autoCapitalize="none"
-                  placeholderTextColor={colors.inputPlaceholder}
                 />
-                {touched.password && errors.password && (
-                  <ThemedText
-                    type={"small"}
-                    style={{
-                      color: colors.error,
-                      marginTop: -10,
-                      marginBottom: 20,
-                    }}
-                  >
-                    {errors.password}
-                  </ThemedText>
-                )}
-                <ThemedText style={styles.label}>
+                <ThemedText style={ui.label}>
                   {t("settings.profile.newEmail")}
                 </ThemedText>
-                <TextInput
+                <ThemedTextInput
+                  name="newEmail"
+                  touched={touched}
+                  errors={errors}
                   placeholder={t("settings.profile.newEmail")}
-                  style={styles.input}
+                  containerStyle={{
+                    marginBottom: 16,
+                  }}
                   value={values.newEmail}
                   onChangeText={handleChange("newEmail")}
                   onBlur={handleBlur("newEmail")}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  placeholderTextColor={colors.inputPlaceholder}
                 />
-                {touched.newEmail && errors.newEmail && (
-                  <ThemedText
-                    type={"small"}
-                    style={{
-                      color: colors.error,
-                      marginTop: -10,
-                      marginBottom: 20,
-                    }}
-                  >
-                    {errors.newEmail}
-                  </ThemedText>
-                )}
               </View>
               {error && (
                 <ThemedText
@@ -342,7 +319,7 @@ export default function ChangeEmailModal({
                 </ThemedText>
               )}
               <TouchableOpacity
-                style={styles.btn}
+                style={ui.btnPrimary}
                 onPress={() => {
                   setError(null);
                   handleSubmit();
@@ -370,30 +347,28 @@ export default function ChangeEmailModal({
           <ThemedText style={styles.label}>
             {t("auth.weHaveSentYouCodeByEmail")}
           </ThemedText>
-          <TextInput
+          <ThemedTextInput
+            name="pin"
+            errorMessage={error}
             value={code}
             onChangeText={setCode}
             keyboardType="number-pad"
             maxLength={6}
-            style={[
-              styles.input,
-              { letterSpacing: 5, width: 180, textAlign: "center" },
-            ]}
+            inputStyle={{
+              letterSpacing: 5,
+              textAlign: "center",
+              minWidth: 180,
+              paddingTop: 10,
+              paddingBottom: 8,
+            }}
+            containerStyle={{
+              marginBottom: 16,
+            }}
+            errorStyle={{
+              textAlign: "center",
+            }}
             placeholder="******"
-            placeholderTextColor={colors.inputPlaceholder}
           />
-          {error && (
-            <ThemedText
-              type={"small"}
-              style={{
-                color: colors.error,
-                marginTop: -10,
-                marginBottom: 20,
-              }}
-            >
-              {error}
-            </ThemedText>
-          )}
           {!resendTimer && (
             <TouchableOpacity
               style={{
@@ -430,7 +405,7 @@ export default function ChangeEmailModal({
             </ThemedText>
           )}
           <TouchableOpacity
-            style={styles.btn}
+            style={ui.btnPrimary}
             onPress={() => handleSubmit()}
             disabled={loading}
           >

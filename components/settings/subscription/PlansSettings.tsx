@@ -87,6 +87,8 @@ const PlansSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
           />
         ) : showAuthForm ? (
           <AuthForm
+            isLogin={true}
+            isRegister={true}
             forPlanSelect={true}
             onSuccessSignWithGoogle={onAuthSuccess}
             onSuccessEmailCode={onAuthSuccess}

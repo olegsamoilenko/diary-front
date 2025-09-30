@@ -24,6 +24,7 @@ import type {
 } from "./notifications";
 import { EPlatform } from "./platform";
 import { IapProduct } from "./subscription";
+import { SupportCategory } from "./support";
 
 export type {
   ColorTheme,
@@ -64,4 +65,5 @@ export {
   BasePlanIds,
   EPlatform,
   IapProduct,
+  SupportCategory,
 };

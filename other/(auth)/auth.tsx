@@ -30,6 +30,7 @@ export default function AuthScreen() {
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.logo}>
           <Text style={styles.logoText}>Nemory</Text>

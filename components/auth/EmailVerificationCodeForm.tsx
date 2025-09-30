@@ -18,6 +18,8 @@ import { RootState, useAppDispatch } from "@/store";
 import { verifyUserEmail } from "@/store/thunks/auth/verifyUserEmail";
 import { useSelector } from "react-redux";
 import { resendEmailVerificationCodeApi } from "@/utils/api/endpoints/auth/resendEmailVerificationCodeApi";
+import ThemedTextInput from "@/components/ui/ThemedTextInput";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 type EmailVerificationCodeFormProps = {
   forPlanSelect: boolean;
@@ -39,6 +41,7 @@ export default function EmailVerificationCodeForm({
   const [timer, setTimer] = useState(0);
   const dispatch = useAppDispatch();
   const user = useSelector((s: RootState) => s.user.value);
+  const ui = useUIStyles();
 
   const handleSubmit = async () => {
     if (code.length !== 6) {
@@ -127,20 +130,28 @@ export default function EmailVerificationCodeForm({
       <ThemedText style={styles.label}>
         {t("auth.weHaveSentYouCodeByEmail")}
       </ThemedText>
-      <TextInput
+      <ThemedTextInput
+        name="code"
         value={code}
         onChangeText={setCode}
         keyboardType="number-pad"
         maxLength={6}
-        style={[styles.input, { letterSpacing: 5 }]}
         placeholder="******"
-        placeholderTextColor={colors.inputPlaceholder}
+        inputStyle={{
+          letterSpacing: 5,
+          textAlign: "center",
+          minWidth: 180,
+          paddingTop: 10,
+          paddingBottom: 8,
+        }}
+        containerStyle={{
+          marginBottom: 16,
+        }}
+        errorStyle={{
+          textAlign: "center",
+        }}
+        errorMessage={error}
       />
-      {error && (
-        <ThemedText type={"small"} style={styles.error}>
-          {error}
-        </ThemedText>
-      )}
 
       {!timer && (
         <TouchableOpacity
@@ -175,7 +186,7 @@ export default function EmailVerificationCodeForm({
         </ThemedText>
       )}
       <TouchableOpacity
-        style={styles.btn}
+        style={ui.btnPrimary}
         onPress={() => handleSubmit()}
         disabled={loading}
       >
@@ -207,7 +218,7 @@ const getStyles = (colors: ColorTheme) =>
       padding: 20,
     },
     label: {
-      fontSize: 18,
+      fontSize: 16,
       marginBottom: 16,
       textAlign: "center",
       fontWeight: "500",
@@ -216,23 +227,6 @@ const getStyles = (colors: ColorTheme) =>
       color: colors.error,
       marginTop: -10,
       marginBottom: 20,
-    },
-    input: {
-      borderRadius: 12,
-      padding: 12,
-      fontSize: 20,
-      marginBottom: 16,
-      width: 180,
-      textAlign: "center",
-      backgroundColor: colors.inputBackground,
-      color: colors.text,
-    },
-    btn: {
-      paddingHorizontal: 18,
-      paddingVertical: 10,
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      textAlign: "center",
     },
     resendCodeBtn: {
       paddingHorizontal: 18,

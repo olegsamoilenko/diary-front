@@ -18,6 +18,8 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
 import i18n from "i18next";
+import { changePasswordApi } from "@/utils/api/endpoints/auth/changePasswordApi";
+import { forgotPasswordApi } from "@/utils/api/endpoints/auth/forgotPasswordApi";
 
 export default function ChangePasswordForm({
   email,
@@ -63,14 +65,10 @@ export default function ChangePasswordForm({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/change-password`, {
-        email,
-        code: values.code,
-        password: values.password,
-      });
+      const res = await changePasswordApi(email, values.code, values.password);
 
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setTimer(res.data.retryAfterSec || 0);
+      if (res && res.status === CodeStatus.COOLDOWN) {
+        setTimer(res.retryAfterSec || 0);
         const intervalId = setInterval(() => {
           setTimer((prev) => {
             if (prev <= 1) {
@@ -89,13 +87,11 @@ export default function ChangePasswordForm({
       onSuccess();
       Toast.show({
         type: "success",
-        text1: t("toast.successfullySend"),
+        text1: t("toast.successfullyChanged"),
         text2: t("toast.youHaveSuccessfullyChangedYourPassword"),
       });
     } catch (err: any) {
-      console.log("Change password error", err);
       console.log("Change password error response", err?.response);
-      console.log("Change password error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
@@ -108,13 +104,10 @@ export default function ChangePasswordForm({
     setResendLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/reset-password`, {
-        email: email,
-        lang,
-      });
+      const res = await forgotPasswordApi(email, lang as string);
 
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setResendTimer(res.data.retryAfterSec || 0);
+      if (res && res.status === CodeStatus.COOLDOWN) {
+        setResendTimer(res.retryAfterSec || 0);
         const intervalId = setInterval(() => {
           setResendTimer((prev) => {
             if (prev <= 1) {
@@ -137,7 +130,6 @@ export default function ChangePasswordForm({
     } catch (err: any) {
       console.log("reset password error", err);
       console.log("reset password error response", err?.response);
-      console.log("reset password error response data", err?.response?.data);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));

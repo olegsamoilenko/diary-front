@@ -25,7 +25,7 @@ import ModalPortal from "@/components/ui/Modal";
 import { ExpandableSection } from "@/components/ExpandableSection";
 import RotatingIcon from "@/components/ui/RotatingIcon";
 
-import type { ColorTheme, Entry, Dialog, User } from "@/types";
+import { ColorTheme, Entry, Dialog, User, TimeFormat } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import type { RootState } from "@/store";
@@ -50,7 +50,7 @@ export default React.memo(function EntryCard({
   const styles = useMemo(() => getStyles(colors), [colors]);
 
   const { t } = useTranslation();
-  const timeFormat = useSelector((state: RootState) => state.timeFormat);
+  const settings = useSelector((state: RootState) => state.settings.value);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
@@ -111,13 +111,13 @@ export default React.memo(function EntryCard({
         .toLocaleTimeString(i18n.language!, {
           hour: "2-digit",
           minute: "2-digit",
-          hour12: timeFormat === "12h",
+          hour12: settings?.timeFormat === TimeFormat["12_H"],
         })
         .toUpperCase();
     } catch {
       return "";
     }
-  }, [entry.createdAt, timeFormat]);
+  }, [entry.createdAt, settings?.timeFormat]);
 
   const background = useMemo(
     () =>

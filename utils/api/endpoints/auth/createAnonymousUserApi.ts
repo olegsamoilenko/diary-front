@@ -36,7 +36,7 @@ export async function createAnonymousUserApi() {
         devicePubKey,
       },
     });
-    if (res?.status !== 201) return null;
+    if (res?.status !== 201 && res?.status !== 200) return null;
     return res.data as {
       accessToken: string;
       refreshToken: string;

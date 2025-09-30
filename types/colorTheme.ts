@@ -10,6 +10,7 @@ export type ColorTheme = {
   disabledPrimary: string;
   secondary: string;
   text: string;
+  textDisabled: string;
   textAdditional: string;
   textInPrimary: string;
   link: string;

@@ -8,7 +8,6 @@ export async function getMeApi(hash: string) {
       method: "POST",
       data: { hash },
     });
-    console.log("Get me response", res);
     if (res?.status !== 201 && res?.status !== 200) return null;
     return res.data as {
       user?: User;

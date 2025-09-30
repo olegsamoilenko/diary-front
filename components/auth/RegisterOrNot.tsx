@@ -7,6 +7,7 @@ import NemoryLogo from "@/components/ui/logo/NemoryLogo";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { saveRegisterOrNot } from "@/utils/store/storage";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 type RegisterOrNotProps = {
   setShowAuthForm: (show: boolean) => void;
@@ -21,6 +22,7 @@ export default function RegisterOrNot({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
+  const ui = useUIStyles();
 
   const handleRegistration = async () => {
     setShowAuthForm(true);
@@ -51,20 +53,11 @@ export default function RegisterOrNot({
           marginHorizontal: 20,
         }}
       >
-        <TouchableOpacity
-          style={{
-            paddingHorizontal: 18,
-            paddingVertical: 10,
-            backgroundColor: colors.primary,
-            borderRadius: 12,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          onPress={handleRegistration}
-        >
+        <TouchableOpacity style={ui.btnPrimary} onPress={handleRegistration}>
           <ThemedText
             style={{
               color: colors.textInPrimary,
+              textAlign: "center",
             }}
           >
             {t("auth.registerOrLogin")}
@@ -104,19 +97,13 @@ export default function RegisterOrNot({
           ></View>
         </View>
         <TouchableOpacity
-          style={{
-            paddingHorizontal: 18,
-            paddingVertical: 10,
-            backgroundColor: colors.primary,
-            borderRadius: 12,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          style={ui.btnPrimary}
           onPress={handleWithoutRegistration}
         >
           <ThemedText
             style={{
               color: colors.textInPrimary,
+              textAlign: "center",
             }}
           >
             {t("auth.continueWithoutRegistration")}

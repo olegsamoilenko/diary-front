@@ -78,7 +78,10 @@ export default function HandleSubscription({
           color={colors.primary}
         />
       </TouchableOpacity>
-      <ScrollView contentContainerStyle={styles.scrollView}>
+      <ScrollView
+        contentContainerStyle={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           {showPayment ? (
             <Payment onSuccessPayment={onSuccessPayment} plan={plan} />

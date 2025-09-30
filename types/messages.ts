@@ -63,4 +63,5 @@ export enum ErrorMessages {
   USER_SETTINGS_NOT_FOUND = "userSettingsNotFound",
   USER_UPDATE_ERROR = "userUpdateError",
   USER_NOT_FOUND_AFTER_UPDATE = "userNotFoundAfterUpdate",
+  USER_MISMATCH = "userMismatch",
 }

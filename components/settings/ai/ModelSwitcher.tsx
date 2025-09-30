@@ -44,7 +44,10 @@ const ModelSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           <ThemedText type={"titleLG"}>
             {t("settings.model.titlePlural")}
           </ThemedText>
-          <ScrollView style={{ marginBottom: 0 }}>
+          <ScrollView
+            style={{ marginBottom: 0 }}
+            showsVerticalScrollIndicator={false}
+          >
             {AI_MODELS.map((model) => (
               <TouchableOpacity
                 key={model}

@@ -36,7 +36,7 @@ export const verifyUserEmail = createAsyncThunk<
 
       if (!data) {
         return rejectWithValue({
-          message: "Login No response from server",
+          message: "verifyUserEmail No response from server",
         });
       }
 

@@ -18,7 +18,14 @@ import {
   ActivityIndicator,
   Pressable,
 } from "react-native";
-import { ColorTheme, Entry, EPlatform, PlanStatus } from "@/types";
+import {
+  ColorTheme,
+  Entry,
+  EPlatform,
+  PlanStatus,
+  AiModel,
+  Font,
+} from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import {
@@ -34,7 +41,6 @@ import {
   tokeniseInlineBase64,
   hydrateHtmlWithLocalUris,
 } from "@/utils";
-import { useAppSelector } from "@/store/hooks";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BackArrow from "@/components/ui/BackArrow";
@@ -49,7 +55,7 @@ import RichToolbar from "@/components/ui/RichToolbar";
 import SettingsEntry from "@/components/diary/add-new-entry/settings-entry/SettingsEntry";
 import { FONTS } from "@/assets/fonts/entry";
 import { useSelector } from "react-redux";
-import type { RootState } from "@/store";
+import { RootState, useAppDispatch } from "@/store";
 import * as SecureStore from "expo-secure-store";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
@@ -73,11 +79,11 @@ const AddNewEntry = forwardRef<
     tabBarHeight: number;
   }
 >((props, ref) => {
-  const aiModel = useAppSelector((state) => state.aiModel);
+  const settings = useSelector((state: RootState) => state.settings.value);
+  const plan = useSelector((state: RootState) => state.plan.value);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const styles = useMemo(() => getStyles(colors), [colors]);
-  const font = useSelector((state: RootState) => state.font);
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
@@ -105,6 +111,7 @@ const AddNewEntry = forwardRef<
   const [textReachEditorKey, setTextReachEditorKey] = useState(0);
   const [titleReachEditorKey, setTitleReachEditorKey] = useState(0);
   const [isFocusTextRichEditor, setIsFocusTextRichEditor] = useState(false);
+  const dispatch = useAppDispatch();
 
   const [contentLoading, setContentLoading] = useState(false);
   const [showTip, setShowTip] = useState(false);
@@ -122,7 +129,7 @@ const AddNewEntry = forwardRef<
     mood: "",
     aiComment: {
       content: "",
-      aiModel: aiModel,
+      aiModel: settings?.aiModel as AiModel,
     },
     embedding: [],
     images: [],
@@ -165,7 +172,7 @@ const AddNewEntry = forwardRef<
       title: "",
       content: "",
       mood: "",
-      aiComment: { content: "", aiModel },
+      aiComment: { content: "", aiModel: settings?.aiModel as AiModel },
       embedding: [],
       dialogs: [],
       images: [],
@@ -187,7 +194,7 @@ const AddNewEntry = forwardRef<
     setShowTip(false);
     setTextReachEditorKey((k) => k + 1);
     setTitleReachEditorKey((k) => k + 1);
-  }, [aiModel, colors.card]);
+  }, [settings?.aiModel, colors.card]);
 
   useEffect(() => {
     if (!props.isOpen) resetForm();
@@ -274,13 +281,7 @@ const AddNewEntry = forwardRef<
   }, []);
 
   const changeUserPlanStatus = async (status: PlanStatus) => {
-    const rowUser = await SecureStore.getItemAsync("user");
-    if (!rowUser) return;
-    const user = JSON.parse(rowUser);
-
-    user.plan.status = status;
-
-    await SecureStore.setItemAsync("user", JSON.stringify(user));
+    // plan?.planStatus = status;
   };
 
   const toastError = useCallback(
@@ -330,7 +331,7 @@ const AddNewEntry = forwardRef<
           title: entry.title,
           content: contentWithTokens,
           mood: entry.mood,
-          aiModel,
+          aiModel: settings?.aiModel,
           settings: entrySettings,
         },
       });
@@ -402,7 +403,7 @@ const AddNewEntry = forwardRef<
         data: {
           entryId: newEntry.id,
           content: contentWithTokens,
-          aiModel: aiModel,
+          aiModel: settings?.aiModel,
           mood: newEntry.mood,
         },
         eventNames: {
@@ -449,7 +450,7 @@ const AddNewEntry = forwardRef<
       setContentLoading(false);
     }
   }, [
-    aiModel,
+    settings?.aiModel,
     changeUserPlanStatus,
     entry.content,
     entry.mood,
@@ -483,7 +484,7 @@ const AddNewEntry = forwardRef<
           entryId: Number(entry!.id),
           uuid: dialog.uuid,
           content: dialogQuestion,
-          aiModel,
+          aiModel: settings?.aiModel,
           mood: entry!.mood,
         },
         eventNames: {
@@ -547,7 +548,7 @@ const AddNewEntry = forwardRef<
     },
     [
       aiDialogLoading,
-      aiModel,
+      settings?.aiModel,
       changeUserPlanStatus,
       dialogQuestion,
       entry.id,
@@ -796,7 +797,7 @@ const AddNewEntry = forwardRef<
                   style={{
                     maxHeight: ROW_HEIGHT * 10,
                     color: colors.text,
-                    fontFamily: getFont(font, "regular"),
+                    fontFamily: getFont(settings?.font as Font, "regular"),
                   }}
                 />
                 <View style={styles.sendMessageButton}>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   TextInput,
@@ -6,60 +6,55 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import i18n from "i18next";
-import { useTranslation } from "react-i18next";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { ThemedText } from "@/components/ThemedText";
+import type { ColorTheme, Rejected, User } from "@/types";
+import { ErrorMessages } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { CodeStatus, ColorTheme, ErrorMessages } from "@/types";
-import type { Rejected, User } from "@/types";
-import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
-import { logStoredUserData, passwordRules } from "@/utils/";
+import { useTranslation } from "react-i18next";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/store";
-import { registerUser } from "@/store/thunks/auth/registerUser";
+import { loginUser } from "@/store/thunks/auth/loginUser";
 import ThemedTextInput from "@/components/ui/ThemedTextInput";
 import { useUIStyles } from "@/hooks/useUIStyles";
 
-interface RegisterFormProps {
-  forPlanSelect: boolean;
+type LoginFormProps = {
+  forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
-  setShowEmailVerificationCodeForm: (show: boolean) => void;
-}
-
-export default function RegisterForm({
+  onSuccessSignIn: () => void;
+  setShowForgotPasswordForm: (show: boolean) => void;
+};
+export default function RefreshForm({
   forPlanSelect,
   onSuccessSignWithGoogle,
-  setShowEmailVerificationCodeForm,
-}: RegisterFormProps) {
+  onSuccessSignIn,
+  setShowForgotPasswordForm,
+}: LoginFormProps) {
   const [loading, setLoading] = useState(false);
-  const lang = useState<string>(i18n.language)[0];
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
   const [error, setError] = useState<string | null>(null);
-  const [timer, setTimer] = useState(0);
   const user = useSelector((s: RootState) => s.user.value);
   const dispatch = useAppDispatch();
   const ui = useUIStyles();
 
-  const registerSchema = Yup.object().shape({
+  const loginSchema = Yup.object().shape({
     email: Yup.string()
       .email(t("auth.enterValidEmailAddress"))
       .required(t("auth.emailIsRequired")),
     password: Yup.string()
       .matches(passwordRules, t("auth.thePasswordMustContain"))
       .required(t("auth.passwordRequired")),
-    confirmPassword: Yup.string()
-      .required(t("auth.confirmYourPassword"))
-      .oneOf([Yup.ref("password")], t("auth.passwordsDoNotMatch")),
   });
 
-  const handleRegister = async (
+  const handleRefresh = async (
     values: { email: string; password: string },
     {
       setSubmitting,
@@ -70,43 +65,29 @@ export default function RegisterForm({
     setError(null);
     try {
       await dispatch(
-        registerUser({
+        loginUser({
           email: values.email,
           password: values.password,
-          lang,
           uuid: user!.uuid,
         }),
       ).unwrap();
 
       setLoading(false);
-      setShowEmailVerificationCodeForm(true);
       resetForm();
       setSubmitting(false);
       Toast.show({
         type: "success",
-        text1: t("toast.successfullyRegistered"),
-        text2: t("toast.youHaveSuccessfullyRegistered"),
+        text1: t("toast.successfullyRefreshed"),
+        text2: t("toast.youHaveSuccessfullyRefreshedYourSession"),
       });
+      onSuccessSignIn();
     } catch (err: any) {
       const payload = err as Rejected;
-      if (payload.code === CodeStatus.COOLDOWN) {
-        const intervalId = setInterval(() => {
-          setTimer((prev) => {
-            if (prev <= 1) {
-              clearInterval(intervalId);
-              setLoading(false);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-      } else {
-        console.log("handle registerUser error", payload);
-        const errorKey =
-          ErrorMessages[payload.code as keyof typeof ErrorMessages];
-        setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
-        setLoading(false);
-      }
+      console.log("handle refresh session error", payload);
+      const errorKey =
+        ErrorMessages[payload.code as keyof typeof ErrorMessages];
+      setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
+      setLoading(false);
     }
   };
 
@@ -115,7 +96,7 @@ export default function RegisterForm({
       <GoogleSignInButton
         onSuccessSignWithGoogle={onSuccessSignWithGoogle}
         forPlanSelect={forPlanSelect}
-        type="register"
+        type="refresh"
       />
       <View style={styles.separator}>
         <View
@@ -136,7 +117,6 @@ export default function RegisterForm({
           ]}
         ></View>
       </View>
-
       <View
         style={{
           marginBottom: 20,
@@ -148,14 +128,14 @@ export default function RegisterForm({
             textAlign: "center",
           }}
         >
-          {t("auth.signUpWithEmail")}
+          {t("auth.refreshWithEmail")}
         </ThemedText>
       </View>
 
       <Formik
-        initialValues={{ email: "", password: "", confirmPassword: "" }}
-        validationSchema={registerSchema}
-        onSubmit={handleRegister}
+        initialValues={{ email: "", password: "" }}
+        validationSchema={loginSchema}
+        onSubmit={handleRefresh}
       >
         {({
           handleChange,
@@ -202,40 +182,30 @@ export default function RegisterForm({
                   marginBottom: 12,
                 }}
               />
-              <ThemedText style={ui.label}>
-                {t("auth.confirmPassword")}
-              </ThemedText>
-              <ThemedTextInput
-                name="confirmPassword"
-                touched={touched}
-                errors={errors}
-                placeholder={t("auth.confirmPassword")}
-                value={values.confirmPassword}
-                onChangeText={handleChange("confirmPassword")}
-                onBlur={handleBlur("confirmPassword")}
-                secureTextEntry
-                autoCapitalize="none"
-                containerStyle={{
-                  marginBottom: 12,
-                }}
-              />
             </View>
             {error && (
               <ThemedText type={"small"} style={styles.error}>
                 {error}
               </ThemedText>
             )}
-            {timer > 0 && (
+            <TouchableOpacity
+              style={styles.forgotYourPasswordBtn}
+              onPress={() => {
+                setShowForgotPasswordForm(true);
+              }}
+            >
               <ThemedText
-                type="small"
+                type="subtitleLG"
                 style={[
-                  styles.error,
-                  { marginBottom: 10, textAlign: "center" },
+                  styles.text,
+                  {
+                    color: colors.text,
+                  },
                 ]}
               >
-                {t("auth.youCanSendCodeIn")} {timer} {t("common.sec")}
+                {t("auth.forgotYourPassword")}
               </ThemedText>
-            )}
+            </TouchableOpacity>
             <TouchableOpacity
               style={ui.btnPrimary}
               onPress={() => handleSubmit()}
@@ -252,7 +222,7 @@ export default function RegisterForm({
                     },
                   ]}
                 >
-                  {t("auth.registration")}
+                  {t("auth.refreshSession")}
                 </ThemedText>
               )}
             </TouchableOpacity>
@@ -266,7 +236,7 @@ export default function RegisterForm({
 const getStyles = (colors: ColorTheme) =>
   StyleSheet.create({
     container: {
-      marginBottom: 30,
+      marginBottom: 40,
     },
     separator: {
       flexDirection: "row",
@@ -287,6 +257,32 @@ const getStyles = (colors: ColorTheme) =>
       color: colors.error,
       marginTop: -10,
       marginBottom: 20,
+    },
+    input: {
+      backgroundColor: colors.inputBackground,
+      color: colors.text,
+      padding: 14,
+      borderRadius: 8,
+      marginBottom: 12,
+      fontSize: 16,
+      minWidth: "100%",
+    },
+    label: {
+      marginBottom: 16,
+      textAlign: "left",
+    },
+    btn: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      textAlign: "center",
+    },
+    forgotYourPasswordBtn: {
+      paddingHorizontal: 18,
+      paddingVertical: 10,
+      borderRadius: 12,
+      marginBottom: 16,
     },
     text: {
       textAlign: "center",

@@ -165,7 +165,10 @@ export default function WeekView({
           return (
             <Pressable
               key={item}
-              onPress={() => handleDayPress(item)}
+              onPress={() => {
+                if (isSelected) return;
+                handleDayPress(item);
+              }}
               style={[
                 styles.dayContainer,
                 {

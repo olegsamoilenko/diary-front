@@ -12,6 +12,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
+import RefreshForm from "./RefreshForm";
 import React, { useMemo, useState } from "react";
 import { ThemedText } from "@/components/ThemedText";
 import { useTranslation } from "react-i18next";
@@ -27,17 +28,23 @@ export default function AuthForm({
   onSuccessSignWithGoogle,
   onSuccessEmailCode,
   onSuccessSignIn,
-  activeAuthTab = "registerUser",
+  activeAuthTab = "register",
   handleBack,
+  isLogin = false,
+  isRegister = false,
+  isRefresh = false,
 }: {
   forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
   onSuccessEmailCode: () => void;
   onSuccessSignIn: () => void;
-  activeAuthTab?: "login" | "registerUser";
+  activeAuthTab?: "login" | "register" | "refresh";
   handleBack?: () => void;
+  isLogin?: boolean;
+  isRegister?: boolean;
+  isRefresh?: boolean;
 }) {
-  const [activeTab, setActiveTab] = useState<"login" | "registerUser">(
+  const [activeTab, setActiveTab] = useState<"login" | "register" | "refresh">(
     activeAuthTab,
   );
   const colorScheme = useColorScheme();
@@ -69,7 +76,7 @@ export default function AuthForm({
       setShowForgotPasswordForm(false);
     } else if (showEmailVerificationCodeForm) {
       setShowEmailVerificationCodeForm(false);
-      setActiveTab("registerUser");
+      setActiveTab("register");
     } else {
       handleBack();
     }
@@ -99,7 +106,10 @@ export default function AuthForm({
             color={colors.primary}
           />
         </TouchableOpacity>
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.logo}>
             <NemoryLogo />
           </View>
@@ -119,46 +129,84 @@ export default function AuthForm({
             <View style={styles.container}>
               {/* Tabs */}
               <View style={styles.tabsContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.tab,
-                    activeTab === "login" && styles.activeTab,
-                  ]}
-                  onPress={() => setActiveTab("login")}
-                >
-                  <ThemedText
-                    type="subtitleLG"
+                {isLogin && (
+                  <TouchableOpacity
                     style={[
-                      styles.tabText,
-                      activeTab === "login" && styles.activeTabText,
+                      styles.tab,
+                      activeTab === "login" && isLogin && styles.activeTab,
                     ]}
+                    onPress={() => setActiveTab("login")}
                   >
-                    {t("auth.login")}
-                  </ThemedText>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.tab,
-                    activeTab === "registerUser" && styles.activeTab,
-                  ]}
-                  onPress={() => setActiveTab("registerUser")}
-                >
-                  <ThemedText
-                    type="subtitleLG"
+                    <ThemedText
+                      type="titleLG"
+                      style={[
+                        { color: colors.textDisabled },
+                        activeTab === "login" &&
+                          isLogin &&
+                          styles.activeTabText,
+                      ]}
+                    >
+                      {t("auth.login")}
+                    </ThemedText>
+                  </TouchableOpacity>
+                )}
+                {isRefresh && (
+                  <TouchableOpacity
                     style={[
-                      styles.tabText,
-                      activeTab === "registerUser" && styles.activeTabText,
+                      styles.tab,
+                      activeTab === "refresh" && isRefresh && styles.activeTab,
                     ]}
+                    onPress={() => setActiveTab("refresh")}
                   >
-                    {t("auth.registration")}
-                  </ThemedText>
-                </TouchableOpacity>
+                    <ThemedText
+                      type="titleLG"
+                      style={[
+                        { color: colors.textDisabled },
+                        activeTab === "refresh" &&
+                          isRefresh &&
+                          styles.activeTabText,
+                      ]}
+                    >
+                      {t("auth.refreshSession")}
+                    </ThemedText>
+                  </TouchableOpacity>
+                )}
+                {isRegister && (
+                  <TouchableOpacity
+                    style={[
+                      styles.tab,
+                      activeTab === "register" &&
+                        isRegister &&
+                        styles.activeTab,
+                    ]}
+                    onPress={() => setActiveTab("register")}
+                  >
+                    <ThemedText
+                      type="titleLG"
+                      style={[
+                        { color: colors.textDisabled },
+                        activeTab === "register" &&
+                          isRegister &&
+                          styles.activeTabText,
+                      ]}
+                    >
+                      {t("auth.registration")}
+                    </ThemedText>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Tab Content */}
               <View style={styles.tabContent}>
                 {activeTab === "login" ? (
                   <LoginForm
+                    forPlanSelect={forPlanSelect}
+                    onSuccessSignWithGoogle={onSuccessSignWithGoogle}
+                    setShowForgotPasswordForm={setShowForgotPasswordForm}
+                    onSuccessSignIn={onSuccessSignIn}
+                  />
+                ) : activeTab === "refresh" ? (
+                  <RefreshForm
                     forPlanSelect={forPlanSelect}
                     onSuccessSignWithGoogle={onSuccessSignWithGoogle}
                     setShowForgotPasswordForm={setShowForgotPasswordForm}
@@ -214,11 +262,6 @@ const getStyles = (colors: any) =>
     },
     activeTab: {
       borderBottomColor: colors.primary,
-    },
-    tabText: {
-      fontSize: 16,
-      color: colors.text,
-      fontWeight: "600",
     },
     activeTabText: {
       color: colors.primary,

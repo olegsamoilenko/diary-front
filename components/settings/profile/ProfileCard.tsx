@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme } from "@/types";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 type ProfileCardProps = {
   title: string;
@@ -22,6 +23,7 @@ export default function ProfileCard({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const ui = useUIStyles();
 
   return (
     <View style={{ marginBottom: 20, flexDirection: "column", gap: 5 }}>
@@ -33,11 +35,20 @@ export default function ProfileCard({
           alignItems: "center",
         }}
       >
-        <View>
-          <ThemedText>{val}</ThemedText>
+        <View style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
+          <ThemedText
+            numberOfLines={2}
+            ellipsizeMode="tail"
+            style={{ flexShrink: 1 }}
+          >
+            {val}
+          </ThemedText>
         </View>
         {isActionButton && (
-          <TouchableOpacity style={styles.btn} onPress={handleAction}>
+          <TouchableOpacity
+            style={[ui.btnPrimary, { flexShrink: 0 }]}
+            onPress={handleAction}
+          >
             <ThemedText
               style={{
                 color: colors.textInPrimary,
@@ -53,22 +64,4 @@ export default function ProfileCard({
   );
 }
 
-const getStyles = (colors: ColorTheme) =>
-  StyleSheet.create({
-    container: {
-      flexDirection: "column",
-      gap: 5,
-    },
-    info: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    btn: {
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      textAlign: "center",
-    },
-  });
+const getStyles = (colors: ColorTheme) => StyleSheet.create({});

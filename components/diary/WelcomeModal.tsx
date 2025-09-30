@@ -8,6 +8,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ColorTheme } from "@/types";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 export default function WelcomeModal({}) {
   const [showWelcome, setShowWelcome] = useState<boolean>(false);
@@ -16,6 +17,7 @@ export default function WelcomeModal({}) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const styles = useMemo(() => getStyles(colors), [colors]);
+  const ui = useUIStyles();
 
   useEffect(() => {
     const getData = async () => {
@@ -71,7 +73,7 @@ export default function WelcomeModal({}) {
         />
       </View>
       <TouchableOpacity
-        style={styles.btn}
+        style={ui.btnPrimary}
         onPress={() => setShowWelcome(false)}
       >
         <ThemedText
@@ -87,13 +89,4 @@ export default function WelcomeModal({}) {
   );
 }
 
-const getStyles = (colors: ColorTheme) =>
-  StyleSheet.create({
-    btn: {
-      paddingHorizontal: 18,
-      paddingVertical: 10,
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      textAlign: "center",
-    },
-  });
+const getStyles = (colors: ColorTheme) => StyleSheet.create({});

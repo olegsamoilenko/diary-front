@@ -169,7 +169,10 @@ const ThemeSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           >
             {t("settings.theme.titlePlural")}
           </ThemedText>
-          <ScrollView style={{ marginBottom: 0 }}>
+          <ScrollView
+            style={{ marginBottom: 0 }}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 16 }}>
               {themes.map((thm) => {
                 return (

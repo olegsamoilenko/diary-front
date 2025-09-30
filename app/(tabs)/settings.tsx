@@ -31,6 +31,8 @@ import SecuritySettingsBlock from "@/components/settings/security/SecuritySettin
 import BiometrySettings from "@/components/settings/security/BiometrySettings";
 import ProfileSettings from "@/components/settings/profile/ProfileSettings";
 import ProfileSettingsBlock from "@/components/settings/profile/ProfileSettingsBlock";
+import SupportBlock from "@/components/settings/support/SupportBlock";
+import Support from "@/components/settings/support/Support";
 
 export default function Settings() {
   const themeSwitcherRef = useRef<SideSheetRef>(null);
@@ -41,12 +43,12 @@ export default function Settings() {
   const securityRef = useRef<SideSheetRef>(null);
   const biometryRef = useRef<SideSheetRef>(null);
   const profileRef = useRef<SideSheetRef>(null);
+  const supportRef = useRef<SideSheetRef>(null);
   const { t } = useTranslation();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
 
   const modelSwitcherRef = useRef<SideSheetRef>(null);
-  const aiModel = useAppSelector((state) => state.aiModel);
 
   return (
     <Background background={colors.backgroundImage} paddingTop={40}>
@@ -81,6 +83,8 @@ export default function Settings() {
         <SecuritySettingsBlock biometryRef={biometryRef} />
         <ThemedText type="subtitleXL">{t("settings.profile.title")}</ThemedText>
         <ProfileSettingsBlock profileRef={profileRef} />
+        <ThemedText type="subtitleXL">{t("settings.support.title")}</ThemedText>
+        <SupportBlock supportRef={supportRef} />
       </ParallaxScrollView>
       <Portal>
         <ThemeSwitcher ref={themeSwitcherRef} />
@@ -91,6 +95,7 @@ export default function Settings() {
         <PlansSettings ref={plansRef} />
         <BiometrySettings ref={biometryRef} />
         <ProfileSettings ref={profileRef} />
+        <Support ref={supportRef} />
       </Portal>
     </Background>
   );

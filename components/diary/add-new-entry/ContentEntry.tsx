@@ -70,7 +70,11 @@ export default function ContentEntry({
   }, []);
 
   return (
-    <ScrollView style={{ marginBottom: 0 }} ref={scrollViewRef}>
+    <ScrollView
+      style={{ marginBottom: 0 }}
+      ref={scrollViewRef}
+      showsVerticalScrollIndicator={false}
+    >
       <View
         style={{
           marginBottom: isKeyboardOpen ? 0 : 20,

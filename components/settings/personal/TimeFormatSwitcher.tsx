@@ -52,7 +52,10 @@ const TimeFormatSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           <ThemedText type={"titleLG"}>
             {t("settings.timeFormat.titlePlural")}
           </ThemedText>
-          <ScrollView style={{ marginBottom: 0 }}>
+          <ScrollView
+            style={{ marginBottom: 0 }}
+            showsVerticalScrollIndicator={false}
+          >
             {timeFormatOptions.map((f) => (
               <TouchableOpacity
                 key={f}

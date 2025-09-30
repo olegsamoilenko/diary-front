@@ -9,7 +9,7 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { FIRST_DAY_BY_LOCALE } from "@/constants/FirstDayByLocale";
 import i18n from "i18next";
-import { ColorTheme, MoodByDate } from "@/types";
+import { ColorTheme, MoodByDate, Font } from "@/types";
 import { getMonthYearStr, getWeekdayLabels, polarToCartesian } from "@/utils";
 import { CENTER, CLOCK_RADIUS, EMOJI_SIZE } from "@/constants/Calendar";
 import { ThemedText } from "@/components/ThemedText";
@@ -53,7 +53,7 @@ export default function MonthView({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const styles = useMemo(() => getStyles(colors), [colors]);
-  const font = useSelector((state: RootState) => state.font);
+  const settings = useSelector((state: RootState) => state.settings.value);
 
   const locale = useMemo(() => {
     const arr = Localization.getLocales();
@@ -81,9 +81,9 @@ export default function MonthView({
       calendarBackground: colors.calendarBackground,
       arrowColor: colors.primary,
       monthTextColor: colors.text,
-      textDayHeaderFontFamily: getFont(font, "regular"),
+      textDayHeaderFontFamily: getFont(settings?.font as Font, "regular"),
     }),
-    [colors.calendarBackground, colors.primary, colors.text, font],
+    [colors.calendarBackground, colors.primary, colors.text, settings?.font],
   );
 
   const renderArrow = useCallback(

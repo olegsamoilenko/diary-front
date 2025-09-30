@@ -58,7 +58,14 @@
     "weHaveSentYouCodeToDeleteYourAccount": "We have sent you a code to delete your account to your email address.",
     "pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount": "Please enter this code to confirm the deletion of your account",
     "youCanResendCodeIn": "You can resend code in",
-    "youCanSendCodeIn": "You can send code in"
+    "youCanSendCodeIn": "You can send code in",
+    "textRequired": "Text required",
+    "categoryRequired": "Category required",
+    "refreshSession": "Refresh session",
+    "refreshWithGoogle": "Refresh with Google",
+    "signUpWithGoogle": "Sign up with Google",
+    "refreshWithEmail": "Refresh with Email",
+    "titleRequired": "Title required"
   },
   "diary": {
     "title": "Diary",
@@ -193,7 +200,20 @@
       "notLoggedIn": "Not logged in",
       "loggedOut": "Logged out",
       "notRegister": "Not registered"
-    }
+    },
+    "support": {
+      "title": "Support",
+      "askQuestion": "Ask a question",
+      "reportABug": "Report a bug",
+      "suggestAnImprovement": "Suggest an improvement",
+      "leaveAReview": "Leave a review",
+      "other": "Other",
+      "selectCategory": "Select a category",
+      "describeYourRequest": "Describe your request",
+      "addDetails": "Add details that will help us assist you faster",
+      "messageSent": "Message sent",
+      "thankYouForReachingOut": "Thank you for reaching out to us. We will get back to you as soon as possible.",
+      }
   },
   "planModal": {
     "title": "Choose your Plan",
@@ -235,7 +255,9 @@
     "loading": "Loading...",
     "or": "or",
     "continue": "Continue",
-    "sec": "sec."
+    "sec": "sec.",
+    "select": "Select",
+    "title": "Title"
   },
   "errors": {
     "invalidPassword": "The password you entered is incorrect",
@@ -329,6 +351,7 @@
     "userSettingsNotFound": "User settings not found",
     "userUpdateError": "User update error",
     "userNotFoundAfterUpdate": "User not found after update",
+    "userMismatch": "The provided userId and uuid do not match any existing user"
   },
   "toast": {
     "successfullyLogged": "Successfully logged in",
@@ -353,7 +376,9 @@
     "youHaveSuccessfullyUpdateYourName": "You have successfully update your name",
     "successfullyChanged": "Successfully changed",
     "youHaveSuccessfullyChangedYourPassword": "You have successfully changed your password",
-    "successfullyLoggedOut": "Successfully logged out"
+    "successfullyLoggedOut": "Successfully logged out",
+    "successfullyRefreshed": "Successfully refreshed",
+    "youHaveSuccessfullyRefreshedYourSession": "You have successfully refreshed your session"
   },
   "welcome": {
     "title": "Welcome to Smart Diary",

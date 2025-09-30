@@ -18,6 +18,8 @@ import * as Yup from "yup";
 import { useAppDispatch } from "@/store";
 import { updateUser } from "@/store/thunks/auth/updateUser";
 import Toast from "react-native-toast-message";
+import ThemedTextInput from "@/components/ui/ThemedTextInput";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 type ChangeNameModalProps = {
   showChangeNameModal: boolean;
@@ -37,6 +39,7 @@ export default function ChangeNameModal({
 
   const [error, setError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
+  const ui = useUIStyles();
 
   const changeNameSchema = Yup.object().shape({
     newName: Yup.string().required(t("settings.profile.nameIsRequired")),
@@ -112,29 +115,21 @@ export default function ChangeNameModal({
                 marginBottom: 20,
               }}
             >
-              <ThemedText style={styles.label}>
+              <ThemedText style={ui.label}>
                 {t("settings.profile.newName")}
               </ThemedText>
-              <TextInput
+              <ThemedTextInput
+                name="newName"
+                touched={touched}
+                errors={errors}
                 placeholder={t("settings.profile.newName")}
-                placeholderTextColor={colors.inputPlaceholder}
-                style={styles.input}
+                containerStyle={{
+                  marginBottom: 16,
+                }}
                 value={values.newName}
                 onChangeText={handleChange("newName")}
                 onBlur={handleBlur("newName")}
               />
-              {touched.newName && errors.newName && (
-                <ThemedText
-                  type={"small"}
-                  style={{
-                    color: colors.error,
-                    marginTop: -10,
-                    marginBottom: 20,
-                  }}
-                >
-                  {errors.newName}
-                </ThemedText>
-              )}
             </View>
             {error && (
               <ThemedText
@@ -149,7 +144,7 @@ export default function ChangeNameModal({
               </ThemedText>
             )}
             <TouchableOpacity
-              style={styles.btn}
+              style={ui.btnPrimary}
               onPress={() => handleSubmit()}
               disabled={isSubmitting}
             >

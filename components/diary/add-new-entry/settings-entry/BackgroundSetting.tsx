@@ -47,6 +47,7 @@ export default function BackgroundSetting({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             flexDirection: "row",
             alignItems: "center",
@@ -100,6 +101,8 @@ export default function BackgroundSetting({
             paddingLeft: 30,
             paddingRight: 15,
           }}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
           {AddEntryBackgroundImage.map((image) => (
             <TouchableOpacity

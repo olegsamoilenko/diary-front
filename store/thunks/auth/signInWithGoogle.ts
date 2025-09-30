@@ -1,54 +1,47 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUserApi } from "@/utils/api/endpoints/auth/loginUserApi";
+import { signInWithGoogleApi } from "@/utils/api/endpoints/auth/signInWithGoogleApi";
 import { setUser } from "@/store/slices/userSlice";
-import { CodeStatus, StatusCode } from "@/types";
-import type { User, Rejected, Plan, UserSettings } from "@/types";
-import {
-  saveAccessToken,
-  saveDeviceId,
-  saveRefreshToken,
-} from "@/utils/store/storage";
 import { setPlan } from "@/store/slices/planSlice";
 import { setSettings } from "@/store/slices/settingsSlice";
+import {
+  saveAccessToken,
+  saveRefreshToken,
+  saveDeviceId,
+} from "@/utils/store/storage";
+import { logStoredUserData } from "@/utils/storedUserData";
+import { CodeStatus, Rejected, StatusCode } from "@/types";
 
 type Args = {
-  email: string;
-  password: string;
+  userId: number;
   uuid: string;
+  idToken: string;
 };
 
-type Resp = {
-  accessToken: string;
-  user: User;
-  plan: Plan;
-  settings: UserSettings;
-};
+type Resp = void;
 
-export const loginUser = createAsyncThunk<
+export const signInWithGoogle = createAsyncThunk<
   Resp,
   Args,
   { rejectValue: Rejected }
 >(
-  "auth/loginUser",
-  async ({ email, password, uuid }, { dispatch, rejectWithValue }) => {
+  "auth/signInWithGoogle",
+  async ({ userId, uuid, idToken }, { dispatch, rejectWithValue }) => {
     try {
-      const data = await loginUserApi(email, password, uuid);
+      const data = await signInWithGoogleApi(userId, uuid, idToken);
 
       if (!data) {
         return rejectWithValue({
-          message: "Login No response from server",
+          message: "signInWithGoogle No response from server",
         });
       }
 
       await saveAccessToken(data.accessToken);
       await saveRefreshToken(data.refreshToken);
       await saveDeviceId(data.deviceId);
-
       dispatch(setUser(data.user));
       if (data.plan) dispatch(setPlan(data.plan));
       if (data.settings) dispatch(setSettings(data.settings));
-
-      return data;
+      await logStoredUserData();
     } catch (err: any) {
       const code = err?.response?.data?.code as string | undefined;
       const status = err?.response?.data?.status as
@@ -56,7 +49,9 @@ export const loginUser = createAsyncThunk<
         | StatusCode
         | undefined;
       const msg =
-        err?.response?.data?.message ?? err?.message ?? "Login failed";
+        err?.response?.data?.message ??
+        err?.message ??
+        "signInWithGoogle failed";
       return rejectWithValue({ status, message: msg, code });
     }
   },

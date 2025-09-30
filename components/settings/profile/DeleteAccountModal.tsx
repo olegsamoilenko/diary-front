@@ -5,29 +5,24 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  unstable_batchedUpdates,
   View,
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { useTranslation } from "react-i18next";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
-import { apiRequest } from "@/utils";
 import { UserEvents } from "@/utils/events/userEvents";
-import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useBiometry } from "@/context/BiometryContext";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import type { ColorTheme, User } from "@/types";
+import type { ColorTheme } from "@/types";
 import { CodeStatus, ErrorMessages } from "@/types";
-import { RootState, store, useAppDispatch } from "@/store";
-import { resetUser } from "@/store/slices/userSlice";
-import { resetSettings } from "@/store/slices/settingsSlice";
-import { resetPlan } from "@/store/slices/planSlice";
+import { RootState, useAppDispatch } from "@/store";
 import { sendVerificationCodeForUserDeleteApi } from "@/utils/api/endpoints/auth/sendVerificationCodeForUserDeleteApi";
 import { useSelector } from "react-redux";
 import { deleteAccount } from "@/store/thunks/auth/deleteAccount";
+import { useUIStyles } from "@/hooks/useUIStyles";
+import ThemedTextInput from "@/components/ui/ThemedTextInput";
 
 type DeleteAccountModalProps = {
   showDeleteAccountModal: boolean;
@@ -50,6 +45,7 @@ export default function DeleteAccountModal({
   const [timer, setTimer] = React.useState(0);
   const user = useSelector((s: RootState) => s.user.value);
   const dispatch = useAppDispatch();
+  const ui = useUIStyles();
 
   const handleSentCode = async (type: "send" | "resend") => {
     setError("");
@@ -134,7 +130,7 @@ export default function DeleteAccountModal({
       }}
     >
       {showEnterCodeForm ? (
-        <View style={{ padding: 20, alignItems: "center" }}>
+        <View style={{ alignItems: "center" }}>
           <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>
             {t("auth.weHaveSentYouCodeToDeleteYourAccount")}
           </ThemedText>
@@ -143,20 +139,28 @@ export default function DeleteAccountModal({
               {t("auth.pleaseEnterThisCodeToConfirmTheDeletionOfYourAccount")}
             </ThemedText>
           </View>
-          <TextInput
+          <ThemedTextInput
+            name="code"
+            errorMessage={error}
             value={code}
             onChangeText={setCode}
             keyboardType="number-pad"
             maxLength={6}
-            style={[styles.input, { letterSpacing: 5 }]}
+            inputStyle={{
+              letterSpacing: 5,
+              textAlign: "center",
+              minWidth: 180,
+              paddingTop: 10,
+              paddingBottom: 8,
+            }}
+            containerStyle={{
+              marginBottom: 16,
+            }}
+            errorStyle={{
+              textAlign: "center",
+            }}
             placeholder="******"
-            placeholderTextColor={colors.inputPlaceholder}
           />
-          {error && (
-            <ThemedText type={"small"} style={styles.error}>
-              {error}
-            </ThemedText>
-          )}
           {!timer && (
             <TouchableOpacity
               style={styles.resendCodeBtn}
@@ -190,7 +194,7 @@ export default function DeleteAccountModal({
             </ThemedText>
           )}
           <TouchableOpacity
-            style={styles.btn}
+            style={ui.btnPrimary}
             onPress={() => handleDeleteAccount()}
             disabled={loading}
           >
@@ -211,7 +215,7 @@ export default function DeleteAccountModal({
           </TouchableOpacity>
         </View>
       ) : (
-        <View style={{ padding: 20 }}>
+        <View>
           <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>
             {t("auth.wantToDeleteAccount")}
           </ThemedText>
@@ -220,43 +224,32 @@ export default function DeleteAccountModal({
           </ThemedText>
           <View
             style={{
-              flexDirection: "row",
-              gap: 10,
-              justifyContent: "flex-end",
               marginTop: 20,
             }}
           >
             <TouchableOpacity
-              onPress={() => setShowDeleteAccountModal(false)}
-              style={{
-                paddingHorizontal: 14,
-                paddingVertical: 8,
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: colors.border,
-              }}
-            >
-              <ThemedText style={{ color: colors.text }}>
-                {t("common.cancel")}
-              </ThemedText>
-            </TouchableOpacity>
-            <TouchableOpacity
               onPress={() => handleSentCode("send")}
-              style={{
-                backgroundColor: "red",
-                paddingHorizontal: 14,
-                paddingVertical: 8,
-                borderRadius: 12,
-              }}
+              style={[
+                ui.btnPrimary,
+                { backgroundColor: colors.error, marginBottom: 18 },
+              ]}
               disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <ThemedText style={{ color: "white" }}>
+                <ThemedText style={{ color: "white", textAlign: "center" }}>
                   {t("common.delete")}
                 </ThemedText>
               )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setShowDeleteAccountModal(false)}
+              style={ui.btnOutline}
+            >
+              <ThemedText style={{ color: colors.text, textAlign: "center" }}>
+                {t("common.cancel")}
+              </ThemedText>
             </TouchableOpacity>
           </View>
         </View>

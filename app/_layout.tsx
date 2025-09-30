@@ -1,10 +1,4 @@
-import React, { useEffect, useMemo, useState, lazy, Suspense } from "react";
-import {
-  Appearance,
-  unstable_batchedUpdates,
-  StyleSheet,
-  Platform,
-} from "react-native";
+import React, { useEffect, useMemo, useState, Suspense } from "react";
 import "../i18n";
 import "@/constants/CalendarLocale";
 import { ThemeProvider as NavThemeProvider } from "@react-navigation/native";
@@ -15,7 +9,7 @@ import { store, RootState, useAppDispatch } from "@/store";
 import { ThemeProviderCustom, useThemeCustom } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { BiometryProvider } from "@/context/BiometryContext";
-import { PortalHost, PortalProvider } from "@gorhom/portal";
+import { PortalProvider } from "@gorhom/portal";
 import CustomToast from "@/components/ui/CustomToast";
 import { Colors } from "@/constants/Colors";
 import { NavigationThemes } from "@/constants/Theme";
@@ -25,15 +19,11 @@ import { Stack } from "expo-router";
 import i18n from "i18next";
 import { LocaleConfig } from "react-native-calendars";
 import { UserEvents } from "@/utils/events/userEvents";
-import type { User, UserSettings } from "@/types";
+import type { User } from "@/types";
 import { Lang } from "@/types";
-import { resetPlan } from "@/store/slices/planSlice";
-import { resetSettings } from "@/store/slices/settingsSlice";
-import { resetUser, setUser } from "@/store/slices/userSlice";
 import * as Localization from "expo-localization";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { IapProvider } from "@/context/IapContext";
-import { hydrateAll } from "@/store/hydrate";
 import { initAnonymousUser } from "@/store/thunks/auth/initAnonymousUser";
 import { loadRegisterOrNot } from "@/utils/store/storage";
 import { updateUser } from "@/store/thunks/auth/updateUser";
@@ -45,6 +35,10 @@ import AuthGate from "@/components/auth/AuthGate";
 import AuthForm from "@/components/auth/AuthForm";
 import HandleSubscription from "@/components/auth/HandleSubscription";
 import RegisterOrNot from "@/components/auth/RegisterOrNot";
+import { unstable_batchedUpdates } from "react-native";
+import { resetUser } from "@/store/slices/userSlice";
+import { resetSettings } from "@/store/slices/settingsSlice";
+import { resetPlan } from "@/store/slices/planSlice";
 
 function NavigationThemeWrapper({ children }: { children: React.ReactNode }) {
   const { theme } = useThemeCustom();
@@ -272,6 +266,8 @@ function MainAfterAuth() {
   if (showAuthForm) {
     return (
       <AuthForm
+        isLogin={true}
+        isRegister={true}
         forPlanSelect
         onSuccessSignWithGoogle={() => {
           setShowAuthForm(false);

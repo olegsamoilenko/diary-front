@@ -4,28 +4,31 @@ import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import axios from "axios";
-import * as SecureStore from "expo-secure-store";
-import type { User } from "@/types";
 import { ErrorMessages } from "@/types";
 import { useTranslation } from "react-i18next";
-import { apiUrl } from "@/constants/env";
 import { Image } from "expo-image";
-import { UserEvents } from "@/utils/events/userEvents";
-import { useEffect } from "react";
 import Toast from "react-native-toast-message";
+import { RootState, useAppDispatch } from "@/store";
+import { signInWithGoogle } from "@/store/thunks/auth/signInWithGoogle";
+import { useSelector } from "react-redux";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 export default function GoogleSignInButton({
   forPlanSelect,
   onSuccessSignWithGoogle,
+  type = "register",
 }: {
   forPlanSelect?: boolean;
   onSuccessSignWithGoogle: () => void;
+  type?: "login" | "register" | "refresh";
 }) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const googleLogo = require("@/assets/images/logo/google_logo.webp");
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const user = useSelector((s: RootState) => s.user.value);
+  const ui = useUIStyles();
 
   GoogleSignin.configure({
     webClientId:
@@ -54,40 +57,21 @@ export default function GoogleSignInButton({
   };
 
   const processUserData = async (idToken: string) => {
-    const userString = await SecureStore.getItemAsync("user");
-    const userObj: User | null = userString ? JSON.parse(userString) : null;
     try {
-      const res = await axios.post(`${apiUrl}/auth/sign-in-with-google`, {
-        userId: userObj?.id,
-        uuid: userObj?.uuid,
-        idToken,
-      });
-
-      if (res?.status !== 200 && res?.status !== 201) {
-        console.log("No data returned from server");
-        Toast.show({
-          type: "error",
-          text1: t(`error.noDataReturnedFromServer`),
-        });
-        return;
-      }
-
-      await SecureStore.setItemAsync("user", JSON.stringify(res.data.user));
-      await SecureStore.setItemAsync("token", res.data.accessToken);
-
+      await dispatch(
+        signInWithGoogle({
+          userId: Number(user!.id),
+          uuid: user!.uuid,
+          idToken,
+        }),
+      ).unwrap();
       onSuccessSignWithGoogle();
-      UserEvents.emit("userLoggedIn", res.data.user);
     } catch (err: any) {
       console.error("Error during Google sign-in:", err);
-      console.error("Error during Google sign-in response:", err.response);
-      console.error(
-        "Error during Google sign-in response data:",
-        err.response.data,
-      );
       Toast.show({
         type: "error",
         text1: t(
-          `errors.${ErrorMessages[err.response.data.code as keyof typeof ErrorMessages]}`,
+          `errors.${ErrorMessages[err.code as keyof typeof ErrorMessages]}`,
         ),
       });
     }
@@ -110,16 +94,7 @@ export default function GoogleSignInButton({
 
   return (
     <TouchableOpacity
-      style={{
-        paddingHorizontal: 18,
-        paddingVertical: 10,
-        backgroundColor: colors.primary,
-        borderRadius: 12,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 16,
-      }}
+      style={[ui.btnPrimary, { flexDirection: "row", alignItems: "center" }]}
       onPress={googleSignIn}
       disabled={false}
     >
@@ -142,7 +117,11 @@ export default function GoogleSignInButton({
           marginLeft: 8,
         }}
       >
-        {t("auth.signInWithGoogle")}
+        {type === "login"
+          ? t("auth.signInWithGoogle")
+          : type === "refresh"
+            ? t("auth.refreshWithGoogle")
+            : t("auth.signUpWithGoogle")}
       </ThemedText>
     </TouchableOpacity>
   );

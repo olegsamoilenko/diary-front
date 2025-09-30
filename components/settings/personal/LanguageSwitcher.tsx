@@ -57,7 +57,10 @@ const LanguageSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           <ThemedText type={"titleLG"}>
             {t("settings.languages.titlePlural")}
           </ThemedText>
-          <ScrollView style={{ marginBottom: 0 }}>
+          <ScrollView
+            style={{ marginBottom: 0 }}
+            showsVerticalScrollIndicator={false}
+          >
             {languages.map((option) => (
               <TouchableOpacity
                 key={option.value}

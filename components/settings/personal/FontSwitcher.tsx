@@ -50,7 +50,10 @@ const FontSwitcher = forwardRef<SideSheetRef, {}>((props, ref) => {
           >
             {t("settings.font.titlePlural")}
           </ThemedText>
-          <ScrollView style={{ marginBottom: 0 }}>
+          <ScrollView
+            style={{ marginBottom: 0 }}
+            showsVerticalScrollIndicator={false}
+          >
             <View
               style={{
                 flexDirection: "row",

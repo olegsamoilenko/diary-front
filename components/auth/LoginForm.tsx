@@ -6,8 +6,6 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import axios from "axios";
-import * as SecureStore from "expo-secure-store";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { ThemedText } from "@/components/ThemedText";
 import type { ColorTheme, Rejected, User } from "@/types";
@@ -17,17 +15,13 @@ import { Colors } from "@/constants/Colors";
 import { useTranslation } from "react-i18next";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { logStoredUserData, passwordRules } from "@/utils/";
+import { passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
-import { apiUrl } from "@/constants/env";
-import { UserEvents } from "@/utils/events/userEvents";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/store";
 import { loginUser } from "@/store/thunks/auth/loginUser";
-import { setUser } from "@/store/slices/userSlice";
-import { setSettings } from "@/store/slices/settingsSlice";
-import { setPlan } from "@/store/slices/planSlice";
+import ThemedTextInput from "@/components/ui/ThemedTextInput";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 type LoginFormProps = {
   forPlanSelect?: boolean;
@@ -49,6 +43,7 @@ export default function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const user = useSelector((s: RootState) => s.user.value);
   const dispatch = useAppDispatch();
+  const ui = useUIStyles();
 
   const loginSchema = Yup.object().shape({
     email: Yup.string()
@@ -101,6 +96,7 @@ export default function LoginForm({
       <GoogleSignInButton
         onSuccessSignWithGoogle={onSuccessSignWithGoogle}
         forPlanSelect={forPlanSelect}
+        type="login"
       />
       <View style={styles.separator}>
         <View
@@ -156,38 +152,36 @@ export default function LoginForm({
                 marginBottom: 20,
               }}
             >
-              <ThemedText style={styles.label}>{t("auth.email")}</ThemedText>
-              <TextInput
+              <ThemedText style={ui.label}>{t("auth.email")}</ThemedText>
+              <ThemedTextInput
+                name="email"
+                touched={touched}
+                errors={errors}
                 placeholder={t("auth.email")}
-                style={styles.input}
                 value={values.email}
                 onChangeText={handleChange("email")}
                 onBlur={handleBlur("email")}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                placeholderTextColor={colors.inputPlaceholder}
+                containerStyle={{
+                  marginBottom: 12,
+                }}
               />
-              {touched.email && errors.email && (
-                <ThemedText type={"small"} style={styles.error}>
-                  {errors.email}
-                </ThemedText>
-              )}
-              <ThemedText style={styles.label}>{t("auth.password")}</ThemedText>
-              <TextInput
+              <ThemedText style={ui.label}>{t("auth.password")}</ThemedText>
+              <ThemedTextInput
+                name="password"
+                touched={touched}
+                errors={errors}
                 placeholder={t("auth.password")}
-                style={styles.input}
                 value={values.password}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
                 secureTextEntry
                 autoCapitalize="none"
-                placeholderTextColor={colors.inputPlaceholder}
+                containerStyle={{
+                  marginBottom: 12,
+                }}
               />
-              {touched.password && errors.password && (
-                <ThemedText type={"small"} style={styles.error}>
-                  {errors.password}
-                </ThemedText>
-              )}
             </View>
             {error && (
               <ThemedText type={"small"} style={styles.error}>
@@ -213,7 +207,7 @@ export default function LoginForm({
               </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.btn}
+              style={ui.btnPrimary}
               onPress={() => handleSubmit()}
               disabled={isSubmitting}
             >

@@ -28,6 +28,8 @@ import { useSelector } from "react-redux";
 import { loadPin, savePin } from "@/utils/store/storage";
 import { updateUser } from "@/store/thunks/auth/updateUser";
 import { logStoredUserData } from "@/utils";
+import ThemedTextInput from "@/components/ui/ThemedTextInput";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 export default function AuthGate({
   onAuthenticated,
@@ -51,6 +53,7 @@ export default function AuthGate({
   const [nameLoading, setNameLoading] = useState(false);
   const [pinLoading, setPinLoading] = useState(false);
   const { setBiometry, biometryEnabled } = useBiometry();
+  const ui = useUIStyles();
 
   const PinSchema = Yup.object().shape({
     pin: Yup.string()
@@ -138,6 +141,7 @@ export default function AuthGate({
         resetForm,
       }: { setSubmitting: (b: boolean) => void; resetForm: () => void },
     ) => {
+      console.log("qqq");
       setPinLoading(true);
       try {
         await savePin(values.pin);
@@ -217,7 +221,10 @@ export default function AuthGate({
           behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
           keyboardVerticalOffset={0}
         >
-          <ScrollView contentContainerStyle={styles.scrollCenter}>
+          <ScrollView
+            contentContainerStyle={styles.scrollCenter}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.logoWrap}>
               <NemoryLogo width={120} height={150} />
             </View>
@@ -237,28 +244,30 @@ export default function AuthGate({
                   isSubmitting,
                 }) => (
                   <View style={styles.center}>
-                    <ThemedText type="subtitleLG" style={styles.label}>
+                    <ThemedText type="subtitleLG" style={ui.label}>
                       {t("auth.name")}
                     </ThemedText>
-                    <TextInput
+                    <ThemedTextInput
+                      name="name"
+                      touched={touched}
+                      errors={errors}
                       value={values.name}
+                      inputStyle={{
+                        textAlign: "center",
+                      }}
+                      containerStyle={{
+                        marginBottom: 16,
+                      }}
+                      errorStyle={{
+                        textAlign: "center",
+                      }}
                       onChangeText={handleChange("name")}
                       onBlur={handleBlur("name")}
-                      style={[styles.input, { minWidth: "100%" }]}
                       placeholder={t("auth.name")}
-                      placeholderTextColor={colors.inputPlaceholder}
                     />
-                    {touched.name && errors.name && (
-                      <ThemedText type="small" style={styles.errorText}>
-                        {errors.name}
-                      </ThemedText>
-                    )}
                     <View>
                       <TouchableOpacity
-                        style={[
-                          styles.btn,
-                          { backgroundColor: colors.primary },
-                        ]}
+                        style={[ui.btnPrimary]}
                         onPress={() => handleSubmit()}
                         disabled={isSubmitting}
                       >
@@ -289,7 +298,10 @@ export default function AuthGate({
           behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
           keyboardVerticalOffset={0}
         >
-          <ScrollView contentContainerStyle={styles.scrollCenter}>
+          <ScrollView
+            contentContainerStyle={styles.scrollCenter}
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.logoWrap}>
               <NemoryLogo width={120} height={150} />
             </View>
@@ -308,47 +320,63 @@ export default function AuthGate({
                 isSubmitting,
               }) => (
                 <View style={styles.center}>
-                  <ThemedText style={styles.label}>
-                    {t("auth.setPin")}
-                  </ThemedText>
-                  <TextInput
+                  <ThemedText style={ui.label}>{t("auth.setPin")}</ThemedText>
+                  <ThemedTextInput
+                    name="pin"
+                    touched={touched}
+                    errors={errors}
                     secureTextEntry
                     value={values.pin}
                     onChangeText={handleChange("pin")}
                     onBlur={handleBlur("pin")}
                     keyboardType="number-pad"
                     maxLength={6}
-                    style={[styles.input, { letterSpacing: 5 }]}
+                    inputStyle={{
+                      letterSpacing: 5,
+                      textAlign: "center",
+                      minWidth: 180,
+                      paddingTop: 10,
+                      paddingBottom: 8,
+                    }}
+                    containerStyle={{
+                      marginBottom: 16,
+                    }}
+                    errorStyle={{
+                      textAlign: "center",
+                    }}
                     placeholder="******"
-                    placeholderTextColor={colors.inputPlaceholder}
                   />
-                  {touched.pin && errors.pin && (
-                    <ThemedText type="small" style={styles.errorText}>
-                      {errors.pin}
-                    </ThemedText>
-                  )}
-                  <ThemedText style={styles.label}>
+                  <ThemedText style={ui.label}>
                     {t("auth.confirmPin")}
                   </ThemedText>
-                  <TextInput
+                  <ThemedTextInput
+                    name="confirmPin"
+                    touched={touched}
+                    errors={errors}
                     secureTextEntry
                     value={values.confirmPin}
                     onChangeText={handleChange("confirmPin")}
                     onBlur={handleBlur("confirmPin")}
                     keyboardType="number-pad"
                     maxLength={6}
-                    style={[styles.input, { letterSpacing: 5 }]}
+                    inputStyle={{
+                      letterSpacing: 5,
+                      textAlign: "center",
+                      minWidth: 180,
+                      paddingTop: 10,
+                      paddingBottom: 8,
+                    }}
+                    containerStyle={{
+                      marginBottom: 16,
+                    }}
+                    errorStyle={{
+                      textAlign: "center",
+                    }}
                     placeholder="******"
-                    placeholderTextColor={colors.inputPlaceholder}
                   />
-                  {touched.confirmPin && errors.confirmPin && (
-                    <ThemedText style={styles.errorText}>
-                      {errors.confirmPin}
-                    </ThemedText>
-                  )}
                   <View>
                     <TouchableOpacity
-                      style={[styles.btn, { backgroundColor: colors.primary }]}
+                      style={[ui.btnPrimary]}
                       onPress={() => handleSubmit()}
                       disabled={isSubmitting}
                     >
@@ -385,7 +413,7 @@ export default function AuthGate({
           </ThemedText>
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.btnOutline, { borderColor: colors.primary }]}
+              style={[ui.btnOutline]}
               onPress={() => handleBiometryChoice(false)}
             >
               <ThemedText style={{ color: colors.text }}>
@@ -393,7 +421,7 @@ export default function AuthGate({
               </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.btn, { backgroundColor: colors.primary }]}
+              style={[ui.btnPrimary]}
               onPress={() => handleBiometryChoice(true)}
             >
               <ThemedText style={{ color: colors.textInPrimary }}>
@@ -413,7 +441,7 @@ export default function AuthGate({
           <NemoryLogo width={120} height={150} />
         </View>
         <View style={styles.center}>
-          <ThemedText style={styles.label}>
+          <ThemedText style={ui.label}>
             {t("auth.waitingForBiometrics")}
           </ThemedText>
         </View>
@@ -428,30 +456,40 @@ export default function AuthGate({
         behavior={Platform.OS === EPlatform.IOS ? "padding" : "height"}
         keyboardVerticalOffset={0}
       >
-        <ScrollView contentContainerStyle={styles.scrollCenter}>
+        <ScrollView
+          contentContainerStyle={styles.scrollCenter}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.logoWrap}>
             <NemoryLogo width={120} height={150} />
           </View>
           <View style={styles.center}>
-            <ThemedText style={styles.label}>{t("auth.enterPin")}</ThemedText>
-            <TextInput
+            <ThemedText style={ui.label}>{t("auth.enterPin")}</ThemedText>
+            <ThemedTextInput
+              name="pin"
+              errorMessage={errorPin}
               secureTextEntry
               value={pin}
               onChangeText={setPin}
               keyboardType="number-pad"
               maxLength={6}
-              style={[styles.input, { letterSpacing: 5 }]}
+              inputStyle={{
+                letterSpacing: 5,
+                textAlign: "center",
+                minWidth: 180,
+                paddingTop: 10,
+                paddingBottom: 8,
+              }}
+              containerStyle={{
+                marginBottom: 16,
+              }}
+              errorStyle={{
+                textAlign: "center",
+              }}
               placeholder="******"
-              placeholderTextColor={colors.inputPlaceholder}
             />
-            {!!errorPin && (
-              <ThemedText style={styles.errorText}>{errorPin}</ThemedText>
-            )}
             <TouchableOpacity
-              style={[
-                styles.btn,
-                { backgroundColor: colors.primary, marginBottom: 10 },
-              ]}
+              style={[ui.btnPrimary, { marginBottom: 10 }]}
               onPress={handleCheckPin}
             >
               <ThemedText style={{ color: colors.textInPrimary }}>
@@ -460,7 +498,7 @@ export default function AuthGate({
             </TouchableOpacity>
             {biometryEnabled && (
               <TouchableOpacity
-                style={[styles.btn, { backgroundColor: colors.primary }]}
+                style={[ui.btnPrimary]}
                 onPress={() => setStep("biometry")}
               >
                 <ThemedText style={{ color: colors.textInPrimary }}>
@@ -488,40 +526,6 @@ const getStyles = (colors: ColorTheme) =>
       alignItems: "center",
       justifyContent: "center",
       padding: 20,
-    },
-    label: {
-      fontSize: 18,
-      marginBottom: 16,
-      textAlign: "center",
-      fontWeight: "500",
-    },
-    input: {
-      borderRadius: 12,
-      padding: 12,
-      fontSize: 20,
-      marginBottom: 16,
-      width: 180,
-      textAlign: "center",
-      backgroundColor: colors.inputBackground,
-      color: colors.text,
-      borderColor: colors.border,
-      borderWidth: 1,
-    },
-    errorText: {
-      color: colors.error,
-      marginTop: -10,
-      marginBottom: 20,
-    },
-    btn: {
-      paddingHorizontal: 18,
-      paddingVertical: 10,
-      borderRadius: 12,
-    },
-    btnOutline: {
-      paddingHorizontal: 18,
-      paddingVertical: 10,
-      borderRadius: 12,
-      borderWidth: 1,
     },
     logoWrap: {
       alignItems: "center",

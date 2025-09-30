@@ -18,6 +18,7 @@ import DeleteAccountModal from "@/components/settings/profile/DeleteAccountModal
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { loadAccessToken } from "@/utils/store/storage";
+import { useUIStyles } from "@/hooks/useUIStyles";
 
 const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const colorScheme = useColorScheme();
@@ -30,14 +31,15 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   const [showChangeNameModal, setShowChangeNameModal] = useState(false);
   const [showChangeEmailModal, setShowChangeEmailModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<"login" | "registerUser">(
-    "registerUser",
+  const [activeTab, setActiveTab] = useState<"login" | "register" | "refresh">(
+    "register",
   );
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const ui = useUIStyles();
 
   useEffect(() => {
     getUserLogged();
-  }, []);
+  }, [user]);
 
   const getUserLogged = async () => {
     const token = await loadAccessToken();
@@ -76,12 +78,17 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
   };
 
   const handleRegister = async () => {
-    setActiveTab("registerUser");
+    setActiveTab("register");
     setShowAuthForm(true);
   };
 
   const handleLogin = async () => {
     setActiveTab("login");
+    setShowAuthForm(true);
+  };
+
+  const handleRefresh = async () => {
+    setActiveTab("refresh");
     setShowAuthForm(true);
   };
 
@@ -102,6 +109,9 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
       <Background background={colors.backgroundImage} paddingTop={10}>
         {showAuthForm ? (
           <AuthForm
+            isLogin={activeTab === "login"}
+            isRegister={activeTab === "register"}
+            isRefresh={activeTab === "refresh"}
             handleBack={() => setShowAuthForm(false)}
             onSuccessSignWithGoogle={() => {
               setShowAuthForm(false);
@@ -186,9 +196,8 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               <>
                 <TouchableOpacity
                   style={[
-                    styles.btn,
+                    ui.btnPrimary,
                     {
-                      backgroundColor: colors.primary,
                       marginBottom: 20,
                     },
                   ]}
@@ -211,13 +220,35 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               </>
             )}
 
+            {userLogged && (
+              <View>
+                <TouchableOpacity
+                  style={[
+                    ui.btnPrimary,
+                    {
+                      marginBottom: 20,
+                    },
+                  ]}
+                  onPress={handleRefresh}
+                >
+                  <ThemedText
+                    style={{
+                      color: colors.textInPrimary,
+                      textAlign: "center",
+                    }}
+                  >
+                    {t("auth.refreshSession")}
+                  </ThemedText>
+                </TouchableOpacity>
+              </View>
+            )}
+
             {!user?.isRegistered && (
               <View>
                 <TouchableOpacity
                   style={[
-                    styles.btn,
+                    ui.btnPrimary,
                     {
-                      backgroundColor: colors.primary,
                       marginBottom: 20,
                     },
                   ]}
@@ -238,9 +269,8 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               <View>
                 <TouchableOpacity
                   style={[
-                    styles.btn,
+                    ui.btnPrimary,
                     {
-                      backgroundColor: colors.primary,
                       marginBottom: 20,
                     },
                   ]}
@@ -261,12 +291,9 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
               <View>
                 <TouchableOpacity
                   style={[
-                    styles.btn,
+                    ui.btnOutline,
                     {
-                      borderWidth: 1,
-                      borderColor: colors.border,
                       marginBottom: 20,
-                      backgroundColor: colors.background,
                     },
                   ]}
                   onPress={() => setShowDeleteAccountModal(true)}

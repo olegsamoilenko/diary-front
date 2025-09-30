@@ -17,6 +17,7 @@ import axios from "axios";
 import i18n from "i18next";
 import Toast from "react-native-toast-message";
 import { apiUrl } from "@/constants/env";
+import { forgotPasswordApi } from "@/utils/api/endpoints/auth/forgotPasswordApi";
 
 export default function ForgotPasswordForm({
   onSuccess,
@@ -30,6 +31,7 @@ export default function ForgotPasswordForm({
   const styles = useMemo(() => getStyles(colors), [colors]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [timer, setTimer] = useState(0);
 
   const forgotPasswordSchema = Yup.object().shape({
     email: Yup.string()
@@ -47,19 +49,19 @@ export default function ForgotPasswordForm({
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${apiUrl}/auth/reset-password`, {
-        email: values.email,
-        lang,
-      });
+      const res = await forgotPasswordApi(values.email, lang as string);
 
-      if (res.data.status === CodeStatus.COOLDOWN) {
-        setError(
-          t("auth.youCanResendEmailIn") +
-            " " +
-            res.data.retryAfterSec +
-            " " +
-            t("common.sec"),
-        );
+      if (res && res.status === CodeStatus.COOLDOWN) {
+        setTimer(res.retryAfterSec || 0);
+        const intervalId = setInterval(() => {
+          setTimer((prev) => {
+            if (prev <= 1) {
+              clearInterval(intervalId);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
         return;
       }
 
@@ -73,20 +75,14 @@ export default function ForgotPasswordForm({
         text2: t("toast.weHaveSuccessfullySentTheCodeToYourEmail"),
       });
     } catch (err: any) {
-      console.log("forgot password error", err);
-      console.log("forgot password error response", err?.response);
-      console.log("forgot password error response data", err?.response?.data);
-      console.log(
-        "forgot password error response data message",
-        err?.response?.data.message,
-      );
-      const code = err?.response?.data?.code as keyof typeof ErrorMessages;
+      console.log("forgot password error", err.response);
+      const code = err?.response.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(
         errorKey
           ? t(`errors.${errorKey}`)
-          : err?.response?.data?.message
-            ? err?.response?.data.message
+          : err?.response.data?.message
+            ? err?.response.data.message
             : t("errors.undefined"),
       );
     } finally {
@@ -150,6 +146,17 @@ export default function ForgotPasswordForm({
             {error && (
               <ThemedText type={"small"} style={styles.error}>
                 {error}
+              </ThemedText>
+            )}
+            {timer > 0 && (
+              <ThemedText
+                type="small"
+                style={[
+                  styles.error,
+                  { marginBottom: 10, textAlign: "center" },
+                ]}
+              >
+                {t("auth.youCanResendEmailIn")} {timer} {t("common.sec")}
               </ThemedText>
             )}
             <TouchableOpacity
