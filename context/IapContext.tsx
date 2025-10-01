@@ -13,24 +13,15 @@ import {
   type PurchaseError,
   type Product,
   type Purchase,
+  type ProductSubscriptionAndroidOfferDetails,
   purchaseUpdatedListener,
-  PurchaseStateAndroid,
+  ErrorCode,
 } from "react-native-iap";
-import { INAPP_SKUS, SUB_SKUS, SUB_BASE } from "@/constants/iap";
-import { isSub, getAndroidOfferTokenFromProduct, apiRequest } from "@/utils";
-import * as Application from "expo-application";
+import { SUB_SKUS, SUB_BASE } from "@/constants/iap";
+import { apiRequest } from "@/utils";
 import { EPlatform, Plan, Subscriptions } from "@/types";
 
-type AndroidOffer = {
-  basePlanId?: string;
-  offerTags?: string[];
-  offerToken: string;
-  pricingPhases?: any;
-};
-
-type SubProduct = IAP.Product & {
-  subscriptionOfferDetailsAndroid?: AndroidOffer[];
-};
+type AndroidOffer = ProductSubscriptionAndroidOfferDetails;
 
 type VerifyResp = {
   planId: string;
@@ -44,9 +35,8 @@ type IapContextValue = {
   connected: boolean;
   loading: boolean;
   subscriptions: Product[];
-  buySubById: (sku: string) => Promise<VerifyResp>;
   buyPlan: (
-    basePlanId: "lite-m1" | "pro-m1" | "ultra-m1",
+    basePlanId: "lite-m1" | "base-m1" | "pro-m1",
     opts?: { oldToken?: string; obfuscatedId?: string },
   ) => Promise<Plan>;
   restore: () => Promise<void>;
@@ -63,13 +53,18 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   const {
     connected,
     requestPurchase,
-    // currentPurchase,
     finishTransaction,
     getAvailablePurchases,
     getActiveSubscriptions,
   } = useIAP({
     onPurchaseError: (error: PurchaseError) => {
-      if (error.code !== "E_USER_CANCELLED") {
+      const code: any = (error as any)?.code;
+      const userCancelled =
+        code === ErrorCode.UserCancelled ||
+        code === "E_USER_CANCELLED" ||
+        code === "UserCancelled" ||
+        code === "userCancelled";
+      if (!userCancelled) {
         Alert.alert("Purchase failed", error.message);
       }
     },
@@ -92,17 +87,26 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   const baseSub = catalog.find((p) => p.id === Subscriptions.NEMORY);
 
   function pickOfferToken(
-    p: SubProduct,
+    p: Product,
     opts: { basePlanId: string; preferTrial?: boolean; tag?: string },
   ) {
-    const offers = p.subscriptionOfferDetailsAndroid ?? [];
-    let candidates = offers.filter((o) => o.basePlanId === opts.basePlanId);
+    if (
+      !("subscriptionOfferDetailsAndroid" in p) ||
+      !p.subscriptionOfferDetailsAndroid
+    ) {
+      return undefined;
+    }
+
+    const offers = (p.subscriptionOfferDetailsAndroid ?? []) as AndroidOffer[];
+    let candidates = offers.filter(
+      (o: AndroidOffer) => o.basePlanId === opts.basePlanId,
+    );
     if (opts.tag)
-      candidates = candidates.filter((o) =>
-        (o.offerTags ?? []).includes(opts.tag),
+      candidates = candidates.filter((o: AndroidOffer) =>
+        (o.offerTags ?? []).includes(opts.tag as string),
       );
     if (opts.preferTrial) {
-      const withTrial = candidates.find((o) =>
+      const withTrial = candidates.find((o: AndroidOffer) =>
         (o.pricingPhases?.pricingPhaseList ?? []).some(
           (ph: any) => ph.recurrenceMode === 2 || ph.priceAmountMicros === "0",
         ),
@@ -113,9 +117,10 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
   }
 
   const pending = useRef<{
-    resolve?: (v: VerifyResp) => void;
+    resolve?: (v: any) => void;
     reject?: (e: any) => void;
     sku?: string;
+    basePlanId?: string;
   }>({});
 
   const fetchWithRetry = async (
@@ -137,8 +142,10 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const numericState = purchase?.purchaseStateAndroid as number | undefined;
     if (typeof numericState === "number") {
-      return numericState === PurchaseStateAndroid.PURCHASED;
+      return numericState === 1;
     }
+    if (purchase?.transactionReceipt) return true;
+
     return false;
   }
 
@@ -219,35 +226,11 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
     if (connected) loadCatalogAndState();
   }, [connected]);
 
-  const buySubById = async (sku: string) => {
-    const product = catalog.find((p) => p.id === sku);
-    const offerToken =
-      product && isSub(product)
-        ? getAndroidOfferTokenFromProduct(product)
-        : undefined;
-
-    const p = new Promise<VerifyResp>((resolve, reject) => {
-      pending.current = { resolve, reject, sku };
-    });
-
-    await requestPurchase({
-      type: "subs",
-      request: {
-        ios: { sku },
-        android: {
-          skus: [sku],
-          ...(offerToken ? { subscriptionOffers: [{ sku, offerToken }] } : {}),
-        },
-      },
-    });
-    return p;
-  };
-
   async function buyPlan(
-    basePlanId: "lite-m1" | "pro-m1" | "ultra-m1",
+    basePlanId: "lite-m1" | "base-m1" | "pro-m1",
     opts?: { oldToken?: string; obfuscatedId?: string },
   ): Promise<Plan> {
-    const offerToken = pickOfferToken(baseSub, {
+    const offerToken = pickOfferToken(baseSub as Product, {
       basePlanId,
       preferTrial: true,
     });
@@ -284,11 +267,10 @@ export const IapProvider: React.FC<{ children: React.ReactNode }> = ({
       connected,
       loading: loading || !connected,
       subscriptions: catalog,
-      buySubById,
       buyPlan,
       restore: loadCatalogAndState,
     }),
-    [connected, catalog, loading],
+    [connected, catalog, loading, buyPlan, loadCatalogAndState],
   );
 
   return <IapCtx.Provider value={value}>{children}</IapCtx.Provider>;

@@ -48,6 +48,7 @@ const Base = {
     // rich
     toolbarBackground: "#",
     toolbarIcon: "#",
+    activeToolbarTabBackground: "#",
     // Modal
     modalBackground: "#FFFFFF",
   },
@@ -102,7 +103,8 @@ export const Colors: Record<string, ColorTheme> = {
     barStyle: "dark",
     // rich
     toolbarBackground: "#ffffff",
-    toolbarIcon: "#526D73526D73",
+    toolbarIcon: "#526D73",
+    activeToolbarTabBackground: "#b7c5c8",
     // Modal
     modalBackground: "#FFFFFF",
   },
@@ -155,6 +157,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#3D383B",
+    activeToolbarTabBackground: "#D1CDC1",
     // Modal
     modalBackground: "#dfdede",
   },
@@ -207,6 +210,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#836e53",
+    activeToolbarTabBackground: "#e6daca",
     // Modal
     modalBackground: "#DCDCDE",
   },
@@ -261,6 +265,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#F8F8F8",
     toolbarIcon: "#604d3f",
+    activeToolbarTabBackground: "#bab0a9",
     // Modal
     modalBackground: "#EFEFEF",
   },
@@ -313,6 +318,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#43484B",
+    activeToolbarTabBackground: "#afb0b1",
     // Modal
     modalBackground: "#dcdcd6",
   },
@@ -365,6 +371,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#C6A186",
+    activeToolbarTabBackground: "#ddc5b4",
     // Modal
     modalBackground: "#e3dad0",
   },
@@ -417,6 +424,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#3D2B1D",
+    activeToolbarTabBackground: "#9c897b",
     // Modal
     modalBackground: "#DDD9D6",
   },
@@ -469,6 +477,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#213F34",
+    activeToolbarTabBackground: "#869f96",
     // Modal
     modalBackground: "#E6E5E1",
   },
@@ -521,6 +530,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#929c94",
+    activeToolbarTabBackground: "#CEDAD1",
     // Modal
     modalBackground: "#F8F9F4",
   },
@@ -573,6 +583,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#474144",
+    activeToolbarTabBackground: "#a5a4a4",
     // Modal
     modalBackground: "#d6cfcb",
   },
@@ -625,6 +636,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#414C4E",
+    activeToolbarTabBackground: "#939892",
     // Modal
     modalBackground: "#FBFBF5",
   },
@@ -677,6 +689,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#2D5C80",
+    activeToolbarTabBackground: "#8b96a1",
     // Modal
     modalBackground: "#f3ede4",
   },
@@ -729,6 +742,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#FF6C05",
+    activeToolbarTabBackground: "#dda37c",
     // Modal
     modalBackground: "#f8f4e8",
   },
@@ -781,6 +795,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#B77E77",
+    activeToolbarTabBackground: "#d1c5c4",
     // Modal
     modalBackground: "#E2D6D8",
   },
@@ -833,6 +848,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#ffffff",
     toolbarIcon: "#627A91",
+    activeToolbarTabBackground: "#c0c9d1",
     // Modal
     modalBackground: "#CFD6E1",
   },
@@ -888,6 +904,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#FFFFFF",
     toolbarIcon: "#2A7BA7",
+    activeToolbarTabBackground: "#aebec8",
     // Modal
     modalBackground: "#E9E8E4",
   },
@@ -943,6 +960,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#FFFFFF",
     toolbarIcon: "#344360",
+    activeToolbarTabBackground: "#babfc8",
     // Modal
     modalBackground: "#D3D1D4",
   },
@@ -995,6 +1013,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#F6F7F9",
     toolbarIcon: "#5BA9A6",
+    activeToolbarTabBackground: "#CADBE3",
     // Modal
     modalBackground: "#f8f8f5",
   },
@@ -1047,6 +1066,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#FFE4C7",
     toolbarIcon: "#A54E32",
+    activeToolbarTabBackground: "#bd795a",
     // Modal
     modalBackground: "#F9F1E1",
   },
@@ -1060,8 +1080,8 @@ export const Colors: Record<string, ColorTheme> = {
       url: require("@/assets/images/background/ball.jpeg"),
     },
     backgroundAdditional: "#534f4f",
-    primary: "#202020",
-    disabledPrimary: "#3e3e3e",
+    primary: "#b6bcca",
+    disabledPrimary: "#656975",
     secondary: "#4a5365",
     text: "#b6bcca",
     textDisabled: "#4e535e",
@@ -1099,7 +1119,8 @@ export const Colors: Record<string, ColorTheme> = {
     barStyle: "light",
     // rich
     toolbarBackground: "#222020",
-    toolbarIcon: "#7e7d6f",
+    toolbarIcon: "#b6bcca",
+    activeToolbarTabBackground: "#534f4f",
     // Modal
     modalBackground: "#383838",
   },
@@ -1112,13 +1133,13 @@ export const Colors: Record<string, ColorTheme> = {
       url: require("@/assets/images/background/compass.jpg"),
     },
     backgroundAdditional: "#4c4341",
-    primary: "#382A27",
-    disabledPrimary: "#493c37",
+    primary: "#e4ccc7",
+    disabledPrimary: "#7c6b67",
     secondary: "#",
     text: "#e4ccc7",
     textDisabled: "#4a403e",
     textAdditional: "#786c6a",
-    textInPrimary: "#e4ccc7",
+    textInPrimary: "#fff",
     link: "#0000ff",
     border: "#3a3533",
     error: "#B9130F",
@@ -1151,7 +1172,8 @@ export const Colors: Record<string, ColorTheme> = {
     barStyle: "light",
     // rich
     toolbarBackground: "#4a403e",
-    toolbarIcon: "#382A27",
+    toolbarIcon: "#e4ccc7",
+    activeToolbarTabBackground: "#978581",
     // Modal
     modalBackground: "#4C4442",
   },
@@ -1164,13 +1186,13 @@ export const Colors: Record<string, ColorTheme> = {
       url: require("@/assets/images/background/oceanDepths.jpg"),
     },
     backgroundAdditional: "#15222e",
-    primary: "#18314a",
-    disabledPrimary: "#0c1925",
+    primary: "#abbfd5",
+    disabledPrimary: "#626e7c",
     secondary: "#",
     text: "#abbfd5",
     textDisabled: "#464f59",
     textAdditional: "#56606a",
-    textInPrimary: "#abbfd5",
+    textInPrimary: "#fff",
     link: "#0000ff",
     border: "#15222e",
     error: "#B9130F",
@@ -1204,6 +1226,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#19232D",
     toolbarIcon: "#2b5580",
+    activeToolbarTabBackground: "#4e708f",
     // Modal
     modalBackground: "#121C26",
   },
@@ -1256,6 +1279,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#111515",
     toolbarIcon: "#62B959",
+    activeToolbarTabBackground: "#3f525e",
     // Modal
     modalBackground: "#0C0E10",
   },
@@ -1308,6 +1332,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#0F181A",
     toolbarIcon: "#466a67",
+    activeToolbarTabBackground: "#223735",
     // Modal
     modalBackground: "#1A2829",
   },
@@ -1360,6 +1385,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#424041",
     toolbarIcon: "#54676E",
+    activeToolbarTabBackground: "#2f3639",
     // Modal
     modalBackground: "#000000",
   },
@@ -1412,6 +1438,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#1E1E1E",
     toolbarIcon: "#0d5132",
+    activeToolbarTabBackground: "#394539",
     // Modal
     modalBackground: "#171717",
   },
@@ -1464,6 +1491,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#1b1b1b",
     toolbarIcon: "#5B010B",
+    activeToolbarTabBackground: "#736b6b",
     // Modal
     modalBackground: "#000000",
   },
@@ -1517,6 +1545,7 @@ export const Colors: Record<string, ColorTheme> = {
     // rich
     toolbarBackground: "#151718",
     toolbarIcon: "#344360",
+    activeToolbarTabBackground: "#42494c",
     // Modal
     modalBackground: "#060907",
   },

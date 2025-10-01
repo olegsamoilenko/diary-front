@@ -10,7 +10,7 @@ export async function getPlanTypeApi() {
     if (res?.status !== 201 && res?.status !== 200) return null;
     return res.data as PlanTypes;
   } catch (err: any) {
-    console.log("Get plan type error response", err.response);
+    console.error("Get plan type error response", err.response);
     throw err;
   }
 }

@@ -20,7 +20,7 @@ export async function createAnonymousUserApi() {
     await ensureDeviceKeypair();
     devicePubKey = await getDevicePublicKey();
   } catch (e) {
-    console.log("ensureDeviceKeypair failed:", e);
+    console.error("ensureDeviceKeypair failed:", e);
   }
 
   try {
@@ -46,7 +46,7 @@ export async function createAnonymousUserApi() {
       settings?: UserSettings;
     };
   } catch (err: any) {
-    console.log("Create anonymous user error response", err.response);
+    console.error("Create anonymous user error response", err.response);
     throw err;
   }
 }

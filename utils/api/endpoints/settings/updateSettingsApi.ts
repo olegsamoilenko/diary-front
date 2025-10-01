@@ -11,7 +11,7 @@ export async function updateSettingsApi(data: Partial<UserSettings>) {
     if (res?.status !== 201 && res?.status !== 200) return null;
     return res.data as UserSettings;
   } catch (err: any) {
-    console.log("Get plan error response", err.response);
+    console.error("Get plan error response", err.response);
     throw err;
   }
 }

@@ -41,8 +41,6 @@ export function ExpandableSection({
     }).start();
   }, [expanded, measured, ready, collapsedHeight, duration, anim]);
 
-  const clipStyle = ready ? { height: anim, overflow: "hidden" as const } : {};
-
   return (
     <Animated.View style={[style]}>
       <View onLayout={onLayout}>{children}</View>

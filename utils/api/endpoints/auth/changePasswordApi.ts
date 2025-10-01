@@ -19,7 +19,7 @@ export async function changePasswordApi(
       message?: string;
     };
   } catch (err: any) {
-    console.log("changePasswordApi error response", err.response);
+    console.error("changePasswordApi error response", err.response);
     throw err;
   }
 }

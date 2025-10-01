@@ -16,7 +16,7 @@ export async function loginUserApi(
     await ensureDeviceKeypair();
     devicePubKey = await getDevicePublicKey();
   } catch (e) {
-    console.log("ensureDeviceKeypair failed:", e);
+    console.error("ensureDeviceKeypair failed:", e);
   }
 
   const deviceId = await loadDeviceId();
@@ -37,7 +37,7 @@ export async function loginUserApi(
       settings: UserSettings;
     };
   } catch (err: any) {
-    console.log("Login user error response", err.response);
+    console.error("Login user error response", err.response);
     throw err;
   }
 }

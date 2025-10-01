@@ -89,7 +89,7 @@ export default function RichToolbar({
             onPress={handleBoldAction}
             style={{
               backgroundColor: activeActions?.isBold
-                ? colors.backgroundAdditional
+                ? colors.activeToolbarTabBackground
                 : "transparent",
             }}
           >
@@ -106,7 +106,7 @@ export default function RichToolbar({
             onPress={handleItalicAction}
             style={{
               backgroundColor: activeActions?.isItalic
-                ? colors.backgroundAdditional
+                ? colors.activeToolbarTabBackground
                 : "transparent",
             }}
           >
@@ -123,7 +123,7 @@ export default function RichToolbar({
             onPress={handleUnderlineAction}
             style={{
               backgroundColor: activeActions?.isUnderline
-                ? colors.backgroundAdditional
+                ? colors.activeToolbarTabBackground
                 : "transparent",
             }}
           >
@@ -170,7 +170,7 @@ export default function RichToolbar({
             onPress={handleBulletedListAction}
             style={{
               backgroundColor: activeActions?.isInsertUnorderedList
-                ? colors.backgroundAdditional
+                ? colors.activeToolbarTabBackground
                 : "transparent",
             }}
           >
@@ -187,7 +187,7 @@ export default function RichToolbar({
             onPress={handleOrderedListAction}
             style={{
               backgroundColor: activeActions?.isInsertOrderedList
-                ? colors.backgroundAdditional
+                ? colors.activeToolbarTabBackground
                 : "transparent",
             }}
           >

@@ -15,7 +15,7 @@ export async function forgotPasswordApi(email: string, lang: string) {
       message?: string;
     };
   } catch (err: any) {
-    console.log("forgotPasswordApi error response", err.response);
+    console.error("forgotPasswordApi error response", err.response);
     throw err;
   }
 }

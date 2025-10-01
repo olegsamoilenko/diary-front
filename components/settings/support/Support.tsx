@@ -71,8 +71,6 @@ const Support = forwardRef<SideSheetRef, {}>((props, ref) => {
         values.text,
       );
 
-      console.log("Support request response:", res);
-
       if (res && res.status === CodeStatus.OK) {
         Toast.show({
           type: "success",
@@ -103,7 +101,7 @@ const Support = forwardRef<SideSheetRef, {}>((props, ref) => {
               marginBottom: 20,
             }}
           >
-            Support
+            {t("settings.support.title")}
           </ThemedText>
           <KeyboardAvoidingView
             style={{ flex: 1 }}

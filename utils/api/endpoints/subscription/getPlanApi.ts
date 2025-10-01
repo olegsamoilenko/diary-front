@@ -12,7 +12,7 @@ export async function getPlanApi() {
       plan: Plan;
     };
   } catch (err: any) {
-    console.log("Get plan error response", err.response);
+    console.error("Get plan error response", err.response);
     throw err;
   }
 }

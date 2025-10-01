@@ -1,130 +1,164 @@
 import { Colors } from "@/constants/Colors";
 
+const defaultFonts = {
+  regular: {
+    fontFamily: "System",
+    fontWeight: "400" as const,
+  },
+  medium: {
+    fontFamily: "System",
+    fontWeight: "500" as const,
+  },
+  bold: {
+    fontFamily: "System",
+    fontWeight: "700" as const,
+  },
+  heavy: {
+    fontFamily: "System",
+    fontWeight: "900" as const,
+  },
+};
+
 export const NavigationThemes = {
   light: {
     dark: false,
     colors: Colors["light"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   silentPeaks: {
     dark: false,
     colors: Colors["silentPeaks"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   goldenHour: {
     dark: false,
     colors: Colors["goldenHour"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   vintagePaper: {
     dark: false,
     colors: Colors["vintagePaper"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   zenMind: {
     dark: false,
     colors: Colors["zenMind"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   mindset: {
     dark: false,
     colors: Colors["mindset"],
-    fonts: {},
-  },
-  seaWhisper: {
-    dark: false,
-    colors: Colors["seaWhisper"],
-    fonts: {},
-  },
-  fallLight: {
-    dark: false,
-    colors: Colors["fallLight"],
-    fonts: {},
-  },
-  whiteLotus: {
-    dark: false,
-    colors: Colors["whiteLotus"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   balance: {
     dark: false,
     colors: Colors["balance"],
-    fonts: {},
+    fonts: defaultFonts,
+  },
+  leafScape: {
+    dark: false,
+    colors: Colors["leafScape"],
+    fonts: defaultFonts,
+  },
+  pastelCollage: {
+    dark: false,
+    colors: Colors["pastelCollage"],
+    fonts: defaultFonts,
+  },
+  seaWhisper: {
+    dark: false,
+    colors: Colors["seaWhisper"],
+    fonts: defaultFonts,
+  },
+  whiteLotus: {
+    dark: false,
+    colors: Colors["whiteLotus"],
+    fonts: defaultFonts,
   },
   slowDown: {
     dark: false,
     colors: Colors["slowDown"],
-    fonts: {},
+    fonts: defaultFonts,
+  },
+  fallLight: {
+    dark: false,
+    colors: Colors["fallLight"],
+    fonts: defaultFonts,
   },
   pinkWhisper: {
     dark: false,
     colors: Colors["pinkWhisper"],
-    fonts: {},
+    fonts: defaultFonts,
+  },
+  paperRose: {
+    dark: false,
+    colors: Colors["paperRose"],
+    fonts: defaultFonts,
   },
   blueBloom: {
     dark: false,
     colors: Colors["blueBloom"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   softWaves: {
     dark: false,
     colors: Colors["softWaves"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   calmMind: {
     dark: false,
     colors: Colors["calmMind"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   orange: {
     dark: false,
     colors: Colors["orange"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   ball: {
     dark: true,
     colors: Colors["ball"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   goodLuck: {
     dark: true,
     colors: Colors["goodLuck"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   oceanDepths: {
     dark: true,
     colors: Colors["oceanDepths"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   dreamAchieve: {
     dark: true,
     colors: Colors["dreamAchieve"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   cipheredNight: {
     dark: true,
     colors: Colors["cipheredNight"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   neonFocus: {
     dark: true,
     colors: Colors["neonFocus"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   compass: {
     dark: true,
     colors: Colors["compass"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   timeToLive: {
     dark: true,
     colors: Colors["timeToLive"],
-    fonts: {},
+    fonts: defaultFonts,
   },
   dark: {
     dark: true,
     colors: Colors["dark"],
-    fonts: {},
+    fonts: defaultFonts,
   },
 };
 

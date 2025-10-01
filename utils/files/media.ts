@@ -276,7 +276,10 @@ async function sha256b64(uri: string) {
 }
 async function fileSize(uri: string) {
   const info = await FileSystem.getInfoAsync(uri, { size: true });
-  return String(info.size ?? 0);
+  if (!info.exists) return "0";
+
+  const s = (info as any).size;
+  return String(typeof s === "number" ? s : 0);
 }
 
 function getExtFromUri(uri: string): string {
@@ -289,7 +292,7 @@ function getManipulatorFormat(ext: string) {
   if (ext === "png") return ImageManipulator.SaveFormat.PNG;
   if (Platform.OS === EPlatform.ANDROID && ext === "webp")
     return ImageManipulator.SaveFormat.WEBP;
-  return null; // інші формати не підтримуємо → не чіпаємо
+  return null;
 }
 
 export async function deleteEntryImages(entryImages: EntryImage[] | []) {

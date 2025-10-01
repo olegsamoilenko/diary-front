@@ -49,9 +49,8 @@ export default function GoogleSignInButton({
       const userInfo = await GoogleSignin.signIn();
       return userInfo;
     } catch (err: any) {
-      console.log("Error GoogleLogin", err);
-      console.log("Error GoogleLogin response", err.response);
-      console.log("Error GoogleLogin response data", err.response.data);
+      console.error("Error GoogleLogin", err);
+      console.error("Error GoogleLogin response", err.response);
       throw err;
     }
   };
@@ -86,9 +85,8 @@ export default function GoogleSignInButton({
         await processUserData(idToken);
       }
     } catch (err: any) {
-      console.log("Error googleSignIn", err);
-      console.log("Error googleSignIn response", err.response);
-      console.log("Error googleSignIn response data", err.response.data);
+      console.error("Error googleSignIn", err);
+      console.error("Error googleSignIn response", err.response);
     }
   };
 

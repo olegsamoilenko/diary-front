@@ -41,7 +41,7 @@ export async function apiRequest<T = any>({
     };
     return await apiClient<T>(requestConfig);
   } catch (err: any) {
-    console.log("API Request Error:", err.response);
+    console.error("API Request Error:", err.response);
     if (err.isAxiosError) {
       if (!err.response) {
         Toast.show({

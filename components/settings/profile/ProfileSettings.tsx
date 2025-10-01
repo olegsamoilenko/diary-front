@@ -43,10 +43,8 @@ const ProfileSettings = forwardRef<SideSheetRef, {}>((props, ref) => {
 
   const getUserLogged = async () => {
     const token = await loadAccessToken();
-    console.log("Token:", token);
 
     const logged = !!token && !!user?.isLogged;
-    console.log("User logged:", logged);
     setUserLogged(logged);
   };
 

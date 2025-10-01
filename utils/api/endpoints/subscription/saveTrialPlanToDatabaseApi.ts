@@ -36,7 +36,7 @@ export async function saveTrialPlanToDatabaseApi(basePlanId: BasePlanIds) {
       plan: Plan;
     };
   } catch (err: any) {
-    console.log("Save trial plan error response", err.response);
+    console.error("Save trial plan error response", err.response);
     throw err;
   }
 }

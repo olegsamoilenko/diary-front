@@ -7,9 +7,10 @@ import { Colors } from "@/constants/Colors";
 import { ColorTheme, Entry } from "@/types";
 import NemoryIcon from "@/components/ui/logo/NemoryIcon";
 import StreamingText from "@/components/diary/add-new-entry/StreamingText";
-import * as SecureStore from "expo-secure-store";
-import { hydrateEntryHtmlFromAlbum } from "@/utils";
 import WebViewHTML from "@/components/ui/WebViewHTML";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { hydrateEntryHtmlFromAlbum } from "@/utils";
 
 type ContentEntryProps = {
   entry: Entry;
@@ -35,18 +36,17 @@ export default function ContentEntry({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const styles = useMemo(() => getStyles(colors), [colors]);
-  const scrollViewRef = useRef(null);
+  const scrollViewRef = useRef<ScrollView>(null);
   const [idx, setIdx] = useState<number>(0);
   const [html, setHtml] = useState(entry.content ?? "");
+  const user = useSelector((s: RootState) => s.user.value);
 
   useEffect(() => {
     if (
       scrollViewRef.current &&
-      // @ts-ignore
       typeof scrollViewRef.current.scrollToEnd === "function"
     ) {
       setTimeout(() => {
-        // @ts-ignore
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 1000);
     }
@@ -54,9 +54,12 @@ export default function ContentEntry({
 
   useEffect(() => {
     (async () => {
-      const rawUser = await SecureStore.getItemAsync("user");
-      const user = rawUser ? JSON.parse(rawUser) : null;
-      if (user.id && entry.id && entry.content?.includes("nemory://i/")) {
+      if (
+        user &&
+        user?.id &&
+        entry.id &&
+        entry.content?.includes("nemory://i/")
+      ) {
         const hydrated = await hydrateEntryHtmlFromAlbum(
           entry.content,
           Number(user.id),
@@ -88,22 +91,30 @@ export default function ContentEntry({
             <View style={styles.commentContainer}>
               {aiLoading ? (
                 <View style={styles.loaderContainer}>
-                  <AILoader width={50} height={60} dotFontSize={24} />
+                  <AILoader width={20} height={20} dotFontSize={10} />
                 </View>
               ) : (
-                <View>
+                <View
+                  style={{
+                    paddingTop: 10,
+                    paddingHorizontal: 15,
+                    paddingBottom: 15,
+                  }}
+                >
                   <View
                     style={{
-                      padding: 10,
+                      position: "absolute",
+                      top: 10,
+                      left: 10,
                     }}
                   >
-                    <NemoryIcon width={50} height={60} />
+                    <NemoryIcon width={20} height={20} />
                   </View>
                   <StreamingText
                     key={entry.id}
                     id={`comment-${entry.id}`}
                     speed={50}
-                    style={{ color: colors.text, padding: 10 }}
+                    style={{ color: colors.text }}
                     onChange={() => {
                       setTimeout(() => {
                         // @ts-ignore
@@ -142,9 +153,25 @@ export default function ContentEntry({
                       strimDialogError.uuid !== dialog.uuid)) && (
                     <View style={styles.answerContainer}>
                       {aiDialogLoading && dialog.loading ? (
-                        <AILoader width={50} height={60} dotFontSize={24} />
+                        <View
+                          style={{
+                            position: "absolute",
+                            top: 10,
+                            left: 10,
+                          }}
+                        >
+                          <AILoader width={20} height={20} dotFontSize={10} />
+                        </View>
                       ) : (
-                        <NemoryIcon width={50} height={60} />
+                        <View
+                          style={{
+                            position: "absolute",
+                            top: 10,
+                            left: 10,
+                          }}
+                        >
+                          <NemoryIcon width={20} height={20} />
+                        </View>
                       )}
                       <StreamingText
                         key={dialog.uuid}
@@ -184,7 +211,7 @@ const getStyles = (colors: ColorTheme) =>
     commentContainer: {
       flex: 1,
       padding: 0,
-      marginLeft: 15,
+      marginLeft: 10,
       width: "75%",
       alignItems: "flex-start",
       borderRadius: 8,
@@ -207,7 +234,9 @@ const getStyles = (colors: ColorTheme) =>
       width: "75%",
       alignItems: "flex-start",
       backgroundColor: colors.aiCommentBackground,
-      padding: 10,
+      paddingHorizontal: 5,
+      paddingTop: 0,
+      paddingBottom: 5,
       marginLeft: 10,
       borderRadius: 8,
     },

@@ -70,7 +70,7 @@ export default function EmailVerificationCodeForm({
       UserEvents.emit("userRegistered");
     } catch (err: any) {
       const payload = err as Rejected;
-      console.log("handle verify email error", payload);
+      console.error("handle verify email error", payload);
       const errorKey =
         ErrorMessages[payload.code as keyof typeof ErrorMessages];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
@@ -115,7 +115,7 @@ export default function EmailVerificationCodeForm({
         text2: t("toast.weHaveSentYouCodeByEmail"),
       });
     } catch (err: any) {
-      console.log("resend code error response", err?.response);
+      console.error("resend code error response", err?.response);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));

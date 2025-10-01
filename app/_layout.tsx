@@ -97,6 +97,7 @@ export default function RootLayout() {
     setLoader(true);
     if (!loaded) return;
     (async () => {
+      // await SecureStore.deleteItemAsync("token");
       // await Promise.allSettled([
       //   SecureStore.deleteItemAsync("access_token"),
       //   SecureStore.deleteItemAsync("refresh_token"),
@@ -116,7 +117,7 @@ export default function RootLayout() {
       //   store.dispatch(resetSettings());
       //   store.dispatch(resetPlan());
       // });
-      await logStoredUserData();
+      // await logStoredUserData();
 
       const token = await SecureStore.getItemAsync("access_token");
 
@@ -195,7 +196,7 @@ function AppContent() {
       try {
         await store.dispatch(initAnonymousUser()).unwrap();
       } catch (err) {
-        console.log("Failed to init anonymous user after deletion", err);
+        console.error("Failed to init anonymous user after deletion", err);
       }
     };
 
@@ -325,7 +326,7 @@ function useUpdateLastActive(user: User | null) {
           }),
         ).unwrap();
       } catch (err: any) {
-        console.log("Set Name error response", err);
+        console.error("Set Name error response", err);
       }
     };
 

@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { getValidAccessToken } from "@/utils/auth/getValidAccessToken";
 
 type StreamEventHandlers = {
   onChunk: (data: any) => void;
@@ -11,15 +12,13 @@ export async function runAIStream({
   data,
   eventNames,
   handlers,
-  getToken,
 }: {
   endpoint: string;
   data: any;
   eventNames: { chunk: string; done: string; error: string[] };
   handlers: StreamEventHandlers;
-  getToken: () => Promise<string | null>;
 }) {
-  const token = await getToken();
+  const token = await getValidAccessToken();
   const socket = io(process.env.EXPO_PUBLIC_URL, {
     transports: ["websocket"],
     auth: { token },

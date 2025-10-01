@@ -1,14 +1,5 @@
 import { RichEditor } from "react-native-pell-rich-editor";
-import {
-  ActivityIndicator,
-  ScrollView,
-  View,
-  Keyboard,
-  useWindowDimensions,
-  Platform,
-  KeyboardAvoidingView,
-  Dimensions,
-} from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 import React, { useEffect, useRef, useState, RefObject } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -27,12 +18,7 @@ import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStyleshee
 import uuid from "react-native-uuid";
 
 import * as ImagePicker from "expo-image-picker";
-import {
-  prepareImageForUpload,
-  uploadImageToServer,
-  queueImage,
-  prepareImageForStorage,
-} from "@/utils";
+import { queueImage, prepareImageForStorage } from "@/utils";
 import { useTranslation } from "react-i18next";
 
 type TextReachEditorProps = {
@@ -61,7 +47,6 @@ type TextReachEditorProps = {
   setShowPhotoSetting: (show: boolean) => void;
   emoji?: string;
   counterTextEmojiRef: RefObject<number>;
-  keyboardHeight: number;
 };
 
 const sizeMap: Record<number, number> = {
@@ -94,15 +79,13 @@ export default function TextReachEditor({
   setShowPhotoSetting,
   emoji,
   counterTextEmojiRef,
-  keyboardHeight,
 }: TextReachEditorProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
-  const richText = useRef(null);
-  const scrollRef = useRef(null);
+  const richText = useRef<RichEditor>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const [imageLoading, setImageLoading] = useState(false);
   const { t } = useTranslation();
-  const scr = Dimensions.get("screen");
 
   const handleEditorMessage = (event: any) => {
     try {
@@ -127,13 +110,10 @@ export default function TextReachEditor({
 
   useEffect(() => {
     if (isKeyboardOpen) {
-      // @ts-ignore
       richText.current?.commandDOM(
         'document.getElementsByClassName("content")[0].focus()',
       );
-      // @ts-ignore
       richText.current?.commandDOM("document.execCommand('bold', false, '')");
-      // @ts-ignore
       richText.current?.commandDOM(`
     (function() {
       var result = document.queryCommandState('bold');
@@ -144,15 +124,12 @@ export default function TextReachEditor({
   }, [isBoldAction]);
 
   useEffect(() => {
-    // @ts-ignore
-    richText.current?.insertText(emoji);
+    richText.current?.insertText(emoji as string);
   }, [emoji, counterTextEmojiRef.current]);
 
   useEffect(() => {
     if (isKeyboardOpen) {
-      // @ts-ignore
       richText.current?.commandDOM("document.execCommand('italic', false, '')");
-      // @ts-ignore
       richText.current?.commandDOM(`
     (function() {
       var result = document.queryCommandState('italic');
@@ -164,11 +141,9 @@ export default function TextReachEditor({
 
   useEffect(() => {
     if (isKeyboardOpen) {
-      // @ts-ignore
       richText.current?.commandDOM(
         "document.execCommand('underline', false, '')",
       );
-      // @ts-ignore
       richText.current?.commandDOM(`
     (function() {
       var result = document.queryCommandState('underline');
@@ -180,11 +155,9 @@ export default function TextReachEditor({
 
   useEffect(() => {
     if (isKeyboardOpen) {
-      // @ts-ignore
       richText.current?.commandDOM(
         "document.execCommand('insertUnorderedList', false, '')",
       );
-      // @ts-ignore
       richText.current?.commandDOM(`
     (function() {
       var result = document.queryCommandState('insertUnorderedList');
@@ -196,11 +169,9 @@ export default function TextReachEditor({
 
   useEffect(() => {
     if (isKeyboardOpen) {
-      // @ts-ignore
       richText.current?.commandDOM(
         "document.execCommand('insertOrderedList', false, '')",
       );
-      // @ts-ignore
       richText.current?.commandDOM(`
     (function() {
       var result = document.queryCommandState('insertOrderedList');
@@ -211,12 +182,10 @@ export default function TextReachEditor({
   }, [isOrderedListAction]);
 
   useEffect(() => {
-    // @ts-ignore
     richText.current?.setForeColor(colorAction);
   }, [colorAction]);
 
   useEffect(() => {
-    // @ts-ignore
     richText.current?.commandDOM(
       `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
       var fontElements = document.getElementsByTagName("font");
@@ -230,7 +199,6 @@ export default function TextReachEditor({
   }, [sizeAction]);
 
   useEffect(() => {
-    // @ts-ignore
     richText.current?.commandDOM(`
     document.execCommand("fontName", false, "${selectedFont.name}");
   `);
@@ -238,17 +206,14 @@ export default function TextReachEditor({
 
   const onFocus = () => {
     handleFocus();
-    // @ts-ignore
     richText.current?.commandDOM(`
         document.execCommand("fontName", false, "${selectedFont.name}");
       `);
     setTimeout(() => {
       if (richText.current) {
-        // @ts-ignore
         richText.current.commandDOM(
           `document.execCommand('foreColor', false, '${colorAction}')`,
         );
-        // @ts-ignore
         richText.current?.commandDOM(
           `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
       var fontElements = document.getElementsByTagName("font");
@@ -269,7 +234,7 @@ export default function TextReachEditor({
         try {
           const permissionResult =
             await ImagePicker.requestCameraPermissionsAsync();
-          if (permissionResult.granted === false) {
+          if (!permissionResult.granted) {
             alert("Дозвольте доступ до камери!");
             return;
           }
@@ -286,19 +251,16 @@ export default function TextReachEditor({
           }
 
           setTimeout(() => {
-            // @ts-ignore
             scrollRef.current?.scrollToEnd({ animated: true });
           }, 0);
 
           setShowPhotoSetting(false);
         } catch (error: any) {
           // TODO: Показати користувачу тоаст з помилкою.
-          // @ts-ignore
           richText.current?.commandDOM(
             "document.execCommand('undo', false, null)",
           );
           setTimeout(() => {
-            // @ts-ignore
             scrollRef.current?.scrollToEnd({ animated: true });
           }, 0);
           console.error("Error picking photo:", error);
@@ -332,19 +294,16 @@ export default function TextReachEditor({
           }
 
           setTimeout(() => {
-            // @ts-ignore
             scrollRef.current?.scrollToEnd({ animated: true });
           }, 0);
 
           setShowImageSetting(false);
-        } catch (error) {
-          // TODO: Показати користувачу тоаст з помилкою.
-          // @ts-ignore
+        } catch (error: any) {
+          // TODO: Показати користувачу тоаст з помилкою
           richText.current?.commandDOM(
             "document.execCommand('undo', false, null)",
           );
           setTimeout(() => {
-            // @ts-ignore
             scrollRef.current?.scrollToEnd({ animated: true });
           }, 0);
           console.error("Error picking image:", error);
@@ -363,7 +322,6 @@ export default function TextReachEditor({
 
   const handleImageAndPhoto = async (result: any) => {
     setImageLoading(true);
-    richText.current?.prepareInsert?.();
 
     const picked = result.assets ? result.assets[0] : result;
     const localUri = picked.uri;
@@ -372,7 +330,6 @@ export default function TextReachEditor({
     const anchorId = `cursor-anchor-${imageId}`;
 
     if (picked.base64) {
-      // @ts-ignore
       richText.current?.insertHTML(
         `<img id="${imageId}" src="data:image/jpeg;base64,${picked.base64}" 
             style="max-width:70%;height:auto;border-radius:12px;margin:10px auto;display:block;"
@@ -390,7 +347,6 @@ export default function TextReachEditor({
     setImageLoading(false);
 
     setTimeout(() => {
-      // @ts-ignore
       richText.current?.commandDOM(`
           (function() {
             var el = document.getElementById('${anchorId}');
@@ -407,38 +363,32 @@ export default function TextReachEditor({
 
       scrollEditorToAnchor(anchorId);
 
-      // @ts-ignore
       richText.current?.commandDOM(`
                 (function() {
                   document.execCommand('fontName', false, "${selectedFont.name}");
                 })()
               `);
       if (sizeAction) {
-        // @ts-ignore
         richText.current?.commandDOM(
           `document.execCommand('fontSize', false, "${sizeMap[sizeAction]}");`,
         );
       }
       if (colorAction) {
-        // @ts-ignore
         richText.current?.commandDOM(
           `document.execCommand('foreColor', false, "${colorAction}");`,
         );
       }
       if (isBoldAction) {
-        // @ts-ignore
         richText.current?.commandDOM("document.execCommand('bold', false, '')");
       }
 
       if (isItalicAction) {
-        // @ts-ignore
         richText.current?.commandDOM(
           `document.execCommand('italic', false, null);`,
         );
       }
 
       if (isUnderlineAction) {
-        // @ts-ignore
         richText.current?.commandDOM(
           `document.execCommand('underline', false, null);`,
         );
@@ -468,8 +418,6 @@ export default function TextReachEditor({
     }
   }, [isKeyboardOpen]);
 
-  const [editorHeight, setEditorHeight] = useState(60);
-
   return (
     <>
       <View
@@ -485,13 +433,12 @@ export default function TextReachEditor({
           onChange={setContent}
           style={{
             flex: 1,
-            minHeight: scr,
           }}
           onFocus={onFocus}
           onBlur={handleBlur}
+          autoCapitalize="sentences"
           editorInitializedCallback={() => {}}
           placeholder={t("diary.addEntryText")}
-          onHeightChange={(height) => setEditorHeight(height)}
           editorStyle={{
             backgroundColor: "transparent",
             color: "#6c6b6b",

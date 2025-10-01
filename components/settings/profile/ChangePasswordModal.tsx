@@ -75,7 +75,7 @@ export default function ChangePasswordModal({
       onSuccessChangePassword();
     } catch (err: any) {
       const payload = err as Rejected;
-      console.log("handle handleChangePassword error", payload);
+      console.error("handle handleChangePassword error", payload);
       const errorKey =
         ErrorMessages[payload.code as keyof typeof ErrorMessages];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));

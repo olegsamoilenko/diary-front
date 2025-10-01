@@ -7,7 +7,7 @@ import { fetchProducts } from "react-native-iap";
 
 const SUB_SKUS = ["nemory_lite", "nemory_base", "nemory_pro"];
 export default function IapDiagnostics() {
-  const { connected, products, restore, buySubById } = useIap();
+  const { connected, restore } = useIap();
 
   const [log, setLog] = useState<string[]>([]);
   const add = (m: string) =>
@@ -33,7 +33,6 @@ export default function IapDiagnostics() {
         IAP diagnostics
       </Text>
       <Text>connected: {String(connected)}</Text>
-      <Text>products: {products.length}</Text>
 
       <View style={{ height: 12 }} />
       <Button
@@ -42,16 +41,8 @@ export default function IapDiagnostics() {
       />
 
       <View style={{ height: 12 }} />
-      {products.map((p) => (
-        <View key={p.id} style={{ paddingVertical: 8 }}>
-          <Text>{getProductTitle(p)}</Text>
-          <Text>{getProductPrice(p)}</Text>
-          <Button title={`Buy ${p.id}`} onPress={() => buySubById(p.id)} />
-        </View>
-      ))}
 
       <View style={{ height: 12 }} />
-      <Button title="Buy Lite" onPress={() => buySubById("nemory_lite")} />
 
       <View style={{ height: 12 }} />
       <Button title="Test Fetch Once" onPress={() => testFetchOnce()} />

@@ -17,6 +17,7 @@ import YesevaOneFontStylesheet from "@/assets/fonts/entry/YesevaOneFontStyleshee
 
 type Props = WebViewProps & {
   content: string;
+  maxLines?: number;
   minHeight?: number;
   onAutoHeight?: (h: number) => void;
   onReady?: (h: number) => void;
@@ -24,6 +25,7 @@ type Props = WebViewProps & {
 
 export default function WebViewHTML({
   content,
+  maxLines,
   style,
   minHeight = 20,
   onAutoHeight,
@@ -66,13 +68,26 @@ export default function WebViewHTML({
   i, em     { font-style: italic; }
   u         { text-decoration: underline; }
   ul, ol { margin:8px 0 8px 18px; padding:0; } li { margin:6px 0; }
+  
+  ${
+    typeof maxLines === "number"
+      ? `
+  #wrap {
+    display: -webkit-box;
+    -webkit-line-clamp: ${maxLines};
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  `
+      : ""
+  }
 </style>
 </head>
 <body>
-  <div id="wrap" style="display:block">${content}</div>
+  <div id="wrap">${content}</div>
 </body>
 </html>`,
-    [content, FONTS_CSS],
+    [content, FONTS_CSS, maxLines],
   );
 
   const injected = useMemo(
@@ -149,8 +164,12 @@ true; // <- потрібно для Android, щоб injectedJavaScript заве�
 
   return (
     <WebView
+      key={String(maxLines ?? "full")}
       originWhitelist={["*"]}
       source={{ html }}
+      allowFileAccess
+      allowFileAccessFromFileURLs
+      allowUniversalAccessFromFileURLs
       javaScriptEnabled={true}
       injectedJavaScript={injected}
       onMessage={onMessage}

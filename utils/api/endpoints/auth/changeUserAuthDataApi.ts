@@ -13,8 +13,8 @@ export async function changeUserAuthDataApi(data: Partial<User>) {
       user: User;
     };
   } catch (err: any) {
-    console.log("Update user error", err);
-    console.log("Update user error response", err.response);
+    console.error("Update user error", err);
+    console.error("Update user error response", err.response);
     throw err;
   }
 }

@@ -2,6 +2,8 @@ import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const logStoredUserData = async () => {
+  const token = await SecureStore.getItemAsync("token");
+  console.log("token", token);
   const accessToken = await SecureStore.getItemAsync("access_token");
   console.log("accessToken", accessToken);
   const refreshToken = await SecureStore.getItemAsync("refresh_token");

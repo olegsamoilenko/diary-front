@@ -13,7 +13,7 @@ export async function deleteAccountApi(email: string, code: string) {
       status: CodeStatus;
     };
   } catch (err: any) {
-    console.log("deleteAccountApi error response", err.response);
+    console.error("deleteAccountApi error response", err.response);
     throw err;
   }
 }

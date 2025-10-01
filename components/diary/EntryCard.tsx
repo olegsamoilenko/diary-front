@@ -25,12 +25,11 @@ import ModalPortal from "@/components/ui/Modal";
 import { ExpandableSection } from "@/components/ExpandableSection";
 import RotatingIcon from "@/components/ui/RotatingIcon";
 
-import { ColorTheme, Entry, Dialog, User, TimeFormat } from "@/types";
+import { ColorTheme, Entry, Dialog, TimeFormat } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import type { RootState } from "@/store";
 import { apiRequest, hydrateEntryHtmlFromAlbum } from "@/utils";
-import * as SecureStore from "expo-secure-store";
 import WebViewHTML from "@/components/ui/WebViewHTML";
 
 type EntryCardProps = {
@@ -51,11 +50,11 @@ export default React.memo(function EntryCard({
 
   const { t } = useTranslation();
   const settings = useSelector((state: RootState) => state.settings.value);
+  const user = useSelector((state: RootState) => state.user.value);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [visibleDeleteModal, setVisibleDeleteModal] = useState(false);
   const [showAiComment, setShowAiComment] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
   const [readyCount, setReadyCount] = useState(0);
 
   const REQUIRED = isExpanded ? 2 : 1;
@@ -73,7 +72,8 @@ export default React.memo(function EntryCard({
     }
   }, [allReady]);
 
-  const onWVReady = useCallback(() => {
+  const onWVReady = useCallback((h: number) => {
+    if (!isExpanded) setCollapsedH(h);
     setReadyCount((c) => c + 1);
   }, []);
 
@@ -86,14 +86,6 @@ export default React.memo(function EntryCard({
       setActiveMoods((prev) => prev.filter((mood) => mood.id !== entry.id));
     }
   }, [isExpanded]);
-
-  useEffect(() => {
-    (async () => {
-      const rawUser = await SecureStore.getItemAsync("user");
-      const user = rawUser ? JSON.parse(rawUser) : null;
-      setUser(user);
-    })();
-  }, [entry.content, entry.id]);
 
   const [details, setDetails] = useState<{
     content?: string | null;
@@ -175,6 +167,31 @@ export default React.memo(function EntryCard({
     setVisibleDeleteModal(false);
     deleteEntry(entry);
   };
+
+  const [previewHtml, setPreviewHtml] = useState<string>("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      if (!entry.previewContent) {
+        if (!cancelled) setPreviewHtml("");
+        return;
+      }
+      const html = await hydrateEntryHtmlFromAlbum(
+        entry.previewContent,
+        Number(user?.id ?? 0),
+        Number(entry.id),
+      );
+      if (!cancelled) setPreviewHtml(html);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [entry.id, entry.previewContent]);
+
+  const [collapsedH, setCollapsedH] = useState(0);
 
   return (
     <Animated.View
@@ -261,7 +278,7 @@ export default React.memo(function EntryCard({
 
           <ExpandableSection
             expanded={isExpanded}
-            collapsedHeight={100}
+            collapsedHeight={collapsedH}
             style={styles.expandedSectionContainer}
           >
             <Pressable
@@ -272,10 +289,13 @@ export default React.memo(function EntryCard({
               <WebViewHTML
                 content={
                   isExpanded
-                    ? (details.content ?? entry.previewContent ?? "")
-                    : (entry.previewContent ?? "")
+                    ? (details.content ?? previewHtml ?? "")
+                    : entry.previewContent
+                      ? previewHtml
+                      : ""
                 }
                 onReady={onWVReady}
+                maxLines={isExpanded ? undefined : 4}
               />
 
               <View style={styles.contentIcon}>
@@ -306,13 +326,16 @@ export default React.memo(function EntryCard({
               <View style={styles.aiCommentContent}>
                 <View
                   style={{
-                    paddingLeft: 5,
-                    paddingTop: 10,
+                    position: "absolute",
+                    top: 10,
+                    left: 10,
                   }}
                 >
-                  <NemoryIcon />
+                  <NemoryIcon width={20} height={20} />
                 </View>
-                <ThemedText style={{ padding: 5 }}>
+                <ThemedText style={{ padding: 10 }}>
+                  {"\u2003"}
+                  {"\u2009"}
                   {details.aiComment.content}
                 </ThemedText>
               </View>
@@ -335,10 +358,12 @@ export default React.memo(function EntryCard({
                     </ThemedText>
                   </View>
                   <View style={styles.answer}>
-                    <View style={{ paddingTop: 10 }}>
-                      <NemoryIcon />
+                    <View style={{ position: "absolute", top: 10, left: 10 }}>
+                      <NemoryIcon width={20} height={20} />
                     </View>
-                    <ThemedText style={{ marginTop: 6 }}>
+                    <ThemedText style={{ padding: 10 }}>
+                      {"\u2003"}
+                      {"\u2009"}
                       {dialog.answer}
                     </ThemedText>
                   </View>
@@ -366,7 +391,7 @@ const getStyles = (colors: ColorTheme) =>
       alignItems: "flex-start",
       justifyContent: "space-between",
       backgroundColor: "transparent",
-      marginBottom: 0,
+      marginBottom: 8,
       marginTop: 5,
     },
     moodContainer: {
@@ -453,8 +478,8 @@ const getStyles = (colors: ColorTheme) =>
     answer: {
       backgroundColor: colors.answerBackground,
       borderRadius: 10,
-      paddingHorizontal: 10,
-      paddingBottom: 10,
+      paddingHorizontal: 5,
+      paddingBottom: 5,
       width: "80%",
     },
     showDialogButton: {

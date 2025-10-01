@@ -63,5 +63,11 @@ export default function StreamingText({
     };
   }, [speed]);
 
-  return <ThemedText style={style}>{displayedText}</ThemedText>;
+  return (
+    <ThemedText style={style}>
+      {"\u2003"}
+      {"\u2009"}
+      {displayedText}
+    </ThemedText>
+  );
 }

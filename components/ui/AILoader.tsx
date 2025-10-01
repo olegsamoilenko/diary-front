@@ -13,14 +13,14 @@ type AILoaderProps = {
 };
 
 export const AILoader = ({
-  width = 25,
-  height = 30,
-  dotFontSize = 16,
+  width = 20,
+  height = 20,
+  dotFontSize = 10,
 }: AILoaderProps) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const [step, setStep] = useState(0);
-  const interval = useRef<NodeJS.Timeout | null>(null);
+  const interval = useRef<number | null>(null);
 
   useEffect(() => {
     interval.current = setInterval(() => {

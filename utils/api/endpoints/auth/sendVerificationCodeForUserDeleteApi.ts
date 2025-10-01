@@ -18,7 +18,7 @@ export async function sendVerificationCodeForUserDeleteApi(
       message?: string;
     };
   } catch (err: any) {
-    console.log(
+    console.error(
       "sendVerificationCodeForUserDeleteApi error response",
       err.response,
     );

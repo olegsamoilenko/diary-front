@@ -1,14 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { ThemedText } from "@/components/ThemedText";
-import type { ColorTheme, Rejected, User } from "@/types";
+import type { ColorTheme, Rejected } from "@/types";
 import { ErrorMessages } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
@@ -22,6 +21,7 @@ import { RootState, useAppDispatch } from "@/store";
 import { loginUser } from "@/store/thunks/auth/loginUser";
 import ThemedTextInput from "@/components/ui/ThemedTextInput";
 import { useUIStyles } from "@/hooks/useUIStyles";
+import { UserEvents } from "@/utils/events/userEvents";
 
 type LoginFormProps = {
   forPlanSelect?: boolean;
@@ -81,9 +81,10 @@ export default function LoginForm({
         text2: t("toast.youHaveSuccessfullyLoggedIn"),
       });
       onSuccessSignIn();
+      UserEvents.emit("userLoggedIn");
     } catch (err: any) {
       const payload = err as Rejected;
-      console.log("handle registerUser error", payload);
+      console.error("handle registerUser error", payload);
       const errorKey =
         ErrorMessages[payload.code as keyof typeof ErrorMessages];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));

@@ -46,6 +46,7 @@ export type ColorTheme = {
   // rich
   toolbarBackground: string;
   toolbarIcon: string;
+  activeToolbarTabBackground: string;
   // Modal
   modalBackground: string;
 };

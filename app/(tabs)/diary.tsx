@@ -20,7 +20,7 @@ import AddButton from "@/components/ui/AddButton";
 import { SideSheetRef } from "@/components/SideSheet";
 import AddNewEntry from "@/components/diary/add-new-entry/AddNewEntry";
 import { apiRequest, deleteEntryImages } from "@/utils";
-import { Entry, MoodByDate, type User } from "@/types";
+import { Entry, MoodByDate } from "@/types";
 import WeekView from "@/components/diary/calendar/WeekView";
 import MonthView from "@/components/diary/calendar/MonthView";
 import Animated from "react-native-reanimated";
@@ -138,7 +138,7 @@ export default function Diary() {
         data: { month, year, offsetMinutes },
       });
       if (response?.status !== 200 && response?.status !== 201) {
-        console.log("No data returned from server");
+        console.error("No data returned from server");
         Toast.show({
           type: "error",
           text1: t(`error.noDataReturnedFromServer`),
@@ -163,13 +163,13 @@ export default function Diary() {
   const updateDiary = useCallback(() => {
     fetchMoodsByDate();
     fetchDiaryEntriesFor(selectedDay);
-  }, []);
+  }, [fetchMoodsByDate, fetchDiaryEntriesFor, selectedDay]);
 
   useEffect(() => {
     const handler = () => updateDiary();
     UserEvents.on("userLoggedIn", handler);
-    return () => UserEvents.off("userLoggedIn", handler);
-  }, []);
+    return () => void UserEvents.off("userLoggedIn", handler);
+  }, [updateDiary]);
 
   const handleBack = useCallback(
     async (back: boolean) => {
@@ -206,7 +206,7 @@ export default function Diary() {
           method: "DELETE",
         });
         if (response?.status !== 200 && response?.status !== 201) {
-          console.log("No data returned from server");
+          console.error("No data returned from server");
           Toast.show({
             type: "error",
             text1: t(`error.noDataReturnedFromServer`),

@@ -25,6 +25,8 @@ import {
   callRefresh,
 } from "./refreshManager";
 import { buildUserAgent } from "../auth/buildUserAgent";
+import { isExpiredOrNearExpiry } from "@/utils/jwt/jwt";
+import { getValidAccessToken } from "@/utils/auth/getValidAccessToken";
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL;
 
@@ -37,7 +39,13 @@ apiClient.interceptors.request.use(
     const headers = ensureAxiosHeaders(config);
 
     const access = await loadAccessToken();
-    if (access) setAuthHeader(config, access);
+    if (access && isExpiredOrNearExpiry(access, 30)) {
+      try {
+        await getValidAccessToken();
+      } catch {}
+    }
+    const fresh = await loadAccessToken();
+    if (fresh) setAuthHeader(config, fresh);
     ensureJsonContentType(config);
 
     headers.set("X-Client-UA", buildUserAgent());

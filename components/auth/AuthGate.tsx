@@ -123,7 +123,7 @@ export default function AuthGate({
         });
         setStep(!savedPin ? "setup" : biometryEnabled ? "biometry" : "pin");
       } catch (err: any) {
-        console.log("Set Name error response", err);
+        console.error("Set Name error response", err);
       } finally {
         setNameLoading(false);
         setSubmitting(false);
@@ -141,7 +141,6 @@ export default function AuthGate({
         resetForm,
       }: { setSubmitting: (b: boolean) => void; resetForm: () => void },
     ) => {
-      console.log("qqq");
       setPinLoading(true);
       try {
         await savePin(values.pin);

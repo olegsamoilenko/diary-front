@@ -28,11 +28,6 @@ export default function ThemedTextInput({
   const scheme = useColorScheme();
   const colors = Colors[scheme];
   const ui = useUIStyles();
-
-  useEffect(() => {
-    console.log("touched", touched);
-    console.log("errors", errors);
-  }, [errors, touched]);
   return (
     <View style={containerStyle}>
       <TextInput

@@ -33,6 +33,7 @@ export const loggerMiddleware: Middleware = (api) => (next) => (action) => {
     plan: prev.plan !== nextState.plan,
   };
 
+  // @ts-ignore
   console.groupCollapsed(`[REDUX] ${action.type}`);
   console.log("changed refs:", changed);
   console.log("prev:", prevSnap);

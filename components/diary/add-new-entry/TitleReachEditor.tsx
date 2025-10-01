@@ -64,7 +64,7 @@ export default function TitleReachEditor({
   titleEmoji,
   counterTitleEmojiRef,
 }: TitleReachEditorProps) {
-  const richTitle = useRef(null);
+  const richTitle = useRef<RichEditor>(null);
   const [editorHeight, setEditorHeight] = useState(40);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
@@ -80,13 +80,10 @@ export default function TitleReachEditor({
 
   useEffect(() => {
     if (isKeyboardOpen) {
-      // @ts-ignore
       richTitle.current?.commandDOM(
         'document.getElementsByClassName("content")[0].focus()',
       );
-      // @ts-ignore
       richTitle.current?.commandDOM("document.execCommand('bold', false, '')");
-      // @ts-ignore
       richTitle.current?.commandDOM(`
     (function() {
       var result = document.queryCommandState('bold');
@@ -98,11 +95,9 @@ export default function TitleReachEditor({
 
   useEffect(() => {
     if (isKeyboardOpen) {
-      // @ts-ignore
       richTitle.current?.commandDOM(
         "document.execCommand('italic', false, '')",
       );
-      // @ts-ignore
       richTitle.current?.commandDOM(`
     (function() {
       var result = document.queryCommandState('italic');
@@ -113,12 +108,10 @@ export default function TitleReachEditor({
   }, [isItalicAction]);
 
   useEffect(() => {
-    // @ts-ignore
     richTitle.current?.setForeColor(colorAction);
   }, [colorAction]);
 
   useEffect(() => {
-    // @ts-ignore
     richTitle.current?.commandDOM(
       `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
       var fontElements = document.getElementsByTagName("font");
@@ -133,13 +126,11 @@ export default function TitleReachEditor({
 
   useEffect(() => {
     if (titleEmoji) {
-      // @ts-ignore
       richTitle.current?.insertText(titleEmoji);
     }
   }, [titleEmoji, counterTitleEmojiRef.current]);
 
   useEffect(() => {
-    // @ts-ignore
     richTitle.current?.commandDOM(`
     document.execCommand("fontName", false, "${selectedFont.name}");
   `);
@@ -147,18 +138,15 @@ export default function TitleReachEditor({
 
   const onFocus = () => {
     handleFocus();
-    // @ts-ignore
     richTitle.current?.commandDOM(`
         document.execCommand("fontName", false, "${selectedFont.name}");
       `);
 
     setTimeout(() => {
       if (richTitle.current) {
-        // @ts-ignore
         richTitle.current.commandDOM(
           `document.execCommand('foreColor', false, '${colorAction}')`,
         );
-        // @ts-ignore
         richTitle.current?.commandDOM(
           `document.execCommand('fontSize', false, '${sizeMap[sizeAction]}');
       var fontElements = document.getElementsByTagName("font");
@@ -197,6 +185,7 @@ export default function TitleReachEditor({
       onBlur={handleBlur}
       onHeightChange={(h) => setEditorHeight(Math.max(h, 40))}
       placeholder={t("diary.addEntryTitle")}
+      autoCapitalize="sentences"
       editorStyle={{
         backgroundColor: "transparent",
         placeholderColor: colors.inputPlaceholder,

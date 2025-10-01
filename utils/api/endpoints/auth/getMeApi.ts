@@ -15,7 +15,7 @@ export async function getMeApi(hash: string) {
       settings?: UserSettings;
     };
   } catch (err: any) {
-    console.log("Get me error response", err.response);
+    console.error("Get me error response", err.response);
     throw err;
   }
 }

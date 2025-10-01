@@ -1,4 +1,3 @@
-// utils/media/html.ts
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
 import { ALBUM_NAME } from "./media";
@@ -109,7 +108,11 @@ export async function hydrateEntryHtmlFromAlbum(
       if (info.localUri && info.localUri.startsWith("file://")) {
         localUri = info.localUri;
       } else if (asset.uri) {
-        const target = FileSystem.cacheDirectory + filename;
+        const name =
+          info.filename ??
+          asset.filename ??
+          `${buildAlbumBasename(userId, entryId, imageId)}.jpg`;
+        const target = `${FileSystem.cacheDirectory}${name}`;
         try {
           await FileSystem.copyAsync({
             from: info.localUri ?? asset.uri,

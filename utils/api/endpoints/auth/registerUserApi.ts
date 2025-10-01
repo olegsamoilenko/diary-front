@@ -21,7 +21,7 @@ export async function registerUserApi(
       user: User;
     };
   } catch (err: any) {
-    console.log("Register user error response", err.response);
+    console.error("Register user error response", err.response);
     throw err;
   }
 }

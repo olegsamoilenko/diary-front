@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import {
   View,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
@@ -14,15 +13,16 @@ import { ThemedText } from "@/components/ThemedText";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { CodeStatus, ColorTheme, ErrorMessages } from "@/types";
-import type { Rejected, User } from "@/types";
+import type { Rejected } from "@/types";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
-import { logStoredUserData, passwordRules } from "@/utils/";
+import { passwordRules } from "@/utils/";
 import Toast from "react-native-toast-message";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/store";
 import { registerUser } from "@/store/thunks/auth/registerUser";
 import ThemedTextInput from "@/components/ui/ThemedTextInput";
 import { useUIStyles } from "@/hooks/useUIStyles";
+import { UserEvents } from "@/utils/events/userEvents";
 
 interface RegisterFormProps {
   forPlanSelect: boolean;
@@ -87,6 +87,7 @@ export default function RegisterForm({
         text1: t("toast.successfullyRegistered"),
         text2: t("toast.youHaveSuccessfullyRegistered"),
       });
+      UserEvents.emit("userLoggedIn");
     } catch (err: any) {
       const payload = err as Rejected;
       if (payload.code === CodeStatus.COOLDOWN) {
@@ -101,7 +102,7 @@ export default function RegisterForm({
           });
         }, 1000);
       } else {
-        console.log("handle registerUser error", payload);
+        console.error("handle registerUser error", payload);
         const errorKey =
           ErrorMessages[payload.code as keyof typeof ErrorMessages];
         setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));

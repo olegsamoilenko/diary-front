@@ -65,7 +65,7 @@ export default function AuthScreen() {
         </View>
 
         {/* Forms */}
-        {activeTab === "login" ? <LoginForm /> : <RegisterForm />}
+        {/*{activeTab === "login" ? <LoginForm /> : <RegisterForm />}*/}
       </ScrollView>
     </KeyboardAvoidingView>
   );

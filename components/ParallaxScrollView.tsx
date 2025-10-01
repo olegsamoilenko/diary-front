@@ -1,8 +1,6 @@
 import type { PropsWithChildren, ReactElement } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { useAnimatedRef } from "react-native-reanimated";
-
-import { ThemedView } from "@/components/ThemedView";
 import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
 
 const HEADER_HEIGHT = 250;

@@ -5,9 +5,11 @@ import { LogoTheme } from "@/types";
 export default function NemoryIcon({
   width = 40,
   height = 50,
+  style,
 }: {
   width?: number;
   height?: number;
+  style?: any;
 }) {
   const colorScheme = useColorScheme();
   const logos: LogoTheme = {
@@ -17,6 +19,9 @@ export default function NemoryIcon({
     vintagePaper: require("@/assets/images/logo/vintagePaper.png"),
     zenMind: require("@/assets/images/logo/zenMind.png"),
     mindset: require("@/assets/images/logo/mindset.png"),
+    leafScape: require("@/assets/images/logo/leafScape.png"),
+    pastelCollage: require("@/assets/images/logo/pastelCollage.png"),
+    paperRose: require("@/assets/images/logo/paperRose.png"),
     fallLight: require("@/assets/images/logo/fallLight.png"),
     balance: require("@/assets/images/logo/balance.png"),
     whiteLotus: require("@/assets/images/logo/whiteLotus.png"),
@@ -40,7 +45,7 @@ export default function NemoryIcon({
   return (
     <Image
       source={logos[colorScheme]}
-      style={{ width: width, height: height }}
+      style={[style, { width: width, height: height }]}
       resizeMode="contain"
     />
   );

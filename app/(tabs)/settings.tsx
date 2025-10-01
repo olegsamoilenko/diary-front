@@ -1,22 +1,13 @@
-import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { useTranslation } from "react-i18next";
-import { useThemeCustom } from "@/context/ThemeContext";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useRef } from "react";
-import {
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  StatusBar,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SideSheetRef } from "@/components/SideSheet";
 import ThemeSwitcher from "@/components/settings/personal/ThemeSwitcher";
 import LanguageSwitcher from "@/components/settings/personal/LanguageSwitcher";
-import { useAppSelector } from "@/store/hooks";
 import ModelSwitcher from "@/components/settings/ai/ModelSwitcher";
 import PersonalSettingsBlock from "@/components/settings/personal/PersonalSettingsBlock";
 import TimeFormatSwitcher from "@/components/settings/personal/TimeFormatSwitcher";
@@ -40,7 +31,6 @@ export default function Settings() {
   const languageSwitcherRef = useRef<SideSheetRef>(null);
   const fontSwitcherRef = useRef<SideSheetRef>(null);
   const plansRef = useRef<SideSheetRef>(null);
-  const securityRef = useRef<SideSheetRef>(null);
   const biometryRef = useRef<SideSheetRef>(null);
   const profileRef = useRef<SideSheetRef>(null);
   const supportRef = useRef<SideSheetRef>(null);

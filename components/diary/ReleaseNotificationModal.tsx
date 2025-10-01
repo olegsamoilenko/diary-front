@@ -54,7 +54,7 @@ export default function ReleaseNotificationModal() {
       });
 
       if (res.status !== 200 && res.status !== 201) {
-        console.log("No data returned from server");
+        console.error("No data returned from server");
         return;
       }
 

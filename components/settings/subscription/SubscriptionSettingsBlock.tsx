@@ -1,14 +1,13 @@
 import { TouchableOpacity, View } from "react-native";
-import React, { useState, RefObject, useEffect } from "react";
+import React, { RefObject } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SideSheetRef } from "@/components/SideSheet";
 import { useTranslation } from "react-i18next";
-import type { Plan } from "@/types";
-import { PlanEvents } from "@/utils/events/planEvents";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export default function SubscriptionSettingsBlock({
   plansRef,
@@ -18,22 +17,7 @@ export default function SubscriptionSettingsBlock({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
-  const [plan, setPlan] = useState<Plan | null>(null);
-
-  const getPlan = async () => {
-    const storedPlan = await AsyncStorage.getItem("plan");
-    setPlan(storedPlan ? JSON.parse(storedPlan) : null);
-  };
-
-  useEffect(() => {
-    getPlan();
-  }, []);
-
-  useEffect(() => {
-    const handler = () => getPlan();
-    PlanEvents.on("planChanged", handler);
-    return () => PlanEvents.off("planChanged", handler);
-  }, []);
+  const plan = useSelector((s: RootState) => s.plan.value);
 
   return (
     <View

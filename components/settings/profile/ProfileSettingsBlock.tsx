@@ -1,14 +1,13 @@
 import { TouchableOpacity, View } from "react-native";
-import React, { useState, RefObject, useEffect } from "react";
+import React, { RefObject } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Colors } from "@/constants/Colors";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SideSheetRef } from "@/components/SideSheet";
 import { useTranslation } from "react-i18next";
-import type { User } from "@/types";
-import * as SecureStore from "expo-secure-store";
-import { UserEvents } from "@/utils/events/userEvents";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export default function ProfileSettingsBlock({
   profileRef,
@@ -18,22 +17,7 @@ export default function ProfileSettingsBlock({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme];
   const { t } = useTranslation();
-  const [user, setUser] = useState<User | null>(null);
-
-  const getUser = async () => {
-    const storedUser = await SecureStore.getItemAsync("user");
-    setUser(storedUser ? JSON.parse(storedUser) : null);
-  };
-
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  // useEffect(() => {
-  //   const handler = () => getUser();
-  //   UserEvents.on("userChanged", handler);
-  //   return () => UserEvents.off("userChanged", handler);
-  // }, []);
+  const user = useSelector((s: RootState) => s.user.value);
 
   return (
     <View

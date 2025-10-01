@@ -50,7 +50,7 @@ export default function TabLayout() {
             return (
               <Text
                 style={{
-                  fontFamily: getFont(settings.font, "regular"),
+                  fontFamily: getFont(settings!.font, "regular"),
                   color,
                   fontSize: 13,
                 }}
@@ -100,7 +100,7 @@ export default function TabLayout() {
             return (
               <Text
                 style={{
-                  fontFamily: getFont(settings.font, "regular"),
+                  fontFamily: getFont(settings!.font, "regular"),
                   color,
                   fontSize: 13,
                 }}

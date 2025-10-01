@@ -70,8 +70,8 @@ export default function ChangeNameModal({
       resetForm();
       onSuccessChangeName();
     } catch (err: any) {
-      console.log("change name error", err);
-      console.log("change name error response", err?.response);
+      console.error("change name error", err);
+      console.error("change name error response", err?.response);
       const code = err?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));

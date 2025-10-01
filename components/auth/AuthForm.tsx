@@ -78,7 +78,9 @@ export default function AuthForm({
       setShowEmailVerificationCodeForm(false);
       setActiveTab("register");
     } else {
-      handleBack();
+      if (handleBack) {
+        handleBack();
+      }
     }
   };
 

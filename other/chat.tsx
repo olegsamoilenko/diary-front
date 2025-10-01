@@ -7,13 +7,13 @@ import {
   KeyboardAvoidingView,
   View,
   ScrollView,
+  KeyboardEvent,
 } from "react-native";
 
 import { Collapsible } from "@/components/Collapsible";
 import { ExternalLink } from "@/components/ExternalLink";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -33,7 +33,7 @@ export default function Chat() {
   const richText = useRef(null);
 
   useEffect(() => {
-    const onShow = (e) => {
+    const onShow = (e: KeyboardEvent) => {
       setKeyboardHeight(e.endCoordinates.height);
     };
     const onHide = () => {

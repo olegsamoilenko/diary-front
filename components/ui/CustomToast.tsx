@@ -48,6 +48,7 @@ export default function CustomToast() {
       <ErrorToast
         {...props}
         style={{
+          backgroundColor: colors.backgroundAdditional,
           padding: 10,
           borderLeftColor: "red",
           height: "auto",
@@ -72,6 +73,7 @@ export default function CustomToast() {
       <InfoToast
         {...props}
         style={{
+          backgroundColor: colors.backgroundAdditional,
           padding: 10,
           borderLeftColor: "yellow",
           height: "auto",

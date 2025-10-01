@@ -63,11 +63,6 @@ export default function Plans({
   const plan = useSelector((s: RootState) => s.plan.value);
 
   useEffect(() => {
-    console.log("colorScheme", colorScheme);
-    console.log("colors", colors);
-  }, []);
-
-  useEffect(() => {
     (async () => {
       await getPlanType();
       await getPlan();
@@ -139,8 +134,6 @@ export default function Plans({
   const subscription: IapProduct = subscriptions.find(
     (s) => s.id === Subscriptions.NEMORY,
   ) as IapProduct;
-
-  console.log("subscription", subscription);
 
   const baseSubPlans = subscription?.subscriptionOfferDetailsAndroid?.map(
     (plan) => {

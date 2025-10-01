@@ -19,7 +19,10 @@ export async function resendEmailVerificationCodeApi(
       message?: string;
     };
   } catch (err: any) {
-    console.log("resendEmailVerificationCodeApi error response", err.response);
+    console.error(
+      "resendEmailVerificationCodeApi error response",
+      err.response,
+    );
     throw err;
   }
 }

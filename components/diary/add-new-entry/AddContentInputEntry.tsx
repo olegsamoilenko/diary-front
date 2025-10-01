@@ -186,7 +186,6 @@ export default function AddContentInputEntry({
         content={content}
         setContent={setContent}
         isKeyboardOpen={isKeyboardOpen}
-        keyboardHeight={keyboardHeight}
         isBoldAction={isBoldAction}
         isItalicAction={isItalicAction}
         isUnderlineAction={isUnderlineAction}

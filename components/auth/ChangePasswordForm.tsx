@@ -91,7 +91,7 @@ export default function ChangePasswordForm({
         text2: t("toast.youHaveSuccessfullyChangedYourPassword"),
       });
     } catch (err: any) {
-      console.log("Change password error response", err?.response);
+      console.error("Change password error response", err?.response);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));
@@ -128,8 +128,8 @@ export default function ChangePasswordForm({
         text2: t("toast.weHaveSuccessfullySentTheCodeToYourEmail"),
       });
     } catch (err: any) {
-      console.log("reset password error", err);
-      console.log("reset password error response", err?.response);
+      console.error("reset password error", err);
+      console.error("reset password error response", err?.response);
       const code = err?.response?.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(errorKey ? t(`errors.${errorKey}`) : t("errors.undefined"));

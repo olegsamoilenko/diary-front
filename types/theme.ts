@@ -17,6 +17,9 @@ export type LogoTheme = {
   zenMind?: any;
   fallLight?: any;
   mindset?: any;
+  leafScape?: any;
+  pastelCollage?: any;
+  paperRose?: any;
   seaWhisper?: any;
   whiteLotus?: any;
   balance?: any;

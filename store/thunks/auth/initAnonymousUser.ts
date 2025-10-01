@@ -23,7 +23,7 @@ export const initAnonymousUser = createAsyncThunk(
       dispatch(setUser(data.user));
       if (data.plan) dispatch(setPlan(data.plan));
       if (data.settings) dispatch(setSettings(data.settings));
-      await logStoredUserData();
+
       return data.user;
     } catch (err: any) {
       const code = err?.response?.data?.code as string | undefined;

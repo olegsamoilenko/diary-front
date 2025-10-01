@@ -32,7 +32,6 @@ import {
   apiRequest,
   getFont,
   getTodayDateStr,
-  getToken,
   aiStreamEmitter,
   addToAiChunkBuffer,
   resetAiChunkBuffer,
@@ -56,7 +55,6 @@ import SettingsEntry from "@/components/diary/add-new-entry/settings-entry/Setti
 import { FONTS } from "@/assets/fonts/entry";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "@/store";
-import * as SecureStore from "expo-secure-store";
 import { Dialog } from "@/types/dialog";
 import uuid from "react-native-uuid";
 import Toast from "react-native-toast-message";
@@ -160,6 +158,7 @@ const AddNewEntry = forwardRef<
   );
   const [isFocusTitleRichEditor, setIsFocusTitleRichEditor] = useState(false);
   const [dialogQuestion, setDialogQuestion] = useState("");
+  const user = useSelector((s: RootState) => s.user.value);
 
   useEffect(() => {
     setColorAction(colors.text);
@@ -318,9 +317,6 @@ const AddNewEntry = forwardRef<
     setTitleReachEditorKey((k) => k + 1);
     setContentLoading(true);
 
-    const rawUser = await SecureStore.getItemAsync("user");
-    const userId = rawUser ? JSON.parse(rawUser).id : null;
-
     try {
       const contentWithTokens = tokeniseInlineBase64(entry.content);
 
@@ -337,7 +333,7 @@ const AddNewEntry = forwardRef<
       });
 
       if (res.status !== 200 && res.status !== 201) {
-        console.log("No data returned from server");
+        console.error("No data returned from server");
         Toast.show({
           type: "error",
           text1: t(`error.noDataReturnedFromServer`),
@@ -354,10 +350,10 @@ const AddNewEntry = forwardRef<
       }));
       setIsEntrySaved(true);
 
-      if (userId) {
+      if (user && user.id) {
         try {
           const meta = await persistPrivateThenMaybeExportWithMeta(
-            userId,
+            Number(user.id),
             Number(newEntry.id),
             {
               exportToGallery: true,
@@ -440,12 +436,10 @@ const AddNewEntry = forwardRef<
             setStrimCommentError(true);
           },
         },
-        getToken: async () => await getToken(),
       });
     } catch (err: any) {
-      console.log("Error saving entry.ts:", err);
-      console.log("Error saving entry.ts response:", err?.response);
-      console.log("Error saving entry.ts response data:", err?.response?.data);
+      console.error("Error saving entry.ts:", err);
+      console.error("Error saving entry.ts response:", err?.response);
       setLoading(false);
       setContentLoading(false);
     }
@@ -543,7 +537,6 @@ const AddNewEntry = forwardRef<
             });
           },
         },
-        getToken: async () => await getToken(),
       });
     },
     [
@@ -782,7 +775,7 @@ const AddNewEntry = forwardRef<
                 style={[
                   styles.chatContainer,
                   {
-                    bottom: isKeyboardOpen ? 7 : -25,
+                    bottom: isKeyboardOpen ? 0 : -33,
                     marginTop: isKeyboardOpen ? 0 : -33,
                   },
                 ]}
@@ -858,10 +851,11 @@ const getStyles = (colors: ColorTheme) =>
       left: 0,
       right: 0,
       elevation: 10,
-      borderRadius: 20,
-      backgroundColor: colors.backgroundAdditional,
+      borderTopRightRadius: 20,
+      borderTopLeftRadius: 20,
+      backgroundColor: colors.background,
       padding: 10,
-      marginHorizontal: 10,
+      marginHorizontal: 0,
     },
     sendMessageButton: {
       display: "flex",

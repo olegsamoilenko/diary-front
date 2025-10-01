@@ -75,7 +75,7 @@ export default function ForgotPasswordForm({
         text2: t("toast.weHaveSuccessfullySentTheCodeToYourEmail"),
       });
     } catch (err: any) {
-      console.log("forgot password error", err.response);
+      console.error("forgot password error", err.response);
       const code = err?.response.data?.code as keyof typeof ErrorMessages;
       const errorKey = ErrorMessages[code];
       setError(
