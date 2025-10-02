@@ -160,59 +160,59 @@ export default function Plans({
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.plansContainer}>
-            {planType === PlanTypes.OPEN_TESTING ||
+            {(planType === PlanTypes.OPEN_TESTING ||
               planType === PlanTypes.CLOSED_TESTING ||
-              (planType === PlanTypes.INTERNAL_TESTING && (
-                <TouchableOpacity
-                  onPress={() => onSelectTrial(BasePlanIds.TESTING)}
-                  disabled={plan?.basePlanId === BasePlanIds.TESTING}
+              planType === PlanTypes.INTERNAL_TESTING) && (
+              <TouchableOpacity
+                onPress={() => onSelectTrial(BasePlanIds.TESTING)}
+                disabled={plan?.basePlanId === BasePlanIds.TESTING}
+              >
+                <View
+                  style={[
+                    styles.card,
+                    {
+                      borderColor:
+                        plan && plan.basePlanId === BasePlanIds.TESTING
+                          ? colors.primary
+                          : "transparent",
+                    },
+                  ]}
                 >
-                  <View
-                    style={[
-                      styles.card,
-                      {
-                        borderColor:
-                          plan && plan.basePlanId === BasePlanIds.TESTING
-                            ? colors.primary
-                            : "transparent",
-                      },
-                    ]}
-                  >
-                    <View style={styles.cardInner}>
-                      <ThemedText type="subtitleLG">
-                        {t("planModal.forTesting")}
-                      </ThemedText>
-                      {plan && plan.basePlanId === BasePlanIds.TESTING && (
-                        <View
-                          style={[
-                            styles.status,
-                            {
-                              backgroundColor: getStatusColor(plan.planStatus!),
-                            },
-                          ]}
-                        >
-                          <ThemedText
-                            style={{
-                              color: colors.textInPrimary,
-                            }}
-                          >
-                            {plan.planStatus}
-                          </ThemedText>
-                        </View>
-                      )}
-                    </View>
-                    <ThemedText style={styles.desc}>
+                  <View style={styles.cardInner}>
+                    <ThemedText type="subtitleLG">
                       {t("planModal.forTesting")}
                     </ThemedText>
-                    <ThemedText type="subtitleLG" style={styles.price}>
-                      {t("planModal.freeForTesting")}
-                    </ThemedText>
-                    <ThemedText style={styles.tokens}>
-                      800 000 {t("planModal.tokens")}
-                    </ThemedText>
+                    {plan && plan.basePlanId === BasePlanIds.TESTING && (
+                      <View
+                        style={[
+                          styles.status,
+                          {
+                            backgroundColor: getStatusColor(plan.planStatus!),
+                          },
+                        ]}
+                      >
+                        <ThemedText
+                          style={{
+                            color: colors.textInPrimary,
+                          }}
+                        >
+                          {plan.planStatus}
+                        </ThemedText>
+                      </View>
+                    )}
                   </View>
-                </TouchableOpacity>
-              ))}
+                  <ThemedText style={styles.desc}>
+                    {t("planModal.forTesting")}
+                  </ThemedText>
+                  <ThemedText type="subtitleLG" style={styles.price}>
+                    {t("planModal.freeForTesting")}
+                  </ThemedText>
+                  <ThemedText style={styles.tokens}>
+                    800 000 {t("planModal.tokens")}
+                  </ThemedText>
+                </View>
+              </TouchableOpacity>
+            )}
             {((!plan && planType === PlanTypes.PRODUCTION) ||
               (plan &&
                 planType === PlanTypes.PRODUCTION &&
