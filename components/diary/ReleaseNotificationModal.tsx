@@ -68,10 +68,6 @@ export default function ReleaseNotificationModal() {
         "Error fetching release notifications response:",
         err.response,
       );
-      console.error(
-        "Error fetching release notifications response data:",
-        err.response.data,
-      );
     }
   };
 
@@ -163,7 +159,7 @@ export default function ReleaseNotificationModal() {
           display: "flex",
           flexDirection: "column",
           gap: 10,
-          width: "95%",
+          width: "100%",
         }}
       >
         <TouchableOpacity style={styles.btn} onPress={() => openStore()}>

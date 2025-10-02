@@ -117,7 +117,7 @@ const getStyles = (colors: ColorTheme) =>
       backgroundColor: colors.modalBackground,
       borderRadius: 20,
       padding: 25,
-      alignItems: "center",
+      // alignItems: "center",
       shadowColor: "#000",
       shadowOffset: {
         width: 0,
