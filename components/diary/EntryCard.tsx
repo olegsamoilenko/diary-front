@@ -214,7 +214,8 @@ export default React.memo(function EntryCard({
             <View
               style={{
                 flex: 1,
-                marginBottom: 8,
+                marginBottom: 0,
+                justifyContent: "center",
               }}
             >
               <WebViewHTML content={entry.title} onReady={onWVReady} />

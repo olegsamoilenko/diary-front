@@ -69,6 +69,13 @@ export default function WebViewHTML({
   u         { text-decoration: underline; }
   ul, ol { margin:8px 0 8px 18px; padding:0; } li { margin:6px 0; }
   
+  #outer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+  
   ${
     typeof maxLines === "number"
       ? `
@@ -84,7 +91,9 @@ export default function WebViewHTML({
 </style>
 </head>
 <body>
-  <div id="wrap">${content}</div>
+  <div id="outer">
+    <div id="wrap">${content}</div>
+  </div>
 </body>
 </html>`,
     [content, FONTS_CSS, maxLines],
