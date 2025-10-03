@@ -44,7 +44,7 @@ export const AILoader = ({
         style={{
           marginLeft: 2,
           alignItems: "flex-end",
-          marginBottom: -7,
+          marginBottom: -4,
         }}
       >
         <Text

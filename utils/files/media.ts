@@ -5,6 +5,10 @@ import * as Crypto from "expo-crypto";
 import { Platform } from "react-native";
 import { ensureOneTimeMediaAsk, getMediaAccess } from "@/utils";
 import { EntryImage, EPlatform } from "@/types";
+import {
+  ensureMediaAccess,
+  openAppSettings,
+} from "@/utils/files/media-permissions";
 
 export const ALBUM_NAME = "Nemory";
 
@@ -47,6 +51,9 @@ export async function persistPrivateThenMaybeExportWithMeta(
   entryId: number,
   opts?: { exportToGallery?: boolean; preferSAFOnAndroid?: boolean },
 ): Promise<OutItem[]> {
+  if ((await ensureMediaAccess()) !== "all") {
+    await openAppSettings();
+  }
   const rawItems = __takeAllPendingForSave();
   const seen = new Set<string>();
   const items = rawItems.filter((it) => {
@@ -232,6 +239,10 @@ export async function findAssetInAlbumByFilename(
   filename: string,
   pageSize = 200,
 ): Promise<MediaLibrary.Asset | null> {
+  if ((await ensureMediaAccess()) !== "all") {
+    await openAppSettings();
+  }
+
   const target = filename.toLowerCase();
 
   let after: string | undefined = undefined;

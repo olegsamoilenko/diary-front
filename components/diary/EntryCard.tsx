@@ -132,6 +132,7 @@ export default React.memo(function EntryCard({
           Number(user?.id ?? 0),
           Number(entry.id),
         );
+        console.log("hydrated: ", hydrated);
         setDetails((prev) => ({
           ...prev,
           content: hydrated ?? prev.content ?? null,

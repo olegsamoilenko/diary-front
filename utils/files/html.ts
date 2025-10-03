@@ -1,6 +1,10 @@
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
 import { ALBUM_NAME } from "./media";
+import {
+  ensureMediaAccess,
+  openAppSettings,
+} from "@/utils/files/media-permissions";
 
 export function replaceImgSrcById(
   html: string,
@@ -8,10 +12,10 @@ export function replaceImgSrcById(
   newSrc: string,
 ) {
   const re = new RegExp(
-    `(<img[^>]*id=["']${imageId}["'][^>]*src=["'])[^\"]*(["'][^>]*>)`,
+    `(<img[^>]*\\bid=["']${imageId}["'][^>]*\\bsrc=)(["'])[\\s\\S]*?\\2`,
     "g",
   );
-  return html.replace(re, `$1${newSrc}$2`);
+  return html.replace(re, `$1$2${newSrc}$2`);
 }
 
 export function tokeniseInlineBase64(html: string) {
@@ -48,24 +52,27 @@ export function extractImageIdsFromHtml(html: string): string[] {
 }
 
 async function listAlbumAssets() {
+  if ((await ensureMediaAccess()) !== "all") {
+    await openAppSettings();
+  }
   const album = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
   if (!album) return [] as MediaLibrary.Asset[];
 
   let out: MediaLibrary.Asset[] = [];
   let page = await MediaLibrary.getAssetsAsync({
     album,
-    mediaType: ["photo"],
+    mediaType: [MediaLibrary.MediaType.photo],
     first: 1000,
-    sortBy: MediaLibrary.SortBy.creationTime,
+    sortBy: [MediaLibrary.SortBy.creationTime],
   });
   out = out.concat(page.assets);
   while (page.hasNextPage) {
     page = await MediaLibrary.getAssetsAsync({
       album,
-      mediaType: ["photo"],
+      mediaType: [MediaLibrary.MediaType.photo],
       first: 1000,
       after: page.endCursor,
-      sortBy: MediaLibrary.SortBy.creationTime,
+      sortBy: [MediaLibrary.SortBy.creationTime],
     });
     out = out.concat(page.assets);
   }
@@ -77,17 +84,14 @@ export async function hydrateEntryHtmlFromAlbum(
   userId: number,
   entryId: number,
 ) {
+  if ((await ensureMediaAccess()) !== "all") {
+    await openAppSettings();
+  }
   const ids = extractImageIdsFromHtml(html);
-
   if (!ids.length) return html;
 
   const assets = await listAlbumAssets();
-
   if (!assets.length) return html;
-
-  const byName = new Map<string, MediaLibrary.Asset>();
-
-  for (const a of assets) byName.set(a.filename, a);
 
   let out = html;
 
@@ -95,37 +99,43 @@ export async function hydrateEntryHtmlFromAlbum(
     const base = buildAlbumBasename(userId, entryId, imageId).toLowerCase();
 
     const asset =
-      assets.find((a) => {
-        const name = (a.filename || "").toLowerCase();
-        return name.startsWith(base + ".");
-      }) || null;
+      assets.find((a) =>
+        (a.filename || "").toLowerCase().startsWith(base + "."),
+      ) || null;
 
     if (!asset) continue;
 
     let localUri: string | null = null;
+
     try {
-      const info = await MediaLibrary.getAssetInfoAsync(asset);
-      if (info.localUri && info.localUri.startsWith("file://")) {
-        localUri = info.localUri;
-      } else if (asset.uri) {
-        const name =
-          info.filename ??
-          asset.filename ??
-          `${buildAlbumBasename(userId, entryId, imageId)}.jpg`;
-        const target = `${FileSystem.cacheDirectory}${name}`;
-        try {
-          await FileSystem.copyAsync({
-            from: info.localUri ?? asset.uri,
-            to: target,
-          });
-          localUri = target;
-        } catch {
-          if (info.localUri) localUri = info.localUri;
+      if (asset.uri?.startsWith("file://")) {
+        localUri = asset.uri;
+      } else {
+        const info = await MediaLibrary.getAssetInfoAsync(asset);
+        if (info.localUri?.startsWith("file://")) {
+          localUri = info.localUri;
+        } else if (asset.uri?.startsWith("file://")) {
+          localUri = asset.uri;
+        } else {
+          const name =
+            info.filename ??
+            asset.filename ??
+            `${buildAlbumBasename(userId, entryId, imageId)}.jpg`;
+          const target = `${FileSystem.cacheDirectory}${name}`;
+          try {
+            await FileSystem.copyAsync({
+              from: info.localUri ?? asset.uri,
+              to: target,
+            });
+            localUri = target;
+          } catch {}
         }
       }
     } catch {}
 
-    if (localUri) out = replaceImgSrcById(out, imageId, localUri);
+    if (localUri) {
+      out = replaceImgSrcById(out, imageId, localUri);
+    }
   }
 
   return out;
